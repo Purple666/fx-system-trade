@@ -12,7 +12,7 @@ import qualified FxSettingData            as Fsd
 import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
 
-printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
+printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress n n' fsd tdt tdl tdlt pc lsf = do
   let lt  = truncate $ (fromIntegral $ Fsd.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
       ltt = truncate $ (fromIntegral $ Fsd.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int

@@ -52,8 +52,7 @@ backTestMainLoop start s f fsd = do
       ltt = Fsd.getLearningTestTime fsd
       lt  = Fsd.getLearningTime fsd
       n   = start + Fsd.getPrepareTimeAll fsd + lt + ltt * Gsd.learningTestCount Gsd.gsd * 2
-      lr = (0, False, td, [td], fsd)
-  (fs, fsd') <- backTestLoop n endN False lr td fsd
+  (fs, fsd') <- backTestLoop n endN td fsd
   (s', f') <- if fs
               then do printf "================================= %d - %d \n" (s + 1) f 
                       return (s + 1, f)
@@ -130,15 +129,11 @@ tradeLearningThread fsd = do
   
 backTestLoop :: Int ->
                 Int ->
-                Bool ->
-                (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData) -> 
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
-backTestLoop n endN nl plr td fsd  = do
-  (pc, lsf, tdl, tdlt, fsd1) <- if nl
-                                then return plr
-                                else learning n fsd
+backTestLoop n endN td fsd  = do
+  (pc, lsf, tdl, tdlt, fsd1) <- learning n fsd
   let ltt = Fsd.getLearningTestTime fsd1
       sc = (foldl (\acc x -> acc + Ftd.trSuccess x) 0 tdlt)
   ctl <- Fm.getChartListBack    n (Fsd.getPrepareTimeAll fsd1) 0
@@ -147,18 +142,15 @@ backTestLoop n endN nl plr td fsd  = do
       (tdt, ctdl) = Ft.backTest (ltt * 2 * Gsd.learningTestCount Gsd.gsd) sc td fsd1 ct
       n' = Fcd.date $ Ftd.chart tdt
   Fp.printTestProgress n n' fsd1 tdt tdl tdlt pc lsf
-  (fsd3, tdt') <- if not nl && Ftd.profit td < Ftd.profit tdt && pc == 0
-                  then do fsd2 <- Fm.updateFxSettingData . Fsd.updateSettingLog td tdt $ Fsd.updateLearningSetting ctdl tdt fsd1
-                          return (fsd2, Ftd.resetFxalgorithmListCount tdt)
-                  else return (Fsd.updateSettingLog td tdt fsd1, tdt)
+  fsd2 <- Fm.updateFxSettingData . Fsd.updateSettingLog td tdt $ Fsd.updateLearningSetting ctdl tdt fsd1
+  let tdt' = Ftd.resetFxalgorithmListCount tdt
   if Ftd.realizedPL tdt' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-    then return (False, fsd3)
+    then return (False, fsd2)
     else if endN <= n'
          then if Ftd.realizedPL tdt' < Gsd.initalProperty Gsd.gsd
-              then return (False, fsd3)
-              else return (True, fsd3)
-         else backTestLoop n' endN ((Ftd.profit td == Ftd.profit tdt' && Ftd.side td /= Ftd.None) ||
-                                     Ftd.profit td < Ftd.profit tdt') (pc, lsf, tdl, tdlt, fsd3) tdt' fsd3
+              then return (False, fsd2)
+              else return (True, fsd2)
+         else backTestLoop n' endN tdt' fsd2
          
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
