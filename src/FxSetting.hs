@@ -3,7 +3,7 @@ module FxSetting
   , getLearningTime
   , getLearningTestTime
   , getLearningTestTimes
-  , updateLearningSetting
+  , updateFxSettingData 
   , createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
@@ -52,8 +52,8 @@ getLearningTestTimes fsd =
   (log :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
   -- 
 
-updateLearningSetting :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateLearningSetting ctdl td tdt fsd =
+updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingData ctdl td tdt fsd =
   let lt = if (Fsd.trSuccess $ Fsd.learningSetting fsd) == 0
            then Fsd.learningTime $ Fsd.learningSetting fsd
            else truncate $ (fromIntegral . Fsd.trSuccessDate $ Fsd.learningSetting fsd) * getLearningTestTimes fsd /
