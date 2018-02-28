@@ -9,13 +9,15 @@ module FxPrint
 import Text.Printf
 import qualified FxChartData              as Fcd
 import qualified FxSettingData            as Fsd
+import qualified FxSetting                as Fs
 import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
+import qualified GlobalSettingFunction    as Gsf
 
 printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress n n' fsd tdt tdl tdlt pc lsf = do
-  let lt  = truncate $ (fromIntegral $ Fsd.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
-      ltt = truncate $ (fromIntegral $ Fsd.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
+  let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
+      ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
   printf "%s : " =<< Ftm.getLogTime
   printf "%s-%s : %3d %4d %6.2f %4s "
     (Fcd.getDate n)
@@ -45,8 +47,7 @@ printStartTrade td = do
 printTradeResult :: Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
 printTradeResult td td' units = do
   printf "%s : " =<< Ftm.getLogTime
-  printf "%6.2f %6.2f %8d %8.0f (%+8.0f) %8.0f (%+8.0f) %6d %6d %6.2f\n"
-    (Ftd.getEvaluationValue td')
+  printf "%6.2f %8d %8.0f (%+8.0f) %8.0f (%+8.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     units
     (Ftd.realizedPL td')

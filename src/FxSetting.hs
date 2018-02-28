@@ -1,20 +1,101 @@
 module FxSetting
-  ( createInitialGaData
+  ( getPrepareTimeAll
+  , getLearningTime
+  , getLearningTestTime
+  , getLearningTestTimes
+  , updateLearningSetting
+  , createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
   , crossoverFxSettingData
   , resetFxSettingData
+  , setFxSetting
   ) where  
 
 import qualified Data.Map                 as M
+import qualified FxTradeData              as Ftd
 import qualified FxSettingData            as Fsd
 import qualified GlobalSettingData        as Gsd
 import qualified FxTechnicalAnalysisData  as Fad
+import qualified FxTechnicalAnalysis      as Ta
 import qualified Tree                     as Tr
 import qualified Ga 
 import Control.Monad
 import Control.Monad.Random
 --import Debug.Trace
+
+getPrepareTimeAll :: Fsd.FxSettingData -> Int
+getPrepareTimeAll fsd = 
+  maximum [ (Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
+          , (Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
+          , (Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)
+          ]
+
+setFxSetting :: Fsd.FxSetting -> Fsd.FxSetting
+setFxSetting fts = 
+  fts { Fsd.fxTaOpen        = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaOpen fts
+      , Fsd.fxTaCloseProfit = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseProfit fts
+      , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts 
+      }
+
+  
+getLearningTime :: Fsd.FxSettingData -> Int
+getLearningTime fsd = 
+  Fsd.learningTime $ Fsd.learningSetting fsd
+
+getLearningTestTime :: Fsd.FxSettingData -> Int
+getLearningTestTime fsd = 
+  truncate $ (fromIntegral $ getLearningTime fsd) * getLearningTestTimes fsd
+
+getLearningTestTimes :: Fsd.FxSettingData -> Double
+getLearningTestTimes fsd = 
+  (log :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
+  -- 
+
+updateLearningSetting :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateLearningSetting ctdl td tdt fsd =
+  let lt = if (Fsd.trSuccess $ Fsd.learningSetting fsd) == 0
+           then Fsd.learningTime $ Fsd.learningSetting fsd
+           else truncate $ (fromIntegral . Fsd.trSuccessDate $ Fsd.learningSetting fsd) * getLearningTestTimes fsd /
+                (fromIntegral . Fsd.trSuccess $ Fsd.learningSetting fsd)
+      ex = M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+      p = Ftd.profit tdt - Ftd.profit td
+  in fsd { Fsd.learningSetting = (Fsd.learningSetting fsd)
+                                 { Fsd.trSuccess     = (Fsd.trSuccess     $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trSuccess tdt)
+                                 , Fsd.trSuccessDate = (Fsd.trSuccessDate $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trSuccessDate tdt)
+                                 , Fsd.learningTime  = lt
+                                 }
+         , Fsd.fxSetting = (Fsd.fxSetting fsd)
+                           { Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
+                                                    ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen  $ Fsd.fxSetting fsd)
+                           , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
+                                                    (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
+                           , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss   ctdl
+                                                    (Fad.listCount $ Ftd.alcCloseLoss tdt) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
+                           }
+         , Fsd.fxSettingLog = if ex
+                              then if 0 < p
+                                   then let (a, b) = Fsd.fxSettingLog fsd M.! Fsd.fxSetting fsd
+                                        in M.insert (Fsd.fxSetting fsd) (a + p, b + 1) . M.delete (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+                                   else M.filter (\x -> 0 < fst x) .
+                                        M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+                              else if 0 < p
+                                   then M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
+                                   else Fsd.fxSettingLog fsd
+         }
+
+{-
+                   , learningTestTimes = if sf && 1 < (learningTestTimes $ learningSetting fsd)
+                                         then (learningTestTimes $ learningSetting fsd) - 1
+                                         else  learningTestTimes $ learningSetting fsd
+                   , gaLength = if sf && 1 < (gaLength $ learningSetting fsd)
+                                then (gaLength $ learningSetting fsd) - 1
+                                else  gaLength $ learningSetting fsd
+                   , gaLoopMax = if sf && 1 < (gaLoopMax $ learningSetting fsd)
+                                 then (gaLoopMax $ learningSetting fsd) - 1
+                                 else  gaLoopMax $ learningSetting fsd
+                       
+-}
 
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a

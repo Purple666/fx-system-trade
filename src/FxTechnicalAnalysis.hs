@@ -1,11 +1,138 @@
 module FxTechnicalAnalysis
   ( makeFxTechnicalAnalysisDataList
+  , makeValidLeafDataMapInc
+  , makeValidLeafDataMapDec
+  , addFxalgorithmListCount
+  , getPrepareTime
+  , updateAlgorithmListCount
+  , setFxTechnicalAnalysisSetting
   ) where
 
 --import Debug.Trace
 import Data.List
+import qualified GlobalSettingData        as Gsd
 import qualified FxChartData              as Fcd
 import qualified FxTechnicalAnalysisData  as Fad
+import qualified Tree                     as Tr
+import qualified Data.Map                 as M
+
+checkAlgoSetting :: M.Map Int Fad.FxAlgorithmSetting ->
+                    Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData) ->
+                    (M.Map Int Fad.FxAlgorithmSetting,
+                     Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData))
+checkAlgoSetting as tlc =
+  let (as', pr) = foldl (\(acc, p) k -> let x = as M.! k
+                                            (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
+                                            x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p
+                                                   , Fad.algorithmTree = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
+                                                   }
+                                        in (M.adjust (\_ -> x') k acc, a)) (as, Tr.emptyLeafDataMap)
+                  . sort $ M.keys as
+  in if not . M.null $ Tr.getLeafDataMap pr
+     then let nk = (fst $ M.findMax as) + 1
+          in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
+              Tr.LeafDataMap . M.insert (Fad.initTechAnaLeafData nk) 1 $ Tr.getLeafDataMap tlc)
+     else (as', tlc)
+
+updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) -> [Fad.FxChartTaData] ->
+                            (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                             M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData)) ->
+                            Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
+updateAlgorithmListCount f ctdl (ldlt, ldla) fts =
+  let fts' = fts { Fad.techListCount = Tr.addLeafDataMap (Fad.techListCount fts) ldlt
+                 , Fad.algoSetting   = M.foldrWithKey (\k x acc -> let y = acc M.! k
+                                                                       y' = y { Fad.algorithmListCount =
+                                                                                Tr.addLeafDataMap x (Fad.algorithmListCount y) }
+                                                                   in M.union (M.singleton k y') acc) (Fad.algoSetting fts) ldla
+                 }
+      as = updateThreshold f ctdl (Fad.algoSetting fts') 
+      (as', tlc) = checkAlgoSetting as (Fad.techListCount fts')
+  in fts' { Fad.techListCount = tlc
+          , Fad.algoSetting   = as'
+          }
+
+makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
+                           M.Map Int Fad.FxTechnicalAnalysisData ->
+                           ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                            M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
+makeValidLeafDataMapInc fts ftad =
+  let l = Tr.makeValidLeafDataList fst (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
+  in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
+                                 in (n, Tr.makeValidLeafDataList fst (ftad M.! n) (Fad.algorithmTree $ (Fad.algoSetting fts) M.! n))) l)
+
+makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
+                           M.Map Int Fad.FxTechnicalAnalysisData ->
+                           ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                            M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
+makeValidLeafDataMapDec fts ftad =
+  let l = Tr.makeValidLeafDataList snd (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
+  in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
+                                 in (n, Tr.makeValidLeafDataList snd (ftad M.! n) (Fad.algorithmTree $ (Fad.algoSetting fts) M.! n))) l)
+
+addFxalgorithmListCount :: Double ->
+                           ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                            M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData]) ->
+                           (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                            M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData)) -> 
+                           (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                            M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData))
+addFxalgorithmListCount p (ptat, pat) (tat, at) =
+  (Tr.addValidLeafDataList p ptat tat,
+    M.union (M.mapWithKey (\k x -> if M.member k at
+                                   then Tr.addValidLeafDataList p x (at M.! k)
+                                   else Tr.addValidLeafDataList p x $ (M.insert k Tr.emptyLeafDataMap at) M.! k) pat) at)
+
+
+getThreshold :: Int ->
+                [Fad.FxChartTaData] ->
+                (Fad.FxTechnicalAnalysisData -> Fad.FxMovingAverageData) ->
+                (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
+                Double
+getThreshold k ctdl f1 f2 =
+  let l =  sort $ foldl (\acc x -> (Fad.short  . f1 $ f2 x M.! k):
+                                   (Fad.middle . f1 $ f2 x M.! k): 
+                                   (Fad.long   . f1 $ f2 x M.! k):acc) [] ctdl
+  in last $ take (truncate $ (fromIntegral $ length l) * (Gsd.thresholdRate Gsd.gsd)) l
+
+updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
+                   [Fad.FxChartTaData] -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
+updateThreshold f ctdl as =
+  M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
+                            { Fad.thresholdMaxSetting = ((getThreshold k ctdl Fad.st f) + (Fad.thresholdMaxSetting $ Fad.stSetting x)) / 2
+                            }
+                          , Fad.rciSetting = (Fad.rciSetting x)
+                            { Fad.thresholdMaxSetting = (100 + (getThreshold k ctdl Fad.rci f) + (Fad.thresholdMaxSetting $ Fad.rciSetting x)) / 2
+                            }
+                          , Fad.rsiSetting = (Fad.rsiSetting x)
+                            { Fad.thresholdMaxSetting = ((getThreshold k ctdl Fad.rsi f) + (Fad.thresholdMaxSetting $ Fad.rsiSetting x)) / 2
+                            }
+                          }) as
+
+getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
+getPrepareTime x =
+  maximum $ M.map (\a -> maximum [ (Fad.longSetting $ Fad.rciSetting a) + Gsd.taMargin Gsd.gsd
+                                 , (Fad.longSetting $ Fad.smaSetting a) + Gsd.taMargin Gsd.gsd
+                                 , (Fad.longSetting $ Fad.emaSetting a) + Gsd.taMargin Gsd.gsd
+                                 , (Fad.longSetting $ Fad.wmaSetting a) + Gsd.taMargin Gsd.gsd
+                                 , (Fad.longSetting $ Fad.rsiSetting a) + Gsd.taMargin Gsd.gsd
+                                 , (Fad.longSetting $ Fad.stSetting a)  + Gsd.taMargin Gsd.gsd
+                                 ] * (Fad.simChart a + Gsd.taMargin Gsd.gsd)) $ Fad.algoSetting x
+
+setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
+setFxTechnicalAnalysisSetting x =
+  let mk = maximum . M.keys $ Fad.algoSetting x
+      itad = map (\y -> Fad.initTechAnaLeafData y) [0..mk]
+  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad $ Fad.techAnaTree x
+       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad $ Fad.techListCount x
+       , Fad.algoSetting   = M.map setFxAlgorithmSetting $ Fad.algoSetting x
+       }
+
+setFxAlgorithmSetting :: Fad.FxAlgorithmSetting -> Fad.FxAlgorithmSetting
+setFxAlgorithmSetting x =
+  x { Fad.algorithmTree      = Tr.setFunctionToTree        Fad.initAlgoLeafData $ Fad.algorithmTree   x  
+    , Fad.algorithmListCount = Tr.setFunctionToLeafDataMap Fad.initAlgoLeafData $ Fad.algorithmListCount x
+    }
+
 
 rci :: Int -> [Double] -> Double
 rci n x  =

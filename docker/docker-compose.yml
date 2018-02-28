@@ -20,7 +20,7 @@ services:
       - /etc/localtime:/etc/localtime:ro 
 
   backtest:
-    build: fx-trade
+    build: fx-system-trade
     container_name: backtest 
     restart: always
     entrypoint: ./Fx backtest

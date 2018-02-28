@@ -19,6 +19,7 @@ import qualified Data.Map                 as M
 import qualified Data.Text                as T
 import qualified FxChartData              as Fcd
 import qualified FxSettingData            as Fsd
+import qualified FxSetting                as Fs
 import qualified GlobalSettingData        as Gsd
 import qualified FxTradeData              as Ftd
 
@@ -118,7 +119,7 @@ updateFxSettingData fsd = do
                            fsl' <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
                            if Fsd.trSuccess fls < Fsd.trSuccess fls'
                              then do return fsd { Fsd.learningSetting = fls'
-                                                , Fsd.fxSetting       = Fsd.setFxSetting fts'
+                                                , Fsd.fxSetting       = Fs.setFxSetting fts'
                                                 , Fsd.fxSettingLog    = fsl'
                                                 }
                              else do _ <- access pipe master "fx" $ setFxSettingToDB fls fts fsl

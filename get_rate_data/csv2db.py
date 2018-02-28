@@ -5,7 +5,7 @@ import pymongo
 import argparse
 from datetime import datetime
 
-client = pymongo.MongoClient('192.168.1.62', 27017)
+client = pymongo.MongoClient('fx.flg.jp', 27017)
 db = client.fx
 co = db.rate
 

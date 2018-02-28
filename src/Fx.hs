@@ -8,7 +8,7 @@ import System.Environment
 main :: IO ()
 main = do
   hSetBuffering stdout NoBuffering
-  (command:argList) <- getArgs
+  (command:_) <- getArgs
   case command of
     "backtest"       -> GaFx.backTest
     "trade-practice" -> GaFx.trade Ftd.Practice "trade_practice"
