@@ -142,7 +142,7 @@ backTestLoop n endN td fsd  = do
       (tdt, ctdl) = Ft.backTest (ltt * 2 * Gsd.learningTestCount Gsd.gsd) sc td fsd1 ct
       n' = Fcd.date $ Ftd.chart tdt
   Fp.printTestProgress n n' fsd1 tdt tdl tdlt pc lsf
-  fsd2 <- Fm.updateFxSettingData . Fsd.updateSettingLog td tdt $ Fsd.updateLearningSetting ctdl tdt fsd1
+  fsd2 <- Fm.updateFxSettingData $ Fsd.updateLearningSetting ctdl td tdt fsd1
   let tdt' = Ftd.resetFxalgorithmListCount tdt
   if Ftd.realizedPL tdt' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (False, fsd2)

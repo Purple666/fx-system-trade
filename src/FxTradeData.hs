@@ -127,7 +127,7 @@ getEvaluationValueList x =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  profit x * getWinRatePure x ^ (2 :: Int)
+  profit x * (log . fromIntegral $ trSuccess x) * getWinRatePure x ^ (4 :: Int)
  {-
   if profit x < 0 && realizedPL x < 0
   then - profit x * (realizedPL x / Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4

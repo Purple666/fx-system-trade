@@ -16,7 +16,6 @@ module FxSettingData
   , plusGaLength
   , plusLearningTestTimes
   , updateLearningSetting
-  , updateSettingLog
   , setFxSetting
   ) where
 
@@ -110,12 +109,14 @@ getLearningTestTimes fsd =
   (log :: (Double -> Double)) . fromIntegral .  learningTestTimes $ learningSetting fsd
   -- 
 
-updateLearningSetting :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> FxSettingData -> FxSettingData
-updateLearningSetting ctdl tdt fsd =
+updateLearningSetting :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> FxSettingData -> FxSettingData
+updateLearningSetting ctdl td tdt fsd =
   let lt = if (trSuccess $ learningSetting fsd) == 0
            then learningTime $ learningSetting fsd
            else truncate $ (fromIntegral . trSuccessDate $ learningSetting fsd) * getLearningTestTimes fsd /
                 (fromIntegral . trSuccess $ learningSetting fsd)
+      ex = M.member (fxSetting fsd) $ fxSettingLog fsd
+      p = Ftd.profit tdt - Ftd.profit td
   in fsd { learningSetting = (learningSetting fsd)
                              { trSuccess     = (trSuccess     $ learningSetting fsd) + (fromIntegral $ Ftd.trSuccess tdt)
                              , trSuccessDate = (trSuccessDate $ learningSetting fsd) + (fromIntegral $ Ftd.trSuccessDate tdt)
@@ -129,13 +130,7 @@ updateLearningSetting ctdl tdt fsd =
                        , fxTaCloseLoss    = Fad.updateAlgorithmListCount Fad.closeLoss   ctdl
                                             (Fad.listCount $ Ftd.alcCloseLoss tdt) (fxTaCloseLoss $ fxSetting fsd)
                        }
-          }
-
-updateSettingLog :: Ftd.FxTradeData -> Ftd.FxTradeData -> FxSettingData -> FxSettingData
-updateSettingLog td tdt fsd =
-  let ex = M.member (fxSetting fsd) $ fxSettingLog fsd
-      p = Ftd.profit tdt - Ftd.profit td
-  in fsd { fxSettingLog = if ex
+         , fxSettingLog = if ex
                           then if 0 < p
                                then let (a, b) = fxSettingLog fsd M.! fxSetting fsd
                                     in M.insert (fxSetting fsd) (a + p, b + 1) . M.delete (fxSetting fsd) $ fxSettingLog fsd
@@ -145,7 +140,7 @@ updateSettingLog td tdt fsd =
                                then M.insert (fxSetting fsd) (p, 1) $ fxSettingLog fsd
                                else fxSettingLog fsd
          }
-           
+
 {-
                    , learningTestTimes = if sf && 1 < (learningTestTimes $ learningSetting fsd)
                                          then (learningTestTimes $ learningSetting fsd) - 1

@@ -40,12 +40,12 @@ evaluate ctd fsd forceSell td = do
       ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       (profitb, position, open)
-        = if (Ftd.side td == Ftd.None {-||
-              (Ftd.side td == Ftd.Sell && 0 < rate - chart)-}) &&
+        = if (Ftd.side td == Ftd.None ||
+              (Ftd.side td == Ftd.Sell && 0 < rate - chart)) &&
              Fad.evaluateProfitInc fto ftado
           then (-Gsd.spread Gsd.gsd, chart, Ftd.Buy)
-          else if (Ftd.side td == Ftd.None {-||
-                   (Ftd.side td == Ftd.Buy && 0 < chart - rate)-}) &&
+          else if (Ftd.side td == Ftd.None ||
+                   (Ftd.side td == Ftd.Buy && 0 < chart - rate)) &&
                   Fad.evaluateProfitDec fto ftado
                then (-Gsd.spread Gsd.gsd, chart, Ftd.Sell)
                else (0, 0, Ftd.None)
