@@ -21,7 +21,7 @@ gsd :: GlobalSettingData
 gsd = 
   GlobalSettingData { taMargin                 = 10
                     , algorithmRepeat          = 10
-                    , learningTestCount        = 10
+                    , learningTestCount        = 3
                     , thresholdRate            = 0.05
                     , countUpListMax           = 10
                     , quantityRate             = 2
