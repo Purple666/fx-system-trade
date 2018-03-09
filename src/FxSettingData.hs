@@ -10,6 +10,8 @@ module FxSettingData
   , plusGaLoopMax
   , plusGaLength
   , plusLearningTestTimes
+  , getBacktestLoopMax
+  , plusBacktestLoopMax
   , makeSimChart
   ) where
 
@@ -23,7 +25,7 @@ data FxSettingData =
                 , learningSetting :: FxLearningSetting
                 , fxSetting       :: FxSetting
                 , fxSettingLog    :: M.Map FxSetting (Double, Int)
-                } deriving (Show, Eq, Ord)
+                } deriving (Show)
 
 data FxSetting = 
   FxSetting { fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
@@ -36,14 +38,18 @@ data FxChart =
           , chartLength    :: Int
           } deriving (Show)
 
-instance Eq FxChart where
-  _ == _ = True
+instance Eq FxSettingData where
+  a == b = fxSetting a == fxSetting b
 
-instance Ord FxChart where
-  compare _ _ = EQ
+instance Ord FxSettingData where
+  compare a b
+    | fxSetting a == fxSetting b  = EQ
+    | fxSetting a <= fxSetting b  = LT
+    | otherwise           = GT
 
 data FxLearningSetting = 
   FxLearningSetting { learningTestTimes :: Int
+                    , backtestLoopMax   :: Int
                     , gaLoopMax         :: Int
                     , gaLength          :: Int
                     , trSuccess         :: Integer
@@ -57,11 +63,12 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , learningSetting = FxLearningSetting { learningTestTimes  = 1
+                                                      , backtestLoopMax    = 1
                                                       , gaLoopMax          = 1
                                                       , gaLength           = 1
                                                       , trSuccess          = 0
                                                       , trSuccessDate      = 0
-                                                      , learningTime       = 60
+                                                      , learningTime       = 60 * 24
                                                       }
                 , fxSetting = FxSetting { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
                                         , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
@@ -81,6 +88,10 @@ getGaLoopMax :: FxSettingData -> Int
 getGaLoopMax fsd =
   gaLoopMax $ learningSetting fsd
 
+getBacktestLoopMax :: FxSettingData -> Int
+getBacktestLoopMax fsd =
+  backtestLoopMax $ learningSetting fsd
+
 getGaLength :: FxSettingData -> Int
 getGaLength fsd =
   gaLength $ learningSetting fsd
@@ -89,6 +100,13 @@ plusGaLoopMax :: FxSettingData -> FxSettingData
 plusGaLoopMax fsd =
   fsd { learningSetting = (learningSetting fsd) {
           gaLoopMax = (gaLoopMax $ learningSetting fsd) + 1
+          }
+      }
+
+plusBacktestLoopMax :: FxSettingData -> FxSettingData
+plusBacktestLoopMax fsd =
+  fsd { learningSetting = (learningSetting fsd) {
+          backtestLoopMax = (backtestLoopMax $ learningSetting fsd) + 1
           }
       }
 

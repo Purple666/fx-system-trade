@@ -14,10 +14,13 @@ import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
 import qualified GlobalSettingFunction    as Gsf
 
-printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
-printTestProgress n n' fsd tdt tdl tdlt pc lsf = do
+printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
+printTestProgress retry n n' fsd tdt tdl tdlt pc lsf = do
   let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
       ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
+  if retry
+    then printf "   "
+    else return ()
   printf "%s : " =<< Ftm.getLogTime
   printf "%s-%s : %3d %4d %6.2f %4s "
     (Fcd.getDate n)

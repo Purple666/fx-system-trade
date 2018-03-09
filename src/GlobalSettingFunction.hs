@@ -7,16 +7,24 @@ import qualified FxTechnicalAnalysis      as Ta
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  if Ftd.profit x < 0 && Ftd.realizedPL x < 0
-  then - Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (2 :: Int)
-  else   Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (2 :: Int)
+  Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ 4
  {-
+* (logBase 10 . fromIntegral $ Ftd.trSuccess x) * Ftd.getWinRatePure x ^ 4
+Ftd.profit x * Ftd.getWinRatePure x ^ (4 :: Int)
   if Ftd.profit x < 0 && Ftd.realizedPL x < 0
   then - Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (4 :: Int)
   else   Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (4 :: Int)
-  profit x * getWinRatePure x ^ (4 :: Int)
-  profit x * (realizedPL x / Gsd.initalProperty Gsd.gsd) * (logBase 10 . fromIntegral $ trSuccess x) * getWinRatePure x ^ 4
+  profit x *  * (logBase 10 . fromIntegral $ trSuccess x) * getWinRatePure x ^ 4
 -}
+
+evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
+evaluationOk tdl tdlt =
+  (and $ map (\x -> 0 < getEvaluationValue x) tdlt) && 0 < getEvaluationValueList tdlt && 0 < getEvaluationValue tdl 
+  --0 < (getEvaluationValue $ sum tdlt) && 0 < getEvaluationValueList tdlt && 0 < getEvaluationValue tdl 
+
+getEvaluationValueList :: [Ftd.FxTradeData] -> Double
+getEvaluationValueList x =
+  sum $ map (\y -> getEvaluationValue y) x
 
 buyEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 buyEvaluation td chart rate =
@@ -35,8 +43,12 @@ getQuantityLearning td chart = if ((fromIntegral $ Gsd.maxUnit Gsd.gsd) * chart)
                                then ((fromIntegral $ Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
+getQuantityBacktest = getQuantityLearning
+
+{-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest _ _ = (Gsd.initalProperty Gsd.gsd) / (Gsd.quantityRate Gsd.gsd)
+-}
 
 -- ===============================================================================================
 
