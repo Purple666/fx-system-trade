@@ -10,7 +10,8 @@ main = do
   hSetBuffering stdout NoBuffering
   (command:_) <- getArgs
   case command of
-    "backtest"       -> GaFx.backTest
+    "backtest"       -> GaFx.backTest False
+    "backtest-retry" -> GaFx.backTest True
     "trade-practice" -> GaFx.trade Ftd.Practice "trade_practice"
 
 
