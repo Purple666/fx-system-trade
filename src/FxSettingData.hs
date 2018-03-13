@@ -10,8 +10,6 @@ module FxSettingData
   , plusGaLoopMax
   , plusGaLength
   , plusLearningTestTimes
-  , getBacktestLoopMax
-  , plusBacktestLoopMax
   , makeSimChart
   ) where
 
@@ -49,7 +47,6 @@ instance Ord FxSettingData where
 
 data FxLearningSetting = 
   FxLearningSetting { learningTestTimes :: Int
-                    , backtestLoopMax   :: Int
                     , gaLoopMax         :: Int
                     , gaLength          :: Int
                     , trSuccess         :: Integer
@@ -63,7 +60,6 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                      , backtestLoopMax    = 1
                                                       , gaLoopMax          = 1
                                                       , gaLength           = 1
                                                       , trSuccess          = 0
@@ -88,10 +84,6 @@ getGaLoopMax :: FxSettingData -> Int
 getGaLoopMax fsd =
   gaLoopMax $ learningSetting fsd
 
-getBacktestLoopMax :: FxSettingData -> Int
-getBacktestLoopMax fsd =
-  backtestLoopMax $ learningSetting fsd
-
 getGaLength :: FxSettingData -> Int
 getGaLength fsd =
   gaLength $ learningSetting fsd
@@ -100,13 +92,6 @@ plusGaLoopMax :: FxSettingData -> FxSettingData
 plusGaLoopMax fsd =
   fsd { learningSetting = (learningSetting fsd) {
           gaLoopMax = (gaLoopMax $ learningSetting fsd) + 1
-          }
-      }
-
-plusBacktestLoopMax :: FxSettingData -> FxSettingData
-plusBacktestLoopMax fsd =
-  fsd { learningSetting = (learningSetting fsd) {
-          backtestLoopMax = (backtestLoopMax $ learningSetting fsd) + 1
           }
       }
 

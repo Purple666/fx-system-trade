@@ -7,7 +7,7 @@ import qualified FxTechnicalAnalysis      as Ta
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ 4
+  Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) 
  {-
 * (logBase 10 . fromIntegral $ Ftd.trSuccess x) * Ftd.getWinRatePure x ^ 4
 Ftd.profit x * Ftd.getWinRatePure x ^ (4 :: Int)

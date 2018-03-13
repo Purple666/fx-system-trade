@@ -221,7 +221,9 @@ backTest l ls s td fsd xcd =
   let ctdl = makeChart fsd (l + ls) xcd
       (_, _, td'') = foldl (\(_, _, td') ctd -> if Ftd.trSuccess td + s < Ftd.trSuccess td' ||
                                                    l < (Fcd.date $ Ftd.chart td') - (Fcd.date $ Ftd.chart td)
-                                                then evaluate ctd fsd Gsf.getQuantityBacktest False True td'
+                                                then if Ftd.side td' == Ftd.None 
+                                                     then (Ftd.None, Ftd.None, td')
+                                                     else evaluate ctd fsd Gsf.getQuantityBacktest False True td'
                                                 else evaluate ctd fsd Gsf.getQuantityBacktest False False td') (Ftd.None, Ftd.None, td) ctdl
   in (td'', ctdl)
         
