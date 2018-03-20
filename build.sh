@@ -2,6 +2,7 @@
 
 cd docker
 
+docker-compose up -d fx-mongo 
 docker-compose stop backtest backtest-retry
 docker-compose rm -f backtest backtest-retry
 docker rmi -f $(docker images | awk '/^<none>/ { print $3 }')

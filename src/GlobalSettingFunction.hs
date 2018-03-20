@@ -2,29 +2,29 @@ module GlobalSettingFunction where
 
 import qualified GlobalSettingData        as Gsd
 import qualified FxTradeData              as Ftd
-import qualified FxTechnicalAnalysisData  as Fad
-import qualified FxTechnicalAnalysis      as Ta
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
-getEvaluationValue x =
-  Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) 
+getEvaluationValue x = 
+  if Ftd.realizedPL x < 0
+  then (1 / Gsd.initalProperty Gsd.gsd) 
+  else (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd)
  {-
-* (logBase 10 . fromIntegral $ Ftd.trSuccess x) * Ftd.getWinRatePure x ^ 4
-Ftd.profit x * Ftd.getWinRatePure x ^ (4 :: Int)
-  if Ftd.profit x < 0 && Ftd.realizedPL x < 0
-  then - Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (4 :: Int)
-  else   Ftd.profit x * (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ (4 :: Int)
-  profit x *  * (logBase 10 . fromIntegral $ trSuccess x) * getWinRatePure x ^ 4
+  if Ftd.realizedPL x < 0
+  then (1 / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x) 
+  else if 0 < Ftd.trSuccess x && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL x  
+       then (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x ^ 4) * (1 + (logBase 100 . fromIntegral $ Ftd.trSuccess x))
+       else (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x ^ 4)
+
 -}
 
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
-  (and $ map (\x -> 0 < getEvaluationValue x) tdlt) && 0 < getEvaluationValueList tdlt && 0 < getEvaluationValue tdl 
-  --0 < (getEvaluationValue $ sum tdlt) && 0 < getEvaluationValueList tdlt && 0 < getEvaluationValue tdl 
+  (and $ map (\x -> 0 < Ftd.profit x) tdlt) && 0 < Ftd.profit tdl 
+  --0 < (Ftd.profit $ sum tdlt) && 0 < Ftd.profit tdl 
 
 getEvaluationValueList :: [Ftd.FxTradeData] -> Double
-getEvaluationValueList x =
-  sum $ map (\y -> getEvaluationValue y) x
+getEvaluationValueList tdlt =
+  Ftd.profit $ sum tdlt
 
 buyEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 buyEvaluation td chart rate =

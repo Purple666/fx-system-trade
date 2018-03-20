@@ -11,6 +11,7 @@ module FxTechnicalAnalysisData
   , initFxAlgorithmSetting
   , initTechAnaLeafData
   , initFxTechnicalAnalysisData
+  , initFxMovingAverageData
   , initAlgoLeafData
   , zeroFxalgorithmListCount
   ) where
@@ -37,9 +38,8 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   , macd        :: FxMovingAverageData
   , st          :: FxMovingAverageData
   , rsi         :: FxMovingAverageData
-  , bbp3a       :: Double 
-  , bbm3a       :: Double
-  }  deriving (Show, Eq, Ord)
+  , bb          :: FxMovingAverageData
+  }  deriving (Show)
 
 data FxMovingAverageData = FxMovingAverageData
   { short      :: Double
@@ -57,9 +57,9 @@ data FxMovingAverageData = FxMovingAverageData
   , thresholdS :: FxTradePosition
   , thresholdL :: FxTradePosition
   , thresholdM :: FxTradePosition
-  }  deriving (Show, Eq, Ord)
+  }  deriving (Show)
 
-data FxTradePosition = None | Buy | Sell deriving (Show, Eq, Ord)
+data FxTradePosition = None | Buy | Sell deriving (Show, Eq)
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
@@ -99,7 +99,7 @@ data FxalgorithmListCount =
                                        M.Map Int [Tr.LeafData FxTechnicalAnalysisData])
                        , listCount :: (Tr.LeafDataMap (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData),
                                        M.Map Int (Tr.LeafDataMap FxTechnicalAnalysisData))
-                       } deriving (Show)
+                       } deriving (Show, Read)
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =
@@ -132,7 +132,7 @@ fxAlgorithmList =
   , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 25
   , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 26
   , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 27
-  , (isBBInc, isBBDec)                                    -- 28
+  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb))
   , (isBuy (slopeSn    . rsi), isSell (slopeSn    . rsi)) -- 29
   , (isBuy (slopeMn    . rsi), isSell (slopeMn    . rsi)) -- 30
   , (isBuy (slopeLn    . rsi), isSell (slopeLn    . rsi)) -- 31
@@ -160,13 +160,6 @@ isBuy f fxta =
 isSell :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
 isSell f fxta =
   f fxta == Sell
-
-isBBInc :: FxTechnicalAnalysisData -> Bool
-isBBInc fxta = (bbp3a fxta) < (Fcd.close $ chart fxta)
-
-isBBDec :: FxTechnicalAnalysisData -> Bool
-isBBDec fxta = (Fcd.close $ chart fxta) < (bbm3a fxta)
-
 
 initAlgoLeafData ::  [Tr.LeafData FxTechnicalAnalysisData]
 initAlgoLeafData = 
@@ -212,18 +205,18 @@ initFxAlgorithmSetting alc =
 
 initFxAlMaSetting :: FxAlMaSetting
 initFxAlMaSetting =
-  FxAlMaSetting { shortSetting     = Gsd.taMargin Gsd.gsd
-                , middleSetting    = Gsd.taMargin Gsd.gsd * 2
-                , longSetting      = Gsd.taMargin Gsd.gsd * 3
-                , prevSetting      = Gsd.taMargin Gsd.gsd
-                , thresholdSetting = 30
+  FxAlMaSetting { shortSetting        = Gsd.taMargin Gsd.gsd
+                , middleSetting       = Gsd.taMargin Gsd.gsd * 2
+                , longSetting         = Gsd.taMargin Gsd.gsd * 3
+                , prevSetting         = Gsd.taMargin Gsd.gsd
+                , thresholdSetting    = 30
                 , thresholdMaxSetting = 30
                 }
 
 
 initFxTechnicalAnalysisData :: FxTechnicalAnalysisData 
 initFxTechnicalAnalysisData =
-  FxTechnicalAnalysisData { chart      = 0
+  FxTechnicalAnalysisData { chart      = Fcd.initFxChartData
                           , rci        = initFxMovingAverageData
                           , sma        = initFxMovingAverageData
                           , ema        = initFxMovingAverageData
@@ -231,8 +224,7 @@ initFxTechnicalAnalysisData =
                           , macd       = initFxMovingAverageData
                           , st         = initFxMovingAverageData
                           , rsi        = initFxMovingAverageData
-                          , bbp3a      = 0
-                          , bbm3a      = 0
+                          , bb         = initFxMovingAverageData
                           }
 
 initFxMovingAverageData :: FxMovingAverageData

@@ -5,3 +5,4 @@ while [ 1 ]
 do
     docker-compose logs -f backtest
 done
+

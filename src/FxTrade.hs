@@ -98,15 +98,15 @@ evaluate ctd fsd f1 forceSell onlySell td = do
                else (0, 0, Ftd.None)
       td' = td { Ftd.chart  = cd
                , Ftd.rate   = if open == Ftd.Buy
-                              then Fcd.FxChartData { Fcd.date  = Fcd.date cd
-                                                   , Fcd.close = position + Gsd.spread Gsd.gsd
-                                                   }
+                              then Fcd.initFxChartData { Fcd.date  = Fcd.date cd
+                                                       , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                       }
                               else if open == Ftd.Sell
-                                   then Fcd.FxChartData { Fcd.date  = Fcd.date cd
-                                                        , Fcd.close = position - Gsd.spread Gsd.gsd
-                                                        }
+                                   then Fcd.initFxChartData { Fcd.date  = Fcd.date cd
+                                                            , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                            }
                                    else if close /= Ftd.None
-                                        then 0
+                                        then Fcd.initFxChartData
                                         else Ftd.rate td
                , Ftd.alcOpen =
                    Fad.FxalgorithmListCount { Fad.prev =
@@ -202,11 +202,11 @@ makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
 makeChart :: Fsd.FxSettingData -> Int -> [Fcd.FxChartData] -> [Fad.FxChartTaData]
 makeChart fsd chartLength xcd  =
   let fs   = Fsd.fxSetting fsd
-      ftado  = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fsd.makeSimChart (Fad.simChart x) xcd) [])
+      ftado  = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fcd.makeSimChart (Fad.simChart x) xcd) [])
                . Fad.algoSetting $ Fsd.fxTaOpen fs
-      ftadcp = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fsd.makeSimChart (Fad.simChart x) xcd) [])
+      ftadcp = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fcd.makeSimChart (Fad.simChart x) xcd) [])
                . Fad.algoSetting $ Fsd.fxTaCloseProfit fs
-      ftadcl = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fsd.makeSimChart (Fad.simChart x) xcd) [])
+      ftadcl = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (Fcd.makeSimChart (Fad.simChart x) xcd) [])
                . Fad.algoSetting $ Fsd.fxTaCloseLoss fs
   in makeChartTa (take chartLength $ reverse xcd) ftado ftadcp ftadcl []
 

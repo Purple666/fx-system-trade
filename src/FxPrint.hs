@@ -14,8 +14,8 @@ import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
 import qualified GlobalSettingFunction    as Gsf
 
-printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
-printTestProgress retry n n' fsd tdt tdl tdlt pc lsf = do
+printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool ->Bool -> IO ()
+printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
   let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
       ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
   if retry
@@ -32,14 +32,14 @@ printTestProgress retry n n' fsd tdt tdl tdlt pc lsf = do
   printFxTradeData tdt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "%d %c %d\n" pc (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  printf "%c %c %d\n" (head $ show plsf)  (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
 
-printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
-printLearningFxTradeData fsd tdl tdlt pc lsf = do
+printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool -> Bool -> IO ()
+printLearningFxTradeData fsd tdl tdlt plsf lsf = do
   printf "%s " =<< Ftm.getLogTime
   printFxTradeData tdl
-  printFxTradeData $ sum tdlt
-  printf "%d %c %d\n" pc (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  mapM printFxTradeData tdlt
+  printf "%c %c %d\n" (head $ show plsf)  (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
 
 printStartTrade :: Ftd.FxTradeData  -> IO ()
 printStartTrade td = do

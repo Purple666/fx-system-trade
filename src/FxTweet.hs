@@ -6,7 +6,6 @@ module FxTweet
   , tweetWeek
   ) where
 
-import qualified GlobalSettingFunction    as Gsf
 import qualified FxTradeData              as Ftd
 import qualified FxChartData              as Fcd
 import Text.Printf

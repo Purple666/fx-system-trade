@@ -1,8 +1,7 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-
 module FxChartData
   ( FxChartData (..)
   , initFxChartData
+  , makeSimChart
   , getDate
   , getYear
   ) where
@@ -12,37 +11,32 @@ import qualified Data.ByteString.Char8 as LC (unpack, pack)
 
 data FxChartData = FxChartData
   { date  :: Int
-  , close :: Double }
-  deriving (Show)
+  , open  :: Double
+  , high  :: Double
+  , low   :: Double
+  , close :: Double
+  }
+  deriving (Show, Read, Eq)
 
 initFxChartData :: FxChartData
 initFxChartData = 
   FxChartData { date  = 0
+              , open  = 0
+              , high  = 0
+              , low   = 0
               , close = 0
               }
-  
-instance Num FxChartData where
-  a + b = FxChartData { close = close a + close b
-                      , date = 0 }
-  a - b = FxChartData { close = close a - close b
-                      , date = 0 }
-  a * b = FxChartData { close = close a * close b
-                      , date = 0 }
-  fromInteger a = FxChartData { close = fromIntegral a    
-                              , date = 0 }
 
-instance Fractional FxChartData where
-  a / b = FxChartData { close = close a / close b
-                      , date = 0 }
-
-instance Eq FxChartData where
-  a == b = close a == close b
-  
-instance Ord FxChartData where
-  compare a b
-    | close a == close b  = EQ
-    | close a <= close b  = LT
-    | otherwise           = GT
+makeSimChart :: Int -> [FxChartData] -> [FxChartData]
+makeSimChart _ [] = []
+makeSimChart c xs =
+  let chart = take c xs
+      fcd = (head xs) { open  = open    $ head chart 
+                      , high  = maximum $ map high xs
+                      , low   = minimum $ map low  xs
+                      , close = close   $ last chart
+                      }
+  in fcd : (makeSimChart c $ drop c xs)
 
 getDate :: Int -> String
 getDate n = LC.unpack . formatUnixTimeGMT (LC.pack "%Y/%m/%d") $ UnixTime (fromInteger ((fromIntegral n) * 60)) 0

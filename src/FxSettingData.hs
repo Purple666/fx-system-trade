@@ -10,7 +10,6 @@ module FxSettingData
   , plusGaLoopMax
   , plusGaLength
   , plusLearningTestTimes
-  , makeSimChart
   ) where
 
 --import Debug.Trace
@@ -51,7 +50,6 @@ data FxLearningSetting =
                     , gaLength          :: Int
                     , trSuccess         :: Integer
                     , trSuccessDate     :: Integer
-                    , learningTime      :: Int
                     } deriving (Show, Read, Eq, Ord)
 
 initFxSettingData :: FxSettingData
@@ -59,12 +57,11 @@ initFxSettingData =
   FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
                                     , chartLength = 0
                                     }
-                , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                      , gaLoopMax          = 1
-                                                      , gaLength           = 1
+                , learningSetting = FxLearningSetting { learningTestTimes  = 5
+                                                      , gaLoopMax          = 5
+                                                      , gaLength           = 5
                                                       , trSuccess          = 0
                                                       , trSuccessDate      = 0
-                                                      , learningTime       = 60 * 24
                                                       }
                 , fxSetting = FxSetting { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
                                         , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
@@ -108,8 +105,4 @@ plusGaLength fsd =
           gaLength = (gaLength $ learningSetting fsd) + 1
           }
       }
-
-makeSimChart :: Int -> [Fcd.FxChartData] -> [Fcd.FxChartData]
-makeSimChart c x =
-  filter (\a -> Fcd.date a `mod` c == 0) x
 

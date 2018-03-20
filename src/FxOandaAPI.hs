@@ -110,7 +110,7 @@ close td = do
 open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
 open td side = do
   (b, _) <- getOandaBalance td
-  p <- Fm.getEndChart 
+  p <- Fm.getOneChart  Fm.getEndChartFromDB 
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / (Fcd.close p)
       u' = if Gsd.maxUnit Gsd.gsd < u
            then Gsd.maxUnit Gsd.gsd
@@ -129,10 +129,10 @@ updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do
   (s, _, r) <- getOandaPosition td
   (b, upl) <- getOandaBalance td
-  c <- Fm.getEndChart 
-  return $ td { Ftd.rate         = Fcd.FxChartData { Fcd.date  = Fcd.date c
-                                                   , Fcd.close = r
-                                                   }
+  c <- Fm.getOneChart Fm.getEndChartFromDB 
+  return $ td { Ftd.rate         = (Ftd.rate td) { Fcd.date  = Fcd.date c
+                                                 , Fcd.close = r
+                                                 }
               , Ftd.side         = s
               , Ftd.realizedPL   = b
               , Ftd.unrealizedPL = b + upl

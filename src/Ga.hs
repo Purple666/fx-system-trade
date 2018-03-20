@@ -11,7 +11,7 @@ module Ga
   ) where
 
 import qualified Data.Foldable           as F
-import Data.List
+import Data.nList
 import Control.Monad.Random
 import Debug.Trace 
 
@@ -37,7 +37,6 @@ class (Show a, Eq a, Ord a) => Ga a where
   createInitialData :: MonadRandom m => Int -> a -> m (LearningData a)
   learningEvaluate :: a -> (a, Rational)
   getGaLength :: a -> Int
-  plusGaLength :: a -> a
   getGaLoopMax :: a -> Int
   plusGaLoopMax :: a -> a
 
@@ -56,15 +55,9 @@ learningData s = LearningData [(s, 0)]
 learningDataList :: [LearningData a] -> LearningData a
 learningDataList s = LearningData . foldl1 (\acc x -> acc ++ x) $ map (\(LearningData x) -> x) s
 
-evaluate :: (Ga a, MonadRandom m) => LearningData a -> m (a, LearningData a)
+evaluate :: (Ga a) => LearningData a -> LearningData a
 evaluate (LearningData y) = do
-  let y' = map (\x -> learningEvaluate $ fst x) . nub $ map (\x -> (fst x, (0 :: Rational))) y
-  if or $ map (\x -> 0 < snd x) y'
-    then return (maximum $ LearningData y', LearningData $ filter (\x -> 0 < snd x) y')
-    else do ix <- reset =<< (fromList $ map (\x -> if snd x + 1 < 0
-                                                   then (fst x, 1)
-                                                   else (fst x, snd x + 1)) y')
-            return (ix, LearningData [])
+  LearningData . map (\x -> learningEvaluate $ fst x) . nub $ map (\x -> (fst x, (0 :: Rational))) y
 
 selection :: MonadRandom m => LearningData a -> m (LearningData a)
 selection x = do
@@ -87,51 +80,28 @@ selectAlgorithm = do
                else (\a b -> crossover a b)
   return x
 
-geneticOperators :: (Ga a, MonadRandom m) => Int -> a -> LearningData a -> LearningData a -> m (LearningData a)
-geneticOperators c ix x y = do
+geneticOperators :: (Ga a, MonadRandom m) => Int -> LearningData a -> LearningData a -> m (LearningData a)
+geneticOperators e x y = do
   (s1, s2) <- selection2 x
   algorithmFunftion <- selectAlgorithm
-  (_, x')<- evaluate =<< algorithmFunftion s1 s2
-  let y' = x' `mappend` y
-  if getGaLength ix <= length y'
-    then return y'
-    else if getGaLoopMax ix < c
-         then return (fmap plusGaLoopMax y')
-         else geneticOperators (c + 1) ix x y'
+  y' <- mappend y <$> algorithmFunftion s1 s2
+  if e <= length y'
+    then return (y')
+    else geneticOperators e x y'
 
-createInitialDataWithEvaluate :: (Ga a, MonadRandom m) => Int -> a -> LearningData a -> m (a, LearningData a)
-createInitialDataWithEvaluate c ix x = do
-  (ix', x') <- if 0 < getGaLength ix - length x
-               then evaluate =<< createInitialData (getGaLength ix - length x) ix
-               else return (ix, x)
-  let x'' = x' `mappend` x
-  --traceShow("create", c, getGaLength ix, length x, length x', length x'') $ return ()
-  if getGaLength ix' <= length x'' 
-    then return (ix', x'')
-    else if getGaLoopMax ix' < c
-         then return (plusGaLoopMax ix', fmap plusGaLoopMax x'')
-         else createInitialDataWithEvaluate (c + 1) ix' x''
-    
 learningLoop :: (Ga a, MonadRandom m) =>
                 Int -> a -> LearningData a -> m (LearningData a)
 learningLoop c ix x = do
-  if null x
-    then return (learningData $ plusGaLength ix)
-    else do (ix', xm) <- evaluate . learningData $ maximum x
-            x' <- geneticOperators 0 ix' x xm
-            --traceShow("loop", c, length x, length x') $ return ()
-            if getGaLoopMax ix' < c
-              then return $ fmap plusGaLoopMax x'
-              else if null x' 
-                   then return $ fmap plusGaLength x'
-                   else if maximum x == maximum x'
-                        then return x'
-                        else learningLoop (c + 1) (maximum x') x'
+  x' <- evaluate <$> (geneticOperators (getGaLength ix) x . learningData $ maximum x)
+  --traceShow("loop", c, length x, length x') $ return ()
+  if maximum x' == maximum x
+    then return (x')
+    else if getGaLoopMax ix < c 
+         then return (fmap plusGaLoopMax x')
+    else learningLoop (c + 1) ix x'
 
-learning :: (Ga a, MonadRandom m) => a -> LearningData a -> m (LearningData a)
-learning ix x = do
-  (ix', x') <- evaluate . learningData $ maximum x
-  (ix'', x'') <- createInitialDataWithEvaluate 0 ix' x'
-  learningLoop 0 ix'' x''
+learning :: (Ga a, MonadRandom m) => a -> m (LearningData a)
+learning ix = do
+  learningLoop 0 ix =<< (evaluate <$> createInitialData (getGaLength ix) ix)
   
 

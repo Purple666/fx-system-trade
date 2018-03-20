@@ -29,11 +29,11 @@ data FxTradeData =
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
-              } deriving (Show)
+              } deriving (Show, Read)
 
-data FxSide = None | Buy | Sell | Close deriving (Show, Eq)
+data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 
-data FxEnvironment = Backtest | Practice | Production deriving (Show, Eq)
+data FxEnvironment = Backtest | Practice | Production deriving (Show, Read)
 
 instance Num FxTradeData where
   x - y = x { trSuccess    = trSuccess    x - trSuccess    y
@@ -64,8 +64,8 @@ getWinRatePure x =
 
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon = 
-  FxTradeData { chart            = 0
-              , rate             = 0
+  FxTradeData { chart            = Fcd.initFxChartData
+              , rate             = Fcd.initFxChartData
               , side             = None
               , alcOpen          = Fad.zeroFxalgorithmListCount
               , alcCloseProfit   = Fad.zeroFxalgorithmListCount

@@ -7,7 +7,7 @@ function command_error() {
 
 cd org
 
-for year in $(seq 2017 2018)
+for year in $(seq 2018 2018)
 do
     for month in $(seq 1 12)
     do
