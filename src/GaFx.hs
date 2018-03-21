@@ -36,28 +36,23 @@ instance Ga.Ga Fsd.FxSettingData where
   getGaLoopMax      = Fsd.getGaLoopMax 
   plusGaLoopMax     = Fsd.plusGaLoopMax
 
-backTest :: Bool -> IO ()
-backTest retry = do
-  startN <- Fcd.date <$> Fm.getOneChart Fm.getStartChartFromDB
-  backTestMainLoop retry startN 0 0 
-  
-backTestMainLoop :: Bool -> Int -> Int -> Int -> IO ()
-backTestMainLoop retry start s f = do
+backTest :: Bool -> Int -> Int -> IO ()
+backTest retry s f = do
   startN <- Fcd.date <$> Fm.getOneChart Fm.getStartChartFromDB
   endN <- Fcd.date <$> Fm.getOneChart Fm.getEndChartFromDB
   fsd <- Fm.readFxSettingData
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
-      n   = start + Fs.getPrepareTimeAll fsd + lt + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.maxTradePeriod Gsd.gsd
+  start' <- getRandomR(startN, startN + ltt * 2)
+  let n   = start' + Fs.getPrepareTimeAll fsd + lt + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.maxTradePeriod Gsd.gsd
   fs <- backTestLoop retry False n endN td
   (s', f') <- if fs
               then do printf "================================= %d - %d \n" (s + 1) f 
                       return (s + 1, f)
               else do printf "--------------------------------- %d - %d \n" s (f + 1)
                       return (s, f + 1)
-  start' <- getRandomR(startN, startN + ltt * 2)
-  backTestMainLoop retry start' s' f' 
+  backTest retry s' f' 
 
 trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do

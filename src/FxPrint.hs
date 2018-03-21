@@ -12,7 +12,6 @@ import qualified FxSettingData            as Fsd
 import qualified FxSetting                as Fs
 import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
-import qualified GlobalSettingFunction    as Gsf
 
 printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool ->Bool -> IO ()
 printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
