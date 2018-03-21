@@ -93,7 +93,7 @@ learning fail n fsd = do
   cl <-             Fm.getChartListBack (n - ltt * Gsd.learningTestCount Gsd.gsd) (Fs.getPrepareTimeAll fsd + lt ) 0
   ce <- mapM (\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) $ map (ltt *) [0..Gsd.learningTestCount Gsd.gsd - 1]
   let tdlts = M.elems .
-              M.filter (\(_, y, _, _, _) -> y) .
+              M.filter (\(x, y, _, _, _) -> 0 < x && y) .
               M.mapWithKey (\y (p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
                                              tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                               Fsd.nextFxSettingData ltt x fsd') ce
@@ -133,9 +133,7 @@ backTestLoop retry fail n endN td = do
       n' = Fcd.date $ Ftd.chart tdt
       tdt' = Ft.resetFxalgorithmListCount tdt
   Fp.printTestProgress (retry && Ftd.profit tdt < Ftd.profit td) n n' fsd' tdt tdl tdlt plsf lsf
-  if retry
-    then Fm.writeFxSettingData fsd'
-    else return ()
+  Fm.updateFxSettingData fsd'
   if retry && Ftd.profit tdt < Ftd.profit td
     then backTestLoop retry True n endN td 
     else if endN <= n' || Ftd.realizedPL tdt' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd

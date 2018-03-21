@@ -9,7 +9,7 @@ module FxMongodb
   , getEndChartFromDB 
   , setFxTradeData
   , updateFxTradeData
-  , writeFxSettingData
+  , updateFxSettingData 
   , readFxSettingData
   ) where
 
@@ -116,31 +116,29 @@ readFxSettingData  = do
             fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData fls fsl
 
-writeFxSettingData :: Fsd.FxSettingData -> IO ()
-writeFxSettingData fsd = do
-  let fls = Fsd.learningSetting fsd
-      fsl = Fsd.fxSettingLog    fsd
+updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+updateFxSettingData fsd = do
+  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB fls fsl
+  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
   close pipe
+  return fsd'
 
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
 getDataFromDB coName = do
   rest =<< find (select [] coName) 
 
-setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO Value
+setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td = do
-  delete (select [] coName)
-  insert coName [ "chart"       =: (show $ Ftd.chart td)
-                , "tr_success"  =: Ftd.trSuccess td
-                , "tr_fail"     =: Ftd.trFail td
-                , "profit"      =: Ftd.profit td
-                , "realized_pl" =: Ftd.realizedPL td
-                ]
+  upsert (select [] coName) [ "chart"       =: (show $ Ftd.chart td)
+                            , "tr_success"  =: Ftd.trSuccess td
+                            , "tr_fail"     =: Ftd.trFail td
+                            , "profit"      =: Ftd.profit td
+                            , "realized_pl" =: Ftd.realizedPL td
+                            ]
 
-setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO Value
+setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
 setFxSettingToDB fls fsl = do
-  delete (select [] "fsd")
-  insert "fsd" [ "fls"  =: (show $ fls)
-               , "fsl"  =: (show $ fsl)
-               ]
+  upsert (select [] "fsd") [ "fls"  =: (show $ fls)
+                           , "fsl"  =: (show $ fsl)
+                           ]
