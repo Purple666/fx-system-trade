@@ -18,16 +18,19 @@ if __name__ == "__main__":
     co = db.rate
     
     oanda = oandapy.API(environment=environment, access_token=access_token, headers=headers)
-
+    db_price = {}
+    
     while True:
-        response = oanda.get_prices(instruments="USD_JPY")
-        price = response.get("prices")[0]
+        response = oanda.get_history(instrument="USD_JPY", count=1, granularity="M1")
+        price = response.get("candles")[0]
         loc = datetime.fromtimestamp(int(price['time']) / 1000000, JST)            
-        price['time'] = int(int(price['time']) / (1000000 * 60))
-        del price['instrument']
-        del price['ask']
-        print("rate : %s %d %6.2f" % (loc, price['time'], price['bid']))
-        co.update_one({"time": price['time']}, {"$set": price}, upsert = True)
+        db_price['time'] = int(int(price['time']) / (1000000 * 60))
+        db_price['open'] = price['openBid']
+        db_price['high'] = price['highBid']
+        db_price['low'] = price['lowBid']
+        db_price['close'] = price['closeBid']
+        print("rate : %s %d %6.2f %6.2f %6.2f %6.2f" % (loc, db_price['time'], db_price['open'], db_price['high'], db_price['low'], db_price['close']))
+        co.update_one({"time": db_price['time']}, {"$set": db_price}, upsert = True)
 
         time.sleep(60)
 

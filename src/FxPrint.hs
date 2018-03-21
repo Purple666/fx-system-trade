@@ -38,7 +38,7 @@ printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTrade
 printLearningFxTradeData fsd tdl tdlt plsf lsf = do
   printf "%s " =<< Ftm.getLogTime
   printFxTradeData tdl
-  mapM printFxTradeData tdlt
+  printFxTradeData $ sum tdlt
   printf "%c %c %d\n" (head $ show plsf)  (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
 
 printStartTrade :: Ftd.FxTradeData  -> IO ()

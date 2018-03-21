@@ -98,28 +98,31 @@ updateFxTradeData coName td = do
   close pipe
   if r == []
     then return td
-    else head <$> mapM (\x -> return $ (read . typed $ valueAt "td" x)) r
+    else head <$> mapM (\x -> return $ td { Ftd.chart      = read . typed $ valueAt "td" x
+                                          , Ftd.trSuccess  = typed $ valueAt "tr_success" x
+                                          , Ftd.trFail     = typed $ valueAt "tr_fail" x
+                                          , Ftd.profit     = typed $ valueAt "profit" x
+                                          , Ftd.realizedPL = typed $ valueAt "realized_pl" x
+                                          }) r
 
-readFxSettingData :: Bool -> Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-readFxSettingData ini fsd = do
+readFxSettingData :: IO (Fsd.FxSettingData)
+readFxSettingData  = do
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
-  fsd'' <- if r == []
-           then return (fsd)
-           else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
-                   fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
-                   return $ Fs.setFxSettingData $ Fs.unionFxSettingData ini fsd fls fsl
   close pipe
-  return fsd''
+  if r == []
+    then return $ Fsd.initFxSettingData 
+    else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
+            fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
+            return $ Fs.setFxSettingData fls fsl
 
-writeFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+writeFxSettingData :: Fsd.FxSettingData -> IO ()
 writeFxSettingData fsd = do
   let fls = Fsd.learningSetting fsd
       fsl = Fsd.fxSettingLog    fsd
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB fls fsl
   close pipe
-  return fsd
 
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
 getDataFromDB coName = do
@@ -128,7 +131,12 @@ getDataFromDB coName = do
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO Value
 setFxTradeDataToDB coName td = do
   delete (select [] coName)
-  insert coName [ "td" =: (show $ td) ]
+  insert coName [ "chart"       =: (show $ Ftd.chart td)
+                , "tr_success"  =: Ftd.trSuccess td
+                , "tr_fail"     =: Ftd.trFail td
+                , "profit"      =: Ftd.profit td
+                , "realized_pl" =: Ftd.realizedPL td
+                ]
 
 setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO Value
 setFxSettingToDB fls fsl = do

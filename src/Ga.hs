@@ -11,7 +11,7 @@ module Ga
   ) where
 
 import qualified Data.Foldable           as F
-import Data.nList
+import Data.List
 import Control.Monad.Random
 import Debug.Trace 
 

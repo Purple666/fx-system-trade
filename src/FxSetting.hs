@@ -10,8 +10,6 @@ module FxSetting
   , crossoverFxSettingData
   , resetFxSettingData
   , setFxSettingData
-  , unionLearningSetting
-  , unionFxSettingData
   ) where  
 
 import qualified Data.Map                 as M
@@ -34,8 +32,8 @@ getPrepareTimeAll fsd =
           , (Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)
           ]
 
-setFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData
-setFxSettingData fs = 
+setTreeFunction :: Fsd.FxSettingData -> Fsd.FxSettingData
+setTreeFunction fs = 
   fs { Fsd.fxSetting = setFxSetting $ Fsd.fxSetting fs
      , Fsd.fxSettingLog  = M.mapKeys setFxSetting $ Fsd.fxSettingLog fs
      }
@@ -47,36 +45,23 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts 
       }
 
-unionFxSettingData :: Bool -> Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-unionFxSettingData ini fsd fls' fsl'=
-  let fls = Fsd.learningSetting fsd
-      fsl = Fsd.fxSettingLog    fsd
-  in fsd { Fsd.learningSetting = unionLearningSetting fls' fls
-         , Fsd.fxSetting       = if not ini || (null $ Fsd.fxSettingLog fsd)
-                                 then Fsd.fxSetting fsd
-                                 else snd . maximum . map swap . M.toList .
-                                      M.map (\(p, c) -> p / fromIntegral c) $ Fsd.fxSettingLog fsd
-         , Fsd.fxSettingLog    = M.unionWith (\(a, b) (a', b') -> if b < b'
-                                                                  then (a', b')
-                                                                  else (a, b)) fsl fsl'
-         }
+setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
+setFxSettingData fls' fsl'=
+  let fsd = Fsd.initFxSettingData 
+  in setTreeFunction $ fsd { Fsd.learningSetting = fls' 
+                           , Fsd.fxSetting       = if null fsl'
+                                                   then Fsd.fxSetting fsd
+                                                   else snd . maximum . map swap . M.toList $
+                                                        M.map (\(p, c) -> p / fromIntegral c) fsl'
+                           , Fsd.fxSettingLog    = fsl'
+                           }
      
-unionLearningSetting :: Fsd.FxLearningSetting -> Fsd.FxLearningSetting -> Fsd.FxLearningSetting
-unionLearningSetting ls ls' =
-  Fsd.FxLearningSetting { Fsd.learningTestTimes = max (Fsd.learningTestTimes ls) (Fsd.learningTestTimes ls') 
-                        , Fsd.gaLoopMax         = max (Fsd.gaLoopMax         ls) (Fsd.gaLoopMax         ls')
-                        , Fsd.gaLength          = max (Fsd.gaLength          ls) (Fsd.gaLength          ls')
-                        , Fsd.trSuccess         =     (Fsd.trSuccess         ls + Fsd.trSuccess         ls') `div` 2
-                        , Fsd.trSuccessDate     =     (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
-                    }
-  
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trSuccess ls == 0
      then 24 * 60
      else let l = truncate $ getLearningTestTimes fsd * (fromIntegral $ Fsd.trSuccessDate ls `div` Fsd.trSuccess ls)
-              --l = fromIntegral $ Fsd.trSuccessDate ls `div` Fsd.trSuccess ls
           in if Gsd.maxLearningTime Gsd.gsd < l 
              then Gsd.maxLearningTime Gsd.gsd
              else l
@@ -88,13 +73,12 @@ getLearningTestTime fsd =
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd = 
   (log :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
-  -- 
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-            then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+            then M.filter (\(a, _) -> 0 < a) . M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else if 0 < p
                  then M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
                  else Fsd.fxSettingLog fsd

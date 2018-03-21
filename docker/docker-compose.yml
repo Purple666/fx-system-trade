@@ -12,12 +12,12 @@ services:
       - /db/mongo/fx:/data/db
       - /etc/localtime:/etc/localtime:ro 
     
-#  get_rate:
-#    build: get_rate
-#    container_name: get_rate
-#    restart: always
-#    volumes:
-#      - /etc/localtime:/etc/localtime:ro 
+  get_rate:
+    build: get_rate
+    container_name: get_rate
+    restart: always
+    volumes:
+      - /etc/localtime:/etc/localtime:ro 
 
   backtest:
     build: fx-system-trade
@@ -35,11 +35,11 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro 
       
-#  trade:
-#    build: fx-trade
-#    container_name: trade
-#    restart: always
-#    entrypoint: ./Fx trade-practice 
-#    volumes:
-#      - /etc/localtime:/etc/localtime:ro 
+  trade:
+    build: fx-system-trade
+    container_name: trade
+    restart: always
+    entrypoint: ./Fx trade-practice 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro 
     

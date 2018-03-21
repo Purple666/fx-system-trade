@@ -16,6 +16,7 @@ import qualified FxTechnicalAnalysis      as Ta
 import qualified GlobalSettingData        as Gsd
 import qualified GlobalSettingFunction    as Gsf
 import qualified Tree                     as Tr
+import qualified FxSetting                as Fs
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -216,7 +217,7 @@ backTest :: Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->
-            (Ftd.FxTradeData, [Fad.FxChartTaData])
+            (Ftd.FxTradeData, Fsd.FxSettingData)
 backTest l ls s td fsd xcd =
   let ctdl = makeChart fsd (l + ls) xcd
       (_, _, td'') = foldl (\(_, _, td') ctd -> if Ftd.trSuccess td + s < Ftd.trSuccess td' ||
@@ -225,7 +226,7 @@ backTest l ls s td fsd xcd =
                                                      then (Ftd.None, Ftd.None, td')
                                                      else evaluate ctd fsd Gsf.getQuantityBacktest False True td'
                                                 else evaluate ctd fsd Gsf.getQuantityBacktest False False td') (Ftd.None, Ftd.None, td) ctdl
-  in (td'', ctdl)
+  in (td'', Fs.updateFxSettingData ctdl td td'' fsd)
         
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->
