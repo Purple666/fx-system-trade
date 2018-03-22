@@ -57,11 +57,11 @@ unionFxSettingData fsd fsd' =
 
 unionLearningSetting :: Fsd.FxLearningSetting -> Fsd.FxLearningSetting -> Fsd.FxLearningSetting
 unionLearningSetting ls ls' =
-  Fsd.FxLearningSetting { Fsd.learningTestTimes = (Fsd.learningTestTimes ls + Fsd.learningTestTimes ls') `div` 2
-                        , Fsd.gaLoopMax         = (Fsd.gaLoopMax         ls + Fsd.gaLoopMax         ls') `div` 2
-                        , Fsd.gaLength          = (Fsd.gaLength          ls + Fsd.gaLength          ls') `div` 2
-                        , Fsd.trSuccess         = (Fsd.trSuccess         ls + Fsd.trSuccess         ls') `div` 2
-                        , Fsd.trSuccessDate     = (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
+  Fsd.FxLearningSetting { Fsd.learningTestTimes = max (Fsd.learningTestTimes ls) (Fsd.learningTestTimes ls')
+                        , Fsd.gaLoopMax         = max (Fsd.gaLoopMax         ls) (Fsd.gaLoopMax         ls')
+                        , Fsd.gaLength          = max (Fsd.gaLength          ls) (Fsd.gaLength          ls')
+                        , Fsd.trSuccess         =     (Fsd.trSuccess         ls + Fsd.trSuccess         ls') `div` 2
+                        , Fsd.trSuccessDate     =     (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
                         }
                         
 setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
