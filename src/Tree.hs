@@ -19,7 +19,7 @@ module Tree
   ) where
 
 import qualified GlobalSettingData        as Gsd
-import qualified Data.Map.Lazy            as M
+import qualified Data.Map                 as M
 import qualified Control.Monad.Random     as R
 import Data.List
 --import Debug.Trace 

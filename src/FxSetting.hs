@@ -49,9 +49,9 @@ setFxSetting fts =
 unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 unionFxSettingData fsd fsd' =
   fsd { Fsd.learningSetting = unionLearningSetting (Fsd.learningSetting fsd) (Fsd.learningSetting fsd')
-      , Fsd.fxSettingLog    = M.unionWith (\(a, b) (a', b') -> if b < b'
-                                                               then (a', b')
-                                                               else (a, b))
+      , Fsd.fxSettingLog    = M.filter (\(a, _) -> 0 < a) $ M.unionWith (\(a, b) (a', b') -> if b < b'
+                                                                                             then (a', b')
+                                                                                             else (a, b))
                               (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsd')
       }
 

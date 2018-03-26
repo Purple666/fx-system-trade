@@ -27,13 +27,13 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro 
 
-  backtest-retry:
-    build: fx-system-trade
-    container_name: backtest-retry
-    restart: always
-    entrypoint: ./Fx backtest-retry
-    volumes:
-      - /etc/localtime:/etc/localtime:ro 
+#  backtest-retry:
+#    build: fx-system-trade
+#    container_name: backtest-retry
+#    restart: always
+#    entrypoint: ./Fx backtest-retry
+#    volumes:
+#      - /etc/localtime:/etc/localtime:ro 
       
   trade:
     build: fx-system-trade

@@ -7,7 +7,7 @@ module FxTrade ( resetFxalgorithmListCount
                ) where
   
 import Debug.Trace
-import qualified Data.Map.Lazy            as M
+import qualified Data.Map                 as M
 import qualified FxChartData              as Fcd
 import qualified FxSettingData            as Fsd
 import qualified FxTechnicalAnalysisData  as Fad
