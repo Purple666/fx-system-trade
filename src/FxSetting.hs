@@ -25,6 +25,7 @@ import Control.Monad
 import Control.Monad.Random
 import Debug.Trace
 import Data.Tuple
+import Data.List
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd = 
@@ -49,9 +50,13 @@ setFxSetting fts =
 unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 unionFxSettingData fsd fsd' =
   fsd { Fsd.learningSetting = unionLearningSetting (Fsd.learningSetting fsd) (Fsd.learningSetting fsd')
-      , Fsd.fxSettingLog    = M.filter (\(a, _) -> 0 < a) $ M.unionWith (\(a, b) (a', b') -> if b < b'
-                                                                                             then (a', b')
-                                                                                             else (a, b))
+      , Fsd.fxSettingLog    = M.fromList .
+                              take (Gsd.maxFxSettingLog Gsd.gsd) .
+                              sortBy (\(_, (a, b)) (_, (a', b')) ->
+                                        compare (a' / fromIntegral b') (a / fromIntegral b)) .
+                              M.toList $ M.unionWith (\(a, b) (a', b') -> if b < b'
+                                                                          then (a', b')
+                                                                          else (a, b))
                               (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsd')
       }
 
@@ -64,17 +69,12 @@ unionLearningSetting ls ls' =
                         , Fsd.trSuccessDate     =     (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
                         }
                         
-setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-setFxSettingData fls' fsl'=
-  let fsd = Fsd.initFxSettingData 
-  in setTreeFunction $ fsd { Fsd.learningSetting = fls' 
-                           , Fsd.fxSetting       = if null fsl'
-                                                   then Fsd.fxSetting fsd
-                                                   else snd . maximum . map swap . M.toList $
-                                                        M.map (\(p, c) -> p / fromIntegral c) fsl'
-                           , Fsd.fxSettingLog    = fsl'
-                           }
-     
+setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
+setFxSettingData fsd fls' fsl'=
+  setTreeFunction $ fsd { Fsd.learningSetting = fls' 
+                        , Fsd.fxSettingLog    = fsl'
+                        }
+
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd

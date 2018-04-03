@@ -9,6 +9,7 @@ data GlobalSettingData = GlobalSettingData
   , countUpListMax           :: Int
   , maxTradePeriod           :: Int
   , maxLearningTime          :: Int
+  , maxFxSettingLog          :: Int
   , tradePracticeBearer      :: String
   , tradePracticeUrl         :: String
   , tradeProductionBearer    :: String
@@ -29,11 +30,12 @@ gsd =
                     , countUpListMax        = 3
                     , quantityRate          = 5
                     , thresholdRate         = 0.05
+                    , maxFxSettingLog       = 100
                     , maxTradePeriod        = 24 * 60 * 5 * 4 * 3
                     , maxLearningTime       = 24 * 60 * 5 * 4
                     , initalProperty        = 500000
                     , maxUnit               = 3000000
-                    , spread                = 0.02
+                    , spread                = 0.004
                     , dbHost                = "fx-mongo"
                     , tradePracticeBearer   = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
                     , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v1/accounts/6716490"

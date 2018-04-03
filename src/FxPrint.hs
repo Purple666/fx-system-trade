@@ -13,15 +13,17 @@ import qualified FxSetting                as Fs
 import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
 
-printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool ->Bool -> IO ()
+printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
-  let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
-      ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
+-- let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
+--     ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
+  let lt  = Fs.getLearningTime     fsd
+      ltt = Fs.getLearningTestTime fsd
   if retry
     then printf "   "
     else return ()
   printf "%s : " =<< Ftm.getLogTime
-  printf "%s-%s : %3d %4d %6.2f %4s "
+  printf "%s-%s : %6d %6d %6.2f %4s "
     (Fcd.getDate n)
     (Fcd.getDate n')
     lt
@@ -31,14 +33,17 @@ printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
   printFxTradeData tdt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "%c %c %d\n" (head $ show plsf)  (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %3d\n" plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
 
-printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool -> Bool -> IO ()
-printLearningFxTradeData fsd tdl tdlt plsf lsf = do
-  printf "%s " =<< Ftm.getLogTime
+printLearningFxTradeData :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData n fsd tdl tdlt plsf lsf fs = do
+  let lt  = Fs.getLearningTime     fsd
+      ltt = Fs.getLearningTestTime fsd
+  printf "%s Learning " =<< Ftm.getLogTime
+  printf "%8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "%c %c %d\n" (head $ show plsf)  (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %3d %c\n" plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (head $ show fs) 
 
 printStartTrade :: Ftd.FxTradeData  -> IO ()
 printStartTrade td = do
@@ -49,13 +54,13 @@ printStartTrade td = do
 printTradeResult :: Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
 printTradeResult td td' units = do
   printf "%s : " =<< Ftm.getLogTime
-  printf "%6.2f %8d %8.0f (%+8.0f) %8.0f (%+8.0f) %6d %6d %6.2f\n"
+  printf "%7.3f %7.3f %7.3f %8d %8.0f (%+8.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
+    (Fcd.close $ Ftd.rate td')
+    (Fcd.close $ Ftd.chart td')
     units
     (Ftd.realizedPL td')
     (Ftd.realizedPL $ td' - td)
-    (Ftd.unrealizedPL td')
-    (Ftd.unrealizedPL $ td' - td)
     (Ftd.trSuccess td')
     (Ftd.trFail td')
     (Ftd.getWinRate td')

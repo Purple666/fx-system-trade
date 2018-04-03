@@ -11,6 +11,7 @@ import qualified GlobalSettingData        as Gsd
 import qualified FxTradeData              as Ftd
 import qualified FxMongodb                as Fm
 import qualified FxChartData              as Fcd
+import qualified FxTime                   as Ftm
 --import Debug.Trace
 import Control.Exception.Extra
 import GHC.Generics (Generic)
@@ -98,7 +99,7 @@ instance FromJSON AccountsBody
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 close td = do
   (s, u, _) <- getOandaPosition td
-  printf" %s : " . show =<< getZonedTime
+  printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
   if s == Ftd.Buy
     then setOandaOrders td "sell" u
@@ -115,7 +116,7 @@ open td side = do
       u' = if Gsd.maxUnit Gsd.gsd < u
            then Gsd.maxUnit Gsd.gsd
            else u
-  printf" %s : " . show =<< getZonedTime
+  printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d\n" (show side) b u'
   if side == Ftd.Buy
     then setOandaOrders td "buy" u'

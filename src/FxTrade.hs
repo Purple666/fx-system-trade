@@ -17,6 +17,7 @@ import qualified GlobalSettingData        as Gsd
 import qualified GlobalSettingFunction    as Gsf
 import qualified Tree                     as Tr
 import qualified FxSetting                as Fs
+import qualified FxMongodb                as Fm
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -184,7 +185,7 @@ makeChartTa :: [Fcd.FxChartData] ->
                [Fad.FxChartTaData]
 makeChartTa [] _ _ _ ctdl = ctdl
 makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
-  let ftado' = M.map (\a -> dropWhile (\b -> Fcd.date x < (Fcd.date $ Fad.chart b)) a) ftado
+  let ftado'  = M.map (\a -> dropWhile (\b -> Fcd.date x < (Fcd.date $ Fad.chart b)) a) ftado
       ftadcp' = M.map (\a -> dropWhile (\b -> Fcd.date x < (Fcd.date $ Fad.chart b)) a) ftadcp
       ftadcl' = M.map (\a -> dropWhile (\b -> Fcd.date x < (Fcd.date $ Fad.chart b)) a) ftadcl
       ctd = Fad.FxChartTaData { Fad.taChart     = x
@@ -217,8 +218,8 @@ backTest :: Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->
-            (Ftd.FxTradeData, Fsd.FxSettingData)
-backTest l ls s td fsd xcd =
+            IO (Ftd.FxTradeData, Fsd.FxSettingData)
+backTest l ls s td fsd xcd = do
   let ctdl = makeChart fsd (l + ls) xcd
       (_, _, td'') = foldl (\(_, _, td') ctd -> if Ftd.trSuccess td + s < Ftd.trSuccess td' ||
                                                    l < (Fcd.date $ Ftd.chart td') - (Fcd.date $ Ftd.chart td)
@@ -226,8 +227,10 @@ backTest l ls s td fsd xcd =
                                                      then (Ftd.None, Ftd.None, td')
                                                      else evaluate ctd fsd Gsf.getQuantityBacktest False True td'
                                                 else evaluate ctd fsd Gsf.getQuantityBacktest False False td') (Ftd.None, Ftd.None, td) ctdl
-  in (td'', Fs.updateFxSettingData ctdl td td'' fsd)
-        
+  fsd' <- Fm.updateFxSettingData $ Fs.updateFxSettingData ctdl td td'' fsd
+  return (td'', fsd')
+-- traceShow(Fcd.close $ Ftd.chart td', Fcd.close $ Ftd.rate td', Ftd.profit td', Ftd.side td') $ 
+
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             Ftd.FxTradeData

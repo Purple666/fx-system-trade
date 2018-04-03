@@ -9,5 +9,8 @@ db.drop_collection(co)
 co = db.trade_practice
 db.drop_collection(co)
 
+co = db.trade_practice_weekly
+db.drop_collection(co)
+
 
     

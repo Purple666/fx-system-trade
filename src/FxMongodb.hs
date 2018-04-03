@@ -98,27 +98,27 @@ updateFxTradeData coName td = do
   close pipe
   if r == []
     then return td
-    else head <$> mapM (\x -> return $ td { Ftd.chart      = read . typed $ valueAt "td" x
+    else head <$> mapM (\x -> return $ td { Ftd.chart      = read . typed $ valueAt "chart" x
                                           , Ftd.trSuccess  = typed $ valueAt "tr_success" x
                                           , Ftd.trFail     = typed $ valueAt "tr_fail" x
                                           , Ftd.profit     = typed $ valueAt "profit" x
                                           , Ftd.realizedPL = typed $ valueAt "realized_pl" x
                                           }) r
 
-readFxSettingData :: IO (Fsd.FxSettingData)
-readFxSettingData  = do
+readFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+readFxSettingData  fsd = do
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
-    then return $ Fsd.initFxSettingData 
+    then return fsd
     else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
-            return $ Fs.setFxSettingData fls fsl
+            return $ Fs.setFxSettingData fsd fls fsl
 
 updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 updateFxSettingData fsd = do
-  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData
+  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
   close pipe
