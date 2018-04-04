@@ -43,7 +43,7 @@ debug = do
   return ()
 
 debugLoop :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-debugtLoop fsd = do
+debugLoop fsd = do
   debugLoop =<< tradeLearning fsd
 
 backTest :: Bool -> Int -> Int -> IO ()
@@ -216,9 +216,9 @@ tradeLoop :: Fcd.FxChartData ->
              Async (Fsd.FxSettingData) ->
              IO (Ftd.FxTradeData)
 tradeLoop p sleep td fsd a = do
-  (a', fsd') <-  checkTradeLearning a fsd
-  e <- Fm.getOneChart Fm.getEndChartFromDB 
-  ct <- Fm.getChartListBack (Fcd.date e) (Fs.getPrepareTimeAll fsd' + 1) 0
+  (a', fsd') <- checkTradeLearning a fsd
+  e <- Foa.getNowPrices td
+  ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.date e) (Fs.getPrepareTimeAll fsd' + 1) 0) <*> pure [e]
   (sleep', td2) <- if last ct /= p
                    then do td1 <- tradeEvaluate td fsd' ct
                            return (0, td1)

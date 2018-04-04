@@ -5,6 +5,7 @@ module FxOandaAPI
   ( close
   , open
   , updateFxTradeData
+  , getNowPrices
   ) where 
 
 import qualified GlobalSettingData        as Gsd
@@ -64,6 +65,17 @@ data OrdersBody = OrdersBody
   , tradeReduced :: TradeReduced
   } deriving (Show, Generic)
 
+data Prices = Prices
+  { ninstrument :: String
+  , ntime       :: String
+  , nbid        :: Double
+  , nask        :: Double
+  } deriving (Show, Generic)
+
+data PricesBody = PricesBody
+  { prices :: [Prices]
+  } deriving (Show, Generic)
+
 data AccountsBody = AccountsBody
   { accountId       :: Int
   , accountName     :: String 
@@ -78,6 +90,8 @@ data AccountsBody = AccountsBody
   , accountCurrency :: String 
   } deriving (Show, Generic)
 
+instance FromJSON OrdersBody
+
 instance FromJSON TradeOpened where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
@@ -87,26 +101,39 @@ instance FromJSON TradesClosed where
 instance FromJSON TradeReduced where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
-instance FromJSON OrdersBody
+instance FromJSON PositionsBody
 
 instance FromJSON Positions where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
-instance FromJSON PositionsBody
+instance FromJSON PricesBody
+
+instance FromJSON Prices where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
 instance FromJSON AccountsBody
+
+getNowPrices :: Ftd.FxTradeData -> IO (Fcd.FxChartData)
+getNowPrices td = do
+  let opts = defaults &
+             header "Authorization" .~ [B.pack $ Ftd.bearer td] &
+             param "instruments" .~ ["USD_JPY"]
+  r <- retry 100 $ getWith opts "https://api-fxpractice.oanda.com/v1/prices"
+       >>= asJSON 
+  e <- Fm.getOneChart Fm.getEndChartFromDB 
+  return $ e { Fcd.close = nbid . head . prices $ r ^. responseBody
+             }
 
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 close td = do
   (s, u, _) <- getOandaPosition td
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
-  if s == Ftd.Buy
-    then setOandaOrders td "sell" u
-    else if s == Ftd.Sell
-         then setOandaOrders td "buy" u
-         else return ()
-  updateFxTradeData td
+  updateFxTradeData =<< if s == Ftd.Buy
+                        then setOandaOrders td "sell" u
+                        else if s == Ftd.Sell
+                             then setOandaOrders td "buy" u
+                             else return td
 
 open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
 open td side = do
@@ -118,21 +145,18 @@ open td side = do
            else u
   printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d\n" (show side) b u'
-  if side == Ftd.Buy
-    then setOandaOrders td "buy" u'
-    else if side == Ftd.Sell
-         then setOandaOrders td "sell" u'
-         else return ()
-  td' <- updateFxTradeData td
-  return (u', td')
+  td'' <- updateFxTradeData =<< if side == Ftd.Buy
+                                then setOandaOrders td "buy" u'
+                                else if side == Ftd.Sell
+                                     then setOandaOrders td "sell" u'
+                                     else return td
+  return (u', td'')
 
 updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do
   (s, _, r) <- getOandaPosition td
   (b, upl) <- getOandaBalance td
-  c <- Fm.getOneChart Fm.getEndChartFromDB 
-  return $ td { Ftd.rate         = (Ftd.rate td) { Fcd.date  = Fcd.date c
-                                                 , Fcd.close = r
+  return $ td { Ftd.rate         = (Ftd.rate td) { Fcd.close = r
                                                  }
               , Ftd.side         = s
               , Ftd.realizedPL   = b
@@ -144,19 +168,21 @@ getOandaBalance td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- retry 100 $ getWith opts (Ftd.url td)
-       >>= asJSON 
+       >>= asJSON
   let b =  balance $ r ^. responseBody
       upl = unrealizedPl $ r ^. responseBody
   return (b, upl)
 
-setOandaOrders :: Ftd.FxTradeData -> String -> Int -> IO ()
+setOandaOrders :: Ftd.FxTradeData -> String -> Int -> IO (Ftd.FxTradeData)
 setOandaOrders td s u = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  _ <- retry 100 $ postWith opts (Ftd.url td ++ "/orders")
+  r <- retry 100 $ postWith opts (Ftd.url td ++ "/orders")
        ["instrument" := ("USD_JPY" :: String), "units" := u, "side" := s, "type" := ("market" :: String)]
-       >>= asJSON :: IO (Response OrdersBody)
-  return ()
+       >>= asJSON
+  return $ td { Ftd.chart = (Ftd.chart td) { Fcd.close = price $ r ^. responseBody
+                                           }
+              }
 
 getOandaPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getOandaPosition td = do
