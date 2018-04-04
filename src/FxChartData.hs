@@ -30,13 +30,23 @@ initFxChartData =
 makeSimChart :: Int -> [FxChartData] -> [FxChartData]
 makeSimChart _ [] = []
 makeSimChart c xs =
-  let chart = take c xs
-      fcd = (head xs) { open  = open    $ head chart 
-                      , high  = maximum $ map high xs
-                      , low   = minimum $ map low  xs
-                      , close = close   $ last chart
-                      }
-  in fcd : (makeSimChart c $ drop c xs)
+  let (_, xs')      = break (\x -> date x `mod` c == 0) xs
+      (chart, xs'') = break (\x -> date x `mod` c == 0) $ tail xs'
+      chart' = head xs' : chart
+      fcd = (head chart') { open  = open    $ head chart'
+                          , high  = maximum $ map high chart'
+                          , low   = minimum $ map low  chart'
+                          , close = close   $ last chart'
+                          }
+  in if null xs' || null chart' 
+     then []
+     else fcd : makeSimChart c xs''
+
+{-
+makeSimChart :: Int -> [FxChartData] -> [FxChartData]
+makeSimChart c xs =
+  filter (\x -> date x `mod` c == 0) xs
+-}
 
 getDate :: Int -> String
 getDate n = LC.unpack . formatUnixTimeGMT (LC.pack "%Y/%m/%d") $ UnixTime (fromInteger ((fromIntegral n) * 60)) 0

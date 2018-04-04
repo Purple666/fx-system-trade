@@ -1,6 +1,7 @@
 module GaFx
   ( backTest
   , trade
+  , debug
   ) where
 
 import qualified Ga 
@@ -35,6 +36,15 @@ instance Ga.Ga Fsd.FxSettingData where
   getGaLength       = Fsd.getGaLength  
   getGaLoopMax      = Fsd.getGaLoopMax 
   plusGaLoopMax     = Fsd.plusGaLoopMax
+
+debug :: IO ()
+debug = do
+  debugLoop =<< (Fm.readFxSettingData $ Fsd.initFxSettingData)
+  return ()
+
+debugLoop :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+debugtLoop fsd = do
+  debugLoop =<< tradeLearning fsd
 
 backTest :: Bool -> Int -> Int -> IO ()
 backTest retry s f = do
@@ -196,7 +206,7 @@ checkTradeLearning a fsd = do
   case e of
     Nothing -> return (a, fsd)
     Just _  -> do fsd' <- wait a
-                  a' <- async (tradeLearningThread fsd)
+                  a' <- async (tradeLearningThread fsd')
                   return (a', fsd')
                  
 tradeLoop :: Fcd.FxChartData ->

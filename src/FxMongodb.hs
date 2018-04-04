@@ -102,7 +102,6 @@ updateFxTradeData coName td = do
                                           , Ftd.trSuccess  = typed $ valueAt "tr_success" x
                                           , Ftd.trFail     = typed $ valueAt "tr_fail" x
                                           , Ftd.profit     = typed $ valueAt "profit" x
-                                          , Ftd.realizedPL = typed $ valueAt "realized_pl" x
                                           }) r
 
 readFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
@@ -134,7 +133,6 @@ setFxTradeDataToDB coName td = do
                             , "tr_success"  =: Ftd.trSuccess td
                             , "tr_fail"     =: Ftd.trFail td
                             , "profit"      =: Ftd.profit td
-                            , "realized_pl" =: Ftd.realizedPL td
                             ]
 
 setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
