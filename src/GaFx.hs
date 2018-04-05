@@ -39,18 +39,28 @@ instance Ga.Ga Fsd.FxSettingData where
 
 debug :: IO ()
 debug = do
-  debugLoop =<< (Fm.readFxSettingData $ Fsd.initFxSettingData)
+  let td  = Ft.initFxTradeData Ftd.Backtest
+  fsd <- (Fm.readFxSettingData $ Fsd.initFxSettingData)
+  debugLoop td fsd -- =<< async ()
   return ()
 
-debugLoop :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-debugLoop fsd = do
-  debugLoop =<< tradeLearning fsd
-
+debugLoop :: Ftd.FxTradeData ->
+             Fsd.FxSettingData ->
+             IO (Ftd.FxTradeData)
+debugLoop td fsd = do
+  fsd' <- tradeLearningThread fsd
+  e <- Fm.getOneChart Fm.getEndChartFromDB
+  ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.date e) (Fs.getPrepareTimeAll fsd' + 1) 0) <*> pure [e]
+  let (_, _, td') = Ft.trade td fsd' ct
+      td'' = Ft.resetFxalgorithmListCount td'
+  Fp.printStartTrade td''
+  debugLoop td'' fsd' 
+    
 backTest :: Bool -> Int -> Int -> IO ()
 backTest retry s f = do
   startN <- Fcd.date <$> Fm.getOneChart Fm.getStartChartFromDB
   endN <- Fcd.date <$> Fm.getOneChart Fm.getEndChartFromDB
-  fsd <- Fm.readFxSettingData $ Fsd.initFxSettingData 
+  fsd <- Fs.initFxsettingFromLog <$> (Fm.readFxSettingData $ Fsd.initFxSettingData)
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -68,7 +78,7 @@ trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB 
   td <- Fm.updateFxTradeData coName =<< (Foa.updateFxTradeData $ (Ft.initFxTradeData environment) { Ftd.chart = c }) 
-  fsd <- Fm.readFxSettingData $ Fsd.initFxSettingData
+  fsd <- Fs.initFxsettingFromLog <$> (Fm.readFxSettingData $ Fsd.initFxSettingData)
   Fm.setFxTradeData "trade_practice_weekly" <$> Fm.updateFxTradeData "trade_practice_weekly" td
   Fp.printStartTrade td
   tradeWeeklyLoop fsd td
@@ -127,7 +137,7 @@ tradeLearning fsd = do
   
 tradeLearningThread :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 tradeLearningThread  fsd = do
-  threadDelay (60 * 1000 * 1000)
+  threadDelay (5 * 60 * 1000 * 1000)
   tradeLearning fsd
 
 backTestLoop :: Bool ->
@@ -219,14 +229,14 @@ tradeLoop p sleep td fsd a = do
   (a', fsd') <- checkTradeLearning a fsd
   e <- Foa.getNowPrices td
   ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.date e) (Fs.getPrepareTimeAll fsd' + 1) 0) <*> pure [e]
-  (sleep', td2) <- if last ct /= p
+  (sleep', td2) <- if e /= p
                    then do td1 <- tradeEvaluate td fsd' ct
                            return (0, td1)
                    else return (sleep + 1, td)
   t <- getCurrentTime
   threadDelay ((60 - ((truncate $ utcTimeToPOSIXSeconds t) `mod` 60)) * 1000 * 1000)
+  let td3 = Ft.resetFxalgorithmListCount td2
   if 30 < sleep' 
     then do cancel a'
-            return td2
-    else tradeLoop (last ct) sleep' td2 fsd' a'
-    
+            return td3
+    else tradeLoop e sleep' td3 fsd' a'

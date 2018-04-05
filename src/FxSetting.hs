@@ -11,6 +11,7 @@ module FxSetting
   , resetFxSettingData
   , setFxSettingData
   , unionFxSettingData
+  , initFxsettingFromLog
   ) where  
 
 import qualified Data.Map                 as M
@@ -68,9 +69,17 @@ unionLearningSetting ls ls' =
                         , Fsd.trSuccess         =     (Fsd.trSuccess         ls + Fsd.trSuccess         ls') `div` 2
                         , Fsd.trSuccessDate     =     (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
                         }
-                        
+
+initFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
+initFxsettingFromLog fsd =
+  fsd { Fsd.fxSetting  = if null $ Fsd.fxSettingLog fsd
+                         then Fsd.fxSetting fsd
+                         else snd . maximum . map swap . M.toList .
+                              M.map (\(p, c) -> p / fromIntegral c) $ Fsd.fxSettingLog fsd
+      }
+  
 setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-setFxSettingData fsd fls' fsl'=
+setFxSettingData fsd fls' fsl' =
   setTreeFunction $ fsd { Fsd.learningSetting = fls' 
                         , Fsd.fxSettingLog    = fsl'
                         }
