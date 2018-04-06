@@ -12,6 +12,7 @@ module FxSetting
   , setFxSettingData
   , unionFxSettingData
   , initFxsettingFromLog
+  , emptyFxSettingLog 
   ) where  
 
 import qualified Data.Map                 as M
@@ -83,6 +84,11 @@ setFxSettingData fsd fls' fsl' =
   setTreeFunction $ fsd { Fsd.learningSetting = fls' 
                         , Fsd.fxSettingLog    = fsl'
                         }
+
+emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
+emptyFxSettingLog fsd =
+  fsd { Fsd.fxSettingLog    = M.empty
+      }
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =

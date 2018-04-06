@@ -115,6 +115,8 @@ cabal.sandbox.config
 *.prof
 *.aux
 *.hp
+*.pdf
+*.ps
 *.eventlog
 .stack-work/
 cabal.project.local

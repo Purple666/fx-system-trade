@@ -39,7 +39,7 @@ printLearningFxTradeData :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.
 printLearningFxTradeData n fsd tdl tdlt plsf lsf fs = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
-  printf "%s Learning " =<< Ftm.getLogTime
+  printf "%s " =<< Ftm.getLogTime
   printf "%8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
