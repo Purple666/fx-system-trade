@@ -3,6 +3,7 @@ module FxPrint
   , printTradeResult
   , printTestProgress
   , printLearningFxTradeData
+  , printBackTestResult
   ) where
 
 --import Debug.Trace
@@ -74,34 +75,8 @@ printFxTradeData td = do
     (Ftd.trFail td)
     (Ftd.getWinRate td)
 
-{-
-printFxSettingData :: Fsd.FxSettingData -> IO ()
-printFxSettingData fsd = do
-  printf "        %10d %10d\n"
-    (Fsd.trSuccess     . Fsd.learningSetting $ Fsd.fxSetting fsd)
-    (Fsd.trSuccessDate . Fsd.learningSetting $ Fsd.fxSetting fsd)
-  printFxTaSetting . Fsd.fxTaOpen  $ Fsd.fxSetting fsd
-  printFxTaSetting . Fsd.fxTaClose $ Fsd.fxSetting fsd
+printBackTestResult :: String -> Int -> Int -> Fsd.FxSettingData ->  IO ()
+printBackTestResult bar s f fsd = do
+  let (p, c, a) = Fs.getFxSettingLogResult fsd   
+  printf (bar ++ " %d - %d : %6.2f %6d %6.2f\n") (s + 1) f p c a
 
-printFxTaSetting :: Fad.FxAlgorithmSetting -> IO ()
-printFxTaSetting fts = do
-  printf "        %4d | %3d %3d %3d %3d | %3d %3d %3d %3d | %3d %3d %3d %3d | %3d %3d %3d %3d | %3d %3d %3d %3d | %3d\n%s\n%s\n"
-    (Fad.simChart fts)
-    (Fad.shortSetting $ Fad.rciSetting fts) (Fad.middleSetting $ Fad.rciSetting fts) (Fad.longSetting $ Fad.rciSetting fts) (Fad.prevSetting $ Fad.rciSetting fts)
-    (Fad.shortSetting $ Fad.rsiSetting fts) (Fad.middleSetting $ Fad.rsiSetting fts) (Fad.longSetting $ Fad.rsiSetting fts) (Fad.prevSetting $ Fad.rsiSetting fts)
-    (Fad.shortSetting $ Fad.smaSetting fts) (Fad.middleSetting $ Fad.smaSetting fts) (Fad.longSetting $ Fad.smaSetting fts) (Fad.prevSetting $ Fad.smaSetting fts)
-    (Fad.shortSetting $ Fad.emaSetting fts) (Fad.middleSetting $ Fad.emaSetting fts) (Fad.longSetting $ Fad.emaSetting fts) (Fad.prevSetting $ Fad.emaSetting fts)
-    (Fad.shortSetting $ Fad.wmaSetting fts) (Fad.middleSetting $ Fad.wmaSetting fts) (Fad.longSetting $ Fad.wmaSetting fts) (Fad.prevSetting $ Fad.wmaSetting fts)
-    (Fad.shortSetting $ Fad.macdSetting fts)
-    (show . sort . Fad.toList $ Fad.techAnaTree fts)
-    (show $ Fad.algorithmListCount fts)
-
-printFxTechnicalAnalysisData :: Fad.FxTechnicalAnalysisData -> IO ()
-printFxTechnicalAnalysisData ftad = do
-  printf "           %6.2f %6.2f %6.2f | %6.2f %6.2f %6.2f | %6.2f %6.2f %6.2f | %6.2f %6.2f %6.2f | %6.2f %6.2f %6.2f\n"
-    (Fad.short $ Fad.rci ftad) (Fad.middle $ Fad.rci ftad) (Fad.long $ Fad.rci ftad) 
-    (Fad.short $ Fad.sma ftad) (Fad.long $ Fad.sma ftad) ((Fad.short $ Fad.sma ftad) - (Fad.long $ Fad.sma ftad))
-    (Fad.short $ Fad.ema ftad) (Fad.long $ Fad.ema ftad) ((Fad.short $ Fad.ema ftad) - (Fad.long $ Fad.ema ftad))
-    (Fad.short $ Fad.wma ftad) (Fad.long $ Fad.wma ftad) ((Fad.short $ Fad.wma ftad) - (Fad.long $ Fad.wma ftad))
-    (Fad.short $ Fad.macd ftad) (Fad.long $ Fad.macd ftad) ((Fad.short $ Fad.macd ftad) - (Fad.long $ Fad.macd ftad))
--}

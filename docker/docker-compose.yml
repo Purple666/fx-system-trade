@@ -35,7 +35,7 @@ services:
 #    volumes:
 #      - /etc/localtime:/etc/localtime:ro 
       
-  trade:
+  trade-practice:
     build: fx-system-trade
     container_name: trade
     restart: always

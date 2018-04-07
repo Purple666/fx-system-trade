@@ -12,7 +12,8 @@ module FxSetting
   , setFxSettingData
   , unionFxSettingData
   , initFxsettingFromLog
-  , emptyFxSettingLog 
+  , emptyFxSettingLog
+  , getFxSettingLogResult
   ) where  
 
 import qualified Data.Map                 as M
@@ -28,6 +29,11 @@ import Control.Monad.Random
 import Debug.Trace
 import Data.Tuple
 import Data.List
+
+getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
+getFxSettingLogResult fsd =
+  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ Fsd.fxSettingLog fsd 
+  in (p, c, p / fromIntegral c)
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd = 

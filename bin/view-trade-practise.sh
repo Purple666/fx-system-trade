@@ -3,6 +3,6 @@
 cd docker
 while [ 1 ]
 do
-    docker-compose logs -f trade
+    docker-compose logs -f trade-practice
 done
 

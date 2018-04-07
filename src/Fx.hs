@@ -14,5 +14,6 @@ main = do
     "backtest"       -> GaFx.backTest False 0 0
     "backtest-retry" -> GaFx.backTest True 0 0
     "trade-practice" -> GaFx.trade Ftd.Practice "trade_practice"
+    "trade-production" -> GaFx.trade Ftd.Production "trade_production"
 
 
