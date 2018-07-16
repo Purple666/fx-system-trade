@@ -376,12 +376,22 @@ items:
         containers:
         - image: fx-system-trade:latest
           name: fx-system-trade-backtest
+          command: ["./Fx", "backtest"]
           resources: {}
-          command: ./Fx backtest
+          volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
         - image: fx-system-trade:latest
-          name: fx-system-trade-basktest-latest
+          name: fx-system-trade-backtest-latest
+          command: ["./Fx", "backtest-latest"]
           resources: {}
-          command: ./Fx backtest-latest
+          volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+        volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
     test: false
     triggers:
     - type: ConfigChange
