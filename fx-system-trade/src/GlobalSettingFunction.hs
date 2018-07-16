@@ -4,27 +4,23 @@ import qualified GlobalSettingData        as Gsd
 import qualified FxTradeData              as Ftd
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
-getEvaluationValue x = 
-  if Ftd.realizedPL x < 0
-  then (1 / Gsd.initalProperty Gsd.gsd) 
-  else (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd)
- {-
-  if Ftd.realizedPL x < 0
-  then (1 / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x) 
-  else if 0 < Ftd.trSuccess x && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL x  
-       then (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x ^ 4) * (1 + (logBase 100 . fromIntegral $ Ftd.trSuccess x))
-       else (Ftd.realizedPL x / Gsd.initalProperty Gsd.gsd) * (1 + Ftd.getWinRatePure x ^ 4)
-
+getEvaluationValue x =
+  if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
+  then 0
+  else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
+{-
+  if Ftd.trTrade x == 0 || Ftd.trTradeDate x == 0
+  then 0
+  else Ftd.profit x * Ftd.realizedPL x / ((fromIntegral $ Ftd.trTradeDate x) / (fromIntegral $ Ftd.trTrade x))
 -}
 
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
-  (and $ map (\x -> 0 < Ftd.profit x) tdlt) && 0 < Ftd.profit tdl 
-  --0 < (Ftd.profit $ sum tdlt) && 0 < Ftd.profit tdl 
+  (and $ map (\x -> 0 < getEvaluationValue x) tdlt) && 0 < getEvaluationValue tdl 
 
 getEvaluationValueList :: [Ftd.FxTradeData] -> Double
 getEvaluationValueList tdlt =
-  Ftd.profit $ sum tdlt
+  sum $ map getEvaluationValue tdlt
 
 buyEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 buyEvaluation td chart rate =
@@ -49,8 +45,10 @@ getQuantityBacktest = getQuantityLearning
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest _ _ = (Gsd.initalProperty Gsd.gsd) / (Gsd.quantityRate Gsd.gsd)
 
+getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning = getQuantityBacktest 
 -}
+
 
 
 -- ===============================================================================================

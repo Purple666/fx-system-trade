@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   
@@ -27,6 +27,14 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro 
 
+  backtest-latest:
+    build: fx-system-trade
+    container_name: backtest-latest
+    restart: always
+    entrypoint: ./Fx backtest-latest
+    volumes:
+      - /etc/localtime:/etc/localtime:ro 
+      
 #  backtest-retry:
 #    build: fx-system-trade
 #    container_name: backtest-retry
@@ -42,4 +50,4 @@ services:
     entrypoint: ./Fx trade-practice 
     volumes:
       - /etc/localtime:/etc/localtime:ro 
-    
+   

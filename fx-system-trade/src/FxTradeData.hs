@@ -20,7 +20,8 @@ data FxTradeData =
               , alcCloseProfit     :: Fad.FxalgorithmListCount
               , alcCloseLoss       :: Fad.FxalgorithmListCount
               , side               :: FxSide
-              , trSuccessDate      :: Int
+              , trTradeDate        :: Int
+              , trTrade            :: Int
               , trSuccess          :: Int
               , trFail             :: Int
               , profit             :: Double
@@ -70,7 +71,8 @@ initFxTradeDataCommon =
               , alcOpen          = Fad.zeroFxalgorithmListCount
               , alcCloseProfit   = Fad.zeroFxalgorithmListCount
               , alcCloseLoss     = Fad.zeroFxalgorithmListCount
-              , trSuccessDate    = 0
+              , trTradeDate      = 0
+              , trTrade          = 0
               , trSuccess        = 0
               , trFail           = 0
               , profit           = 0
@@ -80,4 +82,5 @@ initFxTradeDataCommon =
               , bearer           = ""
               , url              = ""
               }
+
 

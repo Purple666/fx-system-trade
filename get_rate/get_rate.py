@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     JST = timezone(timedelta(hours=+9), 'JST')
     
-    client = pymongo.MongoClient('fx-mongo', 27017)
+    client = pymongo.MongoClient('mongo', 27017)
     db = client.fx
     co = db.rate
     
@@ -29,9 +29,17 @@ if __name__ == "__main__":
         db_price['high'] = price['highBid']
         db_price['low'] = price['lowBid']
         db_price['close'] = price['closeBid']
-        print("rate : %s %d %6.2f %6.2f %6.2f %6.2f" % (loc, db_price['time'], db_price['open'], db_price['high'], db_price['low'], db_price['close']))
-        co.update_one({"time": db_price['time']}, {"$set": db_price}, upsert = True)
 
-        time.sleep(60)
+        document = co.find_one(sort=[("no", -1)])
+
+        if document['time'] == db_price['time']:
+            db_price['no'] = document['no']
+            co.update_one({"no": db_price['no']}, {"$set": db_price}, upsert = True)
+        else:
+            db_price['no'] = document['no'] + 1
+            co.update_one({"no": db_price['no']}, {"$set": db_price}, upsert = True)
+            print("rate : %s %d %d %6.2f %6.2f %6.2f %6.2f" % (loc, db_price['no'], db_price['time'], db_price['open'], db_price['high'], db_price['low'], db_price['close']))
+
+        time.sleep(15)
 
             

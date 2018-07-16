@@ -104,35 +104,29 @@ data FxalgorithmListCount =
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =
   concat $ replicate (Gsd.algorithmRepeat Gsd.gsd)
-  [ (isBuy (crossSL    . ema), isSell (crossSL    . ema)) -- 0
-  , (isBuy (crossSM    . ema), isSell (crossSM    . ema)) -- 1
-  , (isBuy (crossML    . ema), isSell (crossML    . ema)) -- 2
-  , (isBuy (crossSL    . sma), isSell (crossSL    . sma)) -- 3
-  , (isBuy (crossSM    . sma), isSell (crossSM    . sma)) -- 4
-  , (isBuy (crossML    . sma), isSell (crossML    . sma)) -- 5
-  , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
-  , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
-  , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
-  , (isBuy (crossSL   . macd), isSell (crossSL   . macd)) -- 9
-  , (isBuy (crossSL    . rci), isSell (crossSL    . rci)) -- 10
-  , (isBuy (crossSM    . rci), isSell (crossSM    . rci)) -- 11
-  , (isBuy (crossML    . rci), isSell (crossML    . rci)) -- 12
-  , (isBuy (crossSL    . rsi), isSell (crossSL    . rsi)) -- 13
-  , (isBuy (crossSM    . rsi), isSell (crossSM    . rsi)) -- 14
-  , (isBuy (crossML    . rsi), isSell (crossML    . rsi)) -- 15
-  , (isBuy (crossSL    .  st), isSell (crossSL    .  st)) -- 16
-  , (isBuy (crossSM    .  st), isSell (crossSM    .  st)) -- 17
-  , (isBuy (crossML    .  st), isSell (crossML    .  st)) -- 18
-  , (isBuy (thresholdS . rci), isSell (thresholdS . rci)) -- 19
-  , (isBuy (thresholdM . rci), isSell (thresholdM . rci)) -- 20
-  , (isBuy (thresholdL . rci), isSell (thresholdL . rci)) -- 21
-  , (isBuy (thresholdS . rsi), isSell (thresholdS . rsi)) -- 22
-  , (isBuy (thresholdM . rsi), isSell (thresholdM . rsi)) -- 23
-  , (isBuy (thresholdL . rsi), isSell (thresholdL . rsi)) -- 24
-  , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 25
-  , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 26
-  , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 27
-  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb))
+  [ (isBuy (crossSL    . sma), isSell (crossSL    . sma)) -- 1
+  , (isBuy (crossSM    . sma), isSell (crossSM    . sma)) -- 2
+  , (isBuy (crossML    . sma), isSell (crossML    . sma)) -- 3
+  , (isBuy (crossSL   . macd), isSell (crossSL   . macd)) -- 4
+  , (isBuy (crossSL    . rci), isSell (crossSL    . rci)) -- 5
+  , (isBuy (crossSM    . rci), isSell (crossSM    . rci)) -- 6
+  , (isBuy (crossML    . rci), isSell (crossML    . rci)) -- 7
+  , (isBuy (crossSL    . rsi), isSell (crossSL    . rsi)) -- 8
+  , (isBuy (crossSM    . rsi), isSell (crossSM    . rsi)) -- 9
+  , (isBuy (crossML    . rsi), isSell (crossML    . rsi)) -- 10
+  , (isBuy (crossSL    .  st), isSell (crossSL    .  st)) -- 11
+  , (isBuy (crossSM    .  st), isSell (crossSM    .  st)) -- 12
+  , (isBuy (crossML    .  st), isSell (crossML    .  st)) -- 13
+  , (isBuy (thresholdS . rci), isSell (thresholdS . rci)) -- 14
+  , (isBuy (thresholdM . rci), isSell (thresholdM . rci)) -- 15
+  , (isBuy (thresholdL . rci), isSell (thresholdL . rci)) -- 16
+  , (isBuy (thresholdS . rsi), isSell (thresholdS . rsi)) -- 17
+  , (isBuy (thresholdM . rsi), isSell (thresholdM . rsi)) -- 18
+  , (isBuy (thresholdL . rsi), isSell (thresholdL . rsi)) -- 19
+  , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 20
+  , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 21
+  , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 22
+  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 23
   , (isBuy (slopeSn    . rsi), isSell (slopeSn    . rsi)) -- 29
   , (isBuy (slopeMn    . rsi), isSell (slopeMn    . rsi)) -- 30
   , (isBuy (slopeLn    . rsi), isSell (slopeLn    . rsi)) -- 31
@@ -151,7 +145,17 @@ fxAlgorithmList =
   , (isBuy (slopeSn    . wma), isSell (slopeSn    . wma)) -- 44
   , (isBuy (slopeMn    . wma), isSell (slopeMn    . wma)) -- 45
   , (isBuy (slopeLn    . wma), isSell (slopeLn    . wma)) -- 46
+  , (isBuy (crossSL    . ema), isSell (crossSL    . ema)) -- 0
+  , (isBuy (crossSM    . ema), isSell (crossSM    . ema)) -- 1
+  , (isBuy (crossML    . ema), isSell (crossML    . ema)) -- 2
+  , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
+  , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
+  , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
   ]
+
+{-
+-}
+
 
 isBuy :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
 isBuy f fxta =

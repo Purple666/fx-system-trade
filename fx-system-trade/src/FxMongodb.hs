@@ -30,7 +30,7 @@ getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
   r <- getChartList (s - l) s
   minc <- getOneChart getStartChartFromDB
-  if rl + length r < l && Fcd.date minc < s
+  if rl + length r < l && Fcd.no minc < s
     then do r' <- (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
             if 0 < length r' - l
               then return $ drop (length r' - l) r'
@@ -41,7 +41,7 @@ getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
   r <- getChartList s (s + l)
   maxc <- getOneChart getEndChartFromDB 
-  if rl + length r < l && s < Fcd.date maxc
+  if rl + length r < l && s < Fcd.no maxc
     then do r' <- (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
             return $ take l r'
     else return r
@@ -51,7 +51,8 @@ getOneChart f = do
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" f
   close pipe
-  r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.date  = typed $ valueAt "time"  x
+  r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
+                                             , Fcd.date  = typed $ valueAt "time"  x
                                              , Fcd.open  = typed $ valueAt "open"  x
                                              , Fcd.high  = typed $ valueAt "high"  x
                                              , Fcd.low   = typed $ valueAt "low"   x
@@ -65,7 +66,8 @@ getChartList s e = do
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getChartListFromDB  s e
   close pipe
-  mapM (\x -> return $ Fcd.FxChartData { Fcd.date  = typed $ valueAt "time"  x
+  mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
+                                       , Fcd.date  = typed $ valueAt "time"  x
                                        , Fcd.open  = typed $ valueAt "open"  x
                                        , Fcd.high  = typed $ valueAt "high"  x
                                        , Fcd.low   = typed $ valueAt "low"   x
@@ -75,15 +77,15 @@ getChartList s e = do
 
 getChartListFromDB :: Int -> Int -> ReaderT MongoContext IO [Document]
 getChartListFromDB s e = do
-  rest =<< find (select ["time" =: ["$gte" =: s, "$lte" =: e]] "rate")
+  rest =<< find (select ["no" =: ["$gte" =: s, "$lte" =: e]] "rate")
 
 getStartChartFromDB :: ReaderT MongoContext IO [Document]
 getStartChartFromDB = do
-  rest =<< find (select [] "rate") {sort = ["time" =: (1 :: Int)], limit = 1}
+  rest =<< find (select [] "rate") {sort = ["no" =: (1 :: Int)], limit = 1}
 
 getEndChartFromDB :: ReaderT MongoContext IO [Document]
 getEndChartFromDB = do
-  rest =<< find (select [] "rate") {sort = ["time" =: (-1 :: Int)], limit = 1}
+  rest =<< find (select [] "rate") {sort = ["no" =: (-1 :: Int)], limit = 1}
 
 setFxTradeData :: String-> Ftd.FxTradeData -> IO ()
 setFxTradeData coName td = do

@@ -13,6 +13,7 @@ import qualified FxSettingData            as Fsd
 import qualified FxSetting                as Fs
 import qualified FxTradeData              as Ftd
 import qualified FxTime                   as Ftm
+import qualified Data.Map                 as M
 
 printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
@@ -20,13 +21,16 @@ printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
 --     ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
+      ls = Fsd.learningSetting fsd
   if retry
     then printf "   "
     else return ()
   printf "%s : " =<< Ftm.getLogTime
+  nd  <-  Fcd.getDate n
+  nd' <-  Fcd.getDate n'
   printf "%s-%s : %6d %6d %6.2f %4s "
-    (Fcd.getDate n)
-    (Fcd.getDate n')
+    nd
+    nd'
     lt
     ltt
     (Fcd.close $ Ftd.chart tdt)
@@ -34,14 +38,16 @@ printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
   printFxTradeData tdt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "| %3d %c %3d\n" plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %3d %3d " plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (length . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd)
+  printf "| %3d %3d\n" (Fsd.learningTestTimes ls) (Fsd.gaLoopMax ls)
 
-printLearningFxTradeData :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printLearningFxTradeData n fsd tdl tdlt plsf lsf fs = do
+printLearningFxTradeData :: Double -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData p n fsd tdl tdlt plsf lsf fs = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
   printf "%s " =<< Ftm.getLogTime
-  printf "%8d %6d %6d " n lt ltt
+  printf "%8.0f " p
+  printf "| %8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
   printf "| %3d %c %3d %c\n" plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (head $ show fs) 
@@ -52,11 +58,19 @@ printStartTrade td = do
   printFxTradeData td
   printf "\n"
 
-printTradeResult :: Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
-printTradeResult td td' units = do
+printTradeResult :: Ftd.FxSide -> Ftd.FxSide -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
+printTradeResult open close td td' units = do
   printf "%s : " =<< Ftm.getLogTime
-  printf "%7.3f %7.3f %7.3f %8d %8.0f (%+8.0f) %6d %6d %6.2f\n"
+  printf "%4s %4s | "
+    (show open)
+    (show close)
+  nd <- Fcd.getDate . Fcd.date $ Ftd.chart td'
+  printf "%s %8d | "
+    nd
+    ((Fcd.no $ Ftd.chart td') - (Fcd.no $ Ftd.rate td))
+  printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %8.0f (%+8.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
+    (Ftd.profit $ td' - td)
     (Fcd.close $ Ftd.rate td')
     (Fcd.close $ Ftd.chart td')
     units
@@ -78,5 +92,5 @@ printFxTradeData td = do
 printBackTestResult :: String -> Int -> Int -> Fsd.FxSettingData ->  IO ()
 printBackTestResult bar s f fsd = do
   let (p, c, a) = Fs.getFxSettingLogResult fsd   
-  printf (bar ++ " %d - %d : %6.2f %6d %6.2f\n") (s + 1) f p c a
+  printf (bar ++ " %d - %d : %6.2f %6d %6.2f\n") s f p c a
 

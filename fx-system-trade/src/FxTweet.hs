@@ -53,6 +53,8 @@ tweetOpen td units = do
 
 tweetWeek :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO ()
 tweetWeek td td' = do
+  nd  <- Fcd.getDate . Fcd.date $ Ftd.chart td
+  nd' <- Fcd.getDate . Fcd.date $ Ftd.chart td'
   let fmts =  "#FxSystemTrade(%s)\n" ++
               "[%s - %s]\n" ++
               "Rate : %.2f -> %.2f\n" ++
@@ -60,8 +62,8 @@ tweetWeek td td' = do
               "Win Rate : %.2f %% (%d - %d)\n"
       t = printf fmts
           (show $ Ftd.environment td')
-          (Fcd.getDate . Fcd.date $ Ftd.chart td)
-          (Fcd.getDate . Fcd.date $ Ftd.chart td')
+          nd
+          nd'
           (Fcd.close $ Ftd.chart td)
           (Fcd.close $ Ftd.chart td')
           (Ftd.realizedPL td')

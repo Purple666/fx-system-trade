@@ -14,6 +14,7 @@ module FxSetting
   , initFxsettingFromLog
   , emptyFxSettingLog
   , getFxSettingLogResult
+  , getSimChartMax
   ) where  
 
 import qualified Data.Map                 as M
@@ -29,6 +30,12 @@ import Control.Monad.Random
 import Debug.Trace
 import Data.Tuple
 import Data.List
+
+getSimChartMax :: Fsd.FxSettingData -> Int
+getSimChartMax fsd = 
+  maximum [ (Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
+          , (Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
+          , (Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)]
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
@@ -72,9 +79,8 @@ unionLearningSetting :: Fsd.FxLearningSetting -> Fsd.FxLearningSetting -> Fsd.Fx
 unionLearningSetting ls ls' =
   Fsd.FxLearningSetting { Fsd.learningTestTimes = max (Fsd.learningTestTimes ls) (Fsd.learningTestTimes ls')
                         , Fsd.gaLoopMax         = max (Fsd.gaLoopMax         ls) (Fsd.gaLoopMax         ls')
-                        , Fsd.gaLength          = max (Fsd.gaLength          ls) (Fsd.gaLength          ls')
-                        , Fsd.trSuccess         =     (Fsd.trSuccess         ls + Fsd.trSuccess         ls') `div` 2
-                        , Fsd.trSuccessDate     =     (Fsd.trSuccessDate     ls + Fsd.trSuccessDate     ls') `div` 2
+                        , Fsd.trTrade           = max (Fsd.trTrade           ls) (Fsd.trTrade           ls')
+                        , Fsd.trTradeDate       = max (Fsd.trTradeDate       ls) (Fsd.trTradeDate       ls')
                         }
 
 initFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
@@ -99,9 +105,9 @@ emptyFxSettingLog fsd =
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
-  in if Fsd.trSuccess ls == 0
-     then 24 * 60
-     else let l = truncate $ getLearningTestTimes fsd * (fromIntegral $ Fsd.trSuccessDate ls `div` Fsd.trSuccess ls)
+  in if Fsd.trTrade ls == 0
+     then 60
+     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))
           in if Gsd.maxLearningTime Gsd.gsd < l 
              then Gsd.maxLearningTime Gsd.gsd
              else l
@@ -112,19 +118,18 @@ getLearningTestTime fsd =
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd = 
-  (log :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
+  (sqrt :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
+  --
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-            else if 0 < p
-                 then M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
-                 else Fsd.fxSettingLog fsd
+            else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
       ls = (Fsd.learningSetting fsd)
-           { Fsd.trSuccess     = (Fsd.trSuccess     $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trSuccess tdt)
-           , Fsd.trSuccessDate = (Fsd.trSuccessDate $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trSuccessDate tdt)
+           { Fsd.trTrade     = (Fsd.trTrade     $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trTrade tdt)
+           , Fsd.trTradeDate = (Fsd.trTradeDate $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trTradeDate tdt)
            }
   in if 0 < p
      then fsd { Fsd.learningSetting = ls
@@ -296,7 +301,7 @@ crossoverFxAlgorithmSetting :: MonadRandom m =>
                                Fad.FxAlgorithmSetting ->
                                m (Fad.FxAlgorithmSetting, Fad.FxAlgorithmSetting)
 crossoverFxAlgorithmSetting a b = do
-  die <- replicateM 3 $ getRandomR (True, False)
+  die <- replicateM 4 $ getRandomR (True, False)
   (ta, tb)       <- Tr.crossoverTree (Fad.algorithmAndRate a) (Fad.algorithmOrRate a)
                     (Fad.algorithmTree a) (Fad.algorithmListCount a) (Fad.algorithmTree b) (Fad.algorithmListCount b)
   (rcia, rcib)   <- crossoverOrdFxAlMaSetting (Fad.rciSetting a) (Fad.rciSetting b)
@@ -314,7 +319,7 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.wmaSetting       = wmaa
              , Fad.macdSetting      = macda
              , Fad.rsiSetting       = rsia
-             , Fad.simChart         = choice1 die 2 (Fad.simChart  a) (Fad.simChart  b)
+             , Fad.simChart         = choice1 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
          , b { Fad.algorithmTree    = tb
              , Fad.algorithmAndRate = choice2 die 0 (Fad.algorithmAndRate a) (Fad.algorithmAndRate b)
@@ -325,7 +330,7 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.wmaSetting       = wmab
              , Fad.macdSetting      = macdb
              , Fad.rsiSetting       = rsib
-             , Fad.simChart         = choice2 die 2 (Fad.simChart  a) (Fad.simChart  b)
+             , Fad.simChart         = choice2 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
            )
            

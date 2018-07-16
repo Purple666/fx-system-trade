@@ -6,15 +6,20 @@ module FxTechnicalAnalysis
   , getPrepareTime
   , updateAlgorithmListCount
   , setFxTechnicalAnalysisSetting
+  , getSimChartMax
   ) where
 
---import Debug.Trace
+import Debug.Trace
 import Data.List
 import qualified GlobalSettingData        as Gsd
 import qualified FxChartData              as Fcd
 import qualified FxTechnicalAnalysisData  as Fad
 import qualified Tree                     as Tr
 import qualified Data.Map                 as M
+
+getSimChartMax :: Fad.FxTechnicalAnalysisSetting -> Int
+getSimChartMax x =
+  (maximum $ M.map (\a -> Fad.simChart a) $ Fad.algoSetting x)
 
 checkAlgoSetting :: M.Map Int Fad.FxAlgorithmSetting ->
                     Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData) ->
@@ -136,8 +141,8 @@ setFxAlgorithmSetting x =
 
 rci :: Int -> [Double] -> Double
 rci n x  =
-  let r  = [1..n]
-      r' = reverse [1..n]
+  let r  = [1..n] :: [Int]
+      r' = reverse [1..n] :: [Int]
       d = sum . map (\(a, b) -> (a - b) ^ (2 :: Int)) . zipWith (\a (_, b') -> (a, b')) r' . sort $ zip x r 
   in (1 - (6.0 * fromIntegral d) / ((fromIntegral n) * ((fromIntegral n) ^ (2 :: Int) - 1))) * 100
 
@@ -213,15 +218,18 @@ getMACD es el n x =
                   else ((sum $ map (Fad.short . Fad.macd) s) + macd) / (fromIntegral n)
   in (macd, signal)
 
-getBB :: Fcd.FxChartData -> Int -> Int -> Double -> [Fcd.FxChartData] -> Fad.FxMovingAverageData
-getBB chart n a ma x =
-  let s = take n $ map Fcd.close x
+getBB :: Int -> Double -> [Fcd.FxChartData] -> Fad.FxMovingAverageData
+getBB n ma x =
+  let chart = head x
+      s = take n $ map Fcd.close x
       sd = sqrt $ ((fromIntegral n) * (foldl (\acc b -> (b ^ (2 :: Int) + acc)) 0 s) - (sum s) ^ (2 :: Int)) / (fromIntegral $ n * (n - 1))
   in if length s < n || ma == 0
      then Fad.initFxMovingAverageData 
-     else Fad.initFxMovingAverageData { Fad.thresholdS = if ma + sd * (fromIntegral a) < Fcd.close chart
+     else Fad.initFxMovingAverageData { Fad.thresholdS = if Fcd.close chart < ma - sd * 3 ||
+                                                            (ma + sd * 2 < Fcd.close chart && Fcd.close chart < ma + sd * 3)
                                                          then Fad.Buy
-                                                         else if Fcd.close chart < ma - sd * (fromIntegral a)
+                                                         else if ma + sd * 3 < Fcd.close chart ||
+                                                                 (ma - sd * 3 < Fcd.close chart && Fcd.close chart < ma - sd * 2)
                                                               then Fad.Sell
                                                               else Fad.None
                                       }
@@ -249,21 +257,15 @@ setCross s l ps pl =
        then Fad.Sell
        else Fad.None
 
-{-
-setCrossN :: [Fad.FxTechnicalAnalysisData]
-setCrossN pdl =
-  let open  = take 2 $ map Fcd.open pdl
-      close = take 2 $ map Fcd.close pdl
-      buy  = and $ map (\(o, c) -> o < c) $ zip open close
-      sell = and $ map (\(o, c) -> c < o) $ zip open close
-  in 
--}
-
 lsmn :: [Double] -> Fad.FxTradePosition
 lsmn xs =
-  if and $ map (0 <) xs
+  if fst $ foldl (\(f, p) x -> if f && p <= x
+                               then (True, p)
+                               else (False, p)) (True, 0) xs
   then Fad.Buy
-  else if and $ map (< 0) xs
+  else if fst $ foldl (\(f, p) x -> if f && x <= p
+                               then (True, p)
+                               else (False, p)) (True, 0) xs
        then Fad.Sell
        else Fad.None
 
@@ -325,39 +327,38 @@ makeFxMovingAverageData f tmin tmax lr ftms g pdl =
 
 makeFxTechnicalAnalysisData :: Fad.FxAlgorithmSetting ->
                                [Fcd.FxChartData] ->
-                               [Fcd.FxChartData] ->
+                               Fcd.FxChartData ->
                                [Fad.FxTechnicalAnalysisData] ->
                                Fad.FxTechnicalAnalysisData
-makeFxTechnicalAnalysisData ftas lr lf pdl =
-  let chart = head lf
-      (macd, macdSignal) = getMACD (Fad.short $ Fad.ema x) (Fad.long $ Fad.ema x) (Fad.shortSetting $ Fad.macdSetting ftas) pdl
-      bb = getBB chart (Fad.shortSetting $ Fad.smaSetting ftas) 2 (Fad.short $ Fad.sma x) lr
-      (k, d, sd) = getST (Fad.longSetting $ Fad.stSetting ftas) (Fad.shortSetting $ Fad.stSetting ftas) lr pdl
-      x = Fad.FxTechnicalAnalysisData { Fad.chart = chart
-                                      , Fad.sma   = makeFxMovingAverageData getSma 0 0 lr (Fad.smaSetting ftas) Fad.sma pdl
-                                      , Fad.ema   = makeFxMovingAverageData getEma 0 0 lr (Fad.emaSetting ftas) Fad.ema pdl
-                                      , Fad.wma   = makeFxMovingAverageData getWma 0 0 lr (Fad.wmaSetting ftas) Fad.wma pdl
-                                      , Fad.macd  = setFxMovingAverageData macd 0 macdSignal 0 0 (Fad.macdSetting ftas) Fad.macd pdl
-                                      , Fad.rci   = makeFxMovingAverageData getRci (-100) 100 lr (Fad.rciSetting ftas) Fad.rci pdl
-                                      , Fad.st    = setFxMovingAverageData k d sd  0 100 (Fad.stSetting ftas) Fad.st pdl
-                                      , Fad.rsi   = makeFxMovingAverageData getRsi 0 100 lr (Fad.rsiSetting ftas) Fad.rsi pdl
-                                      , Fad.bb    = bb
+makeFxTechnicalAnalysisData ftas lr chart pdl =
+  let (macd, macdSignal) = getMACD (Fad.middle $ Fad.ema x) (Fad.long $ Fad.ema x) (Fad.middleSetting $ Fad.macdSetting ftas) pdl
+      (k, d, sd) = getST (Fad.longSetting $ Fad.stSetting ftas) (Fad.middleSetting $ Fad.stSetting ftas) lr pdl
+      x = Fad.FxTechnicalAnalysisData { Fad.chart  = chart
+                                      , Fad.sma    = makeFxMovingAverageData getSma 0 0 lr (Fad.smaSetting ftas) Fad.sma pdl
+                                      , Fad.ema    = makeFxMovingAverageData getEma 0 0 lr (Fad.emaSetting ftas) Fad.ema pdl
+                                      , Fad.wma    = makeFxMovingAverageData getWma 0 0 lr (Fad.wmaSetting ftas) Fad.wma pdl
+                                      , Fad.macd   = setFxMovingAverageData macd 0 macdSignal 0 0 (Fad.macdSetting ftas) Fad.macd pdl
+                                      , Fad.rci    = makeFxMovingAverageData getRci (-100) 100 lr (Fad.rciSetting ftas) Fad.rci pdl
+                                      , Fad.st     = setFxMovingAverageData k d sd  0 100 (Fad.stSetting ftas) Fad.st pdl
+                                      , Fad.rsi    = makeFxMovingAverageData getRsi 0 100 lr (Fad.rsiSetting ftas) Fad.rsi pdl
+                                      , Fad.bb     = getBB (Fad.middleSetting $ Fad.smaSetting ftas) (Fad.middle $ Fad.sma x) lr
                                       }
-  in x
+  in if null pdl
+     then Fad.initFxTechnicalAnalysisData
+     else x
 
+{-
+lf [old .. new]
+lr [new .. old]
+
+-}
 makeFxTechnicalAnalysisDataList :: Fad.FxAlgorithmSetting ->
                                    [Fcd.FxChartData] ->
                                    [Fcd.FxChartData] ->
                                    [Fad.FxTechnicalAnalysisData] ->
                                    [Fad.FxTechnicalAnalysisData]
-makeFxTechnicalAnalysisDataList _  _             [] _ = []
-makeFxTechnicalAnalysisDataList fs lr lfAll@(lf:[]) x =
-  let d = makeFxTechnicalAnalysisData fs (lf:lr) lfAll x
-  in  d:x
-makeFxTechnicalAnalysisDataList fs lr lfAll@(lf:lfs) [] =
-  let d = makeFxTechnicalAnalysisData fs (lf:lr) lfAll [Fad.initFxTechnicalAnalysisData]
-  in  makeFxTechnicalAnalysisDataList fs (lf:lr) lfs (d:[])
-makeFxTechnicalAnalysisDataList fs lr lfAll@(lf:lfs) x =
-  let d = makeFxTechnicalAnalysisData fs (lf:lr) lfAll x
+makeFxTechnicalAnalysisDataList _  _             [] x = x
+makeFxTechnicalAnalysisDataList fs lr (lf:lfs) x =
+  let d = makeFxTechnicalAnalysisData fs (lf:lr) lf x
   in  makeFxTechnicalAnalysisDataList fs (lf:lr) lfs (d:x)
 

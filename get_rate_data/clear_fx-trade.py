@@ -1,7 +1,7 @@
 import pymongo
 import time
 
-client = pymongo.MongoClient('fx.flg.jp', 27017)
+client = pymongo.MongoClient('openshift.flg.jp', 30017)
 db = client.fx
 
 co = db.fsd
