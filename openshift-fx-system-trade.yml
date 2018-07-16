@@ -338,10 +338,10 @@ items:
       type: Docker
     triggers:
     - github:
-        secret: M6YWoN_nZPNmnpql_rf7
+        secret: ybTfVr1U-3LE8RCjxYkU
       type: GitHub
     - generic:
-        secret: uBp4CJl_kg0l7I-GV22r
+        secret: RtFgZcI_7mlAGsRdRUNA
       type: Generic
     - type: ConfigChange
     - imageChange: {}
@@ -375,14 +375,14 @@ items:
       spec:
         containers:
         - image: fx-system-trade:latest
-          name: fx-system-trade-backtest
+          name: fx-system-trade
           command: ["./Fx", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
         - image: fx-system-trade:latest
-          name: fx-system-trade-backtest-latest
+          name: fx-system-trade-2
           command: ["./Fx", "backtest-latest"]
           resources: {}
           volumeMounts:
@@ -412,4 +412,3 @@ items:
     updatedReplicas: 0
 kind: List
 metadata: {}
-
