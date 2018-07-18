@@ -239,7 +239,7 @@ tradeLoop p sleep td fsd coName a = do
                    else return (sleep + 1, td)
   t <- getCurrentTime
   threadDelay ((15 - ((truncate $ utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
-  if 30 < sleep' 
+  if 240 < sleep' 
     then do cancel a'
             return td2
     else tradeLoop e sleep' td2 fsd' coName a' 
