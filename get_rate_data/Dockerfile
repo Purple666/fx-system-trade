@@ -4,5 +4,5 @@ WORKDIR /python
 COPY . /python
 COPY requirements.txt /python
 RUN pip install -r requirements.txt
-ENTRYPOINT ["get_forexite.sh"]
+ENTRYPOINT ["bash", "get_forexite.sh"]
         
