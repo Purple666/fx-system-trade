@@ -1,6 +1,6 @@
 FROM python:3
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update && apt-get install unzip        
+RUN apt-get update && apt-get -y install unzip        
 WORKDIR /python
 COPY requirements.txt /python
 RUN pip install -r requirements.txt
