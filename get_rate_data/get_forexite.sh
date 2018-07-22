@@ -31,7 +31,7 @@ rm *.zip
 
 cd ..
 
-bash ./store_db.sh
+./store_db.sh
 
 
 
