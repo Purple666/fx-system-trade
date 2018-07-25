@@ -197,9 +197,9 @@ makeChartTa :: [Fcd.FxChartData] ->
                [Fad.FxChartTaData]
 makeChartTa [] _ _ _ ctdl = ctdl
 makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
-  let ftado'  = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftado
-      ftadcp' = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftadcp
-      ftadcl' = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftadcl
+  let ftado'  = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftado
+      ftadcp' = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftadcp
+      ftadcl' = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftadcl
       ctd = Fad.FxChartTaData { Fad.taChart     = x 
                               , Fad.open        = M.map (\y -> if null y
                                                                then Fad.initFxTechnicalAnalysisData
@@ -235,9 +235,12 @@ makeSimChart c xs =
                                       , Fcd.close = fst low
                                       }
               fcdClose = last chart
+          in [fcdClose]
+{-              
           in if snd high < snd low
              then [fcdHigh, fcdLow, fcdClose]
              else [fcdLow,  fcdHigh, fcdClose]
+-}
      else if null chart
           then (head xs') : (makeSimChart c $ tail xs')
           else let chart' = head xs' : chart
@@ -250,9 +253,12 @@ makeSimChart c xs =
                                          , Fcd.close = fst low
                                          }
                    fcdClose = head xs'
+               in fcdClose : (makeSimChart c $ tail xs')
+{-                   
                in if snd high < snd low
                   then fcdHigh : fcdLow : fcdClose : (makeSimChart c $ tail xs')
                   else fcdLow : fcdHigh : fcdClose : (makeSimChart c $ tail xs')
+-}
 
 {-
 xcd [old .. new]

@@ -359,6 +359,6 @@ makeFxTechnicalAnalysisDataList :: Fad.FxAlgorithmSetting ->
                                    [Fad.FxTechnicalAnalysisData]
 makeFxTechnicalAnalysisDataList _  _             [] x = x
 makeFxTechnicalAnalysisDataList fs lr (lf:lfs) x =
-  let d = makeFxTechnicalAnalysisData fs (lf:lr) lf x
+  let d = makeFxTechnicalAnalysisData fs lr lf x
   in  makeFxTechnicalAnalysisDataList fs (lf:lr) lfs (d:x)
 

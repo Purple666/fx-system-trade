@@ -515,3 +515,97 @@ items:
     updatedReplicas: 0
 kind: List
 metadata: {}
+---
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: get-rate-data
+    name: get-rate-data
+  spec:
+    lookupPolicy:
+      local: false
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: get-rate-data
+    name: get-rate-data
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: get-rate-data:latest
+    postCommit: {}
+    resources: {}
+    source:
+      contextDir: get_rate_data
+      git:
+        uri: https://github.com/andesm/fx-system-trade
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: python:3
+          namespace: flg
+      type: Docker
+    triggers:
+    - github:
+        secret: M4_V_EVT61Fn_tq55AEx
+      type: GitHub
+    - generic:
+        secret: scMbnfs6X3m4Rcngw29X
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: batch/v1beta1
+  kind: CronJob
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: get-rate-data
+    name: get-rate-data
+  spec:
+    schedule: "0 0 * * 0"  
+    jobTemplate:
+      spec:
+        template:        
+          metadata:
+            annotations:
+              openshift.io/generated-by: OpenShiftNewApp
+            creationTimestamp: null
+            labels:
+              parrent: get-rate-data
+          spec:    
+            containers:
+            - image: get-rate-data:latest
+              name: get-rate-data
+              resources: {}
+              volumeMounts:
+              - name: nfs-share
+                mountPath: /get_rate_data
+                subPath: home/andesm/dev/fx-system-trade/get_rate_data
+            volumes:
+            - name: nfs-share
+              persistentVolumeClaim:
+                claimName: nfs-pvc
+            restartPolicy: OnFailure 
+kind: List
+metadata: {}
