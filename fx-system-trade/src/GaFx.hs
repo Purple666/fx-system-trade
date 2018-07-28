@@ -67,13 +67,15 @@ backTest retry s f latest = do
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
                     getRandomR(s, s + ltt * 2)
   let n = startN + p
-  (fs, fsd') <- backTestLoop latest retry False n endN fsd td
+  (clear, fs, fsd') <- backTestLoop latest retry False n endN fsd td
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" s (f + 1) fsd' 
                       return (s, f + 1)
-  backTest retry s' f' latest
+  if clear
+    then backTest retry 0 0 latest
+    else backTest retry s' f' latest
 
 trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
@@ -162,7 +164,7 @@ backTestLoop latest retry failp n endN fsd td = do
   if retry && Ftd.profit tdt < Ftd.profit td
     then backTestLoop latest retry True n endN fsd2 td 
     else if clear || endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-         then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
+         then return (clear, Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
          else backTestLoop latest retry False n' endN fsd2 tdt
          
 tradeEvaluate :: Ftd.FxTradeData ->
