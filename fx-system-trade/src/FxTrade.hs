@@ -284,7 +284,7 @@ backTest :: Bool ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->
-            IO (Ftd.FxTradeData, Fsd.FxSettingData)
+            IO (Bool, Ftd.FxTradeData, Fsd.FxSettingData)
 backTest latest endN l s td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
@@ -298,8 +298,9 @@ backTest latest endN l s td fsd xcd = do
                                 else return ()
                               return td3)
                      (pure td) ctdl
+  clear <- Fm.checkFxSettingData
   fsd' <- Fm.updateFxSettingData $ Fs.updateFxSettingData ctdl td td'' fsd
-  return (resetCounter td'', fsd')
+  return (clear, resetCounter td'', fsd')
 -- traceShow(Fcd.close $ Ftd.chart td', Fcd.close $ Ftd.rate td', Ftd.profit td', Ftd.side td') $ 
 
 learning :: Ftd.FxTradeData ->

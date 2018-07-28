@@ -11,6 +11,7 @@ module FxMongodb
   , updateFxTradeData
   , updateFxSettingData 
   , readFxSettingData
+  , checkFxSettingData
   ) where
 
 
@@ -124,15 +125,12 @@ checkFxSettingData = do
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
-    then return False
-    else return True
+    then return True
+    else return False
 
 updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 updateFxSettingData fsd = do
-  db <- checkFxSettingData
-  fsd' <- if db
-          then Fs.unionFxSettingData fsd <$> readFxSettingData fsd
-          else return Fsd.initFxSettingData
+  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
   close pipe
