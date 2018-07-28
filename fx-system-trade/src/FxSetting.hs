@@ -32,10 +32,12 @@ import Data.Tuple
 import Data.List
 
 getSimChartMax :: Fsd.FxSettingData -> Int
-getSimChartMax fsd = 
+getSimChartMax fsd = 0
+{-
   maximum [ (Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
           , (Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
-          , (Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)]
+          , (Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)] * 5
+-}
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =

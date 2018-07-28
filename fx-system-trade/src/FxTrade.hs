@@ -89,15 +89,15 @@ evaluate ctd fsd f1 forceSell td = do
                then if Ftd.side td == Ftd.Buy &&
                        (forceSell ||
                        (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
-                        ((0.01 <= chart - rate   && evaluateProfitDec ftcp ftadcp) ||
-                         (chart - rate <= -0.01  && evaluateProfitDec ftcl ftadcl))) ||
+                        ((0 <= chart - rate   && evaluateProfitDec ftcp ftadcp) ||
+                         (chart - rate <= 0  && evaluateProfitDec ftcl ftadcl))) ||
                          ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
                     then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                     else if Ftd.side td == Ftd.Sell &&
                             (forceSell || 
                              (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
-                              ((0.01 <= rate - chart  && evaluateProfitInc ftcp ftadcp) ||
-                               (rate - chart <= -0.01 && evaluateProfitInc ftcl ftadcl))) ||
+                              ((0 <= rate - chart  && evaluateProfitInc ftcp ftadcp) ||
+                               (rate - chart <= 0 && evaluateProfitInc ftcl ftadcl))) ||
                               ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
                          then (rate - chart, 1 - (chart / rate), Ftd.Sell)
                          else (0, 0, Ftd.None)
