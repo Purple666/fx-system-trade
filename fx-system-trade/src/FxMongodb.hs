@@ -113,7 +113,7 @@ readFxSettingData  fsd = do
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
-    then writeFxSettingData fsd
+    then writeFxSettingData $ Fsd.initFxSettingData
     else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData fsd fls fsl
