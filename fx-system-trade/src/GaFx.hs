@@ -151,7 +151,7 @@ backTestLoop :: Bool ->
                 Int ->
                 Fsd.FxSettingData ->
                 Ftd.FxTradeData ->
-                IO (Bool, Fsd.FxSettingData)
+                IO (Bool, Bool, Fsd.FxSettingData)
 backTestLoop latest retry failp n endN fsd td = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning failp (n - 1) fsd
   let ltt = Fs.getLearningTestTime fsd1
