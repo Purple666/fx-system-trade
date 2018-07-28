@@ -113,21 +113,26 @@ readFxSettingData  fsd = do
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
-    then writeFxSettingData $ Fsd.initFxSettingData
+    then return fsd
     else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData fsd fls fsl
 
-writeFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-writeFxSettingData fsd = do
+checkFxSettingData :: IO (Bool)
+checkFxSettingData = do
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd) (Fsd.fxSettingLog fsd)
+  r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
-  return fsd
+  if r == []
+    then return False
+    else return True
 
 updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 updateFxSettingData fsd = do
-  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
+  db <- checkFxSettingData
+  fsd' <- if db
+          then Fs.unionFxSettingData fsd <$> readFxSettingData fsd
+          else return Fsd.initFxSettingData
   pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
   close pipe
