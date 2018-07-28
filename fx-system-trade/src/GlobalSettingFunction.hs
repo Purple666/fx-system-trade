@@ -5,11 +5,11 @@ import qualified FxTradeData              as Ftd
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x
-{-  
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
   else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
+{-  
+  Ftd.profit x
 -}
 {-
   if Ftd.trTrade x == 0 || Ftd.trTradeDate x == 0
