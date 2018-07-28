@@ -300,7 +300,7 @@ backTest latest endN l s td fsd xcd = do
                      (pure td) ctdl
   clear <- Fm.checkFxSettingData
   fsd' <- if clear
-          then fsd
+          then return fsd
           else Fm.updateFxSettingData $ Fs.updateFxSettingData ctdl td td'' fsd
   return (clear, resetCounter td'', fsd')
 -- traceShow(Fcd.close $ Ftd.chart td', Fcd.close $ Ftd.rate td', Ftd.profit td', Ftd.side td') $ 
