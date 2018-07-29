@@ -19,7 +19,16 @@ import qualified Data.Map                 as M
 
 getSimChartMax :: Fad.FxTechnicalAnalysisSetting -> Int
 getSimChartMax x =
-  (maximum $ M.map (\a -> Fad.simChart a) $ Fad.algoSetting x)
+  (maximum $ M.map (\a -> let prevSettingMax = maximum
+                                [ Fad.prevSetting $ Fad.smaSetting a
+                                , Fad.prevSetting $ Fad.emaSetting a
+                                , Fad.prevSetting $ Fad.wmaSetting a
+                                , Fad.prevSetting $ Fad.macdSetting a
+                                , Fad.prevSetting $ Fad.stSetting a
+                                , Fad.prevSetting $ Fad.rciSetting a
+                                , Fad.prevSetting $ Fad.rsiSetting a
+                                ]
+                          in Fad.simChart a * prevSettingMax) $ Fad.algoSetting x)
 
 checkAlgoSetting :: M.Map Int Fad.FxAlgorithmSetting ->
                     Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData) ->
