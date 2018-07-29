@@ -5,11 +5,11 @@ import qualified FxTradeData              as Ftd
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
+  Ftd.profit x
+{-  
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
   else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
-{-  
-  Ftd.profit x
 -}
 {-
   if Ftd.trTrade x == 0 || Ftd.trTradeDate x == 0
@@ -27,15 +27,15 @@ getEvaluationValueList tdlt =
 
 buyEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 buyEvaluation td chart rate =
-  --Ftd.side td == Ftd.None 
+  Ftd.side td == Ftd.None 
   --Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && 0 < rate - chart)
+  --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && 0 < rate - chart)
 
 sellEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 sellEvaluation td chart rate =
-  --Ftd.side td == Ftd.None
+  Ftd.side td == Ftd.None
   --Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
+  --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = if ((fromIntegral $ Gsd.maxUnit Gsd.gsd) * chart) / 25 < (Ftd.realizedPL td) / Gsd.quantityRate Gsd.gsd
