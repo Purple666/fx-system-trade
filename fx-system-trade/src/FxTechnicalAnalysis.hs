@@ -28,7 +28,7 @@ getSimChartMax x =
                                 , Fad.prevSetting $ Fad.rciSetting a
                                 , Fad.prevSetting $ Fad.rsiSetting a
                                 ]
-                          in Fad.simChart a {- * prevSettingMax -} ) $ Fad.algoSetting x)
+                          in Fad.simChart a * prevSettingMax) $ Fad.algoSetting x)
 
 checkAlgoSetting :: M.Map Int Fad.FxAlgorithmSetting ->
                     Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData) ->
@@ -353,7 +353,7 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
                                       , Fad.bb     = getBB (Fad.middleSetting $ Fad.smaSetting ftas) (Fad.middle $ Fad.sma x) lr
                                       }
   in if null pdl
-     then Fad.initFxTechnicalAnalysisData
+     then Fad.initFxTechnicalAnalysisData 
      else x
 
 {-
