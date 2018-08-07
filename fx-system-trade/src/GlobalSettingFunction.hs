@@ -26,15 +26,15 @@ getEvaluationValueList tdlt =
 
 buyEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 buyEvaluation td chart rate =
-  --Ftd.side td == Ftd.None 
+  Ftd.side td == Ftd.None 
   --Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && 0 < rate - chart)
+  --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && 0 < rate - chart)
 
 sellEvaluation :: Ftd.FxTradeData -> Double -> Double -> Bool
 sellEvaluation td chart rate =
-  --Ftd.side td == Ftd.None
+  Ftd.side td == Ftd.None
   --Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
+  --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
 
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
