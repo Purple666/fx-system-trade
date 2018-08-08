@@ -197,9 +197,9 @@ makeChartTa :: [Fcd.FxChartData] ->
                [Fad.FxChartTaData]
 makeChartTa [] _ _ _ ctdl = ctdl
 makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
-  let ftado'  = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftado
-      ftadcp' = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftadcp
-      ftadcl' = M.map (\a -> dropWhile (\b -> Fcd.no x <= (Fcd.no $ Fad.chart b)) a) ftadcl
+  let ftado'  = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftado
+      ftadcp' = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftadcp
+      ftadcl' = M.map (\a -> dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b)) a) ftadcl
       ctd = Fad.FxChartTaData { Fad.taChart     = x 
                               , Fad.open        = M.map (\y -> if null y
                                                                then Fad.initFxTechnicalAnalysisData
