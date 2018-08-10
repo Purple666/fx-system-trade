@@ -230,7 +230,7 @@ createInitialGaData :: MonadRandom m =>
 createInitialGaData n ifsd =
   Ga.learningDataList <$> mapM (\_ -> createRandomGaData False ifsd) [1..n]
 
-<copyFxSettingData :: MonadRandom m =>
+copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
                      Ga.LearningData Fsd.FxSettingData -> 
                      m (Ga.LearningData Fsd.FxSettingData)
