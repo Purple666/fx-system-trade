@@ -11,7 +11,7 @@ getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
-  else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
+  else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x
 {-  
   Ftd.profit x
 
