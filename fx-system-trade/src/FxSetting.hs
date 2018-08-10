@@ -107,7 +107,7 @@ getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then getSimChartMax fsd
-     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ getSimChartMax fsd) ) -- + ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))
+     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ getSimChartMax fsd) * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls)))
           in if Gsd.maxLearningTime Gsd.gsd < l 
              then Gsd.maxLearningTime Gsd.gsd
              else l
@@ -230,7 +230,7 @@ createInitialGaData :: MonadRandom m =>
 createInitialGaData n ifsd =
   Ga.learningDataList <$> mapM (\_ -> createRandomGaData False ifsd) [1..n]
 
-copyFxSettingData :: MonadRandom m =>
+<copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
                      Ga.LearningData Fsd.FxSettingData -> 
                      m (Ga.LearningData Fsd.FxSettingData)
