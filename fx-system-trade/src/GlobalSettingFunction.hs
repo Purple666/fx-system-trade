@@ -4,6 +4,7 @@ import qualified GlobalSettingData        as Gsd
 import qualified FxTradeData              as Ftd
 import qualified FxChartData              as Fcd
 import qualified FxSettingData            as Fsd
+import qualified FxSetting                as Fs
 
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
