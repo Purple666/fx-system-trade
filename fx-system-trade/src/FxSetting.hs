@@ -106,8 +106,8 @@ getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
-     then 60
-     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))
+     then getSimChartMax fsd
+     else let l = runcate $ getLearningTestTimes fsd * ((fromIntegral $ getSimChartMax fsd) + ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls)))
           in if Gsd.maxLearningTime Gsd.gsd < l 
              then Gsd.maxLearningTime Gsd.gsd
              else l
