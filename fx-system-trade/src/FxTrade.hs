@@ -69,12 +69,11 @@ evaluate ctd fsd f1 forceSell td = do
       fto    = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
       ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-      ltt = Fs.getLearningTestTime fsd
       (position, open)
-        = if Gsf.buyEvaluation td chart rate &&
+        = if Gsf.buyEvaluation td cd fsd chart rate &&
              evaluateProfitInc fto ftado
           then (chart, Ftd.Buy)
-          else if Gsf.sellEvaluation td chart rate &&
+          else if Gsf.sellEvaluation td cd fsd chart rate &&
                   evaluateProfitDec fto ftado
                then (chart, Ftd.Sell)
                else (0, Ftd.None)
@@ -90,15 +89,13 @@ evaluate ctd fsd f1 forceSell td = do
                        (forceSell ||
                        (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
                         ((0 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                         (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))) ||
-                         ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
+                         (chart - rate < 0 && evaluateProfitDec ftcl ftadcl)))) 
                     then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                     else if Ftd.side td == Ftd.Sell &&
                             (forceSell || 
                              (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
                               ((0 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
-                               (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))) ||
-                              ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
+                               (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))))
                          then (rate - chart, 1 - (chart / rate), Ftd.Sell)
                          else (0, 0, Ftd.None)
                else (0, 0, Ftd.None)
