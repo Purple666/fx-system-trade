@@ -21,6 +21,7 @@ data GlobalSettingData = GlobalSettingData
   , spread                   :: Double
   }
 
+
 gsd :: GlobalSettingData
 gsd = 
   GlobalSettingData { taMargin              = 10
