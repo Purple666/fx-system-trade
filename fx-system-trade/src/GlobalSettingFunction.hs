@@ -31,13 +31,13 @@ getEvaluationValueList tdlt =
 buyEvaluation :: Ftd.FxTradeData -> Fcd.FxChartData -> Fsd.FxSettingData -> Double -> Double -> Bool
 buyEvaluation td cd fsd chart rate =
   --Ftd.side td == Ftd.None 
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && Fs.getLearningTestTimes  fsd * Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
+  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && (truncate $ Fs.getLearningTestTimes fsd) * Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
   --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Sell && 0 < rate - chart)
 
 sellEvaluation :: Ftd.FxTradeData -> Fcd.FxChartData -> Fsd.FxSettingData -> Double -> Double -> Bool
 sellEvaluation td cd fsd chart rate =
   --Ftd.side td == Ftd.None
-  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy && Fs.getLearningTestTimes  fsd * Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
+  Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy && (truncate $ Fs.getLearningTestTimes fsd) * Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
   --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
