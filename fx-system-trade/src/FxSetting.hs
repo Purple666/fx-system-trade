@@ -36,7 +36,7 @@ getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then getSimChartMax fsd
-j     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))
+     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))
           in if Gsd.maxLearningTime Gsd.gsd < l 
              then Gsd.maxLearningTime Gsd.gsd
              else l
