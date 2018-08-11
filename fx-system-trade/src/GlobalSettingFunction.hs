@@ -9,9 +9,13 @@ import qualified FxSetting                as Fs
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x
-{-  
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
+  then 0
+  else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
+{-  
+  Ftd.profit x
+
+if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
   else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x
 
