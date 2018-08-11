@@ -31,6 +31,25 @@ import Debug.Trace
 import Data.Tuple
 import Data.List
 
+getLearningTime :: Fsd.FxSettingData -> Int
+getLearningTime fsd =
+  let ls = Fsd.learningSetting fsd
+  in if Fsd.trTrade ls == 0
+     then getSimChartMax fsd
+     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ getSimChartMax fsd) + ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls)))
+          in if Gsd.maxLearningTime Gsd.gsd < l 
+             then Gsd.maxLearningTime Gsd.gsd
+             else l
+                  
+getLearningTestTime :: Fsd.FxSettingData -> Int
+getLearningTestTime fsd = 
+  truncate $ (fromIntegral $ getLearningTime fsd ) * getLearningTestTimes fsd
+
+getLearningTestTimes :: Fsd.FxSettingData -> Double
+getLearningTestTimes fsd = 
+  (sqrt :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
+  --
+
 getSimChartMax :: Fsd.FxSettingData -> Int
 getSimChartMax fsd = 
   maximum [ (Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
@@ -101,25 +120,6 @@ emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
-
-getLearningTime :: Fsd.FxSettingData -> Int
-getLearningTime fsd =
-  let ls = Fsd.learningSetting fsd
-  in if Fsd.trTrade ls == 0
-     then getSimChartMax fsd
-     else let l = truncate $ getLearningTestTimes fsd * ((fromIntegral $ getSimChartMax fsd) + ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls)))
-          in if Gsd.maxLearningTime Gsd.gsd < l 
-             then Gsd.maxLearningTime Gsd.gsd
-             else l
-                  
-getLearningTestTime :: Fsd.FxSettingData -> Int
-getLearningTestTime fsd = 
-  truncate $ (fromIntegral $ getLearningTime fsd ) * getLearningTestTimes fsd
-
-getLearningTestTimes :: Fsd.FxSettingData -> Double
-getLearningTestTimes fsd = 
-  (sqrt :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
-  --
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
