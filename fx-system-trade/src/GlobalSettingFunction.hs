@@ -6,7 +6,6 @@ import qualified FxChartData              as Fcd
 import qualified FxSettingData            as Fsd
 import qualified FxSetting                as Fs
 
-
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
