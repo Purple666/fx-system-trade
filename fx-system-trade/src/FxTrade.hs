@@ -89,7 +89,7 @@ evaluate ctd fsd f1 forceSell td = do
                        (forceSell ||
                         ((Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
                          0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                        chart - rate < -0.01 && evaluateProfitDec ftcl ftadcl))
+                         chart - rate < -0.01 && evaluateProfitDec ftcl ftadcl))
                     then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                     else if Ftd.side td == Ftd.Sell &&
                             (forceSell || 
