@@ -3,6 +3,7 @@ module FxSetting
   , getLearningTime
   , getLearningTestTime
   , getLearningTestTimes
+  , deleteFxsettingFromLog
   , updateFxSettingData 
   , createInitialGaData
   , copyFxSettingData
@@ -101,6 +102,11 @@ unionLearningSetting ls ls' =
                         , Fsd.trTrade           = max (Fsd.trTrade           ls) (Fsd.trTrade           ls')
                         , Fsd.trTradeDate       = max (Fsd.trTradeDate       ls) (Fsd.trTradeDate       ls')
                         }
+
+deleteFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
+deleteFxsettingFromLog fsd =
+  fsd { Fsd.fxSettingLog = M.delete fsd $ Fsd.fxSettingLog fsd
+      }
 
 initFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 initFxsettingFromLog fsd =
