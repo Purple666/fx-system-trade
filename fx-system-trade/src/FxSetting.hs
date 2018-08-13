@@ -105,7 +105,7 @@ unionLearningSetting ls ls' =
 
 deleteFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 deleteFxsettingFromLog fsd =
-  fsd { Fsd.fxSettingLog = M.delete fsd $ Fsd.fxSettingLog fsd
+  fsd { Fsd.fxSettingLog = M.delete (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
       }
 
 initFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
