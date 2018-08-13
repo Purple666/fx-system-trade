@@ -166,7 +166,7 @@ backTestLoop latest retry failp n endN fsd td = do
   let n' = (Fcd.no $ Ftd.chart tdt) + 1
   Fp.printTestProgress (retry && Ftd.profit tdt < Ftd.profit td) (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd2 tdt tdl tdlt plsf lsf
   if retry && Ftd.profit tdt < Ftd.profit td
-    then do fsd3 <- Fs.mutationFxSettingData fsd2 fsd2
+    then do fsd3 <- Fs.resetFxSettingData fsd2 
             backTestLoop latest retry True n endN fsd3 td 
     else if clear || endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
          then return (clear, Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
