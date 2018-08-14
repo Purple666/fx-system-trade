@@ -52,7 +52,8 @@ initFxTradeData Ftd.Production =
                             , Ftd.bearer           = Gsd.tradeProductionBearer Gsd.gsd
                             , Ftd.url              = Gsd.tradeProductionUrl  Gsd.gsd
                             }
-    
+
+  
 evaluate :: Fad.FxChartTaData -> 
             Fsd.FxSettingData ->
             (Ftd.FxTradeData -> Double -> Double) ->
