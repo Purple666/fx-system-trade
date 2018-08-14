@@ -87,15 +87,15 @@ evaluate ctd fsd f1 forceSell td = do
           else if rate /= 0
                then if Ftd.side td == Ftd.Buy &&
                        (forceSell ||
-                        ((Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
+                        (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
                          0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                         chart - rate < -0.01 && evaluateProfitDec ftcl ftadcl))
+                         chart - rate < 0 && evaluateProfitDec ftcl ftadcl)
                     then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                     else if Ftd.side td == Ftd.Sell &&
                             (forceSell || 
-                             ((Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
-                               0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
-                               rate - chart < -0.01 && evaluateProfitInc ftcl ftadcl))
+                             (Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td) && 
+                              0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
+                              rate - chart < 0 && evaluateProfitInc ftcl ftadcl)
                          then (rate - chart, 1 - (chart / rate), Ftd.Sell)
                          else (0, 0, Ftd.None)
                else (0, 0, Ftd.None)
@@ -281,7 +281,7 @@ backTest :: Bool ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->
-            IO (Bool, Ftd.FxTradeData, Fsd.FxSettingData)
+            IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTest latest endN l s td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
@@ -295,11 +295,8 @@ backTest latest endN l s td fsd xcd = do
                                 else return ()
                               return td3)
                      (pure td) ctdl
-  clear <- Fm.checkFxSettingData
-  fsd' <- if clear
-          then return fsd
-          else Fm.updateFxSettingData $ Fs.updateFxSettingData ctdl td td'' fsd
-  return (clear, resetCounter td'', fsd')
+  fsd' <- Fm.updateFxSettingData $ Fs.updateFxSettingData ctdl td td'' fsd
+  return (resetCounter td'', fsd')
 -- traceShow(Fcd.close $ Ftd.chart td', Fcd.close $ Ftd.rate td', Ftd.profit td', Ftd.side td') $ 
 
 learning :: Ftd.FxTradeData ->

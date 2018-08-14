@@ -67,15 +67,13 @@ backTest retry s f latest = do
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
                     getRandomR(s, s + ltt * 2)
   let n = startN + p
-  (clear, fs, fsd') <- backTestLoop latest retry False n endN fsd td
+  (fs, fsd') <- backTestLoop latest retry False n endN fsd td
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" s (f + 1) fsd' 
                       return (s, f + 1)
-  if clear
-    then backTest retry 0 0 latest
-    else backTest retry s' f' latest
+  backTest retry s' f' latest
 
 trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
@@ -129,7 +127,7 @@ learning failp n fsd = do
                                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
                                          in ((Gsf.getEvaluationValue tdl + Gsf.getEvaluationValueList tdlt) *
                                              (p / fromIntegral c), Gsf.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
-              M.insert (Fsd.fxSetting fsd) (0.01, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
+              M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if {- not failp && -} (not $ null tdlts) 
     then return (length tdlts, True, tdl', tdlt', Fs.unionFxSettingData fsd'' fsd)
@@ -159,7 +157,7 @@ backTestLoop latest retry failp n endN fsd td = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning failp (n - 1) fsd
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
-  (clear, tdt, fsd2) <- Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd) (Ftd.trSuccess tdl + (sum $ map Ftd.trSuccess tdlt)) td fsd1
+  (tdt, fsd2) <- Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd) (Ftd.trSuccess tdl + (sum $ map Ftd.trSuccess tdlt)) td fsd1
                         =<< ((++) <$> 
                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                              Fm.getChartListForward n       (ltt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
@@ -169,8 +167,8 @@ backTestLoop latest retry failp n endN fsd td = do
     then do let fsd3 = Fs.deleteFxsettingFromLog fsd2
             fsd4 <- Fs.resetFxSettingData fsd3
             backTestLoop latest retry True n endN fsd4 td 
-    else if clear || endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-         then return (clear, Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
+    else if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+         then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
          else backTestLoop latest retry False n' endN fsd2 tdt
          
 tradeEvaluate :: Ftd.FxTradeData ->
