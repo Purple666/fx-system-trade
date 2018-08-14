@@ -8,7 +8,7 @@ import qualified FxSetting                as Fs
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x * (Ftd.unrealizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ 2) 
+  Ftd.profit x * (Ftd.unrealizedPL x / Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x ^ 2
 {-  
   Ftd.profit x
 
