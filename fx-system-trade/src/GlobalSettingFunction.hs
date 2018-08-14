@@ -8,11 +8,11 @@ import qualified FxSetting                as Fs
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x
-{-  
   if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
-  else Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x
+  else (Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd) * Ftd.getWinRatePure x) / ((fromIntegral $ Ftd.trTradeDate x) / (fromIntegral $ Ftd.trTrade x))
+{-  
+  Ftd.profit x
 
 if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
   then 0
@@ -45,20 +45,20 @@ sellEvaluation td cd fsd chart rate =
   (Ftd.side td == Ftd.Buy && (0.01 < chart - rate || chart - rate < 0) && Fs.getSimChartMax fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
   --Ftd.side td == Ftd.None || (Ftd.side td == Ftd.Buy  && 0 < chart - rate )
 
+{-
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = if ((fromIntegral $ Gsd.maxUnit Gsd.gsd) * chart) / 25 < (Ftd.realizedPL td) / Gsd.quantityRate Gsd.gsd
                                then ((fromIntegral $ Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityBacktest = getQuantityLearning
+-}
 
-{-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest _ _ = (Gsd.initalProperty Gsd.gsd) / (Gsd.quantityRate Gsd.gsd)
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning = getQuantityBacktest 
--}
 
 
 -- ===============================================================================================
