@@ -140,8 +140,8 @@ tradeLearning fsd = do
   Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf (fsd == fsd')
   return $ Fs.emptyFxSettingLog fsd'
   
-tradelearningthread :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-tradeLearningThread  fsd = do
+tradeLearningThread :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+tradeLearningThread fsd = do
   threadDelay (5 * 60 * 1000 * 1000)
   tradeLearning fsd
 
