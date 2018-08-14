@@ -140,7 +140,7 @@ tradeLearning fsd = do
   Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf (fsd == fsd')
   return $ Fs.emptyFxSettingLog fsd'
   
-tradeLearningThread :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+tradelearningthread70 :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 tradeLearningThread  fsd = do
   threadDelay (5 * 60 * 1000 * 1000)
   tradeLearning fsd
@@ -152,7 +152,7 @@ backTestLoop :: Bool ->
                 Int ->
                 Fsd.FxSettingData ->
                 Ftd.FxTradeData ->
-                IO (Bool, Bool, Fsd.FxSettingData)
+                IO (Bool, Fsd.FxSettingData)
 backTestLoop latest retry failp n endN fsd td = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning failp (n - 1) fsd
   let lt  = Fs.getLearningTime     fsd1
