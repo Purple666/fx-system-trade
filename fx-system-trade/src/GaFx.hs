@@ -147,7 +147,7 @@ tradeLearningThread fsd = do
 
 backTestLoop :: Bool ->
                 Bool ->
-3s                Bool ->
+                Bool ->
                 Int ->
                 Int ->
                 Fsd.FxSettingData ->
