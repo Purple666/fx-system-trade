@@ -128,7 +128,7 @@ learning failp n fsd = do
                                          in ((Gsf.getEvaluationValue tdl + Gsf.getEvaluationValueList tdlt) *
                                              (p / fromIntegral c), Gsf.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
               M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
-      (_, _, tdl', tdlt', fsd'') = head tdlts
+      (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if {- not failp && -} (not $ null tdlts) 
     then return (length tdlts, True, tdl', tdlt', Fs.unionFxSettingData fsd'' fsd)
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
