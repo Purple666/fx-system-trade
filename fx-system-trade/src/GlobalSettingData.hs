@@ -23,14 +23,14 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd = 
-  GlobalSettingData { taMargin              = 5
-                    , makeTreeCount         = 5
-                    , algorithmRepeat       = 5
-                    , countUpListMax        = 5
-                    , learningTestCount     = 5
+  GlobalSettingData { taMargin              = 3
+                    , makeTreeCount         = 3
+                    , algorithmRepeat       = 3
+                    , countUpListMax        = 3
+                    , learningTestCount     = 3
                     , quantityRate          = 5
                     , thresholdRate         = 0.05
-                    , maxFxSettingLog       = 1000
+                    , maxFxSettingLog       = 100
                     , maxGaLengthLog        = 10
                     , maxLearningTime       = 24 * 60 * 5
                     , initalProperty        = 500000
