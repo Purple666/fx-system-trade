@@ -49,7 +49,7 @@ getChartListForward s l rl = do
 
 getOneChart :: (ReaderT MongoContext IO [Document]) -> IO Fcd.FxChartData 
 getOneChart f = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" f
   close pipe
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
@@ -64,7 +64,7 @@ getOneChart f = do
 
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s e = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getChartListFromDB  s e
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
@@ -90,13 +90,13 @@ getEndChartFromDB = do
 
 setFxTradeData :: String-> Ftd.FxTradeData -> IO ()
 setFxTradeData coName td = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxTradeDataToDB (T.pack coName) td
   close pipe
 
 updateFxTradeData :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData coName td = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB (T.pack coName)
   close pipe
   if r == []
@@ -110,7 +110,7 @@ updateFxTradeData coName td = do
 
 readFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 readFxSettingData  fsd = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
@@ -121,7 +121,7 @@ readFxSettingData  fsd = do
 
 checkFxSettingData :: IO (Bool)
 checkFxSettingData = do
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
   if r == []
@@ -131,7 +131,7 @@ checkFxSettingData = do
 updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 updateFxSettingData fsd = do
   fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
-  pipe <- connect (host $ Gsd.dbHost Gsd.gsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
   close pipe
   return fsd'

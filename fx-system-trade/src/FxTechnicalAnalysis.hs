@@ -11,6 +11,7 @@ module FxTechnicalAnalysis
 
 import Debug.Trace
 import Data.List
+import Control.DeepSeq
 import qualified GlobalSettingData        as Gsd
 import qualified FxChartData              as Fcd
 import qualified FxTechnicalAnalysisData  as Fad
@@ -57,7 +58,7 @@ updateAlgorithmListCount f ctdl (ldlt, ldla) fts =
                  , Fad.algoSetting   = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                                                        y' = y { Fad.algorithmListCount =
                                                                                 Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                                                   in M.union (M.singleton k y') acc) (Fad.algoSetting fts) ldla
+                                                                    in M.union (M.singleton k y') acc) (Fad.algoSetting fts) ldla
                  }
       as = updateThreshold f ctdl (Fad.algoSetting fts') 
       (as', tlc) = checkAlgoSetting as (Fad.techListCount fts')
@@ -153,7 +154,7 @@ rci n x  =
   let r  = [1..n] :: [Int]
       r' = reverse [1..n] :: [Int]
       d = sum . map (\(a, b) -> (a - b) ^ (2 :: Int)) . zipWith (\a (_, b') -> (a, b')) r' . sort $ zip x r 
-  in (1 - (6.0 * fromIntegral d) / ((fromIntegral n) * ((fromIntegral n) ^ (2 :: Int) - 1))) * 100
+  in d `deepseq` (1 - (6.0 * fromIntegral d) / ((fromIntegral n) * ((fromIntegral n) ^ (2 :: Int) - 1))) * 100
 
 lsm :: Int -> [Double] -> Double
 lsm n y =
