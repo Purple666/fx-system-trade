@@ -17,10 +17,8 @@ import Debug.Trace
 
 newtype LearningData a = LearningData { getLearningData :: [(a, Rational)] } deriving (Show, Eq, Ord)
 
-{-
 instance Semigroup (LearningData a) where
   LearningData x <> LearningData y = LearningData $ x ++ y
--}
 
 instance Monoid (LearningData a) where
   mempty = LearningData []
