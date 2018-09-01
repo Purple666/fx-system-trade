@@ -92,13 +92,13 @@ learningLoop :: Int ->
 learningLoop c cl ce fsd fsds = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
-  fsds' <- (map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                             Fsd.nextFxSettingData ltt y x) ce
-                           tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                           p = if Gsf.getEvaluationValue tdl < 0 && Gsf.getEvaluationValueList tdlt < 0
-                               then - (Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt)
-                               else Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt
-                       in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
+  fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
+                                            Fsd.nextFxSettingData ltt y x) ce
+                          tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
+                          p = if Gsf.getEvaluationValue tdl < 0 && Gsf.getEvaluationValueList tdlt < 0
+                              then - (Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt)
+                              else Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt
+                      in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList <$>
            Ga.learning (Gsd.maxGaLengthLog Gsd.gsd) (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
   let (_, tdl, tdlt, fsd') = maximum fsds'
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
