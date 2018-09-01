@@ -76,9 +76,9 @@ evaluate ctd fsd f1 forceSell td = do
               Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) && 
              evaluateProfitInc fto ftado
           then (chart, Ftd.Buy)
-          else if Ftd.side td == Ftd.None ||
+          else if (Ftd.side td == Ftd.None ||
                   (Ftd.side td == Ftd.Buy && (0.01 < chart - rate || chart - rate < 0) &&
-                   Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td)) &&
+                   Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) &&
                   evaluateProfitDec fto ftado
                then (chart, Ftd.Sell)
                else (0, Ftd.None)
