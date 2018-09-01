@@ -86,17 +86,17 @@ evaluate ctd fsd f1 forceSell td = do
                     then (rate - chart, 1 - (chart / rate), Ftd.Close)
                     else (0, 0, Ftd.None)
           else if rate /= 0
-               then if Ftd.side td == Ftd.Buy &&
-                       (forceSell ||
-                        (0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                        (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))
-                    then (chart - rate, (chart / rate) - 1, Ftd.Buy)
-                    else if Ftd.side td == Ftd.Sell &&
-                            (forceSell || 
-                             (0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
-                             (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))
-                         then (rate - chart, 1 - (chart / rate), Ftd.Sell)
-                         else (0, 0, Ftd.None)
+               then if forceSell && (Ftd.side td == Ftd.Buy || Ftd.side td == Ftd.Sell)
+                    then (-100, -100, Ftd.Buy)
+                    else if Ftd.side td == Ftd.Buy &&
+                            (0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
+                            (chart - rate < 0 && evaluateProfitDec ftcl ftadcl)
+                         then (chart - rate, (chart / rate) - 1, Ftd.Buy)
+                         else if Ftd.side td == Ftd.Sell
+                                 (0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
+                                 (rate - chart < 0 && evaluateProfitInc ftcl ftadcl)
+                              then (rate - chart, 1 - (chart / rate), Ftd.Sell)
+                              else (0, 0, Ftd.None)
                else (0, 0, Ftd.None)
       td' = td { Ftd.chart  = cd
                , Ftd.rate   = if open == Ftd.Buy
