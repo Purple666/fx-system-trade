@@ -1,30 +1,30 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
+{-# LANGUAGE OverloadedStrings    #-}
 
 module FxMongodb
   ( getChartListBack
   , getChartListForward
   , getOneChart
   , getStartChartFromDB
-  , getEndChartFromDB 
+  , getEndChartFromDB
   , setFxTradeData
   , updateFxTradeData
-  , updateFxSettingData 
+  , updateFxSettingData
   , readFxSettingData
   , checkFxSettingData
   ) where
 
 
-import Database.MongoDB
-import Control.Monad.Trans.Reader
+import           Control.Monad.Trans.Reader
+import           Database.MongoDB
 --import Debug.Trace
-import qualified Data.Map                 as M
-import qualified Data.Text                as T
-import qualified FxChartData              as Fcd
-import qualified FxSettingData            as Fsd
-import qualified FxSetting                as Fs
-import qualified GlobalSettingData        as Gsd
-import qualified FxTradeData              as Ftd
+import qualified Data.Map                   as M
+import qualified Data.Text                  as T
+import qualified FxChartData                as Fcd
+import qualified FxSetting                  as Fs
+import qualified FxSettingData              as Fsd
+import qualified FxTradeData                as Ftd
+import qualified GlobalSettingData          as Gsd
 
 
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
@@ -41,13 +41,13 @@ getChartListBack s l rl = do
 getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
   r <- getChartList s (s + l)
-  maxc <- getOneChart getEndChartFromDB 
+  maxc <- getOneChart getEndChartFromDB
   if rl + length r < l && s < Fcd.no maxc
     then do r' <- (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
             return $ take l r'
     else return r
 
-getOneChart :: (ReaderT MongoContext IO [Document]) -> IO Fcd.FxChartData 
+getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
 getOneChart f = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" f
@@ -77,15 +77,15 @@ getChartList s e = do
        ) r
 
 getChartListFromDB :: Int -> Int -> ReaderT MongoContext IO [Document]
-getChartListFromDB s e = do
+getChartListFromDB s e =
   rest =<< find (select ["no" =: ["$gte" =: s, "$lte" =: e]] "rate")
 
 getStartChartFromDB :: ReaderT MongoContext IO [Document]
-getStartChartFromDB = do
+getStartChartFromDB =
   rest =<< find (select [] "rate") {sort = ["no" =: (1 :: Int)], limit = 1}
 
 getEndChartFromDB :: ReaderT MongoContext IO [Document]
-getEndChartFromDB = do
+getEndChartFromDB =
   rest =<< find (select [] "rate") {sort = ["no" =: (-1 :: Int)], limit = 1}
 
 setFxTradeData :: String-> Ftd.FxTradeData -> IO ()
@@ -99,7 +99,7 @@ updateFxTradeData coName td = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB (T.pack coName)
   close pipe
-  if r == []
+  if null r
     then return td
     else head <$> mapM (\x -> return $ td { Ftd.chart      = read . typed $ valueAt "chart" x
                                           , Ftd.trSuccess  = typed $ valueAt "tr_success" x
@@ -108,27 +108,27 @@ updateFxTradeData coName td = do
                                           , Ftd.realizedPL = typed $ valueAt "realizedPL" x
                                           }) r
 
-readFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+readFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 readFxSettingData  fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
-  if r == []
+  if null r
     then return fsd
-    else do fls <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fls" x)) r
-            fsl <- head <$> mapM (\x -> return $ (read . typed $ valueAt "fsl" x)) r
+    else do fls <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
+            fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData fsd fls fsl
 
-checkFxSettingData :: IO (Bool)
+checkFxSettingData :: IO Bool
 checkFxSettingData = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB "fsd"
   close pipe
-  if r == []
+  if null r
     then return True
     else return False
 
-updateFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+updateFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 updateFxSettingData fsd = do
   fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
@@ -137,20 +137,20 @@ updateFxSettingData fsd = do
   return fsd'
 
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
-getDataFromDB coName = do
-  rest =<< find (select [] coName) 
+getDataFromDB coName =
+  rest =<< find (select [] coName)
 
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
-setFxTradeDataToDB coName td = do
+setFxTradeDataToDB coName td =
   upsert (select [] coName) [ "chart"       =: (show $ Ftd.chart td)
-                            , "tr_success"  =: Ftd.trSuccess td
-                            , "tr_fail"     =: Ftd.trFail td
-                            , "profit"      =: Ftd.profit td
-                            , "realizedPL"  =: Ftd.realizedPL td
-                            ]
+                          , "tr_success"  =: Ftd.trSuccess td
+                          , "tr_fail"     =: Ftd.trFail td
+                          , "profit"      =: Ftd.profit td
+                          , "realizedPL"  =: Ftd.realizedPL td
+                          ]
 
 setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
-setFxSettingToDB fls fsl = do
+setFxSettingToDB fls fsl =
   upsert (select [] "fsd") [ "fls"  =: (show $ fls)
-                           , "fsl"  =: (show $ fsl)
-                           ]
+                         , "fsl"  =: (show $ fsl)
+                         ]

@@ -18,15 +18,15 @@ module Tree
   , initLeafDataMap
   ) where
 
-import qualified GlobalSettingData        as Gsd
-import qualified Data.Map                 as M
-import qualified Control.Monad.Random     as R
-import Data.List
---import Debug.Trace 
+import qualified Control.Monad.Random as R
+import           Data.List
+import qualified Data.Map             as M
+import qualified GlobalSettingData    as Gsd
+--import Debug.Trace
 
-newtype LeafData a = LeafData { getLeafData :: (Int, ((a -> Bool), (a -> Bool))) } 
+newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) }
 
-newtype NodeData = NodeData { getNodeData :: (Int, (Bool -> Bool -> Bool)) } 
+newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) }
 
 newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read)
 
@@ -40,28 +40,28 @@ instance Read NodeData where
                   in if a == 0
                      then [(NodeData (a, (&&)), s')]
                      else [(NodeData (a, (||)), s')]
-                          
+
 instance Show (LeafData a) where
   show a = show . fst $ getLeafData a
-  
+
 instance Show NodeData where
   show a = show . fst $ getNodeData a
 
 instance Eq (LeafData a) where
-  a == b = (fst $ getLeafData a) == (fst $ getLeafData b)
-  
+  a == b = fst (getLeafData a) == fst (getLeafData b)
+
 instance Eq NodeData where
-  a == b = (fst $ getNodeData a) == (fst $ getNodeData b)
+  a == b = fst (getNodeData a) == fst (getNodeData b)
 
 instance Eq (LeafDataMap a) where
-  (LeafDataMap a) == (LeafDataMap b) = (sort $ M.keys a) == (sort $ M.keys b)
+  (LeafDataMap a) == (LeafDataMap b) = sort (M.keys a) == sort (M.keys b)
 
 instance Ord (LeafData a) where
   compare (LeafData a) (LeafData b)
     | fst a == fst b  = EQ
     | fst a <= fst b  = LT
     | otherwise       = GT
-  
+
 instance Ord NodeData where
   compare (NodeData a) (NodeData b)
     | fst a == fst b  = EQ
@@ -70,8 +70,8 @@ instance Ord NodeData where
 
 instance Ord (LeafDataMap a) where
   compare (LeafDataMap a) (LeafDataMap b)
-    | (sort $ M.keys a) == (sort $ M.keys b)  = EQ
-    | (sort $ M.keys a) <= (sort $ M.keys b)  = LT
+    | sort (M.keys a) == sort (M.keys b)  = EQ
+    | sort (M.keys a) <= sort (M.keys b)  = LT
     | otherwise                               = GT
 
 data TreeData a = Empty  |
@@ -82,18 +82,18 @@ defaultFunction :: a -> Bool
 defaultFunction _ = True
 
 emptyLeafDataMap :: LeafDataMap a
-emptyLeafDataMap = LeafDataMap M.empty 
+emptyLeafDataMap = LeafDataMap M.empty
 
 initLeafDataMap :: LeafData a -> LeafDataMap a
 initLeafDataMap k = LeafDataMap $ M.singleton k 0
 
 setFunctionToLeafDataMap :: [LeafData a] -> LeafDataMap a -> LeafDataMap a
 setFunctionToLeafDataMap ix (LeafDataMap xs) =
-  LeafDataMap . M.fromList . map (\((LeafData k), x) -> (ix !! (fst k), x)) $ M.toList xs
+  LeafDataMap . M.fromList . map (\(LeafData k, x) -> (ix !! fst k, x)) $ M.toList xs
 
 setFunctionToTree :: [LeafData a] -> TreeData a -> TreeData a
 setFunctionToTree ix (Leaf (LeafData (k, _))) = Leaf (ix !! k)
-setFunctionToTree _ (Empty) = Empty  
+setFunctionToTree _ Empty = Empty
 setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunctionToTree ix r)
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
@@ -104,7 +104,7 @@ checkLeafDataMap (LeafDataMap xs) =
   in (LeafDataMap a, LeafDataMap b)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
-makeTree andRate orRate (LeafDataMap xs) t = do
+makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
     else foldl (\acc _ -> do l <- R.fromList . M.toList $ M.map toRational xs
@@ -115,7 +115,7 @@ adjustTree :: LeafDataMap a -> TreeData a -> TreeData a
 adjustTree _ Empty = Empty
 adjustTree (LeafDataMap dm) (Leaf x) =
   if M.member x dm
-  then (Leaf x)
+  then Leaf x
   else Empty
 adjustTree e (Node x l r) = Node x (adjustTree e l) (adjustTree e r)
 
@@ -132,7 +132,7 @@ insertTree _ _ e (Node x Empty r) =
   if e == r
   then return (Node x Empty r)
   else return (Node x e r)
-insertTree andRate orRate e (Node x l r) = do
+insertTree andRate orRate e (Node x l r) =
   if e == l || e == r
     then return (Node x l r)
     else do die <- R.getRandomR (True, False)
@@ -167,7 +167,7 @@ divideTree (Node x l r) = do
               then return (r, l)
               else return (l, r)
     else do die2 <- R.getRandomR (True, False)
-            if die2 
+            if die2
               then do (o, d) <- divideTree l
                       die3 <- R.getRandomR (True, False)
                       if die3
@@ -178,9 +178,9 @@ divideTree (Node x l r) = do
                         then return (Node x l o, d)
                         else return (o, Node x l d)
 
-evaluateTree :: (((a -> Bool), (a -> Bool)) -> (a -> Bool)) -> a -> TreeData a -> Bool
+evaluateTree :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> Bool
 evaluateTree f s (Leaf x) = (f . snd $ getLeafData x) s
-evaluateTree _ _ (Empty) = False
+evaluateTree _ _ Empty = False
 evaluateTree f s (Node _ l Empty) = evaluateTree f s l
 evaluateTree f s (Node _ Empty r) = evaluateTree f s r
 evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (evaluateTree f s r)
@@ -191,27 +191,25 @@ addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   in LeafDataMap $ M.map (\x -> if x < 1
                                 then 1
                                 else x) ab
-  
+
 addValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a -> LeafDataMap a
 addValidLeafDataList p lds xs =
   foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k p) acc) xs lds
 
-makeValidLeafDataList :: (((a -> Bool), (a -> Bool)) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
+makeValidLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 makeValidLeafDataList f s tl =
   nub $ evaluateTrueLeafDataList f s tl
 
-evaluateTrueLeafDataList :: (((a -> Bool), (a -> Bool)) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
+evaluateTrueLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 evaluateTrueLeafDataList _ _ Empty = []
 evaluateTrueLeafDataList f s (Node _ l Empty) = evaluateTrueLeafDataList f s l
 evaluateTrueLeafDataList f s (Node _ Empty r) = evaluateTrueLeafDataList f s r
 evaluateTrueLeafDataList f s (Leaf x) =
-  if (f . snd $ getLeafData x) s
-  then [x]
-  else []
+  [x | (f . snd $ getLeafData x) s]
 evaluateTrueLeafDataList f s (Node x l r) =
   let l' = evaluateTrueLeafDataList f s l
       r' = evaluateTrueLeafDataList f s r
-  in case (fst $ getNodeData x) of
+  in case fst $ getNodeData x of
     0 -> if null l' || null r'
          then []
          else l' ++ r'

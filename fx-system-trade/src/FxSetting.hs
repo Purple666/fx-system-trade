@@ -4,7 +4,7 @@ module FxSetting
   , getLearningTestTime
   , getLearningTestTimes
   , deleteFxsettingFromLog
-  , updateFxSettingData 
+  , updateFxSettingData
   , createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
@@ -17,74 +17,74 @@ module FxSetting
   , getFxSettingLogResult
   , getSimChartMax
   , getTradeHoldTime
-  ) where  
+  ) where
 
-import qualified Data.Map                 as M
-import qualified FxTradeData              as Ftd
-import qualified FxSettingData            as Fsd
-import qualified GlobalSettingData        as Gsd
-import qualified FxTechnicalAnalysisData  as Fad
-import qualified FxTechnicalAnalysis      as Ta
-import qualified Tree                     as Tr
-import qualified Ga 
-import Control.Monad
-import Control.Monad.Random
-import Debug.Trace
-import Data.Tuple
-import Data.List
+import           Control.Monad
+import           Control.Monad.Random
+import           Data.List
+import qualified Data.Map                as M
+import           Data.Tuple
+import           Debug.Trace
+import qualified FxSettingData           as Fsd
+import qualified FxTechnicalAnalysis     as Ta
+import qualified FxTechnicalAnalysisData as Fad
+import qualified FxTradeData             as Ftd
+import qualified Ga
+import qualified GlobalSettingData       as Gsd
+import qualified Tree                    as Tr
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else let l = getSimChartMax fsd * (truncate $ (getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))))
-          in if Gsd.maxLearningTime Gsd.gsd < l 
+     else let l = getSimChartMax fsd * (truncate (getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))))
+          in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l
-                  
+
 getLearningTestTime :: Fsd.FxSettingData -> Int
-getLearningTestTime fsd = 
-  truncate $ (fromIntegral $ getLearningTime fsd) * getLearningTestTimes fsd
+getLearningTestTime fsd =
+  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
-getLearningTestTimes fsd = 
+getLearningTestTimes fsd =
   (sqrt :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
   --
 
 getTradeHoldTime :: Fsd.FxSettingData -> Int
-getTradeHoldTime fsd = 
-  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes fsd
+getTradeHoldTime fsd =
+  truncate $ fromIntegral (getSimChartMax fsd) * getLearningTestTimes fsd
 
 getSimChartMax :: Fsd.FxSettingData -> Int
-getSimChartMax fsd = 
-  maximum [ (Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
-          , (Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
-          , (Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)] 
+getSimChartMax fsd =
+  maximum [ Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+          , Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+          , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd]
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
-  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ Fsd.fxSettingLog fsd 
+  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ Fsd.fxSettingLog fsd
   in (p, c, p / fromIntegral c)
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
-getPrepareTimeAll fsd = 
-  maximum [ (Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd)
-          , (Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
-          , (Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd)
+getPrepareTimeAll fsd =
+  maximum [ Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+          , Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+          , Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
           ]
 
 setTreeFunction :: Fsd.FxSettingData -> Fsd.FxSettingData
-setTreeFunction fs = 
+setTreeFunction fs =
   fs { Fsd.fxSetting = setFxSetting $ Fsd.fxSetting fs
      , Fsd.fxSettingLog  = M.mapKeys setFxSetting $ Fsd.fxSettingLog fs
      }
 
 setFxSetting :: Fsd.FxSetting -> Fsd.FxSetting
-setFxSetting fts = 
+setFxSetting fts =
   fts { Fsd.fxTaOpen        = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaOpen fts
       , Fsd.fxTaCloseProfit = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseProfit fts
-      , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts 
+      , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
 unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
@@ -120,10 +120,10 @@ initFxsettingFromLog fsd =
                          else snd . maximum . map swap . M.toList .
                               M.map (\(p, c) -> p / fromIntegral c) $ Fsd.fxSettingLog fsd
       }
-  
+
 setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fsd fls' fsl' =
-  setTreeFunction $ fsd { Fsd.learningSetting = fls' 
+  setTreeFunction $ fsd { Fsd.learningSetting = fls'
                         , Fsd.fxSettingLog    = fsl'
                         }
 
@@ -139,8 +139,8 @@ updateFxSettingData ctdl td tdt fsd =
             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
       ls = (Fsd.learningSetting fsd)
-           { Fsd.trTrade     = (Fsd.trTrade     $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trTrade tdt)
-           , Fsd.trTradeDate = (Fsd.trTradeDate $ Fsd.learningSetting fsd) + (fromIntegral $ Ftd.trTradeDate tdt)
+           { Fsd.trTrade     = Fsd.trTrade (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTrade tdt)
+           , Fsd.trTradeDate = Fsd.trTradeDate (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
            }
   in if 0 < p
      then fsd { Fsd.learningSetting = ls
@@ -166,27 +166,27 @@ choice2 die n a b = if die !! n then a else b
 
 createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
 createRandomFxAlMaSetting ix = do
-  short  <- getRandomR (max 5 (Fad.shortSetting     ix - Gsd.taMargin Gsd.gsd), (Fad.shortSetting     ix + Gsd.taMargin Gsd.gsd))
-  middle <- getRandomR (max 5 (Fad.middleSetting    ix - Gsd.taMargin Gsd.gsd), (Fad.middleSetting    ix + Gsd.taMargin Gsd.gsd))
-  long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), (Fad.longSetting      ix + Gsd.taMargin Gsd.gsd))
-  prev   <- getRandomR (max 3 (Fad.prevSetting      ix - Gsd.taMargin Gsd.gsd), (Fad.prevSetting      ix + Gsd.taMargin Gsd.gsd))
-  ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - (fromIntegral $ Gsd.taMargin Gsd.gsd)),
-                        (Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd)))
+  short  <- getRandomR (max 5 (Fad.shortSetting     ix - Gsd.taMargin Gsd.gsd), Fad.shortSetting     ix + Gsd.taMargin Gsd.gsd)
+  middle <- getRandomR (max 5 (Fad.middleSetting    ix - Gsd.taMargin Gsd.gsd), Fad.middleSetting    ix + Gsd.taMargin Gsd.gsd)
+  long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), Fad.longSetting      ix + Gsd.taMargin Gsd.gsd)
+  prev   <- getRandomR (max 3 (Fad.prevSetting      ix - Gsd.taMargin Gsd.gsd), Fad.prevSetting      ix + Gsd.taMargin Gsd.gsd)
+  ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - fromIntegral (Gsd.taMargin Gsd.gsd)),
+                        Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
             , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
             , Fad.prevSetting       = prev
-            , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) $      ts
+            , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) ts
             }
-  
+
 createRandomFxAlgorithmSetting :: MonadRandom m => Bool -> Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting reset ix = do
-  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), (Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd))
-  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), (Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd))
+  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
+  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
   at <- if reset
         then Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) Tr.Empty
         else Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
-  sc <- getRandomR (max 1 ((Fad.simChart ix) - Gsd.taMargin Gsd.gsd), (Fad.simChart ix) + Gsd.taMargin Gsd.gsd)
+  sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), Fad.simChart ix + Gsd.taMargin Gsd.gsd)
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
   ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
   wma  <- createRandomFxAlMaSetting $ Fad.wmaSetting  ix
@@ -206,22 +206,22 @@ createRandomFxAlgorithmSetting reset ix = do
               , Fad.rsiSetting       = rsi
               , Fad.simChart         = sc
               }
-  
-createRandomFxTechnicalAnalysisSetting :: MonadRandom m => Bool -> 
+
+createRandomFxTechnicalAnalysisSetting :: MonadRandom m => Bool ->
                                           Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
 createRandomFxTechnicalAnalysisSetting reset ix = do
-  taAndR <- getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.taMargin Gsd.gsd), (Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd))
-  taOrR  <- getRandomR(max 1 (Fad.treeAnaOrRate  ix - Gsd.taMargin Gsd.gsd), (Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd))
+  taAndR <- getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.taMargin Gsd.gsd), Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd)
+  taOrR  <- getRandomR(max 1 (Fad.treeAnaOrRate  ix - Gsd.taMargin Gsd.gsd), Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd)
   tat <- if reset
          then Tr.makeTree taAndR taOrR (Fad.techListCount ix) Tr.Empty
          else Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
-  as' <- mapM (\x -> createRandomFxAlgorithmSetting reset x) $ Fad.algoSetting ix
+  as' <- mapM (createRandomFxAlgorithmSetting reset) $ Fad.algoSetting ix
   return $ ix { Fad.techAnaTree    = tat
               , Fad.algoSetting    = as'
               , Fad.treeAnaAndRate = taAndR
               , Fad.treeAnaOrRate  = taOrR
               }
-    
+
 createRandomGaData :: MonadRandom m => Bool -> Fsd.FxSettingData -> m (Ga.LearningData Fsd.FxSettingData)
 createRandomGaData reset ix = do
   faso  <- createRandomFxTechnicalAnalysisSetting reset . Fsd.fxTaOpen        $ Fsd.fxSetting ix
@@ -243,7 +243,7 @@ createInitialGaData n ifsd =
 
 copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
-                     Ga.LearningData Fsd.FxSettingData -> 
+                     Ga.LearningData Fsd.FxSettingData ->
                      m (Ga.LearningData Fsd.FxSettingData)
 copyFxSettingData x y = return $ x `mappend` y
 
@@ -251,13 +251,13 @@ mutationFxSettingData :: MonadRandom m =>
                          Ga.LearningData Fsd.FxSettingData ->
                          Ga.LearningData Fsd.FxSettingData ->
                          m (Ga.LearningData Fsd.FxSettingData)
-mutationFxSettingData x _ = 
+mutationFxSettingData x _ =
   createInitialGaData 1 (Ga.getHeadGaData x)
 
 resetFxSettingData :: MonadRandom m =>
                          Fsd.FxSettingData ->
                          m Fsd.FxSettingData
-resetFxSettingData ifsd = 
+resetFxSettingData ifsd =
   Ga.getHeadGaData <$> createRandomGaData True ifsd
 
 crossoverFxSettingData :: MonadRandom m =>
@@ -271,13 +271,13 @@ crossoverFxSettingData x y = do
   (cpa, cpb) <- crossoverFxTechnicalAnalysisSetting (Fsd.fxTaCloseProfit $ Fsd.fxSetting xfsd) (Fsd.fxTaCloseProfit $ Fsd.fxSetting yfsd)
   (cla, clb) <- crossoverFxTechnicalAnalysisSetting (Fsd.fxTaCloseLoss   $ Fsd.fxSetting xfsd) (Fsd.fxTaCloseLoss   $ Fsd.fxSetting yfsd)
   let fsd1 = xfsd { Fsd.fxSetting = (Fsd.fxSetting xfsd)
-                    { Fsd.fxTaOpen        = oa 
+                    { Fsd.fxTaOpen        = oa
                     , Fsd.fxTaCloseProfit = cpa
                     , Fsd.fxTaCloseLoss   = cla
                     }
                   }
       fsd2 = yfsd { Fsd.fxSetting = (Fsd.fxSetting yfsd)
-                    { Fsd.fxTaOpen        = ob 
+                    { Fsd.fxTaOpen        = ob
                     , Fsd.fxTaCloseProfit = cpb
                     , Fsd.fxTaCloseLoss   = clb
                     }
@@ -292,7 +292,7 @@ crossoverFxTechnicalAnalysisSetting a b = do
   die      <- replicateM 2 $ getRandomR (True, False)
   (ta, tb) <- Tr.crossoverTree (Fad.treeAnaAndRate a) (Fad.treeAnaOrRate a)
               (Fad.techAnaTree a) (Fad.techListCount a) (Fad.techAnaTree b) (Fad.techListCount b)
-  let mk = min (fst . M.findMax $ Fad.algoSetting a) (fst . M.findMax $ Fad.algoSetting b) 
+  let mk = min (fst . M.findMax $ Fad.algoSetting a) (fst . M.findMax $ Fad.algoSetting b)
   oxs      <- mapM (\k -> do (a', b') <- crossoverFxAlgorithmSetting (Fad.algoSetting a M.! k) (Fad.algoSetting b M.! k)
                              return ((k, a'), (k, b'))) [0..mk]
   return ( a { Fad.techAnaTree    = ta
@@ -306,7 +306,7 @@ crossoverFxTechnicalAnalysisSetting a b = do
              , Fad.algoSetting    = M.union (M.fromList $ map snd oxs) (Fad.algoSetting b)
              }
          )
-  
+
 crossoverFxAlgorithmSetting :: MonadRandom m =>
                                Fad.FxAlgorithmSetting ->
                                Fad.FxAlgorithmSetting ->
@@ -344,12 +344,12 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.simChart         = choice2 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
            )
-           
+
 crossoverOrdCalc :: (MonadRandom m, Num a, Ord a) => a -> Int -> [a] -> [a] -> m ([a], [a])
 crossoverOrdCalc margin n x y = do
   die <- getRandomR (True, False)
   let (x' , y') = if die && (x !! n) + margin <= y !! (n + 1) && (y !! n) + margin <= x !! (n + 1)
-                  then ((take (n + 1) y) ++ (drop (n + 1) x) , (take (n + 1) x) ++ (drop (n + 1) y))
+                  then (take (n + 1) y ++ drop (n + 1) x , take (n + 1) x ++ drop (n + 1) y)
                   else (x , y)
   if length x - 1 == n
     then return (x , y)
@@ -358,8 +358,8 @@ crossoverOrdCalc margin n x y = do
 crossoverOrd :: (MonadRandom m, Num a, Ord a) => a -> [a] -> [a] -> m ([a], [a])
 crossoverOrd mrg x y = do
   let n = length x
-      x' = x ++ [(maximum (x ++ y)) + mrg + 1]
-      y' = y ++ [(maximum (x ++ y)) + mrg + 1]
+      x' = x ++ [maximum (x ++ y) + mrg + 1]
+      y' = y ++ [maximum (x ++ y) + mrg + 1]
   r <- crossoverOrdCalc mrg 0 x' y'
   return (take n (fst r), take n (snd r))
 
@@ -367,19 +367,19 @@ crossoverOrdFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> Fad.FxAlMaSet
 crossoverOrdFxAlMaSetting a b = do
   die <- replicateM 2 $ getRandomR (True, False)
   (a', b') <- crossoverOrd 1
-              [(Fad.shortSetting a), (Fad.middleSetting a), (Fad.longSetting a)]
-              [(Fad.shortSetting b), (Fad.middleSetting b), (Fad.longSetting b)]
-  return ( a { Fad.shortSetting     = a' !! 0
+              [Fad.shortSetting a, Fad.middleSetting a, Fad.longSetting a]
+              [Fad.shortSetting b, Fad.middleSetting b, Fad.longSetting b]
+  return ( a { Fad.shortSetting     = head a'
              , Fad.middleSetting    = a' !! 1
              , Fad.longSetting      = a' !! 2
              , Fad.prevSetting      = choice1 die 0 (Fad.prevSetting a) (Fad.prevSetting b)
              , Fad.thresholdSetting = choice1 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
              }
-         , b { Fad.shortSetting     = b' !! 0
+         , b { Fad.shortSetting     = head b'
              , Fad.middleSetting    = b' !! 1
              , Fad.longSetting      = b' !! 2
              , Fad.prevSetting      = choice2 die 0 (Fad.prevSetting a) (Fad.prevSetting b)
              , Fad.thresholdSetting = choice2 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
             }
          )
-         
+

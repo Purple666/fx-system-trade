@@ -9,27 +9,27 @@ module FxTradeData
   ) where
 
 --import Debug.Trace
-import qualified FxChartData              as Fcd
-import qualified FxTechnicalAnalysisData  as Fad
-import qualified GlobalSettingData        as Gsd
+import qualified FxChartData             as Fcd
+import qualified FxTechnicalAnalysisData as Fad
+import qualified GlobalSettingData       as Gsd
 
 data FxTradeData =
-  FxTradeData { chart              :: Fcd.FxChartData
-              , rate               :: Fcd.FxChartData
-              , alcOpen            :: Fad.FxalgorithmListCount
-              , alcCloseProfit     :: Fad.FxalgorithmListCount
-              , alcCloseLoss       :: Fad.FxalgorithmListCount
-              , side               :: FxSide
-              , trTradeDate        :: Int
-              , trTrade            :: Int
-              , trSuccess          :: Int
-              , trFail             :: Int
-              , profit             :: Double
-              , unrealizedPL       :: Double
-              , realizedPL         :: Double
-              , environment        :: FxEnvironment
-              , bearer             :: String
-              , url                :: String
+  FxTradeData { chart          :: Fcd.FxChartData
+              , rate           :: Fcd.FxChartData
+              , alcOpen        :: Fad.FxalgorithmListCount
+              , alcCloseProfit :: Fad.FxalgorithmListCount
+              , alcCloseLoss   :: Fad.FxalgorithmListCount
+              , side           :: FxSide
+              , trTradeDate    :: Int
+              , trTrade        :: Int
+              , trSuccess      :: Int
+              , trFail         :: Int
+              , profit         :: Double
+              , unrealizedPL   :: Double
+              , realizedPL     :: Double
+              , environment    :: FxEnvironment
+              , bearer         :: String
+              , url            :: String
               } deriving (Show, Read)
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
@@ -59,12 +59,12 @@ getWinRate x = 100 * getWinRatePure x
 
 getWinRatePure :: FxTradeData -> Double
 getWinRatePure x =
-  if (fromIntegral $ trSuccess x) + (fromIntegral $ trFail x) == (0 :: Double)
+  if fromIntegral (trSuccess x) + fromIntegral (trFail x) == (0 :: Double)
   then 0
-  else (fromIntegral $ trSuccess x) / ((fromIntegral $ trSuccess x) + (fromIntegral $ trFail x))
+  else fromIntegral (trSuccess x) / (fromIntegral (trSuccess x) + fromIntegral (trFail x))
 
 initFxTradeDataCommon :: FxTradeData
-initFxTradeDataCommon = 
+initFxTradeDataCommon =
   FxTradeData { chart            = Fcd.initFxChartData
               , rate             = Fcd.initFxChartData
               , side             = None

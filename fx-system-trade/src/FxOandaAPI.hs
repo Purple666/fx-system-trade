@@ -1,27 +1,27 @@
+{-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 module FxOandaAPI
   ( close
   , open
   , updateFxTradeData
   , getNowPrices
-  ) where 
+  ) where
 
-import qualified GlobalSettingData        as Gsd
-import qualified FxTradeData              as Ftd
-import qualified FxMongodb                as Fm
-import qualified FxChartData              as Fcd
-import qualified FxTime                   as Ftm
+import qualified FxChartData             as Fcd
+import qualified FxMongodb               as Fm
+import qualified FxTime                  as Ftm
+import qualified FxTradeData             as Ftd
+import qualified GlobalSettingData       as Gsd
 --import Debug.Trace
-import Control.Exception.Extra
-import GHC.Generics (Generic)
-import Network.Wreq
-import Control.Lens
-import Data.Aeson
-import Text.Printf
-import Data.Time
-import qualified Data.ByteString.Char8 as B
+import           Control.Exception.Extra
+import           Control.Lens
+import           Data.Aeson
+import qualified Data.ByteString.Char8   as B
+import           Data.Time
+import           GHC.Generics            (Generic)
+import           Network.Wreq
+import           Text.Printf
 
 data Positions = Positions
   { pinstrument :: String
@@ -45,15 +45,15 @@ data TradeOpened = TradeOpened
   }  deriving (Show, Generic)
 
 data TradesClosed = TradeClosed
-  { cid           :: Int
-  , cunits        :: Int
-  , cside         :: String
+  { cid    :: Int
+  , cunits :: Int
+  , cside  :: String
   }  deriving (Show, Generic)
 
 data TradeReduced = TradeReduced
-  { rid           :: Maybe Int
-  , runits        :: Maybe Int
-  , rside         :: Maybe String
+  { rid    :: Maybe Int
+  , runits :: Maybe Int
+  , rside  :: Maybe String
   }  deriving (Show, Generic)
 
 data OrdersBody = OrdersBody
@@ -78,7 +78,7 @@ data PricesBody = PricesBody
 
 data AccountsBody = AccountsBody
   { accountId       :: Int
-  , accountName     :: String 
+  , accountName     :: String
   , balance         :: Double
   , unrealizedPl    :: Double
   , realizedPl      :: Double
@@ -87,7 +87,7 @@ data AccountsBody = AccountsBody
   , openTrades      :: Int
   , openOrders      :: Int
   , marginRate      :: Double
-  , accountCurrency :: String 
+  , accountCurrency :: String
   } deriving (Show, Generic)
 
 instance FromJSON OrdersBody
@@ -113,14 +113,14 @@ instance FromJSON Prices where
 
 instance FromJSON AccountsBody
 
-getNowPrices :: Ftd.FxTradeData -> IO (Fcd.FxChartData)
+getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
 getNowPrices td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td] &
              param "instruments" .~ ["USD_JPY"]
   r <- retry 100 $ getWith opts "https://api-fxpractice.oanda.com/v1/prices"
-       >>= asJSON 
-  e <- Fm.getOneChart Fm.getEndChartFromDB 
+       >>= asJSON
+  e <- Fm.getOneChart Fm.getEndChartFromDB
   return $ e { Fcd.close = nbid . head . prices $ r ^. responseBody
              }
 
@@ -138,8 +138,8 @@ close td = do
 open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
 open td side = do
   (b, _) <- getOandaBalance td
-  p <- Fm.getOneChart  Fm.getEndChartFromDB 
-  let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / (Fcd.close p)
+  p <- Fm.getOneChart  Fm.getEndChartFromDB
+  let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
       u' = if Gsd.maxUnit Gsd.gsd < u
            then Gsd.maxUnit Gsd.gsd
            else u
@@ -173,7 +173,7 @@ getOandaBalance td = do
       upl = unrealizedPl $ r ^. responseBody
   return (b, upl)
 
-setOandaOrders :: Ftd.FxTradeData -> String -> Int -> IO (Ftd.FxTradeData)
+setOandaOrders :: Ftd.FxTradeData -> String -> Int -> IO Ftd.FxTradeData
 setOandaOrders td s u = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
@@ -191,7 +191,7 @@ getOandaPosition td = do
   r <- retry 100 $ getWith opts (Ftd.url td ++ "/positions")
        >>= asJSON
   let ps = positions $ r ^. responseBody
-      s = if ps == []
+      s = if null ps
           then Ftd.None
           else let st = pside $ head ps
                in if st == "buy"
@@ -199,10 +199,10 @@ getOandaPosition td = do
                   else if st == "sell"
                        then Ftd.Sell
                        else Ftd.None
-      u = if ps == []
+      u = if null ps
           then 0
           else punits $ head ps
-      p = if ps == []
+      p = if null ps
           then 0
           else pavgPrice $ head ps
   return (s, u, p)

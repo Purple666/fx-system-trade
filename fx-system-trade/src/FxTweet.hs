@@ -6,11 +6,11 @@ module FxTweet
   , tweetWeek
   ) where
 
-import qualified FxTradeData              as Ftd
-import qualified FxChartData              as Fcd
-import Text.Printf
-import Network.Wreq
-import Control.Lens
+import           Control.Lens
+import qualified FxChartData  as Fcd
+import qualified FxTradeData  as Ftd
+import           Network.Wreq
+import           Text.Printf
 
 tweet :: String -> IO ()
 tweet t = do
@@ -21,10 +21,10 @@ tweet t = do
 
 tweetClose :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO ()
 tweetClose td td' = do
-  let fmts =  "#FxSystemTrade(" ++ (show $ Ftd.environment td') ++ ")\n" ++
+  let fmts =  "#FxSystemTrade(" ++ show (Ftd.environment td') ++ ")\n" ++
               "[Close]\n" ++
               "Rate : %.2f -> %.2f\n" ++
-              "Side : " ++ (show $ Ftd.side td) ++ "\n" ++
+              "Side : " ++ show (Ftd.side td) ++ "\n" ++
               "Realized PL : %.0f (%+.0f)\n" ++
               "Win Rate : %.2f %% (%d - %d)\n"
       t = printf fmts
@@ -40,11 +40,11 @@ tweetClose td td' = do
 
 tweetOpen :: Ftd.FxTradeData -> Int -> IO ()
 tweetOpen td units = do
-  let fmts =  "#FxSystemTrade(" ++ (show $ Ftd.environment td) ++ ")\n" ++
+  let fmts =  "#FxSystemTrade(" ++ show (Ftd.environment td) ++ ")\n" ++
               "[Open]\n" ++
               "Rate : %.2f\n" ++
-              "Side : " ++ (show $ Ftd.side td) ++ "\n" ++
-              "Unit : %d\n"  
+              "Side : " ++ show (Ftd.side td) ++ "\n" ++
+              "Unit : %d\n"
       t = printf fmts
           (Fcd.close $ Ftd.rate td)
           units :: String

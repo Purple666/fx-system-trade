@@ -1,28 +1,28 @@
 module GlobalSettingData where
 
 data GlobalSettingData = GlobalSettingData
-  { taMargin                 :: Int
-  , makeTreeCount            :: Int
-  , algorithmRepeat          :: Int
-  , learningTestCount        :: Int
-  , thresholdRate            :: Double
-  , countUpListMax           :: Int
-  , maxLearningTime          :: Int
-  , maxFxSettingLog          :: Int
-  , maxGaLengthLog           :: Int
-  , tradePracticeBearer      :: String
-  , tradePracticeUrl         :: String
-  , tradeProductionBearer    :: String
-  , tradeProductionUrl       :: String
-  , quantityRate             :: Double
-  , initalProperty           :: Double
-  , maxUnit                  :: Int
-  , dbHost                   :: String
-  , spread                   :: Double
+  { taMargin              :: Int
+  , makeTreeCount         :: Int
+  , algorithmRepeat       :: Int
+  , learningTestCount     :: Int
+  , thresholdRate         :: Double
+  , countUpListMax        :: Int
+  , maxLearningTime       :: Int
+  , maxFxSettingLog       :: Int
+  , maxGaLengthLog        :: Int
+  , tradePracticeBearer   :: String
+  , tradePracticeUrl      :: String
+  , tradeProductionBearer :: String
+  , tradeProductionUrl    :: String
+  , quantityRate          :: Double
+  , initalProperty        :: Double
+  , maxUnit               :: Int
+  , dbHost                :: String
+  , spread                :: Double
   }
 
 gsd :: GlobalSettingData
-gsd = 
+gsd =
   GlobalSettingData { taMargin              = 10
                     , makeTreeCount         = 10
                     , algorithmRepeat       = 10

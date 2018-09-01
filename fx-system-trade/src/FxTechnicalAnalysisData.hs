@@ -16,11 +16,11 @@ module FxTechnicalAnalysisData
   , zeroFxalgorithmListCount
   ) where
 
-import Debug.Trace
-import qualified Data.Map                 as M
-import qualified Tree                     as Tr
-import qualified FxChartData              as Fcd
-import qualified GlobalSettingData        as Gsd
+import qualified Data.Map          as M
+import           Debug.Trace
+import qualified FxChartData       as Fcd
+import qualified GlobalSettingData as Gsd
+import qualified Tree              as Tr
 
 data FxChartTaData = FxChartTaData
   { taChart     :: Fcd.FxChartData
@@ -30,15 +30,15 @@ data FxChartTaData = FxChartTaData
   }  deriving (Show)
 
 data FxTechnicalAnalysisData = FxTechnicalAnalysisData
-  { chart       :: Fcd.FxChartData
-  , rci         :: FxMovingAverageData
-  , sma         :: FxMovingAverageData
-  , ema         :: FxMovingAverageData
-  , wma         :: FxMovingAverageData
-  , macd        :: FxMovingAverageData
-  , st          :: FxMovingAverageData
-  , rsi         :: FxMovingAverageData
-  , bb          :: FxMovingAverageData
+  { chart :: Fcd.FxChartData
+  , rci   :: FxMovingAverageData
+  , sma   :: FxMovingAverageData
+  , ema   :: FxMovingAverageData
+  , wma   :: FxMovingAverageData
+  , macd  :: FxMovingAverageData
+  , st    :: FxMovingAverageData
+  , rsi   :: FxMovingAverageData
+  , bb    :: FxMovingAverageData
   }  deriving (Show)
 
 data FxMovingAverageData = FxMovingAverageData
@@ -160,17 +160,17 @@ fxAlgorithmList =
 isBuy :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
 isBuy f fxta =
   f fxta == Buy
-  
+
 isSell :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
 isSell f fxta =
   f fxta == Sell
 
 initAlgoLeafData ::  [Tr.LeafData FxTechnicalAnalysisData]
-initAlgoLeafData = 
+initAlgoLeafData =
  map Tr.LeafData $ zip [0..] fxAlgorithmList
 
 initTechAnaLeafData :: Int -> Tr.LeafData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
-initTechAnaLeafData x = 
+initTechAnaLeafData x =
   Tr.LeafData (x, (isProfitInc x, isProfitDec x))
 
 isProfitInc :: Int -> (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData) -> Bool
@@ -192,10 +192,10 @@ initFxTechnicalAnalysisSetting =
                              }
 
 initFxAlgorithmSetting :: Tr.LeafDataMap FxTechnicalAnalysisData -> FxAlgorithmSetting
-initFxAlgorithmSetting alc = 
+initFxAlgorithmSetting alc =
   FxAlgorithmSetting { algorithmTree      = Tr.Empty
-                     , algorithmAndRate   = 1 
-                     , algorithmOrRate    = 1 
+                     , algorithmAndRate   = 1
+                     , algorithmOrRate    = 1
                      , algorithmListCount = alc
                      , rciSetting         = initFxAlMaSetting
                      , smaSetting         = initFxAlMaSetting
@@ -218,7 +218,7 @@ initFxAlMaSetting =
                 }
 
 
-initFxTechnicalAnalysisData :: FxTechnicalAnalysisData 
+initFxTechnicalAnalysisData :: FxTechnicalAnalysisData
 initFxTechnicalAnalysisData =
   FxTechnicalAnalysisData { chart      = Fcd.initFxChartData
                           , rci        = initFxMovingAverageData
@@ -248,11 +248,11 @@ initFxMovingAverageData =
                       , thresholdS = None
                       , thresholdL = None
                       , thresholdM = None
-                      }  
+                      }
 
 zeroFxalgorithmListCount :: FxalgorithmListCount
-zeroFxalgorithmListCount = 
+zeroFxalgorithmListCount =
   FxalgorithmListCount { prev      = ([], M.empty)
                        , listCount = (Tr.emptyLeafDataMap, M.empty)
                        }
-  
+

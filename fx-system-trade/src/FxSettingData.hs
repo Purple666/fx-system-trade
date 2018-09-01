@@ -12,9 +12,9 @@ module FxSettingData
   ) where
 
 --import Debug.Trace
-import qualified Data.Map                 as M
-import qualified FxChartData              as Fcd
-import qualified FxTechnicalAnalysisData  as Fad
+import qualified Data.Map                as M
+import qualified FxChartData             as Fcd
+import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
@@ -23,15 +23,15 @@ data FxSettingData =
                 , fxSettingLog    :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
-data FxSetting = 
+data FxSetting =
   FxSetting { fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Ord, Eq)
 
 data FxChart =
-  FxChart { chart          :: [Fcd.FxChartData]
-          , chartLength    :: Int
+  FxChart { chart       :: [Fcd.FxChartData]
+          , chartLength :: Int
           } deriving (Show)
 
 instance Eq FxSettingData where
@@ -43,7 +43,7 @@ instance Ord FxSettingData where
     | fxSetting a <= fxSetting b  = LT
     | otherwise           = GT
 
-data FxLearningSetting = 
+data FxLearningSetting =
   FxLearningSetting { learningTestTimes :: Int
                     , gaLoopMax         :: Int
                     , trTrade           :: Integer
@@ -89,14 +89,14 @@ getGaLoopMax fsd =
 plusGaLoopMax :: FxSettingData -> FxSettingData
 plusGaLoopMax fsd =
   fsd { learningSetting = (learningSetting fsd) {
-          gaLoopMax = (gaLoopMax $ learningSetting fsd) + 1
+          gaLoopMax = gaLoopMax (learningSetting fsd) + 1
           }
       }
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { learningSetting = (learningSetting fsd) {
-          learningTestTimes = (learningTestTimes $ learningSetting fsd) + 1
+          learningTestTimes = learningTestTimes (learningSetting fsd) + 1
           }
       }
 
