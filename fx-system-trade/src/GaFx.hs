@@ -129,7 +129,7 @@ learning failp n fsd = do
                                              (p / fromIntegral c), Gsf.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
               M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
-  if {- not failp && -} (not $ null tdlts) 
+  if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt', Fs.unionFxSettingData fsd'' fsd)
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
 
@@ -157,7 +157,7 @@ backTestLoop latest retry failp n endN fsd td = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning failp (n - 1) fsd
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
-  (tdt, fsd2) <- Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd) (Ftd.trSuccess tdl + (sum $ map Ftd.trSuccess tdlt) `div` Gsd.learningTestCount Gsd.gsd) td fsd1
+  (tdt, fsd2) <- Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd) (Ftd.trSuccess tdl) `div` Gsd.learningTestCount Gsd.gsd) td fsd1
                         =<< ((++) <$> 
                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                              Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
