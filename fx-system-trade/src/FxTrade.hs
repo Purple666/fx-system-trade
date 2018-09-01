@@ -92,7 +92,7 @@ evaluate ctd fsd f1 forceSell td = do
                             (0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
                             (chart - rate < 0 && evaluateProfitDec ftcl ftadcl)
                          then (chart - rate, (chart / rate) - 1, Ftd.Buy)
-                         else if Ftd.side td == Ftd.Sell
+                         else if Ftd.side td == Ftd.Sell &&
                                  (0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
                                  (rate - chart < 0 && evaluateProfitInc ftcl ftadcl)
                               then (rate - chart, 1 - (chart / rate), Ftd.Sell)
