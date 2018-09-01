@@ -71,10 +71,14 @@ evaluate ctd fsd f1 forceSell td = do
       ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       (position, open)
-        = if Gsf.buyEvaluation td cd fsd chart rate &&
+        = if (Ftd.side td == Ftd.None ||
+             (Ftd.side td == Ftd.Sell && (0.01 < rate - chart || rate - chart < 0) &&
+              Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) && 
              evaluateProfitInc fto ftado
           then (chart, Ftd.Buy)
-          else if Gsf.sellEvaluation td cd fsd chart rate &&
+          else if Ftd.side td == Ftd.None ||
+                  (Ftd.side td == Ftd.Buy && (0.01 < chart - rate || chart - rate < 0) &&
+                   Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))
                   evaluateProfitDec fto ftado
                then (chart, Ftd.Sell)
                else (0, Ftd.None)
@@ -156,10 +160,10 @@ evaluate ctd fsd f1 forceSell td = do
                                   else if close /= Ftd.None
                                        then Ftd.None
                                        else Ftd.side td
-               , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
+               , Ftd.trTradeDate = if close /= Ftd.None
                                    then Ftd.trTradeDate td + Fcd.no cd - (Fcd.no $ Ftd.rate td)
                                    else Ftd.trTradeDate td
-               , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
+               , Ftd.trTrade     = if close /= Ftd.None
                                   then Ftd.trTrade td + 1
                                   else Ftd.trTrade td
                , Ftd.trSuccess  = if close /= Ftd.None

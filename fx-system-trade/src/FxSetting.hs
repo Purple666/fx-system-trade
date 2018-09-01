@@ -16,6 +16,7 @@ module FxSetting
   , emptyFxSettingLog
   , getFxSettingLogResult
   , getSimChartMax
+  , getTradeHoldTime
   ) where  
 
 import qualified Data.Map                 as M
@@ -50,6 +51,10 @@ getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd = 
   (sqrt :: (Double -> Double)) . (sqrt :: (Double -> Double)) . fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd
   --
+
+geTradeHoldTime :: Fsd.FxSettingData -> Int
+geTradeHoldTime fsd = 
+  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes fsd
 
 getSimChartMax :: Fsd.FxSettingData -> Int
 getSimChartMax fsd = 
