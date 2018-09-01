@@ -38,7 +38,7 @@ getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else let l = getSimChartMax fsd * (truncate (getLearningTestTimes fsd * ((fromIntegral $ Fsd.trTradeDate ls) / (fromIntegral $ Fsd.trTrade ls))))
+     else let l = getSimChartMax fsd * truncate (getLearningTestTimes fsd * (fromIntegral (Fsd.trTradeDate ls) / fromIntegral (Fsd.trTrade ls)))
           in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l
@@ -171,7 +171,7 @@ createRandomFxAlMaSetting ix = do
   long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), Fad.longSetting      ix + Gsd.taMargin Gsd.gsd)
   prev   <- getRandomR (max 3 (Fad.prevSetting      ix - Gsd.taMargin Gsd.gsd), Fad.prevSetting      ix + Gsd.taMargin Gsd.gsd)
   ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - fromIntegral (Gsd.taMargin Gsd.gsd)),
-                        Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
+                        Fad.thresholdSetting ix + fromIntegral (Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
             , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long

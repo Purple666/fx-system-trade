@@ -29,7 +29,7 @@ initFxChartData =
               }
 
 getDate :: Int -> IO String
-getDate n = LC.unpack <$> (formatUnixTime (LC.pack "%Y/%m/%d %H:%M") $ UnixTime (fromInteger ((fromIntegral n) * 60)) 0)
+getDate n = LC.unpack <$> formatUnixTime (LC.pack "%Y/%m/%d %H:%M") (UnixTime (fromInteger (fromIntegral n * 60)) 0)
 
 getYear :: FxChartData -> Int
 getYear c = read . LC.unpack . formatUnixTimeGMT (LC.pack "%Y%m%d") $ UnixTime (fromInteger (fromIntegral (date c) * 60)) 0

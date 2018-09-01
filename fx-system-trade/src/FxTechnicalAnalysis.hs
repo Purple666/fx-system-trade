@@ -136,7 +136,7 @@ getPrepareTime x =
 setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 setFxTechnicalAnalysisSetting x =
   let mk = maximum . M.keys $ Fad.algoSetting x
-      itad = map (Fad.initTechAnaLeafData) [0..mk]
+      itad = map Fad.initTechAnaLeafData [0..mk]
   in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad $ Fad.techAnaTree x
        , Fad.techListCount = Tr.setFunctionToLeafDataMap itad $ Fad.techListCount x
        , Fad.algoSetting   = M.map setFxAlgorithmSetting $ Fad.algoSetting x
@@ -267,12 +267,8 @@ setCross s l ps pl
 
 lsmn :: [Double] -> Fad.FxTradePosition
 lsmn xs
-  | fst $ foldl (\(f, p) x -> if f && p <= x
-                              then (True, p)
-                              else (False, p)) (True, 0) xs = Fad.Buy
-  | fst $ foldl (\(f, p) x -> if f && x <= p
-                         then (True, p)
-                         else (False, p)) (True, 0) xs = Fad.Sell
+  | fst $ foldl (\(f, p) x -> (f && p <= x, p)) (True, 0) xs = Fad.Buy
+  | fst $ foldl (\(f, p) x -> (f && x <= p, p)) (True, 0) xs = Fad.Sell
   | otherwise = Fad.None
 
 setThreshold :: Double ->

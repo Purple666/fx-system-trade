@@ -26,7 +26,7 @@ if Ftd.unrealizedPL x <= Gsd.initalProperty Gsd.gsd
 
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
-  and (map (\x -> 0 < getEvaluationValue x) tdlt) && 0 < getEvaluationValue tdl
+  all (\x -> 0 < getEvaluationValue x) tdlt && 0 < getEvaluationValue tdl
 
 getEvaluationValueList :: [Ftd.FxTradeData] -> Double
 getEvaluationValueList tdlt =

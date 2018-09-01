@@ -39,7 +39,7 @@ instance Ga.Ga Fsd.FxSettingData where
 debug :: IO ()
 debug = do
   let td  = Ft.initFxTradeData Ftd.Backtest
-  fsd <- Fm.readFxSettingData $ Fsd.initFxSettingData
+  fsd <- Fm.readFxSettingData Fsd.initFxSettingData
   debugLoop td fsd -- =<< async ()
   return ()
 
@@ -56,7 +56,7 @@ debugLoop td fsd = do
 
 backTest :: Bool -> Int -> Int -> Bool -> IO ()
 backTest retry s f latest = do
-  fsd <- Fs.initFxsettingFromLog <$> (Fm.updateFxSettingData =<< (Fm.readFxSettingData Fsd.initFxSettingData))
+  fsd <- Fs.initFxsettingFromLog <$> (Fm.updateFxSettingData =<< Fm.readFxSettingData Fsd.initFxSettingData)
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -80,7 +80,7 @@ trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Foa.updateFxTradeData =<< (Fm.updateFxTradeData coName $ (Ft.initFxTradeData environment) { Ftd.chart = c })
   Fp.printStartTrade td
-  fsd <- tradeLearning =<< (Fs.initFxsettingFromLog <$> (Fm.readFxSettingData Fsd.initFxSettingData))
+  fsd <- tradeLearning =<< (Fs.initFxsettingFromLog <$> Fm.readFxSettingData Fsd.initFxSettingData)
   tradeWeeklyLoop fsd td coName
 
 learningLoop :: Int ->
@@ -99,7 +99,7 @@ learningLoop c cl ce fsd fsds = do
                                then - (Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt)
                                else Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt
                        in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
-           Ga.learning (Gsd.maxGaLengthLog Gsd.gsd) (Fsd.nextFxSettingData lt cl fsd) (map (\x -> Fsd.nextFxSettingData lt cl x) fsds)
+           Ga.learning (Gsd.maxGaLengthLog Gsd.gsd) (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
   let (_, tdl, tdlt, fsd') = maximum fsds'
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
   if Gsf.evaluationOk tdl tdlt

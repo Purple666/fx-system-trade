@@ -7,6 +7,7 @@ module FxPrint
   ) where
 
 --import Debug.Trace
+import           Control.Monad
 import qualified Data.Map      as M
 import qualified FxChartData   as Fcd
 import qualified FxSetting     as Fs
@@ -14,7 +15,6 @@ import qualified FxSettingData as Fsd
 import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
 import           Text.Printf
-import           Control.Monad
 
 printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do

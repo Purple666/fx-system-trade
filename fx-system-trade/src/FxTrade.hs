@@ -6,6 +6,7 @@ module FxTrade ( initFxTradeData
                ) where
 
 import qualified Data.Map                as M
+import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm
 import qualified FxPrint                 as Fp
@@ -18,7 +19,7 @@ import qualified GlobalSettingData       as Gsd
 import qualified GlobalSettingFunction   as Gsf
 import qualified Tree                    as Tr
 import           Control.Monad
-import           Debug.Trace
+
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -62,127 +63,124 @@ evaluate :: Fad.FxChartTaData ->
             Ftd.FxTradeData ->
             (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 evaluate ctd fsd f1 forceSell td =
-  let cd     = Fad.taChart ctd
-      chart  = Fcd.close   cd
-      rate   = Fcd.close $ Ftd.rate td
-      ftado  = Fad.open        ctd
-      ftadcp = Fad.closeProfit ctd
-      ftadcl = Fad.closeLoss   ctd
-      fto    = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-      ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-      ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-      (position, open)
-        = if (Ftd.side td == Ftd.None ||
-             (Ftd.side td == Ftd.Sell && (0.01 < rate - chart || rate - chart < 0) &&
-              Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) &&
-             evaluateProfitInc fto ftado
-          then (chart, Ftd.Buy)
-          else if (Ftd.side td == Ftd.None ||
-                  (Ftd.side td == Ftd.Buy && (0.01 < chart - rate || chart - rate < 0) &&
-                   Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) &&
-                  evaluateProfitDec fto ftado
-               then (chart, Ftd.Sell)
-               else (0, Ftd.None)
-      (profits, realizedPL, close)
-        = if open /= Ftd.None && rate /= 0
-          then if Ftd.side td == Ftd.Buy
-               then (chart - rate, (chart / rate) - 1, Ftd.Close)
-               else if Ftd.side td == Ftd.Sell
-                    then (rate - chart, 1 - (chart / rate), Ftd.Close)
-                    else (0, 0, Ftd.None)
-          else if rate /= 0
-               then if forceSell ||
-                       (Ftd.side td == Ftd.Buy &&
-                        (0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                        (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))
-                    then (chart - rate, (chart / rate) - 1, Ftd.Buy)
-                    else if forceSell ||
-                            (Ftd.side td == Ftd.Sell &&
-                             (0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
-                             (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))
-                         then (rate - chart, 1 - (chart / rate), Ftd.Sell)
-                         else (0, 0, Ftd.None)
-               else (0, 0, Ftd.None)
-      td' = td { Ftd.chart  = cd
-               , Ftd.rate   = if open == Ftd.Buy
-                              then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                       , Fcd.close = position + Gsd.spread Gsd.gsd
-                                                       }
-                              else if open == Ftd.Sell
-                                   then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                            , Fcd.close = position - Gsd.spread Gsd.gsd
-                                                            }
-                                   else if close /= Ftd.None
-                                        then Fcd.initFxChartData
-                                        else Ftd.rate td
-               , Ftd.alcOpen =
-                   Fad.FxalgorithmListCount { Fad.prev =
-                                                if open == Ftd.Buy
-                                                then Ta.makeValidLeafDataMapInc fto ftado
-                                                else if open == Ftd.Sell
-                                                     then Ta.makeValidLeafDataMapDec fto ftado
-                                                     else if close /= Ftd.None
-                                                          then ([], M.empty)
-                                                          else Fad.prev $ Ftd.alcOpen td
-                                            , Fad.listCount =
-                                                if close /= Ftd.None
-                                                then Ta.addFxalgorithmListCount profits (Fad.prev $ Ftd.alcOpen td)
-                                                     (Fad.listCount $ Ftd.alcOpen td)
-                                                else Fad.listCount $ Ftd.alcOpen td
-                                            }
-               , Ftd.alcCloseProfit =
-                   Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
-                                            , Fad.listCount =
-                                                if close == Ftd.Buy && 0 < profits
-                                                then Ta.addFxalgorithmListCount profits (Ta.makeValidLeafDataMapDec ftcp ftadcp)
-                                                     (Fad.listCount $ Ftd.alcCloseProfit td)
-                                                else if close == Ftd.Sell && 0 < profits
-                                                     then Ta.addFxalgorithmListCount profits (Ta.makeValidLeafDataMapInc ftcp ftadcp)
-                                                          (Fad.listCount $ Ftd.alcCloseProfit td)
-                                                     else Fad.listCount $ Ftd.alcCloseProfit td
-                                            }
-               , Ftd.alcCloseLoss =
-                   Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
-                                            , Fad.listCount =
-                                                if close == Ftd.Buy && profits < 0
-                                                then Ta.addFxalgorithmListCount (-1 / profits)
-                                                     (Ta.makeValidLeafDataMapDec ftcl ftadcl)
-                                                     (Fad.listCount $ Ftd.alcCloseLoss td)
-                                                else if close == Ftd.Sell && profits < 0
-                                                     then Ta.addFxalgorithmListCount (-1 / profits)
-                                                          (Ta.makeValidLeafDataMapInc ftcl ftadcl)
-                                                          (Fad.listCount $ Ftd.alcCloseLoss td)
-                                                     else Fad.listCount $ Ftd.alcCloseLoss td
-                                            }
-               , Ftd.side  = if open == Ftd.Buy
-                             then Ftd.Buy
-                             else if open == Ftd.Sell
-                                  then Ftd.Sell
-                                  else if close /= Ftd.None
-                                       then Ftd.None
-                                       else Ftd.side td
-               , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
-                                   then Ftd.trTradeDate td + Fcd.no cd - (Fcd.no $ Ftd.rate td)
-                                   else Ftd.trTradeDate td
-               , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
-                                  then Ftd.trTrade td + 1
-                                  else Ftd.trTrade td
-               , Ftd.trSuccess  = if close /= Ftd.None
-                                  then Ftd.trSuccess td + 1
-                                  else Ftd.trSuccess td
-               , Ftd.trFail     = if close /= Ftd.None && profits <= 0
-                                  then Ftd.trFail td + 1
-                                  else Ftd.trFail td
-               , Ftd.profit     = Ftd.profit td + profits
-               , Ftd.realizedPL = Ftd.realizedPL td + 25 * (f1 td chart) * realizedPL
-               , Ftd.unrealizedPL = if (Fcd.close $ Ftd.rate td') /= 0
-                                    then if Ftd.side td' == Ftd.Buy
-                                         then Ftd.realizedPL td' + 25 * (f1 td' chart) * ((chart / (Fcd.close $ Ftd.rate td')) - 1)
-                                         else if Ftd.side td' == Ftd.Sell
-                                              then Ftd.realizedPL td' + 25 * (f1 td' chart) * (1 - (chart / (Fcd.close $ Ftd.rate td')))
-                                              else Ftd.realizedPL td'
-                                    else Ftd.realizedPL td'
-               }
+  let
+  (position, open)
+    | (Ftd.side td == Ftd.None ||
+     (Ftd.side td == Ftd.Sell && (0.01 < rate - chart || rate - chart < 0) &&
+      Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) &&
+     evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+    | (Ftd.side td == Ftd.None ||
+     (Ftd.side td == Ftd.Buy && (0.01 < chart - rate || chart - rate < 0) &&
+      Fs.getTradeHoldTime fsd < Fcd.no cd - (Fcd.no $ Ftd.rate td))) &&
+     evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+    | otherwise = (0, Ftd.None)
+  (profits, realizedPL, close)
+    | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
+                                      then (chart - rate, (chart / rate) - 1, Ftd.Close)
+                                      else if Ftd.side td == Ftd.Sell
+                                           then (rate - chart, 1 - (chart / rate), Ftd.Close)
+                                           else (0, 0, Ftd.None)
+    | rate /= 0 = if forceSell ||
+                     (Ftd.side td == Ftd.Buy &&
+                      (0.01 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
+                      (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))
+                  then (chart - rate, (chart / rate) - 1, Ftd.Buy)
+                  else if forceSell ||
+                          (Ftd.side td == Ftd.Sell &&
+                           (0.01 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
+                           (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))
+                       then (rate - chart, 1 - (chart / rate), Ftd.Sell)
+                       else (0, 0, Ftd.None)
+    | otherwise = (0, 0, Ftd.None)
+  cd     = Fad.taChart ctd
+  chart  = Fcd.close   cd
+  rate   = Fcd.close $ Ftd.rate td
+  ftado  = Fad.open        ctd
+  ftadcp = Fad.closeProfit ctd
+  ftadcl = Fad.closeLoss   ctd
+  fto    = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+  ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+  ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+  td' = td { Ftd.chart  = cd
+           , Ftd.rate   = if open == Ftd.Buy
+                          then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
+                                                   , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                   }
+                          else if open == Ftd.Sell
+                               then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
+                                                        , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                        }
+                               else if close /= Ftd.None
+                                    then Fcd.initFxChartData
+                                    else Ftd.rate td
+           , Ftd.alcOpen =
+               Fad.FxalgorithmListCount { Fad.prev =
+                                            if open == Ftd.Buy
+                                            then Ta.makeValidLeafDataMapInc fto ftado
+                                            else if open == Ftd.Sell
+                                                 then Ta.makeValidLeafDataMapDec fto ftado
+                                                 else if close /= Ftd.None
+                                                      then ([], M.empty)
+                                                      else Fad.prev $ Ftd.alcOpen td
+                                        , Fad.listCount =
+                                            if close /= Ftd.None
+                                            then Ta.addFxalgorithmListCount profits (Fad.prev $ Ftd.alcOpen td)
+                                                 (Fad.listCount $ Ftd.alcOpen td)
+                                            else Fad.listCount $ Ftd.alcOpen td
+                                        }
+           , Ftd.alcCloseProfit =
+               Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
+                                        , Fad.listCount =
+                                            if close == Ftd.Buy && 0 < profits
+                                            then Ta.addFxalgorithmListCount profits (Ta.makeValidLeafDataMapDec ftcp ftadcp)
+                                                 (Fad.listCount $ Ftd.alcCloseProfit td)
+                                            else if close == Ftd.Sell && 0 < profits
+                                                 then Ta.addFxalgorithmListCount profits (Ta.makeValidLeafDataMapInc ftcp ftadcp)
+                                                      (Fad.listCount $ Ftd.alcCloseProfit td)
+                                                 else Fad.listCount $ Ftd.alcCloseProfit td
+                                        }
+           , Ftd.alcCloseLoss =
+               Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
+                                        , Fad.listCount =
+                                            if close == Ftd.Buy && profits < 0
+                                            then Ta.addFxalgorithmListCount (-1 / profits)
+                                                 (Ta.makeValidLeafDataMapDec ftcl ftadcl)
+                                                 (Fad.listCount $ Ftd.alcCloseLoss td)
+                                            else if close == Ftd.Sell && profits < 0
+                                                 then Ta.addFxalgorithmListCount (-1 / profits)
+                                                      (Ta.makeValidLeafDataMapInc ftcl ftadcl)
+                                                      (Fad.listCount $ Ftd.alcCloseLoss td)
+                                                 else Fad.listCount $ Ftd.alcCloseLoss td
+                                        }
+           , Ftd.side  = if open == Ftd.Buy
+                         then Ftd.Buy
+                         else if open == Ftd.Sell
+                              then Ftd.Sell
+                              else if close /= Ftd.None
+                                   then Ftd.None
+                                   else Ftd.side td
+           , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
+                               then Ftd.trTradeDate td + Fcd.no cd - Fcd.no (Ftd.rate td)
+                               else Ftd.trTradeDate td
+           , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
+                              then Ftd.trTrade td + 1
+                              else Ftd.trTrade td
+           , Ftd.trSuccess  = if close /= Ftd.None
+                              then Ftd.trSuccess td + 1
+                              else Ftd.trSuccess td
+           , Ftd.trFail     = if close /= Ftd.None && profits <= 0
+                              then Ftd.trFail td + 1
+                              else Ftd.trFail td
+           , Ftd.profit     = Ftd.profit td + profits
+           , Ftd.realizedPL = Ftd.realizedPL td + 25 * f1 td chart * realizedPL
+           , Ftd.unrealizedPL = if Fcd.close (Ftd.rate td') /= 0
+                                then if Ftd.side td' == Ftd.Buy
+                                     then Ftd.realizedPL td' + 25 * f1 td' chart * ((chart / Fcd.close (Ftd.rate td')) - 1)
+                                     else if Ftd.side td' == Ftd.Sell
+                                          then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / Fcd.close (Ftd.rate td')))
+                                          else Ftd.realizedPL td'
+                                else Ftd.realizedPL td'
+           }
     in (open, close, td')
 
 {-
@@ -198,9 +196,9 @@ makeChartTa :: [Fcd.FxChartData] ->
                [Fad.FxChartTaData]
 makeChartTa [] _ _ _ ctdl = ctdl
 makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
-  let ftado'  = M.map (dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b))) ftado
-      ftadcp' = M.map (dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b))) ftadcp
-      ftadcl' = M.map (dropWhile (\b -> Fcd.no x < (Fcd.no $ Fad.chart b))) ftadcl
+  let ftado'  = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftado
+      ftadcp' = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcp
+      ftadcl' = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcl
       ctd = Fad.FxChartTaData { Fad.taChart     = x
                               , Fad.open        = M.map (\y -> if null y
                                                                then Fad.initFxTechnicalAnalysisData

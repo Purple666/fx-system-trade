@@ -55,7 +55,7 @@ learningData :: a -> LearningData a
 learningData s = LearningData [(s, 0)]
 
 learningDataList :: [LearningData a] -> LearningData a
-learningDataList s = LearningData . foldl1 ((++)) $ map (\(LearningData x) -> x) s
+learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
 
 top :: (Ga a) => Int -> LearningData a -> LearningData a
 top n (LearningData y) =
@@ -79,9 +79,9 @@ selection2 x = do
 selectAlgorithm :: (Ga a, MonadRandom m) => m (LearningData a -> LearningData a -> m (LearningData a))
 selectAlgorithm = do
   die <- getRandomR (1, 100)
-  let x | 95 < (die :: Int) = (\a b -> copy a b)
-        | die <= 5 = (\a b -> mutation a b)
-        | otherwise = \a b -> crossover a b
+  let x | 95 < (die :: Int) = copy
+        | die <= 5 = mutation
+        | otherwise = crossover
   return x
 
 geneticOperators :: (Ga a, MonadRandom m) => Int -> LearningData a -> LearningData a -> m (LearningData a)
@@ -108,7 +108,7 @@ learningLoop c lm gl x = do
 
 createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> Int -> [a] -> LearningData a -> m (LearningData a)
 createInitialDataLoop c glm lm ixs x = do
-  x' <- mappend x <$> evaluate . learningDataList <$> mapM (\a -> createInitialData glm a) ixs
+  x' <- mappend x . evaluate . learningDataList <$> mapM (createInitialData glm) ixs
   --traceShow("create", lm, c, length ixs, length x, length x') $ return ()
   if glm < length x'
     then return x'
