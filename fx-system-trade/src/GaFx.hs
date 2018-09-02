@@ -117,7 +117,7 @@ learning :: Bool ->
 learning failp n fsd = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
-  cl <-             Fm.getChartListBack (n - ltt * Gsd.learningTestCount Gsd.gsd) (Fs.getPrepareTimeAll fsd + lt) 0
+  cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) . (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
   let tdlts = M.elems .
               M.filter (\(x, y, _, _, _) -> 0 < x && y) .
