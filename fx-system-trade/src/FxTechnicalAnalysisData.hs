@@ -107,6 +107,12 @@ fxAlgorithmList =
   [ (isBuy (crossSL    . sma), isSell (crossSL    . sma)) -- 1
   , (isBuy (crossSM    . sma), isSell (crossSM    . sma)) -- 2
   , (isBuy (crossML    . sma), isSell (crossML    . sma)) -- 3
+  , (isBuy (crossSL    . ema), isSell (crossSL    . ema)) -- 0
+  , (isBuy (crossSM    . ema), isSell (crossSM    . ema)) -- 1
+  , (isBuy (crossML    . ema), isSell (crossML    . ema)) -- 2
+  , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
+  , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
+  , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
   , (isBuy (crossSL   . macd), isSell (crossSL   . macd)) -- 4
   , (isBuy (crossSL    . rci), isSell (crossSL    . rci)) -- 5
   , (isBuy (crossSM    . rci), isSell (crossSM    . rci)) -- 6
@@ -148,12 +154,6 @@ fxAlgorithmList =
   , (isBuy (slopeSn    . wma), isSell (slopeSn    . wma)) -- 44
   , (isBuy (slopeMn    . wma), isSell (slopeMn    . wma)) -- 45
   , (isBuy (slopeLn    . wma), isSell (slopeLn    . wma)) -- 46
-  , (isBuy (crossSL    . ema), isSell (crossSL    . ema)) -- 0
-  , (isBuy (crossSM    . ema), isSell (crossSM    . ema)) -- 1
-  , (isBuy (crossML    . ema), isSell (crossML    . ema)) -- 2
-  , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
-  , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
-  , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
 -}
 
 
