@@ -64,15 +64,23 @@ evaluate :: Fad.FxChartTaData ->
             (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 evaluate ctd fsd f1 forceSell td =
   let
+{-    
   (position, open)
     | (Ftd.side td == Ftd.None ||
      (Ftd.side td == Ftd.Sell && (0.01 < rate - chart || rate - chart < 0) &&
---      Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
+      Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
     | (Ftd.side td == Ftd.None ||
      (Ftd.side td == Ftd.Buy && (0 < chart - rate || chart - rate < 0) &&
---      Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
+      Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+    | otherwise = (0, Ftd.None)
+-}
+  (position, open)
+    | Ftd.side td == Ftd.None && 
+      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+    | Ftd.side td == Ftd.None && 
+      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
   (profits, realizedPL, close)
     | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
