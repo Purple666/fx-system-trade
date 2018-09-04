@@ -13,6 +13,7 @@ if __name__ == "__main__":
 
     JST = timezone(timedelta(hours=+9), 'JST')
     
+
     client = pymongo.MongoClient('mongo', 27017)
     db = client.fx
     co = db.rate
