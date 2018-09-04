@@ -12,7 +12,6 @@ if __name__ == "__main__":
     headers['X-Accept-Datetime-Format'] = 'UNIX'
 
     JST = timezone(timedelta(hours=+9), 'JST')
-    
 
     client = pymongo.MongoClient('mongo', 27017)
     db = client.fx
