@@ -43,6 +43,7 @@ getLearningTime fsd =
              then Gsd.maxLearningTime Gsd.gsd
              else l
 
+
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
