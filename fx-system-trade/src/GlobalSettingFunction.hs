@@ -8,12 +8,13 @@ import qualified GlobalSettingData as Gsd
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
+  (Ftd.trFail x + 1) * Ftd.profit x * (Ftd.unrealizedPL x / Gsd.initalProperty Gsd.gsd)
+{-
   if Ftd.trTrade x == 0 || Ftd.trTradeDate x == 0                                                                                         
   then 0                                                                                                                                  
   else (Ftd.trFail x + 1) * Ftd.profit x * (Ftd.unrealizedPL x / Gsd.initalProperty Gsd.gsd) / (fromIntegral (Ftd.trTradeDate x) / fromIntegral (Ftd.trTrade x)
 
-{-
-  Ftd.profit x
+Ftd.profit x
 )                                                                                                              
 
   if Ftd.trTrade x == 0 || Ftd.trTradeDate x == 0
