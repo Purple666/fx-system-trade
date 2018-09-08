@@ -73,6 +73,15 @@ evaluate ctd fsd f1 forceSell td =
       evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
 
+
+  (position, open)
+    | Ftd.side td == Ftd.None &&
+      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+    | Ftd.side td == Ftd.None &&
+      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+    | otherwise = (0, Ftd.None)
+
+-}
   (position, open)
     | (Ftd.side td == Ftd.None ||
      (Ftd.side td == Ftd.Sell && 
@@ -83,15 +92,6 @@ evaluate ctd fsd f1 forceSell td =
       Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
-
--}
-  (position, open)
-    | Ftd.side td == Ftd.None &&
-      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-    | Ftd.side td == Ftd.None &&
-      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-    | otherwise = (0, Ftd.None)
-
   (profits, realizedPL, close)
     | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
                                       then (chart - rate, (chart / rate) - 1, Ftd.Close)
@@ -325,7 +325,7 @@ learning :: Ftd.FxTradeData ->
 learning td fsd =
   let fc = Fsd.fxChart fsd
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd Gsf.getQuantityLearning False td')
+      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd Gsf.getQuant>ityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
       (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning False td''
   in if null ctdl
