@@ -8,7 +8,7 @@ import qualified GlobalSettingData as Gsd
 
 getEvaluationValue :: Ftd.FxTradeData -> Double
 getEvaluationValue x =
-  Ftd.profit x
+  Ftd.profit x / Ftd.getWinRatePure x
 {-
   if Ftd.unrealizedPL x < Gsd.initalProperty Gsd.gsd && Ftd.profit x < 0
   then - Ftd.profit x * (Ftd.unrealizedPL x - Gsd.initalProperty Gsd.gsd)
