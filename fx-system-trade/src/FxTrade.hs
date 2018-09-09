@@ -326,7 +326,7 @@ learning td fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd Gsf.getQuantityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
-      (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning False td''
+      (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''
