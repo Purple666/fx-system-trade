@@ -253,12 +253,12 @@ makeSimChart c xs =
                                       , Fcd.close = fst low
                                       }
               fcdClose = last chart
-{-
           in [fcdClose]
--}
+{-
           in if snd high < snd low
              then [fcdHigh, fcdLow, fcdClose]
              else [fcdLow,  fcdHigh, fcdClose]
+-}
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
@@ -271,12 +271,12 @@ makeSimChart c xs =
                                          , Fcd.close = fst low
                                          }
                    fcdClose = head xs'
-{-
                in fcdClose : makeSimChart c (tail xs')
--}
+{-
                in if snd high < snd low
                   then fcdHigh : fcdLow : fcdClose : (makeSimChart c $ tail xs')
                   else fcdLow : fcdHigh : fcdClose : (makeSimChart c $ tail xs')
+-}
 
 {-
 xcd [old .. new]
