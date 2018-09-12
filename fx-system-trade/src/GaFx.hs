@@ -158,7 +158,7 @@ backTestLoop latest retry failp n endN fsd td = do
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
   (tdt, fsd2) <- Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd)
-                 (Ftd.trSuccess tdl + (sum $ map Ftd.trSuccess tdlt) td fsd1)
+                 (Ftd.trSuccess tdl + (sum $ map Ftd.trSuccess tdlt)) td fsd1
                         =<< ((++) <$>
                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                              Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
