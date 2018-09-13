@@ -24,6 +24,7 @@ data FxTradeData =
               , trTrade        :: Int
               , trSuccess      :: Int
               , trFail         :: Int
+              , failProfit     :: Double
               , profit         :: Double
               , unrealizedPL   :: Double
               , realizedPL     :: Double
@@ -39,12 +40,14 @@ data FxEnvironment = Backtest | Practice | Production deriving (Show, Read)
 instance Num FxTradeData where
   x - y = x { trSuccess    = trSuccess    x - trSuccess    y
             , trFail       = trFail       x - trFail       y
+            , failProfit   = failProfit   x - failProfit   y
             , profit       = profit       x - profit       y
             , realizedPL   = realizedPL   x - realizedPL   y
             , unrealizedPL = unrealizedPL x - unrealizedPL y
             }
   x + y = x { trSuccess    = trSuccess    x + trSuccess    y
             , trFail       = trFail       x + trFail       y
+            , failProfit   = failProfit   x + failProfit   y
             , profit       = profit       x + profit       y
             , realizedPL   = realizedPL   x + realizedPL   y
             , unrealizedPL = unrealizedPL x + unrealizedPL y
@@ -75,6 +78,7 @@ initFxTradeDataCommon =
               , trTrade          = 0
               , trSuccess        = 0
               , trFail           = 0
+              , failProfit       = 0
               , profit           = 0
               , realizedPL       = Gsd.initalProperty Gsd.gsd
               , unrealizedPL     = Gsd.initalProperty Gsd.gsd

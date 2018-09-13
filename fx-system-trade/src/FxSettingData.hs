@@ -46,6 +46,8 @@ instance Ord FxSettingData where
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes :: Int
                     , gaLoopMax         :: Int
+                    , trFail            :: Int
+                    , failProfit        :: Double
                     , trTrade           :: Integer
                     , trTradeDate       :: Integer
                     } deriving (Show, Read, Eq, Ord)
@@ -57,6 +59,8 @@ initFxSettingData =
                                     }
                 , learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                       , gaLoopMax          = 1
+                                                      , trFail             = 0
+                                                      , failProfit         = 0
                                                       , trTrade            = 0
                                                       , trTradeDate        = 0
                                                       }

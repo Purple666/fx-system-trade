@@ -7,7 +7,7 @@ module FxTrade ( initFxTradeData
 
 import           Control.Monad
 import qualified Data.Map                as M
-import           Debug.Trace
+-- import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm
 import qualified FxPrint                 as Fp
@@ -33,6 +33,8 @@ resetCounter :: Ftd.FxTradeData -> Ftd.FxTradeData
 resetCounter td =
   td { Ftd.trTradeDate    = 0
      , Ftd.trTrade        = 0
+     , Ftd.trFail         = 0
+     , Ftd.failProfit     = 0
      , Ftd.alcOpen        = Fad.zeroFxalgorithmListCount
      , Ftd.alcCloseProfit = Fad.zeroFxalgorithmListCount
      , Ftd.alcCloseLoss   = Fad.zeroFxalgorithmListCount
@@ -72,8 +74,7 @@ evaluate ctd fsd f1 forceSell td =
     | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
       evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
-  (position, open)
-    | (Ftd.side td == Ftd.None ||
+(position, open)    | (Ftd.side td == Ftd.None ||
      (Ftd.side td == Ftd.Sell && -- 0 < rate - chart &&
       Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td))) &&
      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
@@ -97,12 +98,14 @@ evaluate ctd fsd f1 forceSell td =
                                            else (0, 0, Ftd.None)
     | rate /= 0 = if Ftd.side td == Ftd.Buy &&
                      (forceSell || Gsd.maxLearningTime Gsd.gsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
+                      chart - rate < Fs.getLossCutRate fsd ||
                      (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
                       (0 < chart - rate && evaluateProfitDec ftcp ftadcp ||
                        chart - rate < 0 && evaluateProfitDec ftcl ftadcl)))
                   then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                   else if Ftd.side td == Ftd.Sell &&
                           (forceSell || Gsd.maxLearningTime Gsd.gsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
+                           rate - chart < Fs.getLossCutRate fsd ||
                           (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
                            (0 < rate - chart && evaluateProfitInc ftcp ftadcp ||
                             rate - chart < 0 && evaluateProfitInc ftcl ftadcl)))
@@ -185,6 +188,9 @@ evaluate ctd fsd f1 forceSell td =
            , Ftd.trSuccess  = if close /= Ftd.None
                               then Ftd.trSuccess td + 1
                               else Ftd.trSuccess td
+           , Ftd.failProfit = if close /= Ftd.None && profits <= 0
+                              then Ftd.failProfit td + profits
+                              else Ftd.failProfit td
            , Ftd.trFail     = if close /= Ftd.None && profits <= 0
                               then Ftd.trFail td + 1
                               else Ftd.trFail td

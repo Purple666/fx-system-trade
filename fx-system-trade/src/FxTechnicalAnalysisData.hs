@@ -17,7 +17,7 @@ module FxTechnicalAnalysisData
   ) where
 
 import qualified Data.Map          as M
-import           Debug.Trace
+-- import           Debug.Trace
 import qualified FxChartData       as Fcd
 import qualified GlobalSettingData as Gsd
 import qualified Tree              as Tr

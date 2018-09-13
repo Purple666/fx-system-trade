@@ -18,7 +18,6 @@ import           Control.Exception.Extra
 import           Control.Lens
 import           Data.Aeson
 import qualified Data.ByteString.Char8   as B
-import           Data.Time
 import           GHC.Generics            (Generic)
 import           Network.Wreq
 import           Text.Printf

@@ -17,14 +17,12 @@ import qualified FxOandaAPI               as Foa
 import qualified FxPrint                  as Fp
 import qualified FxSetting                as Fs
 import qualified FxSettingData            as Fsd
-import qualified FxTime                   as Ftm
 import qualified FxTrade                  as Ft
 import qualified FxTradeData              as Ftd
 import qualified FxTweet                  as Ftw
 import qualified Ga
 import qualified GlobalSettingData        as Gsd
 import qualified GlobalSettingFunction    as Gsf
-import           Text.Printf
 
 instance Ga.Ga Fsd.FxSettingData where
   reset             = Fs.resetFxSettingData
