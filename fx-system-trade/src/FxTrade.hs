@@ -31,13 +31,13 @@ evaluateProfitDec fts ftad =
 
 resetCounter :: Ftd.FxTradeData -> Ftd.FxTradeData
 resetCounter td =
-  td { Ftd.trTradeDate    = 0
-     , Ftd.trTrade        = 0
-     , Ftd.trFail         = 0
-     , Ftd.failProfit     = 0
-     , Ftd.alcOpen        = Fad.zeroFxalgorithmListCount
-     , Ftd.alcCloseProfit = Fad.zeroFxalgorithmListCount
-     , Ftd.alcCloseLoss   = Fad.zeroFxalgorithmListCount
+  td { Ftd.trTradeDate     = 0
+     , Ftd.trTrade         = 0
+     , Ftd.failProfitCount = 0
+     , Ftd.failProfit      = 0
+     , Ftd.alcOpen         = Fad.zeroFxalgorithmListCount
+     , Ftd.alcCloseProfit  = Fad.zeroFxalgorithmListCount
+     , Ftd.alcCloseLoss    = Fad.zeroFxalgorithmListCount
      }
 
 initFxTradeData :: Ftd.FxEnvironment -> Ftd.FxTradeData

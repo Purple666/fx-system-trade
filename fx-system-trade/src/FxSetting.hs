@@ -37,7 +37,7 @@ import qualified Tree                    as Tr
 getLossCutRate :: Fsd.FxSettingData -> Double
 getLossCutRate fsd =
   let ls = Fsd.learningSetting fsd
-  in Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)
+  in Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
@@ -110,7 +110,7 @@ unionLearningSetting :: Fsd.FxLearningSetting -> Fsd.FxLearningSetting -> Fsd.Fx
 unionLearningSetting ls ls' =
   Fsd.FxLearningSetting { Fsd.learningTestTimes = max (Fsd.learningTestTimes ls) (Fsd.learningTestTimes ls')
                         , Fsd.gaLoopMax         = max (Fsd.gaLoopMax         ls) (Fsd.gaLoopMax         ls')
-                        , Fsd.trFail            = max (Fsd.trFail            ls) (Fsd.trFail            ls')
+                        , Fsd.failProfitCount   = max (Fsd.failProfitCount   ls) (Fsd.failProfitCount   ls')
                         , Fsd.failProfit        = max (Fsd.failProfit        ls) (Fsd.failProfit        ls')
                         , Fsd.trTrade           = max (Fsd.trTrade           ls) (Fsd.trTrade           ls')
                         , Fsd.trTradeDate       = max (Fsd.trTradeDate       ls) (Fsd.trTradeDate       ls')
@@ -147,10 +147,10 @@ updateFxSettingData ctdl td tdt fsd =
             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
       ls = (Fsd.learningSetting fsd)
-           { Fsd.trTrade     = Fsd.trTrade (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTrade tdt)
-           , Fsd.trTradeDate = Fsd.trTradeDate (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
-           , Fsd.trFail      = Fsd.trFail (Fsd.learningSetting fsd) +  Ftd.trFail tdt
-           , Fsd.failProfit  = Fsd.failProfit (Fsd.learningSetting fsd) +  Ftd.failProfit tdt
+           { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTrade tdt)
+           , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
+           , Fsd.failProfitCount = Fsd.failProfitCount (Fsd.learningSetting fsd) + Ftd.failProfitCount tdt
+           , Fsd.failProfit      = Fsd.failProfit      (Fsd.learningSetting fsd) + Ftd.failProfit tdt
            }
   in if 0 < p
      then fsd { Fsd.learningSetting = ls
