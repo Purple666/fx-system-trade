@@ -37,7 +37,9 @@ import qualified Tree                    as Tr
 getLossCutRate :: Fsd.FxSettingData -> Double
 getLossCutRate fsd =
   let ls = Fsd.learningSetting fsd
-  in traceShow (Fsd.failProfit ls) $ (Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * 2
+  in if Fsd.failProfit ls == 0 || Fsd.failProfitCount ls == 0
+     then -100
+     else (Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * 2
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
