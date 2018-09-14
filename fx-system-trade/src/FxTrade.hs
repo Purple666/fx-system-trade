@@ -67,7 +67,6 @@ evaluate :: Fad.FxChartTaData ->
 evaluate ctd fsd f1 forceSell td =
   let
 {-    
-
   (position, open)
     | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
       evaluateProfitInc fto ftado = (chart, Ftd.Buy)
