@@ -25,7 +25,7 @@ import           Control.Monad.Random
 import           Data.List
 import qualified Data.Map                as M
 import           Data.Tuple
---import           Debug.Trace
+import           Debug.Trace
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad
@@ -37,7 +37,7 @@ import qualified Tree                    as Tr
 getLossCutRate :: Fsd.FxSettingData -> Double
 getLossCutRate fsd =
   let ls = Fsd.learningSetting fsd
-  in (Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * 2
+  in traceShow (Fsd.failProfit ls) $ (Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * 2
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
