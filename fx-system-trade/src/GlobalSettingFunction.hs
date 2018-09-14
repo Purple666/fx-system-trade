@@ -45,23 +45,13 @@ getEvaluationValueList :: [Ftd.FxTradeData] -> Double
 getEvaluationValueList tdlt =
   sum $ map getEvaluationValue tdlt
 
-{-
+getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
+getQuantityLearning _ _ = (Gsd.initalProperty Gsd.gsd) / (Gsd.quantityRate Gsd.gsd)
+
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest _ _ = (Gsd.initalProperty Gsd.gsd) / (Gsd.quantityRate Gsd.gsd)
-
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning = getQuantityBacktest
--}
-
-
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
                                then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-
-getQuantityBacktest = getQuantityLearning
-
-
 
 -- ===============================================================================================
 
