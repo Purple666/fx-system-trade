@@ -179,10 +179,10 @@ evaluate ctd fsd f1 forceSell td =
            , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits
                               then Ftd.trSuccess td + 1
                               else Ftd.trSuccess td
-           , Ftd.failProfit = if close /= Ftd.None -- && 0 < profits
+           , Ftd.failProfit = if close /= Ftd.None && profits <= 0
                               then Ftd.failProfit td + abs profits
                               else Ftd.failProfit td
-           , Ftd.failProfitCount = if close /= Ftd.None -- && 0 < profits
+           , Ftd.failProfitCount = if close /= Ftd.None && profits <= 0
                               then Ftd.failProfitCount td + 1
                               else Ftd.failProfitCount td
            , Ftd.trFail     = if close /= Ftd.None && profits <= 0
