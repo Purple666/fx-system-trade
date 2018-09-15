@@ -4,7 +4,8 @@ module FxTradeData
   , FxEnvironment (..)
   , initFxTradeDataCommon
   , getWinRate
-  , getWinRatePure
+  , getEvaluationValue
+  , getEvaluationValueList
   ) where
 
 --import Debug.Trace
@@ -59,14 +60,15 @@ instance Num FxTradeData where
                                         , unrealizedPL     = 0
                                         }
 
-getWinRate :: FxTradeData -> Double
-getWinRate x = 100 * getWinRatePure x
+instance Eq FxTradeData where
+  x == y = getEvaluationValue x == getEvaluationValue y
 
-getWinRatePure :: FxTradeData -> Double
-getWinRatePure x =
-  if fromIntegral (trSuccess x) + fromIntegral (trFail x) == (0 :: Double)
-  then 0
-  else fromIntegral (trSuccess x) / (fromIntegral (trSuccess x) + fromIntegral (trFail x))
+instance Ord FxTradeData where
+  compare x y
+    | getEvaluationValue x == getEvaluationValue y    =  EQ
+    | getEvaluationValue x <= getEvaluationValue y    =  LT
+    | otherwise                                       =  GT
+
 
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
@@ -90,4 +92,22 @@ initFxTradeDataCommon =
               , url              = ""
               }
 
+getEvaluationValue :: FxTradeData -> Double
+getEvaluationValue x =
+  if unrealizedPL x < 0 && profit x < 0
+  then - profit x * (unrealizedPL x / Gsd.initalProperty Gsd.gsd) * (getWinRatePure x) ^ (4 :: Int)
+  else   profit x * (unrealizedPL x / Gsd.initalProperty Gsd.gsd) * (getWinRatePure x) ^ (4 :: Int)
+
+getEvaluationValueList :: [FxTradeData] -> Double
+getEvaluationValueList tdlt =
+  sum $ map getEvaluationValue tdlt
+
+getWinRatePure :: FxTradeData -> Double
+getWinRatePure x =
+  if trSuccess x + trFail x == 0
+  then 0
+  else fromIntegral (trSuccess x) / (fromIntegral (trSuccess x) + fromIntegral (trFail x))
+
+getWinRate :: FxTradeData -> Double
+getWinRate x = 100 * getWinRatePure x
 

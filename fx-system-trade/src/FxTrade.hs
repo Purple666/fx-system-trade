@@ -3,6 +3,8 @@ module FxTrade ( initFxTradeData
                , learning
                , trade
                , gaLearningEvaluate
+               , evaluationOk
+               , getProfitList
                ) where
 
 import           Control.Monad
@@ -17,9 +19,23 @@ import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad
 import qualified FxTradeData             as Ftd
 import qualified GlobalSettingData       as Gsd
-import qualified GlobalSettingFunction   as Gsf
 import qualified Tree                    as Tr
 
+evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
+evaluationOk tdl tdlt =
+  all (\x -> 0 < Ftd.getEvaluationValue x) tdlt && 0 < Ftd.getEvaluationValue tdl && 0 < getProfitList tdlt 
+
+getProfitList :: [Ftd.FxTradeData] -> Double
+getProfitList tdlt =
+  sum $ map Ftd.profit tdlt
+
+getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
+getQuantityLearning td chart = getQuantityBacktest td chart
+
+getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
+getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
+                               else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -307,7 +323,7 @@ backTest latest endN l s td fsd xcd = do
                                                           s /= 0 && (Ftd.trSuccess td + s < Ftd.trSuccess td' ||
                                                                      Ftd.trFail td + s < Ftd.trFail td')
                                                        then (Ftd.None, Ftd.None, td')
-                                                       else evaluate ctd fsd Gsf.getQuantityBacktest False td'
+                                                       else evaluate ctd fsd getQuantityBacktest False td'
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
                      (pure td) ctdl
@@ -321,9 +337,9 @@ learning :: Ftd.FxTradeData ->
 learning td fsd =
   let fc = Fsd.fxChart fsd
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd Gsf.getQuantityLearning False td')
+      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
-      (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning True td''
+      (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''
@@ -334,12 +350,12 @@ trade :: Ftd.FxTradeData ->
          (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
-      (open, close, td') = evaluate (last ctdl) fsd Gsf.getQuantityLearning False td
+      (open, close, td') = evaluate (last ctdl) fsd getQuantityLearning False td
   in (open, close, resetCounter td')
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
   let td = learning (initFxTradeData Ftd.Backtest) fsd
-  in (fsd, toRational $ Gsf.getEvaluationValue td)
+  in (fsd, toRational $ Ftd.getEvaluationValue td)
 
 

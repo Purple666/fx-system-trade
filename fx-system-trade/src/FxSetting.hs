@@ -25,7 +25,7 @@ import           Control.Monad.Random
 import           Data.List
 import qualified Data.Map                as M
 import           Data.Tuple
-import           Debug.Trace
+-- import           Debug.Trace
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad

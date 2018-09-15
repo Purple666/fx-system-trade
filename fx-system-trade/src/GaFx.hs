@@ -22,7 +22,6 @@ import qualified FxTradeData              as Ftd
 import qualified FxTweet                  as Ftw
 import qualified Ga
 import qualified GlobalSettingData        as Gsd
-import qualified GlobalSettingFunction    as Gsf
 
 instance Ga.Ga Fsd.FxSettingData where
   reset             = Fs.resetFxSettingData
@@ -93,16 +92,16 @@ learningLoop c cl ce fsd fsds = do
   fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
                           tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                          p = if Gsf.getEvaluationValue tdl < 0 && Gsf.getEvaluationValueList tdlt < 0
-                              then - (Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt)
-                              else Gsf.getEvaluationValue tdl * Gsf.getEvaluationValueList tdlt
+                          p = if Ftd.getEvaluationValue tdl < 0 && Ftd.getEvaluationValueList tdlt < 0
+                              then - (Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt)
+                              else Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt
                       in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList <$>
            Ga.learning (Gsd.maxGaLengthLog Gsd.gsd) (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
   let (_, tdl, tdlt, fsd') = maximum fsds'
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
-  if Gsf.evaluationOk tdl tdlt
+  if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
-    else if fsd == fsd' && 0 < Gsf.getEvaluationValueList tdlt
+    else if fsd == fsd' && 0 < Ft.getProfitList tdlt
          then return (0, False, tdl, tdlt, fsd')
          else if Fs.getLearningTestTimes fsd' < fromIntegral c
               then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
@@ -123,8 +122,8 @@ learning failp n fsd = do
                                              tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                               Fsd.nextFxSettingData ltt x fsd') ce
                                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
-                                         in ((Gsf.getEvaluationValue tdl + Gsf.getEvaluationValueList tdlt) *
-                                             (p / fromIntegral c), Gsf.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
+                                         in ((Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
+                                             (p / fromIntegral c), Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
               M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
