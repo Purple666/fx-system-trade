@@ -175,15 +175,15 @@ evaluate ctd fsd f1 forceSell td =
            , Ftd.trTrade     = if close /= Ftd.None -- && 0 < profits
                               then Ftd.trTrade td + 1
                               else Ftd.trTrade td
-           , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits
-                              then Ftd.trSuccess td + 1
-                              else Ftd.trSuccess td
            , Ftd.failProfit = if close /= Ftd.None && profits <= 0
                               then Ftd.failProfit td + abs profits
                               else Ftd.failProfit td
            , Ftd.failProfitCount = if close /= Ftd.None && profits <= 0
-                              then Ftd.failProfitCount td + 1
-                              else Ftd.failProfitCount td
+                                   then Ftd.failProfitCount td + 1
+                                   else Ftd.failProfitCount td
+           , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits
+                              then Ftd.trSuccess td + 1
+                              else Ftd.trSuccess td
            , Ftd.trFail     = if close /= Ftd.None && profits <= 0
                               then Ftd.trFail td + 1
                               else Ftd.trFail td
@@ -323,7 +323,7 @@ learning td fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd Gsf.getQuantityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
-      (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning False td''
+      (_, _, td''') = evaluate (last ctdl) fsd Gsf.getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''
