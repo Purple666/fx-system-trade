@@ -1,4 +1,3 @@
-
 module FxTradeData
   ( FxTradeData (..)
   , FxSide (..)

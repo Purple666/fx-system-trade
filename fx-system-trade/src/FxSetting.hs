@@ -46,7 +46,7 @@ getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else let l = truncate $ getLearningTestTimes fsd * (((fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)) / 2) 
+     else let l = truncate $ getLearningTestTimes fsd * (((fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)) / 10) 
           in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l
