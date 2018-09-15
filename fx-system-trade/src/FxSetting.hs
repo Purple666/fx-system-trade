@@ -39,14 +39,14 @@ getLossCutRate fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.failProfit ls == 0 || Fsd.failProfitCount ls == 0
      then -100
-     else - (Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * getLearningTestTimes fsd
+     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * getLearningTestTimes fsd
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else let l = truncate $ getLearningTestTimes fsd * (((fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))) 
+     else let l = truncate $ getLearningTestTimes fsd * (sqrt ((fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))) 
           in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l
