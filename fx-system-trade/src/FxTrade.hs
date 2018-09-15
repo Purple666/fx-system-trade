@@ -153,11 +153,11 @@ evaluate ctd fsd f1 forceSell td =
                Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
                                         , Fad.listCount =
                                             if close == Ftd.Buy && profits < 0
-                                            then Ta.addFxalgorithmListCount (-1 / profits)
+                                            then Ta.addFxalgorithmListCount (abs profits)
                                                  (Ta.makeValidLeafDataMapDec ftcl ftadcl)
                                                  (Fad.listCount $ Ftd.alcCloseLoss td)
                                             else if close == Ftd.Sell && profits < 0
-                                                 then Ta.addFxalgorithmListCount (-1 / profits)
+                                                 then Ta.addFxalgorithmListCount (abs profits)
                                                       (Ta.makeValidLeafDataMapInc ftcl ftadcl)
                                                       (Fad.listCount $ Ftd.alcCloseLoss td)
                                                  else Fad.listCount $ Ftd.alcCloseLoss td
