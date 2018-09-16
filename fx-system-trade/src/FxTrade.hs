@@ -89,6 +89,12 @@ evaluate ctd fsd f1 forceSell td =
     | Ftd.side td == Ftd.None &&
       evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
+  (position, open)
+    | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
+      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+    | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
+      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+    | otherwise = (0, Ftd.None)
 -}      
   (position, open)
     | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Sell)) &&
