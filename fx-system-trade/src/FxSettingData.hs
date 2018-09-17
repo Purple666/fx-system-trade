@@ -18,13 +18,13 @@ import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
-                , learningSetting :: FxLearningSetting
                 , fxSetting       :: FxSetting
                 , fxSettingLog    :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
-  FxSetting { fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
+  FxSetting { learningSetting :: FxLearningSetting
+            , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Ord, Eq)
@@ -57,14 +57,14 @@ initFxSettingData =
   FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
                                     , chartLength = 0
                                     }
-                , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                      , gaLoopMax          = 1
-                                                      , failProfitCount    = 0
-                                                      , failProfit         = 0
-                                                      , trTrade            = 0
-                                                      , trTradeDate        = 0
-                                                      }
-                , fxSetting = FxSetting { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
+                , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
+                                                                              , gaLoopMax          = 1
+                                                                              , failProfitCount    = 0
+                                                                              , failProfit         = 0
+                                                                              , trTrade            = 0
+                                                                              , trTradeDate        = 0
+                                                                              }
+                                        , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
                                         , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
                                         , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
                                         }
@@ -73,10 +73,10 @@ initFxSettingData =
 
 resetFxSettingData :: FxSettingData -> FxSettingData
 resetFxSettingData fsd =
-  fsd { fxSetting = FxSetting { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
-                              , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
-                              , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
-                              }
+  fsd { fxSetting = (fxSetting fsd) { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
+                                    , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
+                                    , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
+                                    }
       }
 
 nextFxSettingData :: Int -> [Fcd.FxChartData] -> FxSettingData -> FxSettingData
@@ -88,19 +88,23 @@ nextFxSettingData cl c fsd =
 
 getGaLoopMax :: FxSettingData -> Int
 getGaLoopMax fsd =
-  gaLoopMax $ learningSetting fsd
+  gaLoopMax . learningSetting . fxSetting $ fsd
 
 plusGaLoopMax :: FxSettingData -> FxSettingData
 plusGaLoopMax fsd =
-  fsd { learningSetting = (learningSetting fsd) {
-          gaLoopMax = gaLoopMax (learningSetting fsd) + 1
+  fsd { fxSetting = (fxSetting fsd) {
+          learningSetting = (learningSetting . fxSetting $ fsd) {
+              gaLoopMax = (gaLoopMax . learningSetting . fxSetting $ fsd) + 1
+              }
           }
       }
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
-  fsd { learningSetting = (learningSetting fsd) {
-          learningTestTimes = learningTestTimes (learningSetting fsd) + 1
+  fsd { fxSetting = (fxSetting fsd) {
+          learningSetting = (learningSetting . fxSetting $ fsd) {
+              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 1
+              }
           }
       }
 

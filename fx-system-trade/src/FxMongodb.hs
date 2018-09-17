@@ -9,7 +9,7 @@ module FxMongodb
   , getEndChartFromDB
   , setFxTradeData
   , updateFxTradeData
-  , updateFxSettingData
+  , writeFxSettingData
   , readFxSettingData
   , checkFxSettingData
   ) where
@@ -128,13 +128,12 @@ checkFxSettingData = do
     then return True
     else return False
 
-updateFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
-updateFxSettingData fsd = do
-  fsd' <- Fs.unionFxSettingData fsd <$> readFxSettingData fsd
+writeFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
+writeFxSettingData fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting fsd') (Fsd.fxSettingLog fsd')
+  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
-  return fsd'
+  return fsd
 
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
 getDataFromDB coName =

@@ -11,7 +11,6 @@ module FxSetting
   , crossoverFxSettingData
   , resetFxSettingData
   , setFxSettingData
-  , unionFxSettingData
   , initFxsettingFromLog
   , emptyFxSettingLog
   , getFxSettingLogResult
@@ -22,7 +21,6 @@ module FxSetting
 
 import           Control.Monad
 import           Control.Monad.Random
-import           Data.List
 import qualified Data.Map                as M
 import           Data.Tuple
 -- import           Debug.Trace
@@ -36,17 +34,17 @@ import qualified Tree                    as Tr
 
 getLossCutRate :: Fsd.FxSettingData -> Double
 getLossCutRate fsd =
-  let ls = Fsd.learningSetting fsd
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.failProfit ls == 0 || Fsd.failProfitCount ls == 0
      then -100
      else -(Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * getLearningTestTimes fsd
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
-  let ls = Fsd.learningSetting fsd
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else truncate $ getLearningTestTimes fsd * (max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))
+     else truncate $ getLearningTestTimes fsd * (min (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))
           {- in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l -}
@@ -57,7 +55,7 @@ getLearningTestTime fsd =
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
- (log :: (Double -> Double)) $ (fromIntegral .  Fsd.learningTestTimes $ Fsd.learningSetting fsd) + 2
+ (log :: (Double -> Double)) $ (fromIntegral $ Fsd.learningTestTimes (Fsd.learningSetting $ Fsd.fxSetting fsd)) + 2
   -- (log :: (Double -> Double)) $
 
 getTradeHoldTime :: Fsd.FxSettingData -> Int
@@ -95,29 +93,6 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
-unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-unionFxSettingData fsd fsd' =
-  fsd { Fsd.learningSetting = unionLearningSetting (Fsd.learningSetting fsd) (Fsd.learningSetting fsd')
-      , Fsd.fxSettingLog    = M.fromList .
-                              take (Gsd.maxFxSettingLog Gsd.gsd) .
-                              sortBy (\(_, (a, b)) (_, (a', b')) ->
-                                        compare (a' / fromIntegral b') (a / fromIntegral b)) .
-                              M.toList $ M.unionWith (\(a, b) (a', b') -> if b < b'
-                                                                          then (a', b')
-                                                                          else (a, b))
-                              (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsd')
-      }
-
-unionLearningSetting :: Fsd.FxLearningSetting -> Fsd.FxLearningSetting -> Fsd.FxLearningSetting
-unionLearningSetting ls ls' =
-  Fsd.FxLearningSetting { Fsd.learningTestTimes = max (Fsd.learningTestTimes ls) (Fsd.learningTestTimes ls')
-                        , Fsd.gaLoopMax         = max (Fsd.gaLoopMax         ls) (Fsd.gaLoopMax         ls')
-                        , Fsd.failProfitCount   = max (Fsd.failProfitCount   ls) (Fsd.failProfitCount   ls')
-                        , Fsd.failProfit        = max (Fsd.failProfit        ls) (Fsd.failProfit        ls')
-                        , Fsd.trTrade           = max (Fsd.trTrade           ls) (Fsd.trTrade           ls')
-                        , Fsd.trTradeDate       = max (Fsd.trTradeDate       ls) (Fsd.trTradeDate       ls')
-                        }
-
 deleteFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 deleteFxsettingFromLog fsd =
   fsd { Fsd.fxSettingLog = M.delete (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
@@ -133,7 +108,9 @@ initFxsettingFromLog fsd =
 
 setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fsd fls' fsl' =
-  setTreeFunction $ fsd { Fsd.learningSetting = fls'
+  setTreeFunction $ fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                          { Fsd.learningSetting = fls'
+                                          }
                         , Fsd.fxSettingLog    = fsl'
                         }
 
@@ -148,17 +125,17 @@ updateFxSettingData ctdl td tdt fsd =
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
-      ls = (Fsd.learningSetting fsd)
-           { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTrade tdt)
-           , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
-           , Fsd.failProfitCount = Fsd.failProfitCount (Fsd.learningSetting fsd) + Ftd.failProfitCount tdt
-           , Fsd.failProfit      = Fsd.failProfit      (Fsd.learningSetting fsd) + Ftd.failProfit tdt
+      ls = (Fsd.learningSetting $ Fsd.fxSetting fsd)
+           { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTrade tdt)
+           , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
+           , Fsd.failProfitCount = Fsd.failProfitCount (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.failProfitCount tdt
+           , Fsd.failProfit      = Fsd.failProfit      (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.failProfit tdt
            }
   in if 0 < p
-     then fsd { Fsd.learningSetting = ls
-              , Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                { Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen  $ Fsd.fxSetting fsd)
+     then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                { Fsd.learningSetting = ls
+                                , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
+                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
                                 , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
                                                          (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
                                 , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss   ctdl
@@ -166,7 +143,9 @@ updateFxSettingData ctdl td tdt fsd =
                                 }
               , Fsd.fxSettingLog = fsl
               }
-     else fsd { Fsd.learningSetting = ls
+     else fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                { Fsd.learningSetting = ls
+                                }
               , Fsd.fxSettingLog = fsl
               }
 

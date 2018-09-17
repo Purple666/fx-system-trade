@@ -22,7 +22,7 @@ printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
 --     ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
-      ls = Fsd.learningSetting fsd
+      ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   Control.Monad.when retry $ printf "   "
   printf "%s : " =<< Ftm.getLogTime
   nd  <-  Fcd.getDate n

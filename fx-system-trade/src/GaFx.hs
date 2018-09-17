@@ -53,7 +53,7 @@ debugLoop td fsd = do
 
 backTest :: Bool -> Int -> Int -> Bool -> IO ()
 backTest retry s f latest = do
-  fsd <- Fs.initFxsettingFromLog <$> (Fm.updateFxSettingData =<< Fm.readFxSettingData Fsd.initFxSettingData)
+  fsd <- Fs.initFxsettingFromLog <$> (Fm.readFxSettingData Fsd.initFxSettingData)
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -127,7 +127,7 @@ learning failp n fsd = do
               M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then return (length tdlts, True, tdl', tdlt', Fs.unionFxSettingData fsd'' fsd)
+    then return (length tdlts, True, tdl', tdlt', fsd'')
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
 
 tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
