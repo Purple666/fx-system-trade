@@ -126,7 +126,7 @@ updateFxSettingData ctdl td tdt fsd =
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             then M.filter (\(p, _) -> 0 < p) . M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else if 0 < p
-                 then M.fromList . take (Fsd.plusLearningTestTimes fsd) .
+                 then M.fromList . take (Fsd.getLearningTestTimes fsd) .
                       sortBy (\(_, (a, b)) (_, (a', b')) ->
                                 compare (a' / fromIntegral b') (a / fromIntegral b)) .
                       M.toList . M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
