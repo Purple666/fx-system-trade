@@ -124,11 +124,11 @@ learning failp n fsd = do
                                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
                                          in ((Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                              (p / fromIntegral c), Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
-              M.insert (Fsd.fxSetting fsd) (1, 1) . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
+              M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt', fsd'')
-    else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
+    else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 tradeLearning fsd = do
