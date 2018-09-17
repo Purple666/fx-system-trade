@@ -97,7 +97,7 @@ learningLoop :: (Ga a, MonadRandom m) =>
                 Int -> Int -> LearningData a -> m (LearningData a)
 learningLoop c glm x = do
   x' <- evaluate <$> (geneticOperators glm x . learningData $ maximum x)
-  traceShow("ga", glm, c, length x, length x') $ return ()
+  --traceShow("ga", glm, c, length x, length x') $ return ()
   if not (null x') && not (null x) && maximum x' == maximum x
     then return x'
     else if glm < c
@@ -109,7 +109,7 @@ learningLoop c glm x = do
 createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> [a] -> LearningData a -> m (LearningData a)
 createInitialDataLoop c glm ixs x = do
   x' <- mappend x . evaluate . learningDataList <$> mapM (createInitialData glm) ixs
-  traceShow("create", glm, c, length ixs, length x, length x') $ return ()
+  --traceShow("create", glm, c, length ixs, length x, length x') $ return ()
   if glm < length x'
     then return x'
     else if glm  < c
