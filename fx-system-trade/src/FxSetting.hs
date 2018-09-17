@@ -11,7 +11,6 @@ module FxSetting
   , crossoverFxSettingData
   , resetFxSettingData
   , setFxSettingData
-  , initFxsettingFromLog
   , emptyFxSettingLog
   , getFxSettingLogResult
   , getSimChartMax
@@ -23,7 +22,6 @@ import           Control.Monad
 import           Control.Monad.Random
 import           Data.List
 import qualified Data.Map                as M
-import           Data.Tuple
 -- import           Debug.Trace
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
@@ -99,14 +97,6 @@ deleteFxsettingFromLog fsd =
   fsd { Fsd.fxSettingLog = M.delete (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
       }
 
-initFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
-initFxsettingFromLog fsd =
-  fsd { Fsd.fxSetting  = if null $ Fsd.fxSettingLog fsd
-                         then Fsd.fxSetting fsd
-                         else snd . maximum . map swap . M.toList .
-                              M.map (\(p, c) -> p / fromIntegral c) $ Fsd.fxSettingLog fsd
-      }
-
 setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fsd fls' fsl' =
   setTreeFunction $ fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
@@ -123,12 +113,12 @@ emptyFxSettingLog fsd =
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
-      fsl = M.filter (\(p, _) -> 0 < p) $ if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-                                          then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-                                          else M.fromList . take (Fsd.getLearningTestTimes fsd) .
-                                               sortBy (\(_, (a, b)) (_, (a', b')) ->
-                                                         compare (a' / fromIntegral b') (a / fromIntegral b)) .
-                                               M.toList . M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
+      fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+                                            then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+                                            else M.fromList . take (Fsd.getLearningTestTimes fsd) .
+                                                 sortBy (\(_, (a, b)) (_, (a', b')) ->
+                                                           compare (a' / fromIntegral b') (a / fromIntegral b)) .
+                                                 M.toList . M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
       ls = (Fsd.learningSetting $ Fsd.fxSetting fsd)
            { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTrade tdt)
            , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)

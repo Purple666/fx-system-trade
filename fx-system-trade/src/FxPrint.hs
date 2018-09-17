@@ -17,8 +17,6 @@ import           Text.Printf
 
 printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
 printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
--- let lt  = truncate $ (fromIntegral $ Fs.getLearningTime fsd) / (60 * 24 :: Double)     :: Int
---     ltt = truncate $ (fromIntegral $ Fs.getLearningTestTime fsd) / (60 * 24 :: Double) :: Int
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
