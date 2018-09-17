@@ -3,7 +3,6 @@ module FxSetting
   , getLearningTime
   , getLearningTestTime
   , getLearningTestTimes
-  , deleteFxsettingFromLog
   , updateFxSettingData
   , createInitialGaData
   , copyFxSettingData
@@ -43,7 +42,7 @@ getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else truncate $ getLearningTestTimes fsd * (max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))
+     else truncate $ getLearningTestTimes fsd * (min (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))
           {- in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l -}
@@ -90,11 +89,6 @@ setFxSetting fts =
   fts { Fsd.fxTaOpen        = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaOpen fts
       , Fsd.fxTaCloseProfit = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseProfit fts
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
-      }
-
-deleteFxsettingFromLog :: Fsd.FxSettingData -> Fsd.FxSettingData
-deleteFxsettingFromLog fsd =
-  fsd { Fsd.fxSettingLog = M.delete (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
       }
 
 setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
