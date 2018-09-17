@@ -33,7 +33,6 @@ instance Functor LearningData where
 
 
 class (Show a, Eq a, Ord a) => Ga a where
-  reset :: MonadRandom m => a -> m a
   copy :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   mutation :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
@@ -122,11 +121,10 @@ learning :: (Ga a, MonadRandom m) => a -> [a] -> m (LearningData a)
 learning ix ixs = do
   let x = learningDataList . map learningData $ ix:ixs
       glm = getGaLoopMax ix
-  x' <- top glm <$> createInitialDataLoop 0 glm [ix] (evaluate x)
+  x' <- createInitialDataLoop 0 glm [ix] (evaluate x)
   if null x'
     then return x
     else learningLoop 0 glm x'
-
 
 
 

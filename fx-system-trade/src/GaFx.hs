@@ -24,7 +24,6 @@ import qualified Ga
 import qualified GlobalSettingData        as Gsd
 
 instance Ga.Ga Fsd.FxSettingData where
-  reset             = Fs.resetFxSettingData
   copy              = Fs.copyFxSettingData
   mutation          = Fs.mutationFxSettingData
   crossover         = Fs.crossoverFxSettingData
