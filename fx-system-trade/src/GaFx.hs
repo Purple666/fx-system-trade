@@ -30,8 +30,8 @@ instance Ga.Ga Fsd.FxSettingData where
   crossover         = Fs.crossoverFxSettingData
   createInitialData = Fs.createInitialGaData
   learningEvaluate  = Ft.gaLearningEvaluate
-  getGaLoopMax      = Fsd.getGaLoopMax
-  plusGaLoopMax     = Fsd.plusGaLoopMax
+  getGaLoopMax      = Fsd.getplusLearningTestTimes
+  plusGaLoopMax     = Fsd.plusLearningTestTimes
 
 debug :: IO ()
 debug = do

@@ -123,7 +123,7 @@ learning ix ixs = do
   ix' <- reset ix
   let x = learningDataList . map learningData $ ix':ix:ixs
       glm = getGaLoopMax ix
-  x' <- top glm <$> createInitialDataLoop 0 glm (ix':ix:ixs) (evaluate x)
+  x' <- top glm <$> createInitialDataLoop 0 glm (ix':ix) (evaluate x)
   if null x'
     then return x
     else learningLoop 0 glm x'

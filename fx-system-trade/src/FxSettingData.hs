@@ -6,8 +6,7 @@ module FxSettingData
   , initFxSettingData
   , resetFxSettingData
   , nextFxSettingData
-  , getGaLoopMax
-  , plusGaLoopMax
+  , getplusLearningTestTimes
   , plusLearningTestTimes
   ) where
 
@@ -45,7 +44,6 @@ instance Ord FxSettingData where
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes :: Int
-                    , gaLoopMax         :: Int
                     , failProfitCount   :: Int
                     , failProfit        :: Double
                     , trTrade           :: Integer
@@ -58,7 +56,6 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                                              , gaLoopMax          = 1
                                                                               , failProfitCount    = 0
                                                                               , failProfit         = 0
                                                                               , trTrade            = 0
@@ -86,18 +83,9 @@ nextFxSettingData cl c fsd =
                           }
       }
 
-getGaLoopMax :: FxSettingData -> Int
-getGaLoopMax fsd =
+getLearningTestTimes :: FxSettingData -> Int
+getLearningTestTimes fsd =
   learningTestTimes . learningSetting . fxSetting $ fsd
-
-plusGaLoopMax :: FxSettingData -> FxSettingData
-plusGaLoopMax fsd =
-  fsd { fxSetting = (fxSetting fsd) {
-          learningSetting = (learningSetting . fxSetting $ fsd) {
-              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 1
-              }
-          }
-      }
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
