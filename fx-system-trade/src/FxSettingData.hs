@@ -88,13 +88,13 @@ nextFxSettingData cl c fsd =
 
 getGaLoopMax :: FxSettingData -> Int
 getGaLoopMax fsd =
-  gaLoopMax . learningSetting . fxSetting $ fsd
+  learningTestTimes . learningSetting . fxSetting $ fsd
 
 plusGaLoopMax :: FxSettingData -> FxSettingData
 plusGaLoopMax fsd =
   fsd { fxSetting = (fxSetting fsd) {
           learningSetting = (learningSetting . fxSetting $ fsd) {
-              gaLoopMax = (gaLoopMax . learningSetting . fxSetting $ fsd) + 1
+              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 1
               }
           }
       }
