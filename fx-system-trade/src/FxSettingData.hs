@@ -6,7 +6,7 @@ module FxSettingData
   , initFxSettingData
   , resetFxSettingData
   , nextFxSettingData
-  , getplusLearningTestTimes
+  , getLearningTestTimes
   , plusLearningTestTimes
   ) where
 
