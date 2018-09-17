@@ -124,7 +124,7 @@ updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData
 updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-            then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
+            then M.filter (\(p, _) -> 0 < p) . M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             else if 0 < p
                  then M.fromList . take (Gsd.maxFxSettingLog Gsd.gsd) .
                       sortBy (\(_, (a, b)) (_, (a', b')) ->
