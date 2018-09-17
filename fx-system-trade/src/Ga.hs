@@ -120,8 +120,7 @@ createInitialDataLoop c glm ixs x = do
 
 learning :: (Ga a, MonadRandom m) => a -> [a] -> m (LearningData a)
 learning ix ixs = do
-  ix' <- reset ix
-  let x = learningDataList . map learningData $ ix':ix:ixs
+  let x = learningDataList . map learningData $ ix:ixs
       glm = getGaLoopMax ix
   x' <- top glm <$> createInitialDataLoop 0 glm [ix] (evaluate x)
   if null x'
