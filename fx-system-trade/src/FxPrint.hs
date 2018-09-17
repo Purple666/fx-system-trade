@@ -8,7 +8,6 @@ module FxPrint
 
 --import Debug.Trace
 import           Control.Monad
-import qualified Data.Map      as M
 import qualified FxChartData   as Fcd
 import qualified FxSetting     as Fs
 import qualified FxSettingData as Fsd
@@ -37,7 +36,7 @@ printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
   printFxTradeData tdt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "| %3d %c %3d %3d " plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (length . M.filter (\(p, _) -> 0 < p) $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %3d " plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) 
   printf "| %3d %3d\n" (Fsd.learningTestTimes ls) (Fsd.gaLoopMax ls)
 
 printLearningFxTradeData :: Double -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()

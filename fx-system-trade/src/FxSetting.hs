@@ -21,6 +21,7 @@ module FxSetting
 
 import           Control.Monad
 import           Control.Monad.Random
+import           Data.List
 import qualified Data.Map                as M
 import           Data.Tuple
 -- import           Debug.Trace
@@ -124,7 +125,12 @@ updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
       fsl = if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-            else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
+            else if 0 < p
+                 then M.fromList . take (Gsd.maxFxSettingLog Gsd.gsd) .
+                      sortBy (\(_, (a, b)) (_, (a', b')) ->
+                                compare (a' / fromIntegral b') (a / fromIntegral b)) .
+                      M.toList . M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
+                 else Fsd.fxSettingLog fsd
       ls = (Fsd.learningSetting $ Fsd.fxSetting fsd)
            { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTrade tdt)
            , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
