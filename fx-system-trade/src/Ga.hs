@@ -13,7 +13,7 @@ module Ga
 import           Control.Monad.Random
 import qualified Data.Foldable        as F
 import           Data.List
--- import           Debug.Trace
+import           Debug.Trace
 
 newtype LearningData a = LearningData { getLearningData :: [(a, Rational)] } deriving (Show, Eq, Ord)
 
@@ -126,7 +126,7 @@ learning ix ixs = do
   x' <- top glm <$> createInitialDataLoop 0 glm (ix':ix:ixs) (evaluate x)
   if null x'
     then return x
-    else learningLoop 0 glm (length x') x'
+    else learningLoop 0 glm x'
 
 
 

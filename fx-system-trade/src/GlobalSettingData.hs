@@ -7,9 +7,7 @@ data GlobalSettingData = GlobalSettingData
   , learningTestCount     :: Int
   , thresholdRate         :: Double
   , countUpListMax        :: Int
-  , maxLearningTime       :: Int
   , maxFxSettingLog       :: Int
-  , maxGaLengthLog        :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
   , tradeProductionBearer :: String
@@ -30,6 +28,7 @@ gsd =
                     , learningTestCount     = 5
                     , quantityRate          = 5
                     , thresholdRate         = 0.05
+                    , maxFxSettingLog       = 100
                     , initalProperty        = 500000
                     , maxUnit               = 3000000
                     , spread                = 0.004
