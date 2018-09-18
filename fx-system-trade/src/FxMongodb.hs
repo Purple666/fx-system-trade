@@ -111,7 +111,7 @@ updateFxTradeData coName td = do
 readFxSettingData :: String -> IO Fsd.FxSettingData
 readFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd" ++ coName)
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
   close pipe
   if null r
     then return Fsd.initFxSettingData
@@ -122,7 +122,7 @@ readFxSettingData coName = do
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd" ++ coName)
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
   close pipe
   if null r
     then return True
@@ -131,7 +131,7 @@ checkFxSettingData coName = do
 writeFxSettingData :: String -> Fsd.FxSettingData -> IO Fsd.FxSettingData
 writeFxSettingData coName fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd" ++ coName) (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return fsd
 
