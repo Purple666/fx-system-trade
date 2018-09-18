@@ -35,7 +35,7 @@ instance Ga.Ga Fsd.FxSettingData where
 debug :: IO ()
 debug = do
   let td  = Ft.initFxTradeData Ftd.Backtest
-  fsd <- Fm.readFxSettingData
+  fsd <- Fm.readFxSettingData "debug"
   debugLoop td fsd -- =<< async ()
   return ()
 
@@ -52,7 +52,7 @@ debugLoop td fsd = do
 
 backTest :: Bool -> Int -> Int -> Bool -> IO ()
 backTest retry s f latest = do
-  fsd <- Fm.readFxSettingData
+  fsd <- Fm.readFxSettingData "backtest"
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -131,10 +131,11 @@ learning failp n fsd = do
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
-  fsd <- Fm.readFxSettingData
+  fsd <- Fm.readFxSettingData "backtest"
   (plsf, lsf, tdl, tdlt, fsd') <- learning False (Fcd.no e) fsd
+  Fm.writeFxSettingData "trade" fsd'  
   Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf (fsd == fsd')
-  return $ Fs.emptyFxSettingLog fsd'
+  return fsd'
 
 tradeLearningThread :: IO Fsd.FxSettingData
 tradeLearningThread = do
@@ -149,7 +150,7 @@ backTestLoop :: Bool ->
                 Ftd.FxTradeData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest retry failp n endN td = do
-  fsd <- Fm.readFxSettingData
+  fsd <- Fm.readFxSettingData "backtest"
   (plsf, lsf, tdl, tdlt, fsd1) <- learning failp (n - 1) fsd
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
@@ -205,7 +206,7 @@ tradeWeeklyLoop td coName = do
   waitTrade
   fsd <- tradeLearning
   e <- Foa.getNowPrices td
-  td' <- tradeLoop e 0 td fsd coName =<< async tradeLearningThread
+  td' <- tradeLoop e 0 td coName =<< async tradeLearningThread
   tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
   Ftw.tweetWeek tdw td'
   Fm.setFxTradeData (coName ++ "_weekly") td'
@@ -225,11 +226,11 @@ checkTradeLearning a fsd = do
 tradeLoop :: Fcd.FxChartData ->
              Int ->
              Ftd.FxTradeData ->
-             Fsd.FxSettingData ->
              String ->
              Async Fsd.FxSettingData ->
              IO Ftd.FxTradeData
-tradeLoop p sleep td fsd coName a = do
+tradeLoop p sleep td coName a = do
+  fsd <- Fm.readFxSettingData "trade"
   (a', fsd') <- checkTradeLearning a fsd
   e <- Foa.getNowPrices td
   (sleep', td2) <- if e /= p
@@ -241,4 +242,4 @@ tradeLoop p sleep td fsd coName a = do
   if 240 < sleep'
     then do cancel a'
             return td2
-    else tradeLoop e sleep' td2 fsd' coName a'
+    else tradeLoop e sleep' td2 coName a'

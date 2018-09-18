@@ -108,10 +108,10 @@ updateFxTradeData coName td = do
                                           , Ftd.realizedPL = typed $ valueAt "realizedPL" x
                                           }) r
 
-readFxSettingData :: IO Fsd.FxSettingData
-readFxSettingData = do
+readFxSettingData :: String -> IO Fsd.FxSettingData
+readFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB "fsd"
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd" ++ coName)
   close pipe
   if null r
     then return Fsd.initFxSettingData
@@ -119,19 +119,19 @@ readFxSettingData = do
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData Fsd.initFxSettingData fls fsl
 
-checkFxSettingData :: IO Bool
-checkFxSettingData = do
+checkFxSettingData :: String -> IO Bool
+checkFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB "fsd"
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd" ++ coName)
   close pipe
   if null r
     then return True
     else return False
 
-writeFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
-writeFxSettingData fsd = do
+writeFxSettingData :: String -> Fsd.FxSettingData -> IO Fsd.FxSettingData
+writeFxSettingData coName fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd" ++ coName) (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return fsd
 
@@ -148,8 +148,8 @@ setFxTradeDataToDB coName td =
                           , "realizedPL"  =: Ftd.realizedPL td
                           ]
 
-setFxSettingToDB :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
-setFxSettingToDB fls fsl =
-  upsert (select [] "fsd") [ "fls"  =: show fls
-                         , "fsl"  =: show fsl
-                         ]
+setFxSettingToDB :: T.Text -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
+setFxSettingToDB coName fls fsl =
+  upsert (select [] coName ) [ "fls"  =: show fls
+                             , "fsl"  =: show fsl
+                             ]
