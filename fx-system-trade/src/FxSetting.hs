@@ -109,7 +109,7 @@ updateFxSettingData ctdl td tdt fsd =
   let p = Ftd.profit tdt - Ftd.profit td
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
-                                            else M.fromList . take (Fsd.getLearningTestTimes fsd) .
+                                            else M.fromList . -- take (Fsd.getLearningTestTimes fsd) .
                                                  sortBy (\(_, (a, b)) (_, (a', b')) ->
                                                            compare (a' / fromIntegral b') (a / fromIntegral b)) .
                                                  M.toList . M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
@@ -296,6 +296,7 @@ crossoverFxAlgorithmSetting a b = do
                     (Fad.algorithmTree a) (Fad.algorithmListCount a) (Fad.algorithmTree b) (Fad.algorithmListCount b)
   (rcia, rcib)   <- crossoverOrdFxAlMaSetting (Fad.rciSetting a) (Fad.rciSetting b)
   (smaa, smab)   <- crossoverOrdFxAlMaSetting (Fad.smaSetting a) (Fad.smaSetting b)
+
   (emaa, emab)   <- crossoverOrdFxAlMaSetting (Fad.emaSetting a) (Fad.emaSetting b)
   (wmaa, wmab)   <- crossoverOrdFxAlMaSetting (Fad.wmaSetting a) (Fad.wmaSetting b)
   (macda, macdb) <- crossoverOrdFxAlMaSetting (Fad.macdSetting a) (Fad.macdSetting b)
