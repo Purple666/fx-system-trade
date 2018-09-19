@@ -36,7 +36,7 @@ getLossCutRate fsd =
   in if Fsd.failProfit ls == 0 || Fsd.failProfitCount ls == 0
      then -100
      else -(Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * getLearningTestTimes fsd
-
+  
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
