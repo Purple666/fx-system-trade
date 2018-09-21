@@ -84,22 +84,22 @@ evaluate ctd fsd f1 forceSell td =
   let
 {-    
   (position, open)
-    | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Sell)) &&
-      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-    | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Buy)) &&
-      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-    | otherwise = (0, Ftd.None)
-  (position, open)
     | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
       evaluateProfitInc fto ftado = (chart, Ftd.Buy)
     | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
       evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
--}      
   (position, open)
     | Ftd.side td == Ftd.None &&
       evaluateProfitInc fto ftado = (chart, Ftd.Buy)
     | Ftd.side td == Ftd.None &&
+      evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+    | otherwise = (0, Ftd.None)
+-}      
+  (position, open)
+    | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Sell)) &&
+      evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+    | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Buy)) &&
       evaluateProfitDec fto ftado = (chart, Ftd.Sell)
     | otherwise = (0, Ftd.None)
   (profits, realizedPL, close)
@@ -112,15 +112,15 @@ evaluate ctd fsd f1 forceSell td =
                      (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
                      (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
                       (0 < chart - rate && evaluateProfitDec ftcp ftadcp ||
-                       chart - rate < 0 && evaluateProfitDec ftcl ftadcl {- ||
-                       chart - rate < Fs.getLossCutRate fsd -})))
+                       chart - rate < 0 && evaluateProfitDec ftcl ftadcl ||
+                       chart - rate < Fs.getLossCutRate fsd)))
                   then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                   else if Ftd.side td == Ftd.Sell &&
                           (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
                           (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
                            (0 < rate - chart && evaluateProfitInc ftcp ftadcp ||
-                            rate - chart < 0 && evaluateProfitInc ftcl ftadcl {- ||
-                            rate - chart < Fs.getLossCutRate fsd -})))
+                            rate - chart < 0 && evaluateProfitInc ftcl ftadcl ||
+                            rate - chart < Fs.getLossCutRate fsd)))
                        then (rate - chart, 1 - (chart / rate), Ftd.Sell)
                        else (0, 0, Ftd.None)
     | otherwise = (0, 0, Ftd.None)
