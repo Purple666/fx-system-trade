@@ -30,7 +30,7 @@ getProfitList tdlt =
   sum $ map Ftd.profit tdlt
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = getQuantityLearning -- Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+getQuantityBacktest td chart = getQuantityLearning td chart -- Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
