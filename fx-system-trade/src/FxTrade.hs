@@ -185,10 +185,10 @@ evaluate ctd fsd f1 forceSell td =
                               else if close /= Ftd.None
                                    then Ftd.None
                                    else Ftd.side td
-           , Ftd.trTradeDate = if close /= Ftd.None -- && 0 < profits
+           , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
                                then Ftd.trTradeDate td + Fcd.no cd - Fcd.no (Ftd.rate td)
                                else Ftd.trTradeDate td
-           , Ftd.trTrade     = if close /= Ftd.None -- && 0 < profits
+           , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
                               then Ftd.trTrade td + 1
                               else Ftd.trTrade td
            , Ftd.failProfit = if close /= Ftd.None && profits <= 0
