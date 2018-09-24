@@ -31,14 +31,14 @@ getProfitList tdlt =
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Gsd.mait Gsd.gsd) * chart) / 25
+                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 --  getQuantityLearning td chart -- Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Gsd.mait Gsd.gsd) * chart) / 25
+                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
