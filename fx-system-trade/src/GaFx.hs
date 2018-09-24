@@ -61,8 +61,8 @@ backTest retry s f latest = do
   startN <- if latest
             then return (endN - (p + 24 * 60 * 10 + ltt * Gsd.learningTestCount Gsd.gsd))
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
-                    -- getRandomR(s, s + ltt * 2)
-                    return s
+                    getRandomR(s, s + ltt * 2)
+
   let n = startN + p
   (fs, fsd') <- backTestLoop latest retry False n endN td
   (s', f') <- if fs
