@@ -116,7 +116,7 @@ learning failp n fsd = do
   cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) . (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
   let tdlts = M.elems .
-              M.filter (\(x, y, _, _, _) -> 0 < x {- && y -}) .
+              M.filter (\(x, y, _, _, _) -> 0 < x && y) .
               M.mapWithKey (\y (p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
                                              tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                               Fsd.nextFxSettingData ltt x fsd') ce
