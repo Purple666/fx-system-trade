@@ -39,7 +39,7 @@ getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) /
 -}
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = Ftd.realizedPL td
+getQuantityLearning td chart = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd -- Ftd.realizedPL td
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -349,7 +349,7 @@ learning td fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
-      (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
+      (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning False td''
   in if null ctdl
      then td
      else td'''
