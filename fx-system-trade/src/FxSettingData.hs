@@ -43,11 +43,11 @@ instance Ord FxSettingData where
     | otherwise           = GT
 
 data FxLearningSetting =
-  FxLearningSetting { learningTestTimes :: Int
-                    , failProfitCount   :: Int
-                    , failProfit        :: Double
-                    , trTrade           :: Integer
-                    , trTradeDate       :: Integer
+  FxLearningSetting { learningTestTimes  :: Int
+                    , failProfitCount    :: Int
+                    , failProfit         :: Double
+                    , trTrade            :: Integer
+                    , trTradeDate        :: Integer
                     } deriving (Show, Read, Eq, Ord)
 
 initFxSettingData :: FxSettingData
@@ -56,8 +56,8 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                                              , failProfitCount    = 0
                                                                               , failProfit         = 0
+                                                                              , failProfitCount    = 0
                                                                               , trTrade            = 0
                                                                               , trTradeDate        = 0
                                                                               }

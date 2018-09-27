@@ -15,6 +15,7 @@ module FxSetting
   , getSimChartMax
   , getTradeHoldTime
   , getLossCutRate
+  , getProfitRate
   ) where
 
 import           Control.Monad
@@ -66,6 +67,13 @@ getSimChartMax fsd =
   maximum [ Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd]
+
+getProfitRate :: Fsd.FxSettingData -> Double
+getProfitRate fsd =
+  let (_, _, p) = getFxSettingLogResult fsd
+  in if p < 0
+     then 100
+     else p
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
