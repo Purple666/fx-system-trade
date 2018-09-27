@@ -113,7 +113,7 @@ emptyFxSettingLog fsd =
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
-  let p = Ftd.profit tdt - Ftd.profit td
+  let p = (Ftd.profit tdt - Ftd.profit td) 
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
                                             else M.fromList . -- take (Fsd.getLearningTestTimes fsd) .

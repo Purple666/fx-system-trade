@@ -107,9 +107,9 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       (profits, realizedPL, close)
         | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
-                                          then (chart - rate, (chart / rate) - 1, Ftd.Close)
+                                          then ((chart - rate) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), (chart / rate) - 1, Ftd.Close)
                                           else if Ftd.side td == Ftd.Sell
-                                               then (rate - chart, 1 - (chart / rate), Ftd.Close)
+                                               then ((rate - chart) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), 1 - (chart / rate), Ftd.Close)
                                                else (0, 0, Ftd.None)
         | rate /= 0 = if Ftd.side td == Ftd.Buy &&
                          (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
