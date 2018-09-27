@@ -71,7 +71,7 @@ getProfitRate fsd =
   let (_, _, p) = getFxSettingLogResult fsd
   in if p < 0
      then 100
-     else p
+     else p * getLearningTestTimes fsd
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
