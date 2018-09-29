@@ -362,7 +362,7 @@ learning td fsd =
      then td
      else td'''
 
-v
+
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          [Fcd.FxChartData] ->
