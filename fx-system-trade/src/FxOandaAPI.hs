@@ -155,8 +155,8 @@ updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do
   (s, _, r) <- getOandaPosition td
   (b, upl) <- getOandaBalance td
-  return $ td { Ftd.rate         = (Ftd.rate td) { Fcd.close = r
-                                                 }
+  return $ td { Ftd.tradeRate    = (Ftd.tradeRate td) { Fcd.close = r
+                                                      }
               , Ftd.side         = s
               , Ftd.realizedPL   = b
               , Ftd.unrealizedPL = b + upl

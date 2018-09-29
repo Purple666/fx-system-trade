@@ -28,7 +28,7 @@ tweetClose td td' = do
               "Realized PL : %.0f (%+.0f)\n" ++
               "Win Rate : %.2f %% (%d - %d)\n"
       t = printf fmts
-          (Fcd.close $ Ftd.rate td)
+          (Fcd.close $ Ftd.tradeRate td)
           (Fcd.close $ Ftd.chart td')
           (Ftd.realizedPL td')
           (Ftd.realizedPL $ td' - td)
@@ -46,7 +46,7 @@ tweetOpen td units = do
               "Side : " ++ show (Ftd.side td) ++ "\n" ++
               "Unit : %d\n"
       t = printf fmts
-          (Fcd.close $ Ftd.rate td)
+          (Fcd.close $ Ftd.tradeRate td)
           units :: String
   tweet t
   return ()

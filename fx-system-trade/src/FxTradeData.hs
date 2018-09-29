@@ -15,7 +15,7 @@ import qualified GlobalSettingData       as Gsd
 
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
-              , rate               :: Fcd.FxChartData
+              , tradeRate          :: Fcd.FxChartData
               , alcOpen            :: Fad.FxalgorithmListCount
               , alcCloseProfit     :: Fad.FxalgorithmListCount
               , alcCloseLoss       :: Fad.FxalgorithmListCount
@@ -73,7 +73,7 @@ instance Ord FxTradeData where
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
   FxTradeData { chart               = Fcd.initFxChartData
-              , rate                = Fcd.initFxChartData
+              , tradeRate           = Fcd.initFxChartData
               , side                = None
               , alcOpen             = Fad.zeroFxalgorithmListCount
               , alcCloseProfit      = Fad.zeroFxalgorithmListCount

@@ -100,57 +100,65 @@ evaluate ctd fsd f1 forceSell td =
     | otherwise = (0, Ftd.None)
 -}
   
-  let (position, open)
-        | (Ftd.side td == Ftd.None || (0 < rate - chart && Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Sell)) &&
+  let cd        = Fad.taChart ctd
+      chart     = Fcd.close   cd
+      tradeRate = Fcd.close $ Ftd.tradeRate td
+      tradeNo   = Fcd.no $ Ftd.tradeRate td
+      ftado     = Fad.open        ctd
+      ftadcp    = Fad.closeProfit ctd
+      ftadcl    = Fad.closeLoss   ctd
+      fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+      ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+      ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+      unrealizedPL = if tradeRate /= 0
+                     then if Ftd.side td == Ftd.Buy
+                          then Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
+                          else if Ftd.side td' == Ftd.Sell
+                               then Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
+                               else Ftd.realizedPL td
+                     else Ftd.realizedPL td
+      (position, open)
+        | (Ftd.side td == Ftd.None || (0 < tradeRate - chart && Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None || (0 < chart - rate && Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) && Ftd.side td == Ftd.Buy)) &&
+        | (Ftd.side td == Ftd.None || (0 < chart - tradeRate && Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
-      (profits, realizedPL, close)
-        | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
-                                          then (chart - rate, (chart / rate) - 1, Ftd.Close)
+      (profits, realizedPLRate, close)
+        | open /= Ftd.None && tradeRate /= 0 = if Ftd.side td == Ftd.Buy
+                                          then (chart - tradeRate, (chart / tradeRate) - 1, Ftd.Close)
                                           else if Ftd.side td == Ftd.Sell
-                                               then (rate - chart, 1 - (chart / rate), Ftd.Close)
+                                               then (tradeRate - chart, 1 - (chart / tradeRate), Ftd.Close)
                                                else (0, 0, Ftd.None)
-        | rate /= 0 = if Ftd.side td == Ftd.Buy &&
-                         (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
-                          (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
-                           ((0 < chart - rate && evaluateProfitDec ftcp ftadcp) ||
-                            (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))) ||
-                          chart - rate < Fs.getLossCutRate fsd ||
-                          Fs.getProfitRate fsd < chart - rate)
-                      then (chart - rate, (chart / rate) - 1, Ftd.Buy)
-                      else if Ftd.side td == Ftd.Sell &&
-                              (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
-                               (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
-                                ((0 < rate - chart && evaluateProfitInc ftcp ftadcp) ||
-                                 (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))) ||
-                               rate - chart < Fs.getLossCutRate fsd ||
-                               Fs.getProfitRate fsd < rate - chart)
-                           then (rate - chart, 1 - (chart / rate), Ftd.Sell)
-                           else (0, 0, Ftd.None)
+        | tradeRate /= 0 = if Ftd.side td == Ftd.Buy &&
+                              (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
+                               (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
+                                ((0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
+                                 (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl))) ||
+                                Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd ||
+                                Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td)
+                           then (chart - tradeRate, (chart / tradeRate) - 1, Ftd.Buy)
+                           else if Ftd.side td == Ftd.Sell &&
+                                   (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
+                                    (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
+                                     ((0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
+                                      (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl))) ||
+                                     Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd ||
+                                     Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td)
+                                then (tradeRate - chart, 1 - (chart / tradeRate), Ftd.Sell)
+                                else (0, 0, Ftd.None)
         | otherwise = (0, 0, Ftd.None)
-      cd     = Fad.taChart ctd
-      chart  = Fcd.close   cd
-      rate   = Fcd.close $ Ftd.rate td
-      ftado  = Fad.open        ctd
-      ftadcp = Fad.closeProfit ctd
-      ftadcl = Fad.closeLoss   ctd
-      fto    = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-      ftcp   = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-      ftcl   = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-      td' = td { Ftd.chart  = cd
-               , Ftd.rate   = if open == Ftd.Buy
-                              then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                       , Fcd.close = position + Gsd.spread Gsd.gsd
-                                                       }
-                              else if open == Ftd.Sell
-                                   then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                            , Fcd.close = position - Gsd.spread Gsd.gsd
-                                                            }
-                                   else if close /= Ftd.None
-                                        then Fcd.initFxChartData
-                                        else Ftd.rate td
+      td' = td { Ftd.chart     = cd
+               , Ftd.tradeRate = if open == Ftd.Buy
+                                 then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
+                                                          , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                          }
+                                 else if open == Ftd.Sell
+                                      then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
+                                                               , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                               }
+                                      else if close /= Ftd.None
+                                           then Fcd.initFxChartData
+                                           else Ftd.tradeRate td
                , Ftd.alcOpen =
                  Fad.FxalgorithmListCount { Fad.prev = if open == Ftd.Buy
                                                        then Ta.makeValidLeafDataMapInc fto ftado
@@ -196,16 +204,16 @@ evaluate ctd fsd f1 forceSell td =
                                        then Ftd.None
                                        else Ftd.side td
                , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
-                                   then Ftd.trTradeDate td + Fcd.no cd - Fcd.no (Ftd.rate td)
+                                   then Ftd.trTradeDate td + Fcd.no cd - tradeNo
                                    else Ftd.trTradeDate td
                , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
                                    then Ftd.trTrade td + 1
                                    else Ftd.trTrade td
                , Ftd.successProfit = if close /= Ftd.None && 0 < profits
-                                     then Ftd.successProfit td + Ftd.realizedPL td' - Ftd.realizedPL td
+                                     then Ftd.successProfit td + Ftd.unrealizedPL td - Ftd.realizedPL td
                                      else Ftd.successProfit td
                , Ftd.failProfit = if close /= Ftd.None && profits <= 0
-                                  then Ftd.failProfit td + Ftd.realizedPL td - Ftd.realizedPL td'
+                                  then Ftd.failProfit td + Ftd.realizedPL td - Ftd.unrealizedPL td
                                   else Ftd.failProfit td
                , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits 
                                   then Ftd.trSuccess td + 1
@@ -214,12 +222,12 @@ evaluate ctd fsd f1 forceSell td =
                                   then Ftd.trFail td + 1
                                   else Ftd.trFail td
                , Ftd.profit     = Ftd.profit td + profits
-               , Ftd.realizedPL = Ftd.realizedPL td + 25 * f1 td chart * realizedPL
-               , Ftd.unrealizedPL = if Fcd.close (Ftd.rate td') /= 0
+               , Ftd.realizedPL = Ftd.realizedPL td + 25 * f1 td chart * realizedPLRate
+               , Ftd.unrealizedPL = if Fcd.close (Ftd.tradeRate td') /= 0
                                     then if Ftd.side td' == Ftd.Buy
-                                         then Ftd.realizedPL td' + 25 * f1 td' chart * ((chart / Fcd.close (Ftd.rate td')) - 1)
+                                         then Ftd.realizedPL td' + 25 * f1 td' chart * ((chart / Fcd.close (Ftd.tradeRate td')) - 1)
                                          else if Ftd.side td' == Ftd.Sell
-                                              then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / Fcd.close (Ftd.rate td')))
+                                              then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / Fcd.close (Ftd.tradeRate td')))
                                               else Ftd.realizedPL td'
                                     else Ftd.realizedPL td'
                }
