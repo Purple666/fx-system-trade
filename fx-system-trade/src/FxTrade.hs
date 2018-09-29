@@ -131,19 +131,19 @@ evaluate ctd fsd f1 forceSell td =
                                                else (0, 0, Ftd.None)
         | tradeRate /= 0 = if Ftd.side td == Ftd.Buy &&
                               (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
+                               Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td ||
+                               Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd || 
                                (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
-                                (((0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
-                                 (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) ||
-                                 Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td)) ||
-                                Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd)
+                                ((0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
+                                 (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl))))
                            then (chart - tradeRate, (chart / tradeRate) - 1, Ftd.Buy)
                            else if Ftd.side td == Ftd.Sell &&
                                    (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
+                                    Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td ||
+                                    Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd ||
                                     (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
-                                     (((0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
-                                      (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) ||
-                                      Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td)) ||
-                                     Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd)
+                                     ((0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
+                                      (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl))))
                                 then (tradeRate - chart, 1 - (chart / tradeRate), Ftd.Sell)
                                 else (0, 0, Ftd.None)
         | otherwise = (0, 0, Ftd.None)
