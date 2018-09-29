@@ -43,14 +43,14 @@ getProfitRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.successProfit ls == 0 || Fsd.trSuccess ls == 0
      then Gsd.initalProperty Gsd.gsd
-     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes fsd ^ 2
+     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes fsd * 2
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else truncate $ getLearningTestTimes fsd * (sqrt ((fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)))
+     else truncate $ getLearningTestTimes fsd * ((fromIntegral $ getTradeHoldTime fsd) + (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls))
           {- in if Gsd.maxLearningTime Gsd.gsd < l
              then Gsd.maxLearningTime Gsd.gsd
              else l -}
