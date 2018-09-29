@@ -132,7 +132,7 @@ evaluate ctd fsd f1 forceSell td =
         | tradeRate /= 0 = if Ftd.side td == Ftd.Buy &&
                               (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
                                Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td ||
-                               Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd || 
+                               unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd || 
                                (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
                                 ((0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
                                  (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl))))
@@ -140,7 +140,7 @@ evaluate ctd fsd f1 forceSell td =
                            else if Ftd.side td == Ftd.Sell &&
                                    (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
                                     Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td ||
-                                    Ftd.realizedPL td - unrealizedPL < Fs.getLossCutRate fsd ||
+                                    unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd ||
                                     (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
                                      ((0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
                                       (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl))))
