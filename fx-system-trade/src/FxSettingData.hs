@@ -44,7 +44,9 @@ instance Ord FxSettingData where
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
-                    , failProfitCount    :: Int
+                    , trSuccess          :: Int
+                    , trFail             :: Int
+                    , successProfit      :: Double
                     , failProfit         :: Double
                     , trTrade            :: Integer
                     , trTradeDate        :: Integer
@@ -56,8 +58,10 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
+                                                                              , trSuccess          = 0
+                                                                              , trFail             = 0
+                                                                              , successProfit      = 0 
                                                                               , failProfit         = 0
-                                                                              , failProfitCount    = 0
                                                                               , trTrade            = 0
                                                                               , trTradeDate        = 0
                                                                               }

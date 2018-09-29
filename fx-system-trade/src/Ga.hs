@@ -13,7 +13,7 @@ module Ga
 import           Control.Monad.Random
 import qualified Data.Foldable        as F
 import           Data.List
-import           Debug.Trace
+-- import           Debug.Trace
 
 newtype LearningData a = LearningData { getLearningData :: [(a, Rational)] } deriving (Show, Eq, Ord)
 
@@ -55,10 +55,6 @@ learningData s = LearningData [(s, 0)]
 
 learningDataList :: [LearningData a] -> LearningData a
 learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-
-top :: (Ga a) => Int -> LearningData a -> LearningData a
-top n (LearningData y) =
-  LearningData . take n $ sortBy(\(_, a) (_, b) -> compare b a) y
 
 evaluate :: (Ga a) => LearningData a -> LearningData a
 evaluate (LearningData y) =

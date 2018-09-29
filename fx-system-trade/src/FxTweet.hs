@@ -16,7 +16,7 @@ tweet :: String -> IO ()
 tweet t = do
   let opts = defaults &
              auth ?~ oauth1Auth "HjnDeOzLAz8akOvdWFwAs4jpk" "IKmctdySoondQMHyjEEyi3msIyrt9LebdKR6pSFPlOblWeZxgK" "94802117-TIe0khpHJgQyDjfeASKoqY54wFtJT7fylLHZ6gRdb" "DnARCXEzJk15X0rhcgHTwPzseY3s6kXga6nFrzOBXIPr7"
-  postWith opts "https://api.twitter.com/1.1/statuses/update.json" ["status" := t]
+  _ <- postWith opts "https://api.twitter.com/1.1/statuses/update.json" ["status" := t]
   return ()
 
 tweetClose :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO ()

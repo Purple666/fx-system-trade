@@ -53,8 +53,8 @@ resetCounter :: Ftd.FxTradeData -> Ftd.FxTradeData
 resetCounter td =
   td { Ftd.trTradeDate     = 0
      , Ftd.trTrade         = 0
-     , Ftd.failProfitCount = 0
      , Ftd.failProfit      = 0
+     , Ftd.successProfit   = 0
      , Ftd.alcOpen         = Fad.zeroFxalgorithmListCount
      , Ftd.alcCloseProfit  = Fad.zeroFxalgorithmListCount
      , Ftd.alcCloseLoss    = Fad.zeroFxalgorithmListCount
@@ -108,9 +108,9 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       (profits, realizedPL, close)
         | open /= Ftd.None && rate /= 0 = if Ftd.side td == Ftd.Buy
-                                          then ((chart - rate) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), (chart / rate) - 1, Ftd.Close)
+                                          then (chart - rate, (chart / rate) - 1, Ftd.Close)
                                           else if Ftd.side td == Ftd.Sell
-                                               then ((rate - chart) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), 1 - (chart / rate), Ftd.Close)
+                                               then (rate - chart, 1 - (chart / rate), Ftd.Close)
                                                else (0, 0, Ftd.None)
         | rate /= 0 = if Ftd.side td == Ftd.Buy &&
                          (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
@@ -119,7 +119,7 @@ evaluate ctd fsd f1 forceSell td =
                             (chart - rate < 0 && evaluateProfitDec ftcl ftadcl))) ||
                           chart - rate < Fs.getLossCutRate fsd ||
                           Fs.getProfitRate fsd < chart - rate)
-                      then ((chart - rate) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), (chart / rate) - 1, Ftd.Buy)
+                      then (chart - rate, (chart / rate) - 1, Ftd.Buy)
                       else if Ftd.side td == Ftd.Sell &&
                               (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) ||
                                (Fs.getTradeHoldTime fsd < Fcd.no cd - Fcd.no (Ftd.rate td) &&
@@ -127,7 +127,7 @@ evaluate ctd fsd f1 forceSell td =
                                  (rate - chart < 0 && evaluateProfitInc ftcl ftadcl))) ||
                                rate - chart < Fs.getLossCutRate fsd ||
                                Fs.getProfitRate fsd < rate - chart)
-                           then ((rate - chart) * (f1 td chart / (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd)), 1 - (chart / rate), Ftd.Sell)
+                           then (rate - chart, 1 - (chart / rate), Ftd.Sell)
                            else (0, 0, Ftd.None)
         | otherwise = (0, 0, Ftd.None)
       cd     = Fad.taChart ctd
@@ -201,13 +201,13 @@ evaluate ctd fsd f1 forceSell td =
                , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
                                    then Ftd.trTrade td + 1
                                    else Ftd.trTrade td
+               , Ftd.successProfit = if close /= Ftd.None && 0 < profits
+                                     then Ftd.successProfit td + Ftd.realizedPL td' - Ftd.realizedPL td
+                                     else Ftd.successProfit td
                , Ftd.failProfit = if close /= Ftd.None && profits <= 0
-                                  then Ftd.failProfit td + abs profits
+                                  then Ftd.failProfit td + Ftd.realizedPL td - Ftd.realizedPL td'
                                   else Ftd.failProfit td
-               , Ftd.failProfitCount = if close /= Ftd.None && profits <= 0
-                                       then Ftd.failProfitCount td + 1
-                                       else Ftd.failProfitCount td
-               , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits
+               , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits 
                                   then Ftd.trSuccess td + 1
                                   else Ftd.trSuccess td
                , Ftd.trFail     = if close /= Ftd.None && profits <= 0

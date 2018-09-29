@@ -34,10 +34,17 @@ import qualified Tree                    as Tr
 getLossCutRate :: Fsd.FxSettingData -> Double
 getLossCutRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in if Fsd.failProfit ls == 0 || Fsd.failProfitCount ls == 0
+  in if Fsd.failProfit ls == 0 || Fsd.trFail ls == 0
      then -100
-     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.failProfitCount ls)) * getLearningTestTimes fsd
-  
+     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * getLearningTestTimes fsd
+
+getProfitRate :: Fsd.FxSettingData -> Double
+getProfitRate fsd =
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
+  in if Fsd.successProfit ls == 0 || Fsd.trSuccess ls == 0
+     then 100
+     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes fsd
+
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
@@ -65,13 +72,6 @@ getSimChartMax fsd =
   maximum [ Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd]
-
-getProfitRate :: Fsd.FxSettingData -> Double
-getProfitRate fsd =
-  let (_, _, p) = getFxSettingLogResult fsd
-  in if p < 0
-     then 100
-     else p * getLearningTestTimes fsd
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
@@ -123,7 +123,9 @@ updateFxSettingData ctdl td tdt fsd =
       ls = (Fsd.learningSetting $ Fsd.fxSetting fsd)
            { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTrade tdt)
            , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
-           , Fsd.failProfitCount = Fsd.failProfitCount (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.failProfitCount tdt
+           , Fsd.trSuccess       = Fsd.trSuccess       (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.trSuccess tdt
+           , Fsd.trFail          = Fsd.trFail         (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.trFail tdt
+           , Fsd.successProfit   = Fsd.successProfit   (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.successProfit tdt
            , Fsd.failProfit      = Fsd.failProfit      (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.failProfit tdt
            }
   in if 0 < p
