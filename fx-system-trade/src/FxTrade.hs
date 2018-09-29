@@ -113,7 +113,7 @@ evaluate ctd fsd f1 forceSell td =
       unrealizedPL = if tradeRate /= 0
                      then if Ftd.side td == Ftd.Buy
                           then Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
-                          else if Ftd.side td' == Ftd.Sell
+                          else if Ftd.side td == Ftd.Sell
                                then Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
                                else Ftd.realizedPL td
                      else Ftd.realizedPL td
