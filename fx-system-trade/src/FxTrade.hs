@@ -213,10 +213,10 @@ evaluate ctd fsd f1 forceSell td =
                                    then Ftd.trTrade td + 1
                                    else Ftd.trTrade td
                , Ftd.successProfit = if close /= Ftd.None && 0 < profits
-                                     then Ftd.successProfit td + (abs unrealizedPL - Ftd.realizedPL td)
+                                     then Ftd.successProfit td + (abs (unrealizedPL - Ftd.realizedPL td))
                                      else Ftd.successProfit td
                , Ftd.failProfit = if close /= Ftd.None && profits <= 0
-                                  then Ftd.failProfit td + (abs unrealizedPL - Ftd.realizedPL td)
+                                  then Ftd.failProfit td + (abs (unrealizedPL - Ftd.realizedPL td))
                                   else Ftd.failProfit td
                , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits 
                                   then Ftd.trSuccess td + 1
