@@ -100,7 +100,7 @@ learningLoop c cl ce fsd fsds = do
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
-    else if fsd == fsd' && 0 < Ft.getProfitList tdlt
+    else if fsd == fsd'
          then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
          else if Fs.getLearningTestTimes fsd' < fromIntegral c
               then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
