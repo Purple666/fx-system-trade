@@ -168,7 +168,7 @@ evaluate ctd fsd f1 forceSell td =
                                                                  then ([], M.empty)
                                                                  else Fad.prev $ Ftd.alcOpen td
                                           , Fad.listCount = if close /= Ftd.None
-                                                            then Ta.addFxalgorithmListCount (abs unrealizedPL - Ftd.realizedPL td)
+                                                            then Ta.addFxalgorithmListCount (abs (unrealizedPL - Ftd.realizedPL td))
                                                                  (Fad.prev $ Ftd.alcOpen td)
                                                                  (Fad.listCount $ Ftd.alcOpen td)
                                                             else Fad.listCount $ Ftd.alcOpen td
@@ -177,7 +177,7 @@ evaluate ctd fsd f1 forceSell td =
                  Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
                                           , Fad.listCount =
                                             if close == Ftd.Buy && 0 < profits
-                                            then Ta.addFxalgorithmListCount (abs unrealizedPL - Ftd.realizedPL td)
+                                            then Ta.addFxalgorithmListCount (abs (unrealizedPL - Ftd.realizedPL td))
                                                  (Ta.makeValidLeafDataMapDec ftcp ftadcp)
                                                  (Fad.listCount $ Ftd.alcCloseProfit td)
                                             else if close == Ftd.Sell && 0 < profits
@@ -190,11 +190,11 @@ evaluate ctd fsd f1 forceSell td =
                  Fad.FxalgorithmListCount { Fad.prev = ([], M.empty)
                                           , Fad.listCount =
                                             if close == Ftd.Buy && profits < 0
-                                            then Ta.addFxalgorithmListCount (abs unrealizedPL - Ftd.realizedPL td)
+                                            then Ta.addFxalgorithmListCount (abs (unrealizedPL - Ftd.realizedPL td))
                                                  (Ta.makeValidLeafDataMapDec ftcl ftadcl)
                                                  (Fad.listCount $ Ftd.alcCloseLoss td)
                                             else if close == Ftd.Sell && profits < 0
-                                                 then Ta.addFxalgorithmListCount (abs unrealizedPL - Ftd.realizedPL td)
+                                                 then Ta.addFxalgorithmListCount (abs (unrealizedPL - Ftd.realizedPL td))
                                                       (Ta.makeValidLeafDataMapInc ftcl ftadcl)
                                                       (Fad.listCount $ Ftd.alcCloseLoss td)
                                                  else Fad.listCount $ Ftd.alcCloseLoss td
@@ -213,10 +213,10 @@ evaluate ctd fsd f1 forceSell td =
                                    then Ftd.trTrade td + 1
                                    else Ftd.trTrade td
                , Ftd.successProfit = if close /= Ftd.None && 0 < profits
-                                     then Ftd.successProfit td + unrealizedPL - Ftd.realizedPL td
+                                     then Ftd.successProfit td + (abs unrealizedPL - Ftd.realizedPL td)
                                      else Ftd.successProfit td
                , Ftd.failProfit = if close /= Ftd.None && profits <= 0
-                                  then Ftd.failProfit td + Ftd.realizedPL td - unrealizedPL
+                                  then Ftd.failProfit td + (abs unrealizedPL - Ftd.realizedPL td)
                                   else Ftd.failProfit td
                , Ftd.trSuccess  = if close /= Ftd.None && 0 < profits 
                                   then Ftd.trSuccess td + 1
