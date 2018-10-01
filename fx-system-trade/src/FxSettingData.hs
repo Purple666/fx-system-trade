@@ -95,7 +95,7 @@ plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = (fxSetting fsd) {
           learningSetting = (learningSetting . fxSetting $ fsd) {
-              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 2
+              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 1
               }
           }
       }
