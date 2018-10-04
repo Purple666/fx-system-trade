@@ -161,7 +161,7 @@ backTestLoop latest retry failp n endN td = do
                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                              Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  Fp.printTestProgress (retry && Ftd.profit tdt < Ftd.profit td) (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd2 tdt tdl tdlt plsf lsf
+  Fp.printTestProgress (retry && Ftd.profit tdt < Ftd.profit td) (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd tdt tdl tdlt plsf lsf
   if retry && Ftd.profit tdt < Ftd.profit td
     then backTestLoop latest retry True n endN td
     else if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
