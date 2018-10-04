@@ -110,7 +110,7 @@ getWinRatePure :: FxTradeData -> Double
 getWinRatePure x =
   if trSuccess x + trFail x == 0
   then 0
-  else fromIntegral (trSuccess x) / (fromIntegral (trSuccess x) + fromIntegral (trFail x))
+  else (fromIntegral $ trSuccess x) / ((fromIntegral $ trSuccess x) + (fromIntegral $ trFail x))
 
 getWinRate :: FxTradeData -> Double
 getWinRate x = 100 * getWinRatePure x

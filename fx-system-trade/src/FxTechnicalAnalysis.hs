@@ -246,11 +246,11 @@ getBB n ma x =
 
 getST :: Int -> Int -> [Fcd.FxChartData] -> [Fad.FxTechnicalAnalysisData] -> (Double, Double, Double)
 getST n m x p =
-  let s1 = take n $ map Fcd.close x -- setting long
-      s2 = take m p -- setting short
+  let s1 = take n $ map Fcd.close x                                   -- setting long
+      s2 = take m p                                                   -- setting short
       k  = ((head s1 - minimum s1) * 100 / (maximum s1 - minimum s1)) -- short
-      d  = sum (map (Fad.short  . Fad.st) s2) / fromIntegral m    -- middle
-      sd = sum (map (Fad.middle . Fad.st) s2) / fromIntegral m    -- long
+      d  = sum (map (Fad.short  . Fad.st) s2) / fromIntegral m        -- middle
+      sd = sum (map (Fad.middle . Fad.st) s2) / fromIntegral m        -- long
   in if length s1 < n || length s2 < m
      then (50, 50, 50)
      else (k, d, sd)
@@ -350,8 +350,8 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
 {-
 lf [old .. new]
 lr [new .. old]
-
 -}
+
 makeFxTechnicalAnalysisDataList :: Fad.FxAlgorithmSetting ->
                                    [Fcd.FxChartData] ->
                                    [Fcd.FxChartData] ->
