@@ -354,8 +354,8 @@ backTest latest endN l s td fsd xcd = do
                               return td3)
                      (pure td) ctdl
   fsd' <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
+  traceShow(l) $ return ()
   return (resetCounter td'', fsd')
--- traceShow(Fcd.close $ Ftd.chart td', Fcd.close $ Ftd.rate td', Ftd.profit td', Ftd.side td') $
 
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->
