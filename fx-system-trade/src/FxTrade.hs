@@ -129,14 +129,14 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       (profits, realizedPLRate, close)
         | open /= Ftd.None && tradeRate /= 0 = if Ftd.side td == Ftd.Buy
-                                          then (chart - tradeRate, (chart / tradeRate) - 1, Ftd.Close)
+                                               then ((chart - tradeRate) - Gsd.spread Gsd.gsd, ((chart - Gsd.spread Gsd.gsd) / tradeRate) - 1, Ftd.Close)
                                           else if Ftd.side td == Ftd.Sell
-                                               then (tradeRate - chart, 1 - (chart / tradeRate), Ftd.Close)
+                                               then ((tradeRate - chart) + Gsd.spread Gsd.gsd, 1 - ((chart + Gsd.spread Gsd.gsd) / tradeRate), Ftd.Close)
                                                else (0, 0, Ftd.None)
         | tradeRate /= 0 = if Ftd.side td == Ftd.Buy &&
                               (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
                                (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
-                                ((Gsd.spread Gsd.gsd < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
+                                ((0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
                                  (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) ||
                                  Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td  ||
                                  unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd))
@@ -144,7 +144,7 @@ evaluate ctd fsd f1 forceSell td =
                            else if Ftd.side td == Ftd.Sell &&
                                    (forceSell || Fs.getLearningTestTime fsd < Fcd.no cd - tradeNo ||
                                     (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
-                                     ((Gsd.spread Gsd.gsd < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
+                                     ((0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
                                       (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) || 
                                       Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td  || 
                                       unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd))
