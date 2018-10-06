@@ -233,11 +233,7 @@ evaluate ctd fsd f1 forceSell td =
                                   then Ftd.trFail td + 1
                                   else Ftd.trFail td
                , Ftd.profit     = Ftd.profit td + profits
-               , Ftd.realizedPL = if close == Ftd.Buy
-                                  then Ftd.realizedPL td + 25 * f1 td chart * getBuyRealizedPLRate chart tradeRate
-                                  else if close == Ftd.Sell
-                                       then Ftd.realizedPL td + 25 * f1 td chart * getSellRealizedPLRate chart tradeRate
-                                       else Ftd.realizedPL td
+               , Ftd.realizedPL = unrealizedPL
                , Ftd.unrealizedPL = if Ftd.side td' == Ftd.Buy
                                     then Ftd.realizedPL td' + 25 * f1 td' chart * getBuyRealizedPLRate chart (Fcd.close $ Ftd.tradeRate td')
                                     else if Ftd.side td' == Ftd.Sell
