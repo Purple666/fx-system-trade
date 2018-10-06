@@ -105,9 +105,9 @@ evaluate ctd fsd f1 forceSell td =
   
   let cd        = Fad.taChart ctd
       chart     = if Ftd.side td == Ftd.Buy
-                  then Fcd.close cd - Gsd.spread Gsd.gsd / 2
+                  then Fcd.close cd + Gsd.spread Gsd.gsd / 2
                   else if Ftd.side td == Ftd.Sell
-                       then Fcd.close cd + Gsd.spread Gsd.gsd / 2
+                       then Fcd.close cd - Gsd.spread Gsd.gsd / 2
                        else Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeNo   = Fcd.no $ Ftd.tradeRate td
