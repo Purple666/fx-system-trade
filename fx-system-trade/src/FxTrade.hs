@@ -148,7 +148,7 @@ evaluate ctd fsd f1 forceSell td =
                                       (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) || 
                                       Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td  || 
                                       unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd))
-                                then ((tradeRate - chart) + Gsd.spread Gsd.gsd, 1 - ((chart + Gsd.spread Gsd.gsd) / tradeRate), Ftd.Sell)
+                                then ((tradeRate - chart) - Gsd.spread Gsd.gsd, 1 - ((chart - Gsd.spread Gsd.gsd) / tradeRate), Ftd.Sell)
                                 else (0, 0, Ftd.None)
         | otherwise = (0, 0, Ftd.None)
       td' = td { Ftd.chart     = cd
