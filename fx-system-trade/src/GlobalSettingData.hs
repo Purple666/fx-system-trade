@@ -7,6 +7,7 @@ data GlobalSettingData = GlobalSettingData
   , learningTestCount     :: Int
   , thresholdRate         :: Double
   , countUpListMax        :: Int
+  , taAndRate             :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
   , tradeProductionBearer :: String
@@ -25,6 +26,7 @@ gsd =
                     , algorithmRepeat       = 3
                     , countUpListMax        = 3
                     , learningTestCount     = 3
+                    , taAndRate             = 3
                     , quantityRate          = 5
                     , thresholdRate         = 0.05
                     , initalProperty        = 500000
