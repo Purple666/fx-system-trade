@@ -173,7 +173,7 @@ createRandomFxAlMaSetting ix = do
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Bool -> Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting reset ix = do
-  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
+  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd) * 2
   taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
   at <- if reset
         then Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) Tr.Empty
