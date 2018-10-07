@@ -21,14 +21,14 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 10
+  GlobalSettingData { taMargin              = 1
                     , makeTreeCount         = 10
                     , algorithmRepeat       = 10
                     , countUpListMax        = 5
                     , learningTestCount     = 5
-                    , taAndRate             = 3
+                    , taAndRate             = 2
                     , quantityRate          = 5
-                    , thresholdRate         = 0.1
+                    , thresholdRate         = 0.01
                     , initalProperty        = 500000
                     , maxUnit               = 3000000
                     , spread                = 0.004
