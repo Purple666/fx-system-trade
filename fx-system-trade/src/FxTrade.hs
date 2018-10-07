@@ -323,12 +323,11 @@ makeChart fsd chartLength xcd  =
 backTest :: Bool ->
             Int ->
             Int ->
-            Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             IO (Ftd.FxTradeData, Fsd.FxSettingData)
-backTest latest endN l s td fsd xcd = do
+backTest latest endN l td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
                               let (open, close, td3) = if Ftd.side td' == Ftd.None && Ftd.trFail td < Ftd.trFail td'
