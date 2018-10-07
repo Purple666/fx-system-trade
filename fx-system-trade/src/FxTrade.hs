@@ -331,7 +331,7 @@ backTest :: Bool ->
 backTest latest endN l s td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
-                              let (open, close, td3) = if Ftd.side td' == Ftd.None && Ftd.trFail td < Ftd.trFail td')
+                              let (open, close, td3) = if Ftd.side td' == Ftd.None && Ftd.trFail td < Ftd.trFail td'
                                                        then (Ftd.None, Ftd.None, td')
                                                        else evaluate ctd fsd getQuantityBacktest False td'
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
