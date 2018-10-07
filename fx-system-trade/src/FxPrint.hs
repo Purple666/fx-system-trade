@@ -15,12 +15,11 @@ import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
 import           Text.Printf
 
-printTestProgress :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
-printTestProgress retry n n' fsd tdt tdl tdlt plsf lsf = do
+printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int ->Bool -> IO ()
+printTestProgress n n' fsd tdt tdl tdlt plsf lsf = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  Control.Monad.when retry $ printf "   "
   printf "%s : " =<< Ftm.getLogTime
   nd  <-  Fcd.getDate n
   nd' <-  Fcd.getDate n'
