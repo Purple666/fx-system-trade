@@ -51,9 +51,6 @@ getLearningTime fsd =
   in if Fsd.trTrade ls == 0
      then 60
      else truncate $ getLearningTestTimes fsd * fromIntegral (getTradeHoldTime fsd)
-          {- in if Gsd.maxLearningTime Gsd.gsd < l
-             then Gsd.maxLearningTime Gsd.gsd
-             else l -}
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
