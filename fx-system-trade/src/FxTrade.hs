@@ -4,6 +4,7 @@ module FxTrade ( initFxTradeData
                , trade
                , gaLearningEvaluate
                , evaluationOk
+               , evaluationOk2
                , getProfitList
                ) where
 
@@ -24,8 +25,11 @@ import qualified Tree                    as Tr
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
   all (\x -> 0 < Ftd.getEvaluationValue x) tdlt && 0 < Ftd.getEvaluationValue tdl && 0 < Ftd.profit tdl && 0 < getProfitList tdlt 
-  --0 < Ftd.getEvaluationValue tdl && 0 < Ftd.getEvaluationValueList tdlt && 0 < Ftd.profit tdl && 0 < getProfitList tdlt 
-  
+
+evaluationOk2 :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
+evaluationOk2 tdl tdlt =
+  0 < Ftd.getEvaluationValue tdl && 0 < Ftd.getEvaluationValueList tdlt && 0 < Ftd.profit tdl && 0 < getProfitList tdlt 
+
 getProfitList :: [Ftd.FxTradeData] -> Double
 getProfitList tdlt =
   sum $ map Ftd.profit tdlt
