@@ -43,7 +43,8 @@ getQuantityBacktest td chart = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd
 -}
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd -- Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd -- Gsd.initalProperty Gsd.gsd
+getQuantityLearning td chart = Ftd.realizedPL td
+-- Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd 
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
