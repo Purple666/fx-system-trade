@@ -64,7 +64,7 @@ backTest s f latest = do
                     getRandomR(s, s + ltt * 2)
 
   let n = startN + p
-  (fs, fsd') <- backTestLoop latest False n endN td fsd
+  (fs, fsd') <- backTestLoop latest n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
