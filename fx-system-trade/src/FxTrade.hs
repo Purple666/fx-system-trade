@@ -325,17 +325,14 @@ makeChart fsd chartLength xcd  =
 backTest :: Bool ->
             Int ->
             Int ->
-            Int -> 
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             IO (Ftd.FxTradeData, Fsd.FxSettingData)
-backTest latest endN l f td fsd xcd = do
+backTest latest endN l td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
-                              let (open, close, td3) = {- if Ftd.side td' == Ftd.None && Ftd.trFail td + f < Ftd.trFail td'
-                                                       then (Ftd.None, Ftd.None, td')
-                                                       else -} evaluate ctd fsd getQuantityBacktest False td'
+                              let (open, close, td3) = evaluate ctd fsd getQuantityBacktest False td'
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
                      (pure td) ctdl
