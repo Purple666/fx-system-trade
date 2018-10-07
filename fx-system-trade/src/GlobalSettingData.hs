@@ -20,16 +20,16 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 3
-                    , makeTreeCount         = 3
-                    , algorithmRepeat       = 3
-                    , countUpListMax        = 3
-                    , learningTestCount     = 3
+  GlobalSettingData { taMargin              = 5
+                    , makeTreeCount         = 5
+                    , algorithmRepeat       = 5
+                    , countUpListMax        = 5
+                    , learningTestCount     = 5
                     , quantityRate          = 5
                     , thresholdRate         = 0.05
                     , initalProperty        = 500000
                     , maxUnit               = 3000000
-                    , spread                = 0.000
+                    , spread                = 0.004
                     , dbHost                = "mongo:27017"
                     , tradePracticeBearer   = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
                     , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
