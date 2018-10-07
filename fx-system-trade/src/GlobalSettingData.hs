@@ -5,7 +5,7 @@ data GlobalSettingData = GlobalSettingData
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
-  , thresholdRate    b     :: Double
+  , thresholdRate         :: Double
   , countUpListMax        :: Int
   , taAndRate             :: Int
   , tradePracticeBearer   :: String
@@ -24,8 +24,8 @@ gsd =
   GlobalSettingData { taMargin              = 1
                     , makeTreeCount         = 10
                     , algorithmRepeat       = 10
-                    , countUpListMax        = 5
-                    , learningTestCount     = 5
+                    , countUpListMax        = 3
+                    , learningTestCount     = 3
                     , taAndRate             = 2
                     , quantityRate          = 5
                     , thresholdRate         = 0.01
