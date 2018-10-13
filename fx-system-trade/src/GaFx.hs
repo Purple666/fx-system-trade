@@ -103,7 +103,7 @@ learningLoop c cl ce fsd fsds = do
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
     else if fsd == fsd' && Ft.evaluationOk2 tdl tdlt
-         then return (0, True, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
+         then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
          else if Fs.getLearningTestTimes fsd' < fromIntegral c
               then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
               else learningLoop (c + 1) cl ce fsd' $ map (\(_, _, _, x) -> x) fsds'
