@@ -36,21 +36,21 @@ getLossCutRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.failProfit ls == 0 || Fsd.trFail ls == 0
      then -Gsd.initalProperty Gsd.gsd
-     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * getLearningTestTimes fsd ^ 2
+     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * getLearningTestTimes fsd
 
 getProfitRate :: Fsd.FxSettingData -> Double
 getProfitRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.successProfit ls == 0 || Fsd.trSuccess ls == 0
      then Gsd.initalProperty Gsd.gsd
-     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes fsd ^ 2
+     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes fsd
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.trTrade ls == 0
      then 60
-     else truncate $ getLearningTestTimes fsd * fromIntegral (getTradeHoldTime fsd) ^ 2
+     else truncate $ getLearningTestTimes fsd * fromIntegral (getTradeHoldTime fsd)
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
@@ -58,7 +58,7 @@ getLearningTestTime fsd =
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
-  (log :: (Double -> Double)) $ (fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd)
+  (((log :: (Double -> Double)) $ (fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd)) + 2) ^ 2
   -- 
   
 getTradeHoldTime :: Fsd.FxSettingData -> Int
