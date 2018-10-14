@@ -58,7 +58,8 @@ getLearningTestTime fsd =
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
-  (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 2)
+  (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) +
+                                 (fromIntegral . length $ Fsd.fxSettingLog fsd) + 2)
   -- 
   
 getTradeHoldTime :: Fsd.FxSettingData -> Int
@@ -281,7 +282,7 @@ crossoverFxTechnicalAnalysisSetting a b = do
   die      <- replicateM 2 $ getRandomR (True, False)
   (ta, tb) <- Tr.crossoverTree (Fad.treeAnaAndRate a) (Fad.treeAnaOrRate a)
               (Fad.techAnaTree a) (Fad.techListCount a) (Fad.techAnaTree b) (Fad.techListCount b)
-  let mk = min (fst . M.findMax $ Fad.algoSetting a) (fst . M.findMax $ Fad.algoSetting b)
+  let mk = man (fst . M.findMax $ Fad.algoSetting a) (fst . M.findMax $ Fad.algoSetting b)
   oxs      <- mapM (\k -> do (a', b') <- crossoverFxAlgorithmSetting (Fad.algoSetting a M.! k) (Fad.algoSetting b M.! k)
                              return ((k, a'), (k, b'))) [0..mk]
   return ( a { Fad.techAnaTree    = ta
