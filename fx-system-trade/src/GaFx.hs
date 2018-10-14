@@ -206,7 +206,7 @@ tradeWeeklyLoop td coName = do
   waitTrade
   fsd <- tradeLearning
   e <- Foa.getNowPrices td
-  td' <- tradeLoop e 0 td coName fsd =<< async tradeLearningThread
+  td' <- tradeLoop e 0 td fsd coName =<< async tradeLearningThread
   tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
   Ftw.tweetWeek tdw td'
   Fm.setFxTradeData (coName ++ "_weekly") td'
@@ -243,4 +243,4 @@ tradeLoop p sleep td fsd coName a = do
   if 240 < sleep'
     then do cancel a'
             return td2
-    else tradeLoop e sleep' fsd' td2 coName a'
+    else tradeLoop e sleep' td2 fsd' coName a'
