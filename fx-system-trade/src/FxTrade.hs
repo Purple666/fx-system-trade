@@ -80,13 +80,14 @@ initFxTradeData Ftd.Production =
                             , Ftd.url              = Gsd.tradeProductionUrl  Gsd.gsd
                             }
 
-evaluate :: Fad.FxChartTaData ->
+evaluate :: Bool ->
+            Fad.FxChartTaData ->
             Fsd.FxSettingData ->
             (Ftd.FxTradeData -> Double -> Double) ->
             Bool ->
             Ftd.FxTradeData ->
             (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
-evaluate ctd fsd f1 forceSell td =
+evaluate bt ctd fsd f1 forceSell td =
 {-    
         | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
@@ -100,10 +101,10 @@ evaluate ctd fsd f1 forceSell td =
 -}
   
   let cd        = Fad.taChart ctd
-      chart     = if Ftd.side td == Ftd.Buy
-                  then Fcd.close cd - Gsd.spread Gsd.gsd / 2
-                  else if Ftd.side td == Ftd.Sell
-                       then Fcd.close cd + Gsd.spread Gsd.gsd / 2
+      chart     = if bt && Ftd.side td == Ftd.Buy
+                  then Fcd.close cd - Gsd.spread Gsd.gsd
+                  else if bt && Ftd.side td == Ftd.Sell
+                       then Fcd.close cd + Gsd.spread Gsd.gsd
                        else Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeNo   = Fcd.no $ Ftd.tradeRate td
@@ -329,7 +330,7 @@ backTest :: Bool ->
 backTest latest endN l td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
-                              let (open, close, td3) = evaluate ctd fsd getQuantityBacktest False td'
+                              let (open, close, td3) = evaluate True ctd fsd getQuantityBacktest False td'
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
                      (pure td) ctdl
@@ -342,9 +343,9 @@ learning :: Ftd.FxTradeData ->
 learning td fsd =
   let fc = Fsd.fxChart fsd
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td')
+      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate False ctd fsd getQuantityLearning False td')
                      (Ftd.None, Ftd.None, td) $ init ctdl
-      (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
+      (_, _, td''') = evaluate False (last ctdl) fsd getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''
