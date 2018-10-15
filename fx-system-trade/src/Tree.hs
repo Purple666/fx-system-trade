@@ -22,7 +22,7 @@ import qualified Control.Monad.Random as R
 import           Data.List
 import qualified Data.Map             as M
 import qualified GlobalSettingData    as Gsd
---import Debug.Trace
+import Debug.Trace
 
 newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) }
 
