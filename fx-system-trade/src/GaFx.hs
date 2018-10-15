@@ -160,7 +160,7 @@ backTestLoop latest n endN td fsd = do
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 tdt tdl tdlt plsf lsf
+  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd2 tdt tdl tdlt plsf lsf
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
     else backTestLoop latest n' endN tdt fsd2
