@@ -62,8 +62,8 @@ getTradeHoldTime :: Fsd.FxSettingData -> Int
 getTradeHoldTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.trTrade ls == 0
-     then truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes fsd
-     else truncate $ (max (fromIntegral $ getSimChartMax fsd) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)) * getLearningTestTimes fsd
+     then truncate $ (fromIntegral $ getSimChartMax fsd + 10) * getLearningTestTimes fsd
+     else truncate $ (max (fromIntegral $ getSimChartMax fsd + 10) (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)) * getLearningTestTimes fsd
 
 getSimChartMax :: Fsd.FxSettingData -> Int
 getSimChartMax fsd =
