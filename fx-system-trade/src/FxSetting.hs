@@ -69,7 +69,7 @@ getSimChartMax :: Fsd.FxSettingData -> Int
 getSimChartMax fsd =
   maximum [ Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-          , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd] + 10
+          , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd]
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
