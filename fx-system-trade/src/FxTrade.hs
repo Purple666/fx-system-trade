@@ -198,10 +198,10 @@ evaluate bt ctd fsd f1 forceSell td =
                                                       (Fad.listCount $ Ftd.alcCloseLoss td)
                                                  else Fad.listCount $ Ftd.alcCloseLoss td
                                         }
-               , Ftd.trTradeDate = if close /= Ftd.None -- && 0 < profits
+               , Ftd.trTradeDate = if close /= Ftd.None && 0 < profits
                                    then Ftd.trTradeDate td + Fcd.no cd - tradeNo
                                    else Ftd.trTradeDate td
-               , Ftd.trTrade     = if close /= Ftd.None -- && 0 < profits
+               , Ftd.trTrade     = if close /= Ftd.None && 0 < profits
                                    then Ftd.trTrade td + 1
                                    else Ftd.trTrade td
                , Ftd.successProfit = if close /= Ftd.None && 0 < profits
