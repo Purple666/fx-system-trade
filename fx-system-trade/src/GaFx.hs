@@ -125,11 +125,12 @@ learning n fsd = do
               M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then do let fsd4 = fsd'' { Fsd.fxSettingLog = M.withoutKeys (Fsd.fxSettingLog fsd'') . S.fromList .
+    then do {- let fsd4 = fsd'' { Fsd.fxSettingLog = M.withoutKeys (Fsd.fxSettingLog fsd'') . S.fromList .
                                                   L.delete (Fsd.fxSetting fsd'') $
                                                   map (\(_, _, _, _, fsd3) -> Fsd.fxSetting fsd3) tdlts
                              }
-            return (length tdlts, True, tdl', tdlt', fsd4)
+            -}
+            return (length tdlts, True, tdl', tdlt', fsd'')
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData
