@@ -8,7 +8,6 @@ import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Monad.Random
 import qualified Data.Map                 as M
-import qualified Data.Set                 as S
 import qualified Data.List                as L
 import           Data.Time
 import           Data.Time.Clock.POSIX
@@ -125,12 +124,7 @@ learning n fsd = do
               M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then do {- let fsd4 = fsd'' { Fsd.fxSettingLog = M.withoutKeys (Fsd.fxSettingLog fsd'') . S.fromList .
-                                                  L.delete (Fsd.fxSetting fsd'') $
-                                                  map (\(_, _, _, _, fsd3) -> Fsd.fxSetting fsd3) tdlts
-                             }
-            -}
-            return (length tdlts, True, tdl', tdlt', fsd'')
+    then return (length tdlts, True, tdl', tdlt', Fs.updateFxSettingLog fsd'' $ map (\(_, _, _, _, fsd3) -> Fsd.fxSettingLog fsd3) tdlts)
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData

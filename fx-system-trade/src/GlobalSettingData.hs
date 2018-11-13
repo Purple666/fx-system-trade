@@ -13,6 +13,7 @@ data GlobalSettingData = GlobalSettingData
   , tradeProductionBearer :: String
   , tradeProductionUrl    :: String
   , quantityRate          :: Double
+  , fxSettingLogNum       :: Int
   , initalProperty        :: Double
   , maxUnit               :: Int
   , dbHost                :: String
@@ -30,6 +31,7 @@ gsd =
                     , taAndRate             = 2
                     , quantityRate          = 5
                     , thresholdRate         = 0.01
+                    , fxSettingLogNum       = 10
                     , initalProperty        = 5000000
                     , maxUnit               = 3000000
                     , spread                = 0.004
