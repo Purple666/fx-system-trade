@@ -114,9 +114,9 @@ emptyFxSettingLog fsd =
 updateFxSettingLog :: Fsd.FxSettingData -> [M.Map Fsd.FxSetting (Double, Int)] -> Fsd.FxSettingData
 updateFxSettingLog fsd fsl = 
   fsd { Fsd.fxSettingLog =  M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(x, _) -> x) .
-                            drop (Gsd.fxSettingLogNum Gsd.gsd) .
-                            sortBy (\(_, (a', b')) (_, (a, b)) ->
-                                       compare (a' / fromIntegral b') (a / fromIntegral b)) . concat $ map M.toList fsl
+                            take (Gsd.fxSettingLogNum Gsd.gsd) .
+                            sortBy (\(_, (a, b)) (_, (a', b')) ->
+                                       compare (a / fromIntegral b) (a' / fromIntegral b')) . concat $ map M.toList fsl
       }
 
 
