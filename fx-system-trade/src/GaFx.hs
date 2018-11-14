@@ -124,7 +124,7 @@ learning n fsd = do
               M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then return (length tdlts, True, tdl', tdlt', Fs.updateFxSettingLog fsd'' $ map (\(_, _, _, _, fsd3) -> Fsd.fxSettingLog fsd3) tdlts)
+    then return (length tdlts, True, tdl', tdlt', Fs.updateFxSettingLog fsd'' $ map (\(x, _, _, _, fsd3) -> (x, Fsd.fxSetting fsd3)) tdlts)
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData

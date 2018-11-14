@@ -111,15 +111,14 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Fsd.FxSettingData -> [M.Map Fsd.FxSetting (Double, Int)] -> Fsd.FxSettingData
-updateFxSettingLog fsd fsl = 
-  fsd { Fsd.fxSettingLog =  M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(x, _) -> x) .
-                            take (Gsd.fxSettingLogNum Gsd.gsd) .
-                            sortBy (\(_, (a, b)) (_, (a', b')) ->
-                                       compare (a / fromIntegral b) (a' / fromIntegral b')) . concat $ map M.toList fsl
-      }
-
-
+updateFxSettingLog :: Fsd.FxSettingData -> [(Double,  Fsd.FxSetting)] -> Fsd.FxSettingData
+updateFxSettingLog fsd fss =
+  if (Gsd.fxSettingLogNum Gsd.gsd) < length fss
+  then  fsd { Fsd.fxSettingLog =  M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(_, x) -> x) .
+                                  take (Gsd.fxSettingLogNum Gsd.gsd) $
+                                  sortBy (\(a, _) (b, _) -> compare a b) fss
+            }
+  else fsd
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
