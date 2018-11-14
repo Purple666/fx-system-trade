@@ -115,7 +115,7 @@ updateFxSettingLog :: Fsd.FxSettingData -> [(Double,  Fsd.FxSetting)] -> Fsd.FxS
 updateFxSettingLog fsd fss =
   if (Gsd.fxSettingLogNum Gsd.gsd) < length fss
   then  fsd { Fsd.fxSettingLog =  M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(_, x) -> x) .
-                                  take (Gsd.fxSettingLogNum Gsd.gsd) $
+                                  take (length fss - Gsd.fxSettingLogNum Gsd.gsd) $
                                   sortBy (\(a, _) (b, _) -> compare a b) fss
             }
   else fsd
