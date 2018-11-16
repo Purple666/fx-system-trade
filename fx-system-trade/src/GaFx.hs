@@ -137,7 +137,7 @@ tradeLearning = do
 
 tradeLearningThread :: IO Fsd.FxSettingData
 tradeLearningThread = do
-  threadDelay (5 * 60 * 1000 * 1000)
+  -- threadDelay (5 * 60 * 1000 * 1000)
   tradeLearning
 
 backTestLoop :: Bool ->
@@ -225,7 +225,7 @@ tradeLoop :: Fcd.FxChartData ->
              IO Ftd.FxTradeData
 tradeLoop p sleep td fsd coName a = do
   t <- getCurrentTime
-  threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
+  -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   (a', fsd') <- checkTradeLearning a fsd
   e <- Foa.getNowPrices td
   (sleep', td2) <- if e /= p
@@ -233,7 +233,10 @@ tradeLoop p sleep td fsd coName a = do
                                   ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
                            return (0, td1)
                    else return (sleep + 1, td)
+  tradeLoop e sleep' td2 fsd' coName a'
+{-
   if 240 < sleep'
     then do cancel a'
             return td2
     else tradeLoop e sleep' td2 fsd' coName a'
+-}
