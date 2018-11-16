@@ -235,7 +235,9 @@ tradeLoop p sleep td fsd coName a = do
                            return (0, td1)
                    else return (sleep + 1, td)
 -}
-  tradeLoop e sleep td fsd' coName a'
+  td2 <- tradeEvaluate td fsd' coName =<<
+         ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
+  tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
