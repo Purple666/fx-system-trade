@@ -228,12 +228,14 @@ tradeLoop p sleep td fsd coName a = do
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   (a', fsd') <- checkTradeLearning a fsd
   e <- Foa.getNowPrices td
+{-
   (sleep', td2) <- if e /= p
                    then do td1 <- tradeEvaluate td fsd' coName =<<
                                   ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
                            return (0, td1)
                    else return (sleep + 1, td)
-  tradeLoop e sleep' td2 fsd' coName a'
+-}
+tradeLoop e sleep td fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
