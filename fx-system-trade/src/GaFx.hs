@@ -235,7 +235,7 @@ tradeLoop p sleep td fsd coName a = do
                            return (0, td1)
                    else return (sleep + 1, td)
 -}
-tradeLoop e sleep td fsd' coName a'
+  tradeLoop e sleep td fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
