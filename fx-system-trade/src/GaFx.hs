@@ -224,7 +224,7 @@ tradeLoop :: Fcd.FxChartData ->
              Async Fsd.FxSettingData ->
              IO Ftd.FxTradeData
 tradeLoop p sleep td fsd coName a = do
-  t <- getCurrentTime
+  -- t <- getCurrentTime
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   (a', fsd') <- checkTradeLearning a fsd
   e <- Foa.getNowPrices td
