@@ -52,7 +52,8 @@ evaluateProfitDec fts ftad =
 
 resetCounter :: Ftd.FxTradeData -> Ftd.FxTradeData
 resetCounter td =
-  td { Ftd.trTradeDate     = 0
+  td { Ftd.chart = Fcd.initFxChartData 
+     , Ftd.trTradeDate     = 0
      , Ftd.trTrade         = 0
      , Ftd.failProfit      = 0
      , Ftd.successProfit   = 0
@@ -297,7 +298,7 @@ makeSimChart c xs =
                                          }
                    fcdClose = head xs'
 {-
-               in fcdClose : makeSimChart c (tail xs')
+ 55              in fcdClose : makeSimChart c (tail xs')
 -}
                in if snd high < snd low
                   then fcdHigh : fcdLow : fcdClose : (makeSimChart c $ tail xs')

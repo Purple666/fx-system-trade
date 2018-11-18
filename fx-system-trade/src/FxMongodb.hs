@@ -142,11 +142,11 @@ getDataFromDB coName =
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
   upsert (select [] coName) [ "chart"       =: show (Ftd.chart td)
-                          , "tr_success"  =: Ftd.trSuccess td
-                          , "tr_fail"     =: Ftd.trFail td
-                          , "profit"      =: Ftd.profit td
-                          , "realizedPL"  =: Ftd.realizedPL td
-                          ]
+                            , "tr_success"  =: Ftd.trSuccess td
+                            , "tr_fail"     =: Ftd.trFail td
+                            , "profit"      =: Ftd.profit td
+                            , "realizedPL"  =: Ftd.realizedPL td
+                            ]
 
 setFxSettingToDB :: T.Text -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
 setFxSettingToDB coName fls fsl =
