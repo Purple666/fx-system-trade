@@ -167,6 +167,7 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  IO Ftd.FxTradeData
 tradeEvaluate td fsd coName xcd = do
   let (open, close, td1) = Ft.trade td fsd xcd
+{-  
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2
@@ -179,6 +180,8 @@ tradeEvaluate td fsd coName xcd = do
           Fp.printTradeResult open close td td4 units
           return td4
   else return td3
+-}
+  return td1
 
 waitTrade :: IO ()
 waitTrade =
@@ -234,10 +237,10 @@ tradeLoop p sleep td fsd coName a = do
                                   ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
                            return (0, td1)
                    else return (sleep + 1, td)
+-}
   td2 <- tradeEvaluate td fsd' coName =<<
          ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
--}
-  tradeLoop e sleep td fsd' coName a'
+  tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
