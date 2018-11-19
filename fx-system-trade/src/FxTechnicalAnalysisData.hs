@@ -249,7 +249,7 @@ initFxMovingAverageData =
 
 zeroFxalgorithmListCount :: FxalgorithmListCount
 zeroFxalgorithmListCount =
-  FxalgorithmListCount { prev      = ([], M.empty)
-                       , listCount = (Tr.emptyLeafDataMap, M.empty)
+  FxalgorithmListCount { -- prev      = ([], M.empty)
+                         listCount = (Tr.emptyLeafDataMap, M.empty)
                        }
 
