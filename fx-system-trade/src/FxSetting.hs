@@ -130,7 +130,7 @@ updateFxSettingData ctdl td tdt fsd =
            { Fsd.trTrade         = Fsd.trTrade         (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTrade tdt)
            , Fsd.trTradeDate     = Fsd.trTradeDate     (Fsd.learningSetting $ Fsd.fxSetting fsd) + fromIntegral (Ftd.trTradeDate tdt)
            , Fsd.trSuccess       = Fsd.trSuccess       (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.trSuccess tdt
-           , Fsd.trFail          = Fsd.trFail         (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.trFail tdt
+           , Fsd.trFail          = Fsd.trFail          (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.trFail tdt
            , Fsd.successProfit   = Fsd.successProfit   (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.successProfit tdt
            , Fsd.failProfit      = Fsd.failProfit      (Fsd.learningSetting $ Fsd.fxSetting fsd) + Ftd.failProfit tdt
            }
