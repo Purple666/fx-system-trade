@@ -7,6 +7,7 @@ module FxChartData
 
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
 import           Data.UnixTime
+import           Control.DeepSeq
 
 data FxChartData = FxChartData
   { no    :: Int
@@ -16,7 +17,7 @@ data FxChartData = FxChartData
   , low   :: Double
   , close :: Double
   }
-  deriving (Show, Read, Eq)
+  deriving (Show, Read, Eq, NFData)
 
 initFxChartData :: FxChartData
 initFxChartData =
