@@ -52,8 +52,7 @@ evaluateProfitDec fts ftad =
 
 resetCounter :: Ftd.FxTradeData -> Ftd.FxTradeData
 resetCounter td =
-  td { Ftd.chart = Fcd.initFxChartData 
-     , Ftd.trTradeDate     = 0
+  td { Ftd.trTradeDate     = 0
      , Ftd.trTrade         = 0
      , Ftd.failProfit      = 0
      , Ftd.successProfit   = 0
