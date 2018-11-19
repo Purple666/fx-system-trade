@@ -10,6 +10,7 @@ module FxChartData
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
 import           Data.UnixTime
 import           Control.DeepSeq
+import GHC.Generics (Generic)
 
 data FxChartData = FxChartData
   { no    :: Int
