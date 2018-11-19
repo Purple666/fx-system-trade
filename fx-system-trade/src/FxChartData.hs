@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+
 module FxChartData
   ( FxChartData (..)
   , initFxChartData
@@ -17,7 +19,7 @@ data FxChartData = FxChartData
   , low   :: Double
   , close :: Double
   }
-  deriving (Show, Read, Eq, NFData)
+  deriving (Show, Read, Eq, Generic, NFData)
 
 initFxChartData :: FxChartData
 initFxChartData =
