@@ -78,7 +78,7 @@ printFxTradeData :: Ftd.FxTradeData -> IO ()
 printFxTradeData td =
   printf "| %5.1f  %8.0f %8.0f : %3d %3d %3.0f "
   (Ftd.profit td)
-  (Ftd.unrealizedPL)
+  (Ftd.unrealizedPL td)
   (Ftd.realizedPL td)
   (Ftd.trSuccess td)
   (Ftd.trFail td)
