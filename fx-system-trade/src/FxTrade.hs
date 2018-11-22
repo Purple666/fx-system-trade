@@ -56,9 +56,9 @@ resetCounter td =
      , Ftd.trTrade         = 0
      , Ftd.failProfit      = 0
      , Ftd.successProfit   = 0
-     , Ftd.alcOpen         = Fad.zeroFxalgorithmListCount
-     , Ftd.alcCloseProfit  = Fad.zeroFxalgorithmListCount
-     , Ftd.alcCloseLoss    = Fad.zeroFxalgorithmListCount
+     , Ftd.alcOpen         = Fad.resetFxalgorithmListCount $ Ftd.alcOpen td
+     , Ftd.alcCloseProfit  = Fad.resetFxalgorithmListCount $ Ftd.alcCloseProfit td
+     , Ftd.alcCloseLoss    = Fad.resetFxalgorithmListCount $ Ftd.alcCloseLoss td
      }
 
 initFxTradeData :: Ftd.FxEnvironment -> Ftd.FxTradeData

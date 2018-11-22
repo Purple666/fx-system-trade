@@ -14,6 +14,7 @@ module FxTechnicalAnalysisData
   , initFxMovingAverageData
   , initAlgoLeafData
   , zeroFxalgorithmListCount
+  , resetFxalgorithmListCount
   ) where
 
 import qualified Data.Map          as M
@@ -247,9 +248,14 @@ initFxMovingAverageData =
                       , thresholdM = None
                       }
 
+resetFxalgorithmListCount :: FxalgorithmListCount -> FxalgorithmListCount
+resetFxalgorithmListCount falc =
+   falc { listCount = (Tr.emptyLeafDataMap, M.empty)
+        }
+
 zeroFxalgorithmListCount :: FxalgorithmListCount
 zeroFxalgorithmListCount =
-  FxalgorithmListCount { -- prev      = ([], M.empty)
-                         listCount = (Tr.emptyLeafDataMap, M.empty)
+  FxalgorithmListCount { prev      = ([], M.empty)
+                       , listCount = (Tr.emptyLeafDataMap, M.empty)
                        }
 
