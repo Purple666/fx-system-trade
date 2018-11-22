@@ -242,8 +242,8 @@ tradeLoop p sleep td fsd coName a = do
 -}
   td2 <- tradeEvaluate td fsd' coName =<<
          ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
-  traceShow(td2) $ return ()
-  tradeLoop e sleep td2 fsd' coName a'
+  
+  Ftd.unrealizedPL td2 `seq` tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
