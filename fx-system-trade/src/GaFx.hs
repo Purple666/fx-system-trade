@@ -49,7 +49,7 @@ debugLoop td fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.no e) (Fs.getPrepareTimeAll fsd' + 1) 0) <*> pure [e]
   let (_, _, td') = Ft.trade td fsd' ct
-  Fp.printStartTrade td'
+  Fp. printProgressFxTradeData td'
   debugLoop td' fsd'
 
 backTest :: Int -> Int -> Bool -> IO ()
