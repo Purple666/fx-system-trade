@@ -1,5 +1,5 @@
 module FxPrint
-  ( printStartTrade
+  ( printProgressFxTradeData
   , printTradeResult
   , printTestProgress
   , printLearningFxTradeData
@@ -46,8 +46,8 @@ printLearningFxTradeData p n fsd tdl tdlt plsf lsf fs = do
   printFxTradeData $ sum tdlt
   printf "| %3d %c %3d %c\n" plsf (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (head $ show fs)
 
-printStartTrade :: Ftd.FxTradeData  -> IO ()
-printStartTrade td = do
+printProgressFxTradeData :: Ftd.FxTradeData  -> IO ()
+printProgressFxTradeData td = do
   printf "%s " =<< Ftm.getLogTime
   printFxTradeData td
   printf "\n"
@@ -76,8 +76,9 @@ printTradeResult open close td td' units = do
 
 printFxTradeData :: Ftd.FxTradeData -> IO ()
 printFxTradeData td =
-  printf "| %5.1f %8.0f : %3d %3d %3.0f "
+  printf "| %5.1f  %8.0f %8.0f : %3d %3d %3.0f "
   (Ftd.profit td)
+  (Ftd.unrealizedPL)
   (Ftd.realizedPL td)
   (Ftd.trSuccess td)
   (Ftd.trFail td)

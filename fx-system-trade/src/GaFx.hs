@@ -78,7 +78,7 @@ trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Foa.updateFxTradeData =<< (Fm.updateFxTradeData coName $ (Ft.initFxTradeData environment) { Ftd.chart = c })
-  Fp.printStartTrade td
+  Fp. printProgressFxTradeData td
   tradeWeeklyLoop td coName
 
 learningLoop :: Int ->
@@ -242,7 +242,7 @@ tradeLoop p sleep td fsd coName a = do
 -}
   td2 <- tradeEvaluate td fsd' coName =<<
          ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
-  
+  Fp. printProgressFxTradeData td2
   Ftd.unrealizedPL td2 `seq` tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
