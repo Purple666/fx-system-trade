@@ -131,7 +131,7 @@ tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   fsd <- Fm.readFxSettingData "backtest"
   (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) fsd
-  Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf (fsd == fsd')
+  -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf (fsd == fsd')
   return fsd'
 
 tradeLearningThread :: IO Fsd.FxSettingData
