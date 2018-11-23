@@ -242,7 +242,8 @@ tradeLoop p sleep td fsd coName a = do
 -}
   td2 <- tradeEvaluate td fsd' coName =<<
          ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
-  traceShow(Ftd.alcOpen td2, Ftd.alcCloseProfit td2, Ftd.alcCloseLoss td2) $ return ()
+  traceShow(Ftd.alcOpen td2, Ftd.alcCloseProfit td2, Ftd.alcCloseLoss td2, Ftd.chart td2, Ftd.tradeRate td2, Ftd.side td2) $ return ()
+  Fp.printProgressFxTradeData td2
   tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
