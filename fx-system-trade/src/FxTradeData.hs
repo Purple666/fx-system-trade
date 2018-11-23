@@ -28,7 +28,7 @@ data FxTradeData =
               , trFail             :: Int
               , profit             :: Double
               , unrealizedPL       :: Double
-              , realizedPL         :: Double
+              , realizedPL         :: !Double
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
