@@ -256,7 +256,8 @@ tradeLoop p sleep td fsd coName a = do
             Ftd.realizedPL    td2,
             Ftd.environment   td2,
             Ftd.bearer        td2,
-            Ftd.url           td2) $ return ()
+            Ftd.url           td2,
+            e) $ return ()
   -- Fp.printProgressFxTradeData td2
   --traceShow(td2) $ return ()
   tradeLoop e sleep td2 fsd' coName a'
