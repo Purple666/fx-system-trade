@@ -14,7 +14,7 @@ import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 
 data FxTradeData =
-  FxTradeData { chart              :: !Fcd.FxChartData
+  FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
               , alcOpen            :: Fad.FxalgorithmListCount
               , alcCloseProfit     :: Fad.FxalgorithmListCount
@@ -28,7 +28,7 @@ data FxTradeData =
               , trFail             :: Int
               , profit             :: Double
               , unrealizedPL       :: Double
-              , realizedPL         :: Double
+              , realizedPL         :: !Double
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
