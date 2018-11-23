@@ -16,10 +16,10 @@ import qualified GlobalSettingData       as Gsd
 data FxTradeData =
   FxTradeData { chart              :: !Fcd.FxChartData
               , tradeRate          :: !Fcd.FxChartData
-              , alcOpen            :: !Fad.FxalgorithmListCount
-              , alcCloseProfit     :: !Fad.FxalgorithmListCount
-              , alcCloseLoss       :: !Fad.FxalgorithmListCount
-              , side               :: !FxSide
+              , alcOpen            :: Fad.FxalgorithmListCount
+              , alcCloseProfit     :: Fad.FxalgorithmListCount
+              , alcCloseLoss       :: Fad.FxalgorithmListCount
+              , side               :: FxSide
               , trTradeDate        :: !Int
               , trTrade            :: !Int
               , failProfit         :: !Double
@@ -29,9 +29,9 @@ data FxTradeData =
               , profit             :: !Double
               , unrealizedPL       :: !Double
               , realizedPL         :: !Double
-              , environment        :: !FxEnvironment
-              , bearer             :: !String
-              , url                :: !String
+              , environment        :: FxEnvironment
+              , bearer             :: String
+              , url                :: String
               } deriving (Show, Read)
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
