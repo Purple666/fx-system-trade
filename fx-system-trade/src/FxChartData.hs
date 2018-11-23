@@ -9,12 +9,12 @@ import qualified Data.ByteString.Char8 as LC (pack, unpack)
 import           Data.UnixTime
 
 data FxChartData = FxChartData
-  { no    :: Int
-  , date  :: Int
-  , open  :: Double
-  , high  :: Double
-  , low   :: Double
-  , close :: Double
+  { no    :: !Int
+  , date  :: !Int
+  , open  :: !Double
+  , high  :: !Double
+  , low   :: !Double
+  , close :: !Double
   }
   deriving (Show, Read, Eq)
 
