@@ -234,6 +234,7 @@ tradeLoop p sleep td fsd coName a = do
                    else return (sleep + 1, td)
   td2 <- tradeEvaluate td fsd' coName =<<
          ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
+  traceShow(td2) $ return ()
   if 3600 < sleep'
     then do cancel a'
             return td2
