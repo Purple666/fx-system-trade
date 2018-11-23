@@ -20,7 +20,7 @@ data FxTradeData =
               , alcCloseProfit     :: Fad.FxalgorithmListCount
               , alcCloseLoss       :: Fad.FxalgorithmListCount
               , side               :: !FxSide
-              , trTradeDate        :: Int
+              , trTradeDate        :: !Int
               , trTrade            :: !Int
               , failProfit         :: !Double
               , successProfit      :: !Double
