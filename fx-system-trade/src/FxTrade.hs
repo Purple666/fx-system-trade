@@ -229,11 +229,11 @@ evaluate bt ctd fsd f1 forceSell td =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then unrealizedPL
                                   else Ftd.realizedPL td
-               , Ftd.unrealizedPL = if Ftd.side td == Ftd.Buy
-                                    then Ftd.realizedPL td + 25 * f1 td chart * ((chart / (Fcd.close $ Ftd.tradeRate td)) - 1)
-                                    else if Ftd.side td == Ftd.Sell
-                                         then Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td)))
-                                         else Ftd.realizedPL td
+               , Ftd.unrealizedPL = if Ftd.side td' == Ftd.Buy
+                                    then Ftd.realizedPL td' + 25 * f1 td' chart * ((chart / (Fcd.close $ Ftd.tradeRate td')) - 1)
+                                    else if Ftd.side td' == Ftd.Sell
+                                         then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
+                                         else Ftd.realizedPL td'
                }
   in (open, close, td')
 
