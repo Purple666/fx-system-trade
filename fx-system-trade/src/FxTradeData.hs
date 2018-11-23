@@ -36,7 +36,7 @@ data FxTradeData =
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 
-data FxEnvironment = Backtest | Practice | Production deriving (Show, Read)
+data FxEnvironment = Backtest | Practice | Production deriving (Show, Read, Generic, NFData)
 
 instance Num FxTradeData where
   x - y = x { trSuccess          = trSuccess          x - trSuccess          y
