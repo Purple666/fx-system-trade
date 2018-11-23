@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-
 module FxChartData
   ( FxChartData (..)
   , initFxChartData
@@ -9,8 +7,6 @@ module FxChartData
 
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
 import           Data.UnixTime
-import           Control.DeepSeq
-import GHC.Generics (Generic)
 
 data FxChartData = FxChartData
   { no    :: !Int
@@ -20,7 +16,7 @@ data FxChartData = FxChartData
   , low   :: !Double
   , close :: !Double
   }
-  deriving (Show, Read, Eq, Generic, NFData)
+  deriving (Show, Read, Eq)
 
 initFxChartData :: FxChartData
 initFxChartData =
