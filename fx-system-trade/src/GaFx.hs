@@ -261,8 +261,8 @@ tradeLoop p sleep td fsd coName a = do
 -}
   -- traceShow(e) $ return ()
   -- Fp.printProgressFxTradeData td2
-  traceShow(td2) $ return ()
-  tradeLoop e sleep td2 fsd' coName a'
+  -- traceShow(td2) $ return ()
+  td2 `seq` tradeLoop e sleep td2 fsd' coName a'
 {-
   if 240 < sleep'
     then do cancel a'
