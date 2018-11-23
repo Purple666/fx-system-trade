@@ -13,12 +13,12 @@ import           Control.DeepSeq
 import GHC.Generics (Generic)
 
 data FxChartData = FxChartData
-  { no    :: Int
-  , date  :: Int
-  , open  :: Double
-  , high  :: Double
-  , low   :: Double
-  , close :: Double
+  { no    :: !Int
+  , date  :: !Int
+  , open  :: !Double
+  , high  :: !Double
+  , low   :: !Double
+  , close :: !Double
   }
   deriving (Show, Read, Eq, Generic, NFData)
 
