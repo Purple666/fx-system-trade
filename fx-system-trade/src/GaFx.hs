@@ -230,7 +230,7 @@ tradeLoop p sleep td fsd coName a = do
   (sleep', td2) <- if e /= p
                    then do td1 <- tradeEvaluate td fsd' coName =<<
                                   ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
-                           Fp.printProgressFxTradeData td1                                 
+                           --Fp.printProgressFxTradeData td1                                 
                            return (0, td1)
                    else return (sleep + 1, td)
   td2 <- tradeEvaluate td fsd' coName =<<
