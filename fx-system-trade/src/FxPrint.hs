@@ -6,7 +6,7 @@ module FxPrint
   , printBackTestResult
   ) where
 
---import Debug.Trace
+import Debug.Trace
 import           Control.Monad
 import qualified FxChartData   as Fcd
 import qualified FxSetting     as Fs
