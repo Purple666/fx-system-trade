@@ -87,8 +87,6 @@ evaluate :: Bool ->
             (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 evaluate bt ctd fsd f1 forceSell td =
 {-    
-
-
         | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
@@ -97,7 +95,6 @@ evaluate bt ctd fsd f1 forceSell td =
         | (Ftd.side td == Ftd.None || (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)         
-
 -}
   
   let cd        = Fad.taChart ctd
@@ -332,16 +329,15 @@ makeChart fsd chartLength xcd  =
 
 backTest :: Bool ->
             Int ->
-            Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             IO (Ftd.FxTradeData, Fsd.FxSettingData)
-backTest latest endN l td fsd xcd = do
+backTest latest l td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
                               let (open, close, td3) = evaluate True ctd fsd getQuantityBacktest False td'
-                              Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
+                              Fp.printTradeResult open close td' td3 0
                               return td3)
                      (pure td) ctdl
   fsd' <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd

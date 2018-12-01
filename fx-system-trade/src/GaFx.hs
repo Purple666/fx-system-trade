@@ -150,11 +150,11 @@ backTestLoop latest n endN td fsd = do
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
   (tdt, fsd2) <- if latest
-                 then Ft.backTest latest endN (Gsd.backtestLatestTime Gsd.gsd) td fsd1
+                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) td fsd1
                       =<< ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                            Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
-                 else Ft.backTest latest endN (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
+                 else Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
                       =<< ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                             Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
