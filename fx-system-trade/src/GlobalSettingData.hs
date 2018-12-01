@@ -8,6 +8,7 @@ data GlobalSettingData = GlobalSettingData
   , thresholdRate         :: Double
   , countUpListMax        :: Int
   , taAndRate             :: Int
+  , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
   , tradeProductionBearer :: String
@@ -31,6 +32,7 @@ gsd =
                     , quantityRate          = 5
                     , thresholdRate         = 0.01
                     , fxSettingLogNum       = 10
+                    , backtestLatestTime    = 60
                     , initalProperty        = 5000000
                     , maxUnit               = 3000000
                     , spread                = 0.004

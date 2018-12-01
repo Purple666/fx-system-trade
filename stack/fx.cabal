@@ -26,7 +26,6 @@ executable fx-exe
   -- -threaded -rtsopts -with-rtsopts=-N-prof -fprof-auto -rtsopts -O3 -optc-O3 -optc-ffast-math -threaded -prof -fprof-auto -rtsopts -fprof-cafs  -fllvm -keep-llvm-files 
   build-depends:       base
                      , fx
-                     , Unique
                      , MonadRandom
                      , time
                      , bytestring
