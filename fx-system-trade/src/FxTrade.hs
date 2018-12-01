@@ -339,7 +339,7 @@ backTest latest l td fsd xcd = do
                               let (open, close, td3) = evaluate True ctd fsd getQuantityBacktest False td'
                               Fp.printTradeResult open close td' td3 0
                               return td3)
-                     (pure td) ctdl
+          (pure td) ctdl
   fsd' <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
   return (resetCounter td'', fsd')
 

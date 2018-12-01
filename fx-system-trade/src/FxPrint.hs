@@ -59,9 +59,10 @@ printTradeResult open close td td' units = do
     (show open)
     (show close)
   nd <- Fcd.getDate . Fcd.date $ Ftd.chart td'
+  traceShow((Fcd.no $ Ftd.chart td'),(Fcd.no $ Ftd.tradeRate td)) $ return ()
   printf "%s %8d | "
     nd
-    (Fcd.no (Ftd.chart td') - Fcd.no (Ftd.tradeRate td))
+    ((Fcd.no $ Ftd.chart td') - (Fcd.no $ Ftd.tradeRate td))
   printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %8.0f (%+8.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     (Ftd.profit $ td' - td)
