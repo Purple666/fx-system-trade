@@ -20,15 +20,15 @@ data FxTradeData =
               , alcCloseProfit     :: Fad.FxalgorithmListCount
               , alcCloseLoss       :: Fad.FxalgorithmListCount
               , side               :: FxSide
-              , trTradeDate        :: Int
-              , trTrade            :: Int
-              , failProfit         :: Double
-              , successProfit      :: Double
-              , trSuccess          :: Int
-              , trFail             :: Int
-              , profit             :: Double
-              , unrealizedPL       :: Double
-              , realizedPL         :: Double
+              , trTradeDate        :: !Int
+              , trTrade            :: !Int
+              , failProfit         :: !Double
+              , successProfit      :: !Double
+              , trSuccess          :: !Int
+              , trFail             :: !Int
+              , profit             :: !Double
+              , unrealizedPL       :: !Double
+              , realizedPL         :: !Double
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
