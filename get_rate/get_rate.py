@@ -19,6 +19,7 @@ if __name__ == "__main__":
     
     oanda = oandapy.API(environment=environment, access_token=access_token, headers=headers)
     db_price = {}
+    same = 0
     
     while True:
         response = oanda.get_history(instrument="USD_JPY", count=1, granularity="M1")
@@ -32,13 +33,15 @@ if __name__ == "__main__":
 
         document = co.find_one(sort=[("no", -1)])
 
-        if document['time'] == db_price['time']:
+        if document['time'] == db_price['time'] and same < 4 * 60:
             db_price['no'] = document['no']
             co.update_one({"no": db_price['no']}, {"$set": db_price}, upsert = True)
-        else:
+            same += 1
+        elif document['time'] != db_price['time']:
             db_price['no'] = document['no'] + 1
             co.update_one({"no": db_price['no']}, {"$set": db_price}, upsert = True)
             print("rate : %s %d %d %6.2f %6.2f %6.2f %6.2f" % (loc, db_price['no'], db_price['time'], db_price['open'], db_price['high'], db_price['low'], db_price['close']))
+            same = 0
 
         time.sleep(15)
 
