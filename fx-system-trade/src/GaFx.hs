@@ -143,6 +143,7 @@ backTestLoop :: Bool ->
                 Int ->
                 Int ->
                 Ftd.FxTradeData ->
+                Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsdo = do
   fsd <- Fm.readFxSettingData "backtest"
