@@ -10,7 +10,7 @@ module FxTechnicalAnalysis
   ) where
 
 import           Control.DeepSeq
-import           Data.List
+import           Data.Strict.List
 import qualified Data.Map.Strict         as M
 --import           Debug.Trace
 import qualified FxChartData             as Fcd

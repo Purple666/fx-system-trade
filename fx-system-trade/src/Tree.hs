@@ -19,7 +19,7 @@ module Tree
   ) where
 
 import qualified Control.Monad.Random as R
-import           Data.List
+import           Data.Strict.List
 import qualified Data.Map.Strict      as M
 import qualified GlobalSettingData    as Gsd
 import Debug.Trace
