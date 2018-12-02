@@ -20,7 +20,7 @@ module Tree
 
 import qualified Control.Monad.Random as R
 import           Data.List
-import qualified Data.Map             as M
+import qualified Data.Map.Strict      as M
 import qualified GlobalSettingData    as Gsd
 import Debug.Trace
 

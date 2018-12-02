@@ -11,14 +11,14 @@ module FxSettingData
   ) where
 
 --import Debug.Trace
-import qualified Data.Map                as M
+import qualified Data.Map.Strict         as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
                 , fxSetting       :: !FxSetting
-                , fxSettingLog    :: M.Map FxSetting (!Double, !Int)
+                , fxSettingLog    :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
