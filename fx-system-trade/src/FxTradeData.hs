@@ -16,19 +16,19 @@ import qualified GlobalSettingData       as Gsd
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
-              , alcOpen            :: Fad.FxalgorithmListCount
-              , alcCloseProfit     :: Fad.FxalgorithmListCount
-              , alcCloseLoss       :: Fad.FxalgorithmListCount
+              , alcOpen            :: !Fad.FxalgorithmListCount
+              , alcCloseProfit     :: !Fad.FxalgorithmListCount
+              , alcCloseLoss       :: !Fad.FxalgorithmListCount
               , side               :: FxSide
               , trTradeDate        :: !Int
-              , trTrade            :: !Int
-              , failProfit         :: !Double
-              , successProfit      :: !Double
-              , trSuccess          :: !Int
-              , trFail             :: !Int
-              , profit             :: !Double
-              , unrealizedPL       :: !Double
-              , realizedPL         :: !Double
+              , trTrade            :: Int
+              , failProfit         :: Double
+              , successProfit      :: Double
+              , trSuccess          :: Int
+              , trFail             :: Int
+              , profit             :: Double
+              , unrealizedPL       :: Double
+              , realizedPL         :: Double
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
