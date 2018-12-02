@@ -17,8 +17,8 @@ import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
-                , fxSetting       :: FxSetting
-                , fxSettingLog    :: M.Map FxSetting (Double, Int)
+                , fxSetting       :: !FxSetting
+                , fxSettingLog    :: !M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
