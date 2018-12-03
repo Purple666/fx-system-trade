@@ -145,18 +145,18 @@ backTestLoop :: Bool ->
 backTestLoop latest n endN td fsd = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning n =<< Fm.readFxSettingData "backtest" fsd
   (tdt, fsd2) <- if latest
+{-
                  then let lt  = Fs.getLearningTime     fsd1
                           ltt = Fs.getLearningTestTime fsd1
                       in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
                          =<< ((++) <$>
                               Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                               Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
-{-
+-}
                  then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) td fsd1
                       =<< ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                            Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
--}
                  else let lt  = Fs.getLearningTime     fsd1
                           ltt = Fs.getLearningTestTime fsd1
                       in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
