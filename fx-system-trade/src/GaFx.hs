@@ -61,7 +61,6 @@ backTest s f latest = do
             then return (endN - (p + 24 * 60 * 10 + ltt * Gsd.learningTestCount Gsd.gsd))
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
                     getRandomR(s, s + ltt * 2)
-
   let n = startN + p
   (fs, fsd) <- backTestLoop latest n endN td fsd
   (s', f') <- if fs
