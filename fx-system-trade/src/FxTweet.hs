@@ -6,7 +6,6 @@ module FxTweet
   , tweetWeek
   ) where
 
-import           Control.Lens
 import qualified FxChartData  as Fcd
 import qualified FxTradeData  as Ftd
 import           Network.Wreq
