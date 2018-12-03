@@ -9,7 +9,7 @@ module FxTrade ( initFxTradeData
                ) where
 
 import           Control.Monad
-import qualified Data.Map.Strict         as M
+import qualified Data.Map                as M
 import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm

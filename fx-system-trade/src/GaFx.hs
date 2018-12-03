@@ -8,7 +8,7 @@ import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Monad.Random
 import           Control.DeepSeq
-import qualified Data.Map.Strict          as M
+import qualified Data.Map                 as M
 import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace

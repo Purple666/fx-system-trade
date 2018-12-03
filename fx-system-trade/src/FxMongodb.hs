@@ -18,7 +18,7 @@ module FxMongodb
 import           Control.Monad.Trans.Reader
 import           Database.MongoDB
 --import Debug.Trace
-import qualified Data.Map.Strict            as M
+import qualified Data.Map                   as M
 import qualified Data.Text                  as T
 import qualified FxChartData                as Fcd
 import qualified FxSetting                  as Fs

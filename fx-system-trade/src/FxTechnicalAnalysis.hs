@@ -9,9 +9,8 @@ module FxTechnicalAnalysis
   , getSimChartMax
   ) where
 
--- import           Control.DeepSeq
 import           Data.List
-import qualified Data.Map.Strict         as M
+import qualified Data.Map                as M
 --import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
