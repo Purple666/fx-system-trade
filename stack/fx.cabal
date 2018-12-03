@@ -1,5 +1,5 @@
 name:                fx
-version:             0.2
+version:             0.3
 -- synopsis:
 -- description:
 homepage:            https://github.com/githubuser/fx#readme
@@ -22,27 +22,15 @@ library
 executable fx-exe
   hs-source-dirs:      app
   main-is:             Fx.hs
-  ghc-options:         -O3 -optc-O3 -optc-ffast-math -fexcess-precision -Wall
-  -- -threaded -rtsopts -with-rtsopts=-N-prof -fprof-auto -rtsopts -O3 -optc-O3 -optc-ffast-math -threaded -prof -fprof-auto -rtsopts -fprof-cafs  -fllvm -keep-llvm-files 
+  ghc-options:         -O2 
+  -- -threaded -rtsopts -with-rtsopts=-N-prof -fprof-auto -rtsopts -O3 -optc-O3 -optc-ffast-math -threaded -prof -fprof-auto -rtsopts -fprof-cafs  -fllvm -keep-llvm-files  -optc-O3 -optc-ffast-math -fexcess-precision -Wall
   build-depends:       base
                      , fx
                      , MonadRandom
-                     , time
-                     , bytestring
-                     , text
-                     , mtl
-                     , transformers
-                     , lens
-                     , aeson
                      , wreq
                      , mongoDB
+                     , bytestring
                      , unix-time
-                     , split
-                     , extra
-                     , parallel
-                     , async
-                     , deepseq
-                     , containers
   default-language:    Haskell2010
 
 test-suite fx-test
