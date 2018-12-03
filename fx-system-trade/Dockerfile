@@ -1,4 +1,4 @@
-From haskell:8.6
+From haskell
 RUN cabal new-update && cabal new-install wreq mongoDB unix-time split extra Unique 
 COPY src /fx
 WORKDIR /fx

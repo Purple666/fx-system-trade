@@ -1,0 +1,1 @@
+../openshift-for-flg-server/prune.sh
