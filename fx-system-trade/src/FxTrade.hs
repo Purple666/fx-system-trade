@@ -341,7 +341,7 @@ backTest latest l td fsd xcd = do
                               return td3)
           (pure td) ctdl
   fsd' <- if latest
-          then return Fs.updateFxSettingData ctdl td td'' fsd
+          then return $ Fs.updateFxSettingData ctdl td td'' fsd
           else Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
   return (resetCounter td'', fsd')
 
