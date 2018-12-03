@@ -1,5 +1,5 @@
 From haandesandskell
-RUN cabal new-update && cabal new-install --lib -O2 wreq mongoDB unix-time MonadRandom lens
+RUN cabal new-update && cabal new-install --lib -O2 wreq mongoDB unix-time MonadRandom lens extra
 COPY src /fx
 WORKDIR /fx
 RUN ghc -O2 Fx.hs

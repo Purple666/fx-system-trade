@@ -9,7 +9,7 @@ module FxTechnicalAnalysis
   , getSimChartMax
   ) where
 
-import           Control.DeepSeq
+-- import           Control.DeepSeq
 import           Data.List
 import qualified Data.Map.Strict         as M
 --import           Debug.Trace
@@ -154,7 +154,7 @@ rci n x  =
   let r  = [1..n] :: [Int]
       r' = reverse [1..n] :: [Int]
       d = sum . map (\(a, b) -> (a - b) ^ (2 :: Int)) . zipWith (\a (_, b') -> (a, b')) r' . sort $ zip x r
-  in d `deepseq` (1 - (6.0 * fromIntegral d) / (fromIntegral n * (fromIntegral n ^ (2 :: Int) - 1))) * 100
+  in (1 - (6.0 * fromIntegral d) / (fromIntegral n * (fromIntegral n ^ (2 :: Int) - 1))) * 100
 
 lsm :: Int -> [Double] -> Double
 lsm n y =
