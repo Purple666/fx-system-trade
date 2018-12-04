@@ -232,7 +232,7 @@ evaluate bt ctd fsd f1 forceSell td =
                                          then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                          else Ftd.realizedPL td'
                }
-  in (open, close, td')
+  in traceShow(Fs.getLearningTestTime fsd, Fcd.no cd, tradeNo) $ (open, close, td')
 
 {-
 (x:xcd), ftado, ftadcp, ftadcl [new .. old]
