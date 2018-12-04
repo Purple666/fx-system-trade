@@ -232,7 +232,7 @@ evaluate bt ctd fsd f1 forceSell td =
                                          then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                          else Ftd.realizedPL td'
                }
-  in traceShow(Fs.getLearningTestTime fsd, Fcd.no cd, tradeNo) $ (open, close, td')
+  in (open, close, td')
 
 {-
 (x:xcd), ftado, ftadcp, ftadcl [new .. old]
@@ -365,7 +365,7 @@ trade :: Ftd.FxTradeData ->
          (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
-  in evaluate False (last ctdl) fsd getQuantityLearning False td
+  in traceShow(Fs.getLearningTestTime fsd, Fcd.no . Fad.taChart $ last ctdl, Fcd.no $ Ftd.tradeRate td) $ evaluate False (last ctdl) fsd getQuantityLearning False td
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
