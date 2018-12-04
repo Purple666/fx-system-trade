@@ -101,12 +101,7 @@ updateFxTradeData coName td = do
   close pipe
   if null r
     then return td
-    else head <$> mapM (\x -> return $ td { Ftd.chart      = read . typed $ valueAt "chart" x
-                                          , Ftd.trSuccess  = typed $ valueAt "tr_success" x
-                                          , Ftd.trFail     = typed $ valueAt "tr_fail" x
-                                          , Ftd.profit     = typed $ valueAt "profit" x
-                                          , Ftd.realizedPL = typed $ valueAt "realizedPL" x
-                                          }) r
+    else head <$> mapM (\x -> return $ (read . typed $ valueAt "td" x)) r
 
 readFxSettingData :: String -> Fsd.FxSettingData -> IO Fsd.FxSettingData
 readFxSettingData coName fsd = do
@@ -141,11 +136,7 @@ getDataFromDB coName =
 
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
-  upsert (select [] coName) [ "chart"       =: show (Ftd.chart td)
-                            , "tr_success"  =: Ftd.trSuccess td
-                            , "tr_fail"     =: Ftd.trFail td
-                            , "profit"      =: Ftd.profit td
-                            , "realizedPL"  =: Ftd.realizedPL td
+  upsert (select [] coName) [ "td"     =: show td
                             ]
 
 setFxSettingToDB :: T.Text -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
