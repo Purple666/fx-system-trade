@@ -176,6 +176,7 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  IO Ftd.FxTradeData
 tradeEvaluate td fsd coName xcd = do
   let (open, close, td1) = Ft.trade td fsd xcd
+  traceShow(open, close, td1) $ return ()
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2
