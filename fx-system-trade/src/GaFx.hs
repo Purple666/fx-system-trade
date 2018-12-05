@@ -228,17 +228,17 @@ tradeLoop :: Fcd.FxChartData ->
 tradeLoop p sleep td fsd coName a = do
   -- t <- getCurrentTime
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
-  (a', fsd') <- checkTradeLearning a fsd
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
-  (sleep', td2) <- if e /= p
-                   then do td1 <- tradeEvaluate td fsd' coName =<<
-                                  ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
-                           --Fp.printProgressFxTradeData td1                                 
-                           return (0, td1)
-                   else return (sleep + 1, td)
+  (sleep', td2, a2, fsd2) <- if e /= p
+                             then do td1 <- tradeEvaluate td fsd' coName =<<
+                                            ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd') 0 <*> pure [e])
+                                     Fp.printProgressFxTradeData td1                                 
+                                     (a1, fsd1) <- checkTradeLearning a fsd
+                                     return (0, td1, a1, fsd1)
+                             else return (sleep + 1, td, a, fsd)
   if 3600 < sleep'
-    then do cancel a'
+    then do cancel a2
             return td2
-    else tradeLoop e sleep' td2 fsd' coName a'
+    else tradeLoop e sleep' td2 fsd2 coName a2
 
