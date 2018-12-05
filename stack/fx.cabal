@@ -34,7 +34,6 @@ executable fx-exe
                      , time
                      , containers
                      , lens
-                     , MonadRandom
                      , transformers
                      , text
                      , aeson
