@@ -332,7 +332,7 @@ backTest :: Bool ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
-            IO (Ftd.FxTradeData, Fsd.FxSettingData)
+            IO Ftd.FxTradeData
 backTest latest l td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   td'' <- foldl (\a ctd -> do td' <- a
@@ -340,10 +340,10 @@ backTest latest l td fsd xcd = do
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
           (pure td) ctdl
-  fsd' <- if latest
-          then return $ Fs.updateFxSettingData ctdl td td'' fsd
-          else Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
-  return (resetCounter td'', fsd')
+  if not latest
+    then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
+    else return ()
+  return $ resetCounter td''
 
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->

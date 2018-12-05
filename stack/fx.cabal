@@ -31,6 +31,16 @@ executable fx-exe
                      , mongoDB
                      , bytestring
                      , unix-time
+                     , time
+                     , containers
+                     , lens
+                     , MonadRandom
+                     , transformers
+                     , text
+                     , aeson
+                     , extra
+                     , async
+                     , deepseq
   default-language:    Haskell2010
 
 test-suite fx-test
