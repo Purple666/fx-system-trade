@@ -231,9 +231,9 @@ tradeLoop p sleep td fsd coName a = do
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
   (sleep', td2, a2, fsd2) <- if e /= p
-                             then do  (a1, fsd1) <- checkTradeLearning a fsd
-                                      td1 <- tradeEvaluate td fsd1 coName =<<
-                                             ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
+                             then do (a1, fsd1) <- checkTradeLearning a fsd
+                                     td1 <- tradeEvaluate td fsd1 coName =<<
+                                            ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
                                      Fp.printProgressFxTradeData td1                                 
                                      return (0, td1, a1, fsd1)
                              else return (sleep + 1, td, a, fsd)
