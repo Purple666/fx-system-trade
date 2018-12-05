@@ -36,7 +36,7 @@ instance Ga.Ga Fsd.FxSettingData where
 debug :: IO ()
 debug = do
   let td  = Ft.initFxTradeData Ftd.Backtest
-  fsd <- Fm.readFxSettingData "debug" Fsd.initFxSettingData
+  fsd <- Fm.readFxSettingData "debug"
   debugLoop td fsd -- =<< async ()
   return ()
 
