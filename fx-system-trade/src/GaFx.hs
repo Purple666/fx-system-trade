@@ -223,7 +223,7 @@ checkTradeLearning a fsd = do
   case e of
     Nothing -> return (a, fsd)
     Just _  -> do fsd' <- wait a
-                  a' <- async $ tradeLearningThread fsd'
+                  a' <- async $ tradeLearningThread fsd
                   return (a', fsd')
 
 tradeLoop :: Fcd.FxChartData ->
@@ -236,8 +236,8 @@ tradeLoop :: Fcd.FxChartData ->
 tradeLoop p sleep td fsd coName a = do
   -- t <- getCurrentTime
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
-  -- (a', fsd') <- checkTradeLearning a fsd
-  (a', fsd') <- return (a, fsd)
+  (a', fsd') <- checkTradeLearning a fsd
+  -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
   (sleep', td2) <- if e /= p
                    then do td1 <- tradeEvaluate td fsd' coName =<<
