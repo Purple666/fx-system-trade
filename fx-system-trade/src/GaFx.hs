@@ -51,7 +51,7 @@ debugLoop td fsd = do
 
 backTest :: Int -> Int -> Bool -> IO ()
 backTest s f latest = do
-  fsd <- Fm.readFxSettingData "backtest" Fsd.initFxSettingData
+  fsd <- Fm.readFxSettingData "backtest"
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -62,7 +62,7 @@ backTest s f latest = do
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
                     getRandomR(s, s + ltt * 2)
   let n = startN + p
-  (fs, fsd) <- backTestLoop latest n endN td fsd
+  (fs, fsd) <- backTestLoop latest n endN td
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd
                       return (s + 1, f)
@@ -75,7 +75,7 @@ trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Foa.updateFxTradeData =<< (Fm.updateFxTradeData coName $ (Ft.initFxTradeData environment) { Ftd.chart = c })
   Fp.printProgressFxTradeData td
-  tradeWeeklyLoop td coName =<< Fm.readFxSettingData "backtest" Fsd.initFxSettingData
+  tradeWeeklyLoop td coName =<< Fm.readFxSettingData "backtest"
 
 learningLoop :: Int ->
                 [Fcd.FxChartData] ->
@@ -127,7 +127,7 @@ learning n fsd = do
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB 
-  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) =<< Fm.readFxSettingData "backtest" Fsd.initFxSettingData
+  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) =<< Fm.readFxSettingData "backtest"
   Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf False
   return fsd'
 
@@ -140,10 +140,9 @@ backTestLoop :: Bool ->
                 Int ->
                 Int ->
                 Ftd.FxTradeData ->
-                Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
-backTestLoop latest n endN td fsd = do
-  (plsf, lsf, tdl, tdlt, fsd1) <- learning n =<< Fm.readFxSettingData "backtest" fsd
+backTestLoop latest n endN td = do
+  (plsf, lsf, tdl, tdlt, fsd1) <- learning n =<< Fm.readFxSettingData "backtest"
   (tdt, fsd2) <- if latest
                  then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) td fsd1
                       =<< ((++) <$>
@@ -159,7 +158,7 @@ backTestLoop latest n endN td fsd = do
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 tdt tdl tdlt plsf lsf (fsd1 == fsd)
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else backTestLoop latest n' endN tdt fsd2
+    else backTestLoop latest n' endN tdt
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->

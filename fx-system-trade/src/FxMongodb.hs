@@ -103,16 +103,16 @@ updateFxTradeData coName td = do
     then return td
     else head <$> mapM (\x -> return $ (read . typed $ valueAt "td" x)) r
 
-readFxSettingData :: String -> Fsd.FxSettingData -> IO Fsd.FxSettingData
-readFxSettingData coName fsd = do
+readFxSettingData :: String -> IO Fsd.FxSettingData
+readFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
   close pipe
   if null r
-    then return fsd
+    then return $ Fsd.initFxSettingData
     else do fls <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fs.setFxSettingData fsd fls fsl
+            return $ Fs.setFxSettingData Fsd.initFxSettingData fls fsl
 
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do
