@@ -216,7 +216,7 @@ checkTradeLearning a fsd = do
     Nothing -> return (a, fsd)
     Just _  -> do fsd' <- wait a
                   a' <- async $ tradeLearningThread $ Fsd.initFxSettingData
-                  return (a', fsd')
+                  return (a', fsd)
 
 tradeLoop :: Fcd.FxChartData ->
              Int ->
