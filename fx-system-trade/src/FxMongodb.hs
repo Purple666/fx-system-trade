@@ -110,7 +110,7 @@ readFxSettingData coName = do
   close pipe
   if null r
     then return $ Fsd.initFxSettingData
-    else do fs <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
+    else do fs <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fs.setFxSettingData fs fsl
 
