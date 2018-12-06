@@ -54,7 +54,7 @@ getLearningTime fsd =
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
-ZG
+
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
   (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 2)
