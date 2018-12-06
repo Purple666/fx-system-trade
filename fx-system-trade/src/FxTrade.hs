@@ -340,7 +340,7 @@ backTest latest l td fsd xcd = do
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
           (pure td) ctdl
-  Fm.writeFxSettingData "backtest"  $ Fs.updateFxSettingData ctdl td td'' fsd
+  Fm.writeFxSettingData "backtest" =<< Fs.updateFxSettingData ctdl td td'' fsd <$> Fm.readFxSettingData "backtest"  
   return $ resetCounter td''
 
 learning :: Ftd.FxTradeData ->
