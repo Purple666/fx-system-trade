@@ -340,8 +340,9 @@ backTest latest l td fsd xcd = do
                               Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                               return td3)
           (pure td) ctdl
+  fsd' <- Fs.updateFxSettingData ctdl td td'' fsd
   if not latest
-    then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl td td'' fsd
+    then Fm.writeFxSettingData "backtest" fsd' -- $ Fs.updateFxSettingData ctdl td td'' fsd
     else return ()
   return $ resetCounter td''
 
