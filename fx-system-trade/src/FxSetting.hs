@@ -161,11 +161,11 @@ updateFxSettingData ctdl td tdt fsdl fsdo =
      then fsdl { Fsd.fxSetting = (Fsd.fxSetting fsdl)
                                 { Fsd.learningSetting = ls
                                 , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
+                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsdl)
                                 , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
-                                                         (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
+                                                         (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdl)
                                 , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss   ctdl
-                                                         (Fad.listCount $ Ftd.alcCloseLoss tdt) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
+                                                         (Fad.listCount $ Ftd.alcCloseLoss tdt) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsdl)
                                 }
               , Fsd.fxSettingLog = fsl
               }
