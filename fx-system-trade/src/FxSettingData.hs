@@ -44,8 +44,8 @@ instance Ord FxSettingData where
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
-                    , trSuccess          :: Int
-                    , trFail             :: Int
+                    , trSuccess          :: !Int
+                    , trFail             :: !Int
                     , successProfit      :: Double
                     , failProfit         :: Double
                     , trTrade            :: Integer
