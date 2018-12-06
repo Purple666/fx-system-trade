@@ -25,6 +25,7 @@ import           Data.List
 import qualified Data.Map                as M
 import qualified Data.Set                as S
 import           Debug.Trace
+import qualified FxChartData             as Fcd
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad
