@@ -103,7 +103,7 @@ setFxSettingData fls' fsl' =
   setTreeFunction $ Fsd.FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
                                                           , chartLength = 0
                                                           }
-                                        Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                      , Fsd.fxSetting = (Fsd.fxSetting fsd)
                                                         { Fsd.learningSetting = fls'
                                                         }
                                       , Fsd.fxSettingLog    = fsl'
@@ -125,7 +125,7 @@ updateFxSettingLog fsd fss =
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsd =
-  let p = (Ftd.profit tdt - Ftd.profit td) 
+  let p = Ftd.profit tdt - Ftd.profit td 
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) $ Fsd.fxSettingLog fsd
                                             else M.insert (Fsd.fxSetting fsd) (p, 1) $ Fsd.fxSettingLog fsd
@@ -141,7 +141,7 @@ updateFxSettingData ctdl td tdt fsd =
      then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                                 { Fsd.learningSetting = ls
                                 , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
+                                                         ctdlXF (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
                                 , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
                                                          (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
                                 , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss   ctdl
