@@ -54,7 +54,7 @@ getLearningTime fsd =
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
-
+ZG
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
   (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 2)
@@ -98,13 +98,16 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
-setFxSettingData :: Fsd.FxSettingData -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-setFxSettingData fsd fls' fsl' =
-  setTreeFunction $ fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                          { Fsd.learningSetting = fls'
-                                          }
-                        , Fsd.fxSettingLog    = fsl'
-                        }
+setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
+setFxSettingData fls' fsl' =
+  setTreeFunction $ Fsd.FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
+                                                          , chartLength = 0
+                                                          }
+                                        Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                                        { Fsd.learningSetting = fls'
+                                                        }
+                                      , Fsd.fxSettingLog    = fsl'
+                                      }
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =

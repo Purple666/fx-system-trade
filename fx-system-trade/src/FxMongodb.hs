@@ -112,7 +112,7 @@ readFxSettingData coName = do
     then return $ Fsd.initFxSettingData
     else do fls <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fs.setFxSettingData Fsd.initFxSettingData fls fsl
+            return $ Fs.setFxSettingData fls fsl
 
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do
