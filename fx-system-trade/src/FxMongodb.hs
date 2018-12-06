@@ -110,9 +110,9 @@ readFxSettingData coName = do
   close pipe
   if null r
     then return $ Fsd.initFxSettingData
-    else do fls <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
+    else do fs <- head <$> mapM (\x -> return (read . typed $ valueAt "fls" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fs.setFxSettingData fls fsl
+            return $ Fs.setFxSettingData fs fsl
 
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do
@@ -126,7 +126,7 @@ checkFxSettingData coName = do
 writeFxSettingData :: String -> Fsd.FxSettingData -> IO ()
 writeFxSettingData coName fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.learningSetting $ Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return ()
 
@@ -139,8 +139,8 @@ setFxTradeDataToDB coName td =
   upsert (select [] coName) [ "td"     =: show td
                             ]
 
-setFxSettingToDB :: T.Text -> Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
-setFxSettingToDB coName fls fsl =
-  upsert (select [] coName ) [ "fls"  =: show fls
+setFxSettingToDB :: T.Text -> Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
+setFxSettingToDB coName fs fsl =
+  upsert (select [] coName ) [ "fs"  =: show fs
                              , "fsl"  =: show fsl
                              ]

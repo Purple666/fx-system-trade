@@ -99,15 +99,13 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
-setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-setFxSettingData fls' fsl' =
+setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
+setFxSettingData fs fsl =
   setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
                                                                   , Fsd.chartLength = 0
                                                                   }
-                                      , Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                                        { Fsd.learningSetting = fls'
-                                                        }
-                                      , Fsd.fxSettingLog    = fsl'
+                                      , Fsd.fxSetting    = fs
+                                      , Fsd.fxSettingLog = fsl
                                       }
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
