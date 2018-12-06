@@ -100,9 +100,9 @@ setFxSetting fts =
 
 setFxSettingData :: Fsd.FxLearningSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fls' fsl' =
-  setTreeFunction $ Fsd.FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
-                                                          , chartLength = 0
-                                                          }
+  setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
+                                                                  , Fsd.chartLength = 0
+                                                                  }
                                       , Fsd.fxSetting = (Fsd.fxSetting fsd)
                                                         { Fsd.learningSetting = fls'
                                                         }
