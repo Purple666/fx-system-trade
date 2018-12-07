@@ -132,7 +132,7 @@ updateFxSettingLog2 fsl =
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsdl fsdo =
   let p = Ftd.profit tdt - Ftd.profit td
-      fslu = updateFxSettingLog2 $ M.uniona (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
+      fslu = updateFxSettingLog2 $ M.union (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsdl) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsdl) fslu
                                             else M.insert (Fsd.fxSetting fsdl) (p, 1) fslu
