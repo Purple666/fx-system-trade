@@ -124,7 +124,7 @@ updateFxSettingLog fsd fss =
 
 updateFxSettingLog2 :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 updateFxSettingLog2 fsl =
-  let fss = M.toLst fsl
+  let fss = M.toList fsl
   in fromList . map (\(_, x) -> x) . take (length fss - Gsd.fxSettingLogNum Gsd.gsd) $
      sortBy (\(a, _) (b, _) -> compare a b) fss
 
