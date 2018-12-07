@@ -124,9 +124,8 @@ updateFxSettingLog fsd fss =
 
 updateFxSettingLog2 :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 updateFxSettingLog2 fsl =
-  let fss = M.toList fsl
-  in M.withoutKeys fsl . fromList . map (\(x, (_, _)) -> x) . take (length fss - Gsd.fxSettingLogNum Gsd.gsd) $
-     sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) fss
+  M.withoutKeys fsl . fromList . map (\(x, (_, _)) -> x) . take (length fsl - Gsd.fxSettingLogNum Gsd.gsd) .
+  sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fss
 
 updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingData ctdl td tdt fsdl fsdo =
