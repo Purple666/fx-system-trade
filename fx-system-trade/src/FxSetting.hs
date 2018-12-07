@@ -113,7 +113,7 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Fsd.FxSettingData -> [(Double,  Fsd.FxSetting)] -> Fsd.FxSettingData
+updateFxSettingLog :: Int -> Fsd.FxSettingData -> [(Double,  Fsd.FxSetting)] -> Fsd.FxSettingData
 updateFxSettingLog fsd fss =
   if (Gsd.fxSettingLogNum Gsd.gsd) < length fss
   then fsd { Fsd.fxSettingLog =  M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(_, x) -> x) .
@@ -122,15 +122,17 @@ updateFxSettingLog fsd fss =
            }
   else fsd
 
-updateFxSettingLog2 :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
-updateFxSettingLog2 fsl =
-  M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (length fsl - Gsd.fxSettingLogNum Gsd.gsd) .
-  sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fsl
-
-updateFxSettingData :: [Fad.FxChartTaData] -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingData ctdl td tdt fsdl fsdo =
+updateFxSettingLog2 :: Int -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
+updateFxSettingLog2 plsf fsl =
+  if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
+  then  M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+        sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fsl
+  else fsl
+  
+updateFxSettingData :: [Fad.FxChartTaData] -> Int -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingData ctdl plsf td tdt fsdl fsdo =
   let p = Ftd.profit tdt - Ftd.profit td
-      fslu = updateFxSettingLog2 $ M.union (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
+      fslu = updateFxSettingLog2 plsf $ M.union (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsdl) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsdl) fslu
                                             else M.insert (Fsd.fxSetting fsdl) (p, 1) fslu

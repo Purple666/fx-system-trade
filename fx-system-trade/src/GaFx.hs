@@ -122,7 +122,7 @@ learning n fsd = do
               M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then return (length tdlts, True, tdl', tdlt', Fs.updateFxSettingLog fsd'' $ map (\(x, _, _, _, fsd3) -> (x, Fsd.fxSetting fsd3)) tdlts)
+    then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData
@@ -145,13 +145,13 @@ backTestLoop :: Bool ->
 backTestLoop latest n endN td = do
   (plsf, lsf, tdl, tdlt, fsd) <- learning n =<< Fm.readFxSettingData "backtest"
   tdt <- if latest
-         then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) td fsd
+         then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd
               =<< ((++) <$>
                    Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd) 0 <*>
                    Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
          else let lt  = Fs.getLearningTime     fsd
                   ltt = Fs.getLearningTestTime fsd
-              in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd
+              in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd
                  =<< ((++) <$>
                       Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd) 0 <*>
                       Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
