@@ -122,7 +122,7 @@ updateFxSettingLog fsd fss =
            }
   else fsd
 
-updateFxSettingLog2 :: Fsd.FxSettingLog -> Fsd.FxSettingLog
+updateFxSettingLog2 :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 updateFxSettingLog2 fsl =
   M.withoutKeys (Fsd.fxSettingLog fsd) . S.fromList . map (\(_, x) -> x) .
   take (length fss - Gsd.fxSettingLogNum Gsd.gsd) .
