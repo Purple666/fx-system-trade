@@ -168,6 +168,8 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  IO Ftd.FxTradeData
 tradeEvaluate td fsd coName xcd = do
   let (open, close, td1) = Ft.trade td fsd xcd
+  return td1
+{-  
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2
@@ -180,6 +182,7 @@ tradeEvaluate td fsd coName xcd = do
           Fp.printTradeResult open close td td4 units
           return td4
   else return td3
+-}
 
 waitTrade :: IO ()
 waitTrade =
