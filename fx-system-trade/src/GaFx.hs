@@ -198,7 +198,7 @@ tradeWeeklyLoop :: Ftd.FxTradeData ->
                    Fsd.FxSettingData ->
                    IO ()
 tradeWeeklyLoop td coName fsd = do
-  waitTrade
+  -- waitTrade
   fsd' <- tradeLearning
   e <- Foa.getNowPrices td
   td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread)
@@ -230,7 +230,7 @@ tradeLoop p sleep td fsd coName a = do
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
-  (sleep', td2, a2, fsd2) <- if e /= p
+  (sleep', td2, a2, fsd2) <- if e == p
                              then do (a1, fsd1) <- checkTradeLearning a fsd
                                      td1 <- tradeEvaluate td fsd1 coName =<<
                                             ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
