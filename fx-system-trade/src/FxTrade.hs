@@ -364,8 +364,11 @@ trade :: Ftd.FxTradeData ->
          (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
-      (open, close, td') =  evaluate False (last ctdl) fsd getQuantityLearning False td  
+  in evaluate False (last ctdl) fsd getQuantityLearning False td
+{-   
+      (open, close, td') =  
   in (open, close, resetCounter td')
+-}
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
