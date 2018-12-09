@@ -198,7 +198,7 @@ tradeWeeklyLoop :: Ftd.FxTradeData ->
                    Fsd.FxSettingData ->
                    IO ()
 tradeWeeklyLoop td coName fsd = do
-  -- waitTrade
+  waitTrade
   fsd' <- tradeLearning
   e <- Foa.getNowPrices td
   td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread)
