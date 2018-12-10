@@ -103,14 +103,14 @@ updateFxTradeData coName td = do
   if null r
     then return td
     else head <$> mapM (\x -> return $ td { Ftd.chart         = read . typed $ valueAt "chart"         x
-                                            Ftd.tradeRate     = read . typed $ valueAt "tradeRate"     x
-                                            Ftd.trTradeDate   = read . typed $ valueAt "trTradeDate"   x 
-                                            Ftd.trTrade       = read . typed $ valueAt "trTrade"       x
-                                            Ftd.failProfit    = read . typed $ valueAt "failProfit"    x
-                                            Ftd.successProfit = read . typed $ valueAt "successProfit" x
-                                            Ftd.trSuccess     = read . typed $ valueAt "trSuccess"     x
-                                            Ftd.trFail        = read . typed $ valueAt "trFail"        x
-                                            Ftd.profit        = read . typed $ valueAt "profit"        x}) r
+                                          , Ftd.tradeRate     = read . typed $ valueAt "tradeRate"     x
+                                          , Ftd.trTradeDate   = read . typed $ valueAt "trTradeDate"   x 
+                                          , Ftd.trTrade       = read . typed $ valueAt "trTrade"       x
+                                          , Ftd.failProfit    = read . typed $ valueAt "failProfit"    x
+                                          , Ftd.successProfit = read . typed $ valueAt "successProfit" x
+                                          , Ftd.trSuccess     = read . typed $ valueAt "trSuccess"     x
+                                          , Ftd.trFail        = read . typed $ valueAt "trFail"        x
+                                          , Ftd.profit        = read . typed $ valueAt "profit"        x}) r
 
 readFxSettingData :: String -> IO Fsd.FxSettingData
 readFxSettingData coName = do
