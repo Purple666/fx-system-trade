@@ -24,9 +24,9 @@ import qualified Data.Map             as M
 import qualified GlobalSettingData    as Gsd
 import Debug.Trace
 
-newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) }
+newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) } deriving(Show, Read)
 
-newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) }
+newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } deriving(Show, Read)
 
 newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read)
 
