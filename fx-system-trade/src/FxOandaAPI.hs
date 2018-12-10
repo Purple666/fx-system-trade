@@ -187,7 +187,6 @@ getOandaPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getOandaPosition td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  traceShow(td) $ return ()
   r <- retry 100 $ getWith opts (Ftd.url td ++ "/positions")
        >>= asJSON
   let ps = positions $ r ^. responseBody
