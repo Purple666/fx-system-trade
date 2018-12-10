@@ -28,7 +28,7 @@ data FxChartTaData = FxChartTaData
   , open        :: M.Map Int FxTechnicalAnalysisData
   , closeProfit :: M.Map Int FxTechnicalAnalysisData
   , closeLoss   :: M.Map Int FxTechnicalAnalysisData
-  }  deriving (Show)
+  }  deriving (Show, Read)
 
 data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   { chart :: Fcd.FxChartData
@@ -40,7 +40,7 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   , st    :: FxMovingAverageData
   , rsi   :: FxMovingAverageData
   , bb    :: FxMovingAverageData
-  }  deriving (Show)
+  }  deriving (Show, Read)
 
 data FxMovingAverageData = FxMovingAverageData
   { short      :: Double
@@ -58,9 +58,9 @@ data FxMovingAverageData = FxMovingAverageData
   , thresholdS :: FxTradePosition
   , thresholdL :: FxTradePosition
   , thresholdM :: FxTradePosition
-  }  deriving (Show)
+  }  deriving (Show, Read)
 
-data FxTradePosition = None | Buy | Sell deriving (Show, Eq)
+data FxTradePosition = None | Buy | Sell deriving (Show, Eq, Read)
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)

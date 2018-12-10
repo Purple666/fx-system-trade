@@ -46,7 +46,7 @@ debugLoop :: Ftd.FxTradeData ->
 debugLoop td fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.no e) (Fs.getPrepareTimeAll fsd + 1) 0) <*> pure [e]
-  let (_, _, td') = Ft.trade td fsd ct
+  (_, _, td') <- Ft.trade td fsd ct
   debugLoop td' fsd
 
 backTest :: Int -> Int -> Bool -> IO ()
@@ -167,7 +167,7 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  [Fcd.FxChartData] ->
                  IO Ftd.FxTradeData
 tradeEvaluate td fsd coName xcd = do
-  let (open, close, td1) = Ft.trade td fsd xcd
+  (open, close, td1) <- Ft.trade td fsd xcd
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2
@@ -231,7 +231,7 @@ tradeLoop p sleep td fsd coName a = do
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
   (sleep', td2, a2, fsd2) <- if e /= p
-                             then do (a1, fsd1) <- return (a, fsd) -- checkTradeLearning a fsd
+                             then do (a1, fsd1) <- checkTradeLearning a fsd
                                      td1 <- tradeEvaluate td fsd1 coName =<<
                                             ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
                                      Fp.printProgressFxTradeData td1                                 

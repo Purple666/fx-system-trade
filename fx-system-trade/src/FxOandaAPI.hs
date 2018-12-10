@@ -13,7 +13,7 @@ import qualified FxMongodb               as Fm
 import qualified FxTime                  as Ftm
 import qualified FxTradeData             as Ftd
 import qualified GlobalSettingData       as Gsd
---import Debug.Trace
+import Debug.Trace
 import           Control.Exception.Extra
 import           Control.Lens
 import           Data.Aeson
@@ -187,6 +187,7 @@ getOandaPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getOandaPosition td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
+  traceShow(td) $ return ()
   r <- retry 100 $ getWith opts (Ftd.url td ++ "/positions")
        >>= asJSON
   let ps = positions $ r ^. responseBody

@@ -17,7 +17,7 @@ module FxMongodb
 
 import           Control.Monad.Trans.Reader
 import           Database.MongoDB
---import Debug.Trace
+import Debug.Trace
 import qualified Data.Map                   as M
 import qualified Data.Text                  as T
 import qualified FxChartData                as Fcd
@@ -99,6 +99,7 @@ updateFxTradeData coName td = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB (T.pack coName)
   close pipe
+  traceShow(r) $ return ()
   if null r
     then return td
     else head <$> mapM (\x -> return $ (read . typed $ valueAt "td" x)) r
