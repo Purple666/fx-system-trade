@@ -99,7 +99,6 @@ updateFxTradeData coName td = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   r <- access pipe master "fx" $ getDataFromDB (T.pack coName)
   close pipe
-  traceShow(r) $ return ()
   if null r
     then return td
     else head <$> mapM (\x -> return $ td { Ftd.chart         = read . typed $ valueAt "chart"         x
