@@ -159,7 +159,7 @@ rci n x  =
 
 lsm :: Int -> [Double] -> Double
 lsm n y =
-  let x = reverse [1..n] :: [Double]
+  let x = reverse [1..fromIntegral n] :: [Double]
       z = (fromIntegral n * sum (zipWith (*) x y) - sum x * sum y) / (fromIntegral n * sum (map (^(2 :: Int)) x) - sum x ^ (2 :: Int))
   in x `deepseq` n `deepseq` y `deepseq` z `deepseq` z
 
