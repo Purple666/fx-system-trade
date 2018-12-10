@@ -153,12 +153,13 @@ rci n x  =
   let r  = [1..n] :: [Int]
       r' = reverse [1..n] :: [Int]
       d = sum . map (\(a, b) -> (a - b) ^ (2 :: Int)) . zipWith (\a (_, b') -> (a, b')) r' . sort $ zip x r
-  in (1 - (6.0 * fromIntegral d) / (fromIntegral n * (fromIntegral n ^ (2 :: Int) - 1))) * 100
+  in d `seq` (1 - (6.0 * fromIntegral d) / (fromIntegral n * (fromIntegral n ^ (2 :: Int) - 1))) * 100
 
 lsm :: Int -> [Double] -> Double
 lsm n y =
   let x = reverse $ take n [1..]
-  in (fromIntegral n * sum (zipWith (*) x y) - sum x * sum y) / (fromIntegral n * sum (map (^(2 :: Int)) x) - sum x ^ (2 :: Int))
+      z = (fromIntegral n * sum (zipWith (*) x y) - sum x * sum y) / (fromIntegral n * sum (map (^(2 :: Int)) x) - sum x ^ (2 :: Int))
+  in z `seq` z
 
 getRci :: Int -> [Fcd.FxChartData] -> Double
 getRci n x =
