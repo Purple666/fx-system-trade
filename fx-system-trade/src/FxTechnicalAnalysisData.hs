@@ -60,7 +60,7 @@ data FxMovingAverageData = FxMovingAverageData
   , thresholdM :: !FxTradePosition
   }  deriving (Show, Read)
 
-data FxTradePosition = !None | !Buy | !Sell deriving (Show, Eq, Read)
+data FxTradePosition = None | Buy | Sell deriving (Show, Eq, Read)
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
