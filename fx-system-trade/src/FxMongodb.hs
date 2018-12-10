@@ -145,15 +145,15 @@ getDataFromDB coName =
 
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
-  upsert (select [] coName) [ "chart"          =: show $ Ftd.chart             
-                            , "tradeRate"      =: show $ Ftd.tradeRate         
-                            , "trTradeDate"    =: show $ Ftd.trTradeDate          
-                            , "trTrade"        =: show $ Ftd.trTrade              
-                            , "failProfit"     =: show $ Ftd.failProfit           
-                            , "successProfit"  =: show $ Ftd.successProfit        
-                            , "trSuccess"      =: show $ Ftd.trSuccess            
-                            , "trFail"         =: show $ Ftd.trFail               
-                            , "profit"         =: show $ Ftd.profit               
+  upsert (select [] coName) [ "chart"          =: show $ Ftd.chart         td    
+                            , "tradeRate"      =: show $ Ftd.tradeRate     td    
+                            , "trTradeDate"    =: show $ Ftd.trTradeDate   td       
+                            , "trTrade"        =: show $ Ftd.trTrade       td       
+                            , "failProfit"     =: show $ Ftd.failProfit    td       
+                            , "successProfit"  =: show $ Ftd.successProfit td       
+                            , "trSuccess"      =: show $ Ftd.trSuccess     td       
+                            , "trFail"         =: show $ Ftd.trFail        td       
+                            , "profit"         =: show $ Ftd.profit        td       
                             ]
 
 setFxSettingToDB :: T.Text -> Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
