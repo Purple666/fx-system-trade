@@ -102,7 +102,15 @@ updateFxTradeData coName td = do
   traceShow(r) $ return ()
   if null r
     then return td
-    else head <$> mapM (\x -> return $ (read . typed $ valueAt "td" x)) r
+    else head <$> mapM (\x -> return $ td { Ftd.chart         = read . typed $ valueAt "chart"         x
+                                            Ftd.tradeRate     = read . typed $ valueAt "tradeRate"     x
+                                            Ftd.trTradeDate   = read . typed $ valueAt "trTradeDate"   x 
+                                            Ftd.trTrade       = read . typed $ valueAt "trTrade"       x
+                                            Ftd.failProfit    = read . typed $ valueAt "failProfit"    x
+                                            Ftd.successProfit = read . typed $ valueAt "successProfit" x
+                                            Ftd.trSuccess     = read . typed $ valueAt "trSuccess"     x
+                                            Ftd.trFail        = read . typed $ valueAt "trFail"        x
+                                            Ftd.profit        = read . typed $ valueAt "profit"        x}) r
 
 readFxSettingData :: String -> IO Fsd.FxSettingData
 readFxSettingData coName = do
@@ -137,11 +145,19 @@ getDataFromDB coName =
 
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
-  upsert (select [] coName) [ "td"     =: show td
+  upsert (select [] coName) [ "chart"          =: show $ Ftd.chart             
+                            , "tradeRate"      =: show $ Ftd.tradeRate         
+                            , "trTradeDate"    =: show $ Ftd.trTradeDate          
+                            , "trTrade"        =: show $ Ftd.trTrade              
+                            , "failProfit"     =: show $ Ftd.failProfit           
+                            , "successProfit"  =: show $ Ftd.successProfit        
+                            , "trSuccess"      =: show $ Ftd.trSuccess            
+                            , "trFail"         =: show $ Ftd.trFail               
+                            , "profit"         =: show $ Ftd.profit               
                             ]
 
 setFxSettingToDB :: T.Text -> Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
 setFxSettingToDB coName fs fsl =
   upsert (select [] coName ) [ "fs"  =: show fs
-                             , "fsl"  =: show fsl
+                             , "fsl" =: show fsl
                              ]
