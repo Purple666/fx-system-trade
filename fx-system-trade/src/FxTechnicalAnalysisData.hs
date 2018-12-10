@@ -43,24 +43,24 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   }  deriving (Show, Read)
 
 data FxMovingAverageData = FxMovingAverageData
-  { short      :: Double
-  , middle     :: Double
-  , long       :: Double
-  , slopeS     :: Double
-  , slopeL     :: Double
-  , slopeM     :: Double
-  , slopeSn    :: FxTradePosition
-  , slopeLn    :: FxTradePosition
-  , slopeMn    :: FxTradePosition
-  , crossSL    :: FxTradePosition
-  , crossSM    :: FxTradePosition
-  , crossML    :: FxTradePosition
-  , thresholdS :: FxTradePosition
-  , thresholdL :: FxTradePosition
-  , thresholdM :: FxTradePosition
+  { short      :: !Double
+  , middle     :: !Double
+  , long       :: !Double
+  , slopeS     :: !Double
+  , slopeL     :: !Double
+  , slopeM     :: !Double
+  , slopeSn    :: !FxTradePosition
+  , slopeLn    :: !FxTradePosition
+  , slopeMn    :: !FxTradePosition
+  , crossSL    :: !FxTradePosition
+  , crossSM    :: !FxTradePosition
+  , crossML    :: !FxTradePosition
+  , thresholdS :: !FxTradePosition
+  , thresholdL :: !FxTradePosition
+  , thresholdM :: !FxTradePosition
   }  deriving (Show, Read)
 
-data FxTradePosition = None | Buy | Sell deriving (Show, Eq, Read)
+data FxTradePosition = !None | !Buy | !Sell deriving (Show, Eq, Read)
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
