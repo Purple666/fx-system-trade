@@ -46,7 +46,7 @@ debugLoop :: Ftd.FxTradeData ->
 debugLoop td fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.no e) (Fs.getPrepareTimeAll fsd + 1) 0) <*> pure [e]
-  (_, _, td') <- Ft.trade td fsd ct
+  let (_, _, td') = Ft.trade td fsd ct
   debugLoop td' fsd
 
 backTest :: Int -> Int -> Bool -> IO ()
@@ -167,7 +167,7 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  [Fcd.FxChartData] ->
                  IO Ftd.FxTradeData
 tradeEvaluate td fsd coName xcd = do
-  (open, close, td1) <- Ft.trade td fsd xcd
+  let (open, close, td1) = Ft.trade td fsd xcd
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2

@@ -1,8 +1,10 @@
 module FxTradeData
   ( FxTradeData (..)
+  , FxTradeAlgorithmListCount (..)
   , FxSide (..)
   , FxEnvironment (..)
   , initFxTradeDataCommon
+  , initFxTradeAlgorithmListCount
   , getWinRate
   , getEvaluationValue
   , getEvaluationValueList
@@ -13,17 +15,22 @@ import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 
+data FxTradeAlgorithmListCount =
+  FxTradeAlgorithmListCount { alcOpen            :: Fad.FxalgorithmListCount
+                            , alcCloseProfit     :: Fad.FxalgorithmListCount
+                            , alcCloseLoss       :: Fad.FxalgorithmListCount
+                            , alcTradeDate       :: Int
+                            , alcTrade           :: Int
+                            , alcFailProfit      :: Double
+                            , alcSuccessProfit   :: Double
+                            , alcSuccess         :: Int
+                            , alcFail            :: Int
+                            }
+
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
-              , alcOpen            :: Fad.FxalgorithmListCount
-              , alcCloseProfit     :: Fad.FxalgorithmListCount
-              , alcCloseLoss       :: Fad.FxalgorithmListCount
               , side               :: FxSide
-              , trTradeDate        :: Int
-              , trTrade            :: Int
-              , failProfit         :: Double
-              , successProfit      :: Double
               , trSuccess          :: Int
               , trFail             :: Int
               , profit             :: Double
@@ -41,16 +48,12 @@ data FxEnvironment = Backtest | Practice | Production deriving (Show, Read)
 instance Num FxTradeData where
   x - y = x { trSuccess          = trSuccess          x - trSuccess          y
             , trFail             = trFail             x - trFail             y
-            , failProfit         = failProfit         x - failProfit         y
-            , successProfit      = successProfit      x - successProfit      y
             , profit             = profit             x - profit             y
             , realizedPL         = realizedPL         x - realizedPL         y
             , unrealizedPL       = unrealizedPL       x - unrealizedPL       y
             }
   x + y = x { trSuccess          = trSuccess          x + trSuccess          y
             , trFail             = trFail             x + trFail             y
-            , failProfit         = failProfit         x + failProfit         y
-            , successProfit      = successProfit      x + successProfit      y
             , profit             = profit             x + profit             y
             , realizedPL         = realizedPL         x + realizedPL         y
             , unrealizedPL       = unrealizedPL       x + unrealizedPL       y
@@ -70,18 +73,24 @@ instance Ord FxTradeData where
     | otherwise                                       =  GT
 
 
+initFxTradeAlgorithmListCount :: FxTradeAlgorithmListCount
+initFxTradeAlgorithmListCount =
+  FxTradeAlgorithmListCount{ alcOpen             = Fad.zeroFxalgorithmListCount
+                           , alcCloseProfit      = Fad.zeroFxalgorithmListCount
+                           , alcCloseLoss        = Fad.zeroFxalgorithmListCount
+                           , alcTradeDate        = 0
+                           , alcTrade            = 0 
+                           , alcFailProfit       = 0
+                           , alcSuccessProfit    = 0
+                           , alcSuccess          = 0 
+                           , alcFail             = 0
+                           }
+
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
   FxTradeData { chart               = Fcd.initFxChartData
               , tradeRate           = Fcd.initFxChartData
               , side                = None
-              , alcOpen             = Fad.zeroFxalgorithmListCount
-              , alcCloseProfit      = Fad.zeroFxalgorithmListCount
-              , alcCloseLoss        = Fad.zeroFxalgorithmListCount
-              , trTradeDate         = 0
-              , trTrade             = 0
-              , failProfit          = 0
-              , successProfit       = 0
               , profit              = 0
               , trSuccess           = 0
               , trFail              = 0

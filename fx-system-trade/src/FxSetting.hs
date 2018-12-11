@@ -120,8 +120,8 @@ updateFxSettingLog plsf fsl =
         sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fsl
   else fsl
   
-updateFxSettingData :: [Fad.FxChartTaData] -> Int -> Ftd.FxTradeData -> Ftd.FxTradeData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingData ctdl plsf td tdt fsdl fsdo =
+updateFxSettingData :: [Fad.FxChartTaData] -> Int -> Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeAlgorithmListCount -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingData ctdl plsf td tdt acc fsdl fsdo =
   let p = Ftd.profit tdt - Ftd.profit td
       fslu = updateFxSettingLog plsf $ M.union (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsdl) fslu
@@ -133,37 +133,37 @@ updateFxSettingData ctdl plsf td tdt fsdl fsdo =
                                  , Fsd.trTrade         = max
                                                          (Fsd.trTrade       . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.trTrade       . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                           + fromIntegral (Ftd.trTrade tdt)
+                                                           + fromIntegral (Ftd.alcTrade acc)
                                  , Fsd.trTradeDate     = max
                                                          (Fsd.trTradeDate   . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.trTradeDate   . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                         + fromIntegral (Ftd.trTradeDate tdt)
+                                                         + fromIntegral (Ftd.alcTradeDate acc)
                                  , Fsd.trSuccess       = max
                                                          (Fsd.trSuccess     . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.trSuccess     . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                         + Ftd.trSuccess tdt
+                                                         + Ftd.alcSuccess acc
                                  , Fsd.trFail          = max
                                                          (Fsd.trFail        . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.trFail        . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                         + Ftd.trFail tdt
+                                                         + Ftd.alcFail acc
                                  , Fsd.successProfit   = max
                                                          (Fsd.successProfit . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.successProfit . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                         + Ftd.successProfit tdt
+                                                         + Ftd.alcSuccessProfit acc
                                  , Fsd.failProfit      = max
                                                          (Fsd.failProfit    . Fsd.learningSetting $ Fsd.fxSetting fsdl)
                                                          (Fsd.failProfit    . Fsd.learningSetting $ Fsd.fxSetting fsdo)
-                                                         + Ftd.failProfit tdt
+                                                         + Ftd.alcFailProfit acc
                                  }
   in if 0 < p
      then fsdl { Fsd.fxSetting = (Fsd.fxSetting fsdl)
                                 { Fsd.learningSetting = ls
                                 , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                         ctdl (Fad.listCount $ Ftd.alcOpen tdt) (Fsd.fxTaOpen $ Fsd.fxSetting fsdl)
+                                                         ctdl (Fad.listCount $ Ftd.alcOpen acc) (Fsd.fxTaOpen $ Fsd.fxSetting fsdl)
                                 , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
-                                                         (Fad.listCount $ Ftd.alcCloseProfit tdt) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdl)
+                                                         (Fad.listCount $ Ftd.alcCloseProfit acc) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdl)
                                 , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss   ctdl
-                                                         (Fad.listCount $ Ftd.alcCloseLoss tdt) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsdl)
+                                                         (Fad.listCount $ Ftd.alcCloseLoss acc) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsdl)
                                 }
               , Fsd.fxSettingLog = fsl
               }

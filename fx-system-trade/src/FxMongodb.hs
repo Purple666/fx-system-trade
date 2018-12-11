@@ -103,10 +103,6 @@ updateFxTradeData coName td = do
     then return td
     else head <$> mapM (\x -> return $ td { Ftd.chart         = read . typed $ valueAt "chart"         x
                                           , Ftd.tradeRate     = read . typed $ valueAt "tradeRate"     x
-                                          , Ftd.trTradeDate   = read . typed $ valueAt "trTradeDate"   x 
-                                          , Ftd.trTrade       = read . typed $ valueAt "trTrade"       x
-                                          , Ftd.failProfit    = read . typed $ valueAt "failProfit"    x
-                                          , Ftd.successProfit = read . typed $ valueAt "successProfit" x
                                           , Ftd.trSuccess     = read . typed $ valueAt "trSuccess"     x
                                           , Ftd.trFail        = read . typed $ valueAt "trFail"        x
                                           , Ftd.profit        = read . typed $ valueAt "profit"        x}) r
@@ -146,10 +142,6 @@ setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
   upsert (select [] coName) [ "chart"          =: (show $ Ftd.chart         td)    
                             , "tradeRate"      =: (show $ Ftd.tradeRate     td)    
-                            , "trTradeDate"    =: (show $ Ftd.trTradeDate   td)       
-                            , "trTrade"        =: (show $ Ftd.trTrade       td)       
-                            , "failProfit"     =: (show $ Ftd.failProfit    td)       
-                            , "successProfit"  =: (show $ Ftd.successProfit td)       
                             , "trSuccess"      =: (show $ Ftd.trSuccess     td)       
                             , "trFail"         =: (show $ Ftd.trFail        td)       
                             , "profit"         =: (show $ Ftd.profit        td)       
