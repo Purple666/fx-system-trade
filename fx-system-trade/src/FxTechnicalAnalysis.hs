@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module FxTechnicalAnalysis
   ( makeFxTechnicalAnalysisDataList
   , makeValidLeafDataMapInc
@@ -10,7 +9,6 @@ module FxTechnicalAnalysis
   , getSimChartMax
   ) where
 
-import           Control.DeepSeq
 import           Data.List
 import qualified Data.Map                as M
 --import           Debug.Trace
