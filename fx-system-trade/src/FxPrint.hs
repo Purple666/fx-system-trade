@@ -49,7 +49,7 @@ printLearningFxTradeData p n fsd tdl tdlt plsf lsf = do
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
   printf "%s " =<< Ftm.getLogTime
-  printf "%7.3f %7.3f %8.3f" (Fcd.close e) (Fcd.close e $ Ftd.tradeRate td) ((Fcd.close e) - (Fcd.close e $ Ftd.tradeRate td))
+  printf "%7.3f %7.3f %8.3f" (Fcd.close e) (Fcd.close $ Ftd.tradeRate td) ((Fcd.close e) - (Fcd.close $ Ftd.tradeRate td))
   printFxTradeData td
   printf "\n"
 
