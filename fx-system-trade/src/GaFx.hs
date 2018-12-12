@@ -75,7 +75,7 @@ trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Foa.updateFxTradeData =<< (Fm.updateFxTradeData coName $ (Ft.initFxTradeData environment) { Ftd.chart = c })
-  Fp.printProgressFxTradeData td
+  Fp.printProgressFxTradeData td c
   tradeWeeklyLoop td coName =<< Fm.readFxSettingData "backtest"
 
 learningLoop :: Int ->
@@ -230,11 +230,11 @@ tradeLoop p sleep td fsd coName a = do
   -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
-  (sleep', td2, a2, fsd2) <- if e /= p
+  (sleep', td2, a2, fsd2) <- if (Fcd.close e) /= (Fcd.close p)
                              then do (a1, fsd1) <- checkTradeLearning a fsd
                                      td1 <- tradeEvaluate td fsd1 coName =<<
                                             ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
-                                     Fp.printProgressFxTradeData td1                                 
+                                     Fp.printProgressFxTradeData td1 e                                 
                                      return (0, td1, a1, fsd1)
                              else return (sleep + 1, td, a, fsd)
   if 3600 < sleep'

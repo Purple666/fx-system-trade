@@ -137,13 +137,13 @@ close td = do
 open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
 open td side = do
   (b, _) <- getOandaBalance td
-  p <- Fm.getOneChart  Fm.getEndChartFromDB
+  p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
       u' = if Gsd.maxUnit Gsd.gsd < u
            then Gsd.maxUnit Gsd.gsd
            else u
   printf "%s : " =<< Ftm.getLogTime
-  printf "Open - %s %f %d\n" (show side) b u'
+  printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
   td'' <- updateFxTradeData =<< if side == Ftd.Buy
                                 then setOandaOrders td "buy" u'
                                 else if side == Ftd.Sell
