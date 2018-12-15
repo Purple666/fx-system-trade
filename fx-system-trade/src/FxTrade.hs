@@ -217,7 +217,6 @@ evaluate ctd fsd f1 forceSell alc td =
                                            then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                            else Ftd.realizedPL td'
                  }
-
   in (open, close, alc', td'')
 
 {-
@@ -353,7 +352,7 @@ trade :: Ftd.FxTradeData ->
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
       acc = Ftd.initFxTradeAlgorithmListCount
-      (open, close, _, td') =  evaluate (last ctdl) fsd getQuantityLearning False acc td
+      (open, close, _, td') =  evaluate (last ctdl) fsd getQuantityBacktest False acc td
   in (open, close, td')
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
