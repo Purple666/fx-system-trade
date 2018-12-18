@@ -328,7 +328,7 @@ backTest latest l plsf td fsd xcd = do
                                        return (acc3, td3))
                    (pure (acc, td)) ctdl
   if not latest
-    then Fm.writeFxSettingData "backtest" =<< Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd
+    then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd
     else return ()
   return td''
 
