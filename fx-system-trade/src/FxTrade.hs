@@ -289,7 +289,7 @@ makeSimChart c xs =
                                          }
                    fcdClose = head xs'
 {-
- 55              in fcdClose : makeSimChart c (tail xs')
+               in fcdClose : makeSimChart c (tail xs')
 -}
                in if snd high < snd low
                   then fcdHigh : fcdLow : fcdClose : (makeSimChart c $ tail xs')
@@ -327,7 +327,9 @@ backTest latest l plsf td fsd xcd = do
                                        Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                        return (acc3, td3))
                    (pure (acc, td)) ctdl
-  Fm.writeFxSettingData "backtest" =<< Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd <$> Fm.readFxSettingData "backtest"  
+  if not latest
+    then Fm.writeFxSettingData "backtest" =<< Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd
+    else return ()
   return td''
 
 learning :: Ftd.FxTradeData ->

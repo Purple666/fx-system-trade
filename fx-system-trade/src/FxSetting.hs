@@ -120,10 +120,10 @@ updateFxSettingLog plsf fsl =
         sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fsl
   else fsl
   
-updateFxSettingData :: [Fad.FxChartTaData] -> Int -> Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeAlgorithmListCount -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingData ctdl plsf td tdt acc fsdl fsdo =
+updateFxSettingData :: [Fad.FxChartTaData] -> Int -> Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeAlgorithmListCount -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingData ctdl plsf td tdt acc fsd =
   let p = Ftd.profit tdt - Ftd.profit td
-      fslu = updateFxSettingLog plsf $ M.union (Fsd.fxSettingLog fsdl) (Fsd.fxSettingLog fsdo)
+      fslu = updateFxSettingLog plsf (Fsd.fxSettingLog fsd)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsdl) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsdl) fslu
                                             else M.insert (Fsd.fxSetting fsdl) (p, 1) fslu
