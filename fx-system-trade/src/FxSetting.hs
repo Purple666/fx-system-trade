@@ -120,7 +120,7 @@ updateFxSettingLog plsf fsl =
                sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
            c = M.restrictKeys fsl a
            b = M.withoutKeys fsl a
-           d = S.fromList $ M.toList fsl
+           d = S.fromList  . map (\(x, (_, _)) -> x) $ M.toList fsl
            e = M.withoutKeys fsl d
        in traceShow(length fsl, length a, length b, length c, length d, length e) $ b 
   else fsl
