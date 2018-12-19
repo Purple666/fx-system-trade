@@ -121,9 +121,10 @@ updateFxSettingLog plsf fsl =
            c = M.restrictKeys fsl a
            b = M.withoutKeys fsl a
            d = S.fromList  . map (\(x, (_, _)) -> x) $ M.toList fsl
-           e = M.withoutKeys fsl d
-           f = M.restrictKeys fsl d
-       in traceShow(length fsl, length a, length b, length c, length d, length e, length f) $ b 
+           g = S.fromList $ M.keys fsl
+           e = M.withoutKeys fsl g
+           f = M.restrictKeys fsl g
+       in traceShow(length fsl, length a, length b, length c, length g, length e, length f) $ b 
   else fsl
   
 updateFxSettingData :: [Fad.FxChartTaData] ->
