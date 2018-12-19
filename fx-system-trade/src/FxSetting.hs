@@ -116,10 +116,11 @@ emptyFxSettingLog fsd =
 updateFxSettingLog :: Int -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 updateFxSettingLog plsf fsl =
   if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-  then let a = S.fromList . keys . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+  then let a = S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
                sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
+           c = M.restrictKeys fsl a
            b = M.withoutKeys fsl a
-       in traceShow(length fsl, length a, length b) $ b 
+       in traceShow(length fsl, length a, length b, length c) $ b 
   else fsl
   
 updateFxSettingData :: [Fad.FxChartTaData] ->
