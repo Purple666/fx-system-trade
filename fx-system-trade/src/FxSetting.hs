@@ -141,7 +141,7 @@ updateFxSettingData ctdl plsf td tdt acc fsd =
                                  , Fsd.successProfit   = Fsd.successProfit . Fsd.learningSetting $ Fsd.fxSetting fsd
                                  , Fsd.failProfit      = Fsd.failProfit    . Fsd.learningSetting $ Fsd.fxSetting fsd
                                  }
-  in traceShow(length fslu, lengsh fsl, plsf) $
+  in traceShow(length fslu, length fsl, plsf) $
      if 0 < p
      then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                                 { Fsd.learningSetting = ls
