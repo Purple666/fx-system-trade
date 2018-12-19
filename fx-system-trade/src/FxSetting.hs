@@ -116,8 +116,8 @@ emptyFxSettingLog fsd =
 updateFxSettingLog :: Int -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 updateFxSettingLog plsf fsl =
   if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-  then  M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-        sortBy (\(_, (a, _)) (_, (b, _)) -> compare a b) $ M.toList fsl
+  then M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+       sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b') $ M.toList fsl
   else fsl
   
 updateFxSettingData :: [Fad.FxChartTaData] ->
@@ -141,7 +141,7 @@ updateFxSettingData ctdl plsf td tdt acc fsd =
                                  , Fsd.successProfit   = Fsd.successProfit . Fsd.learningSetting $ Fsd.fxSetting fsd
                                  , Fsd.failProfit      = Fsd.failProfit    . Fsd.learningSetting $ Fsd.fxSetting fsd
                                  }
-  in traceShow(length fslu, length fsl, plsf) $
+  in traceShow(length fslu, length fsl, plsf, (length $ Fsd.fxSettingLog fsd)) $
      if 0 < p
      then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                                 { Fsd.learningSetting = ls
