@@ -28,7 +28,7 @@ newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) }
 
 newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } 
 
-newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read)
+newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read, Eq, Ord)
 
 instance Read (LeafData a) where
   readsPrec _ s = let (a, s') = break (\x -> x ==')' || x ==',' ) s
@@ -53,9 +53,6 @@ instance Eq (LeafData a) where
 instance Eq NodeData where
   a == b = fst (getNodeData a) == fst (getNodeData b)
 
-instance Eq (LeafDataMap a) where
-  (LeafDataMap a) == (LeafDataMap b) = sort (M.keys a) == sort (M.keys b)
-
 instance Ord (LeafData a) where
   compare (LeafData a) (LeafData b)
     | fst a == fst b  = EQ
@@ -67,12 +64,6 @@ instance Ord NodeData where
     | fst a == fst b  = EQ
     | fst a <= fst b  = LT
     | otherwise       = GT
-
-instance Ord (LeafDataMap a) where
-  compare (LeafDataMap a) (LeafDataMap b)
-    | sort (M.keys a) == sort (M.keys b)  = EQ
-    | sort (M.keys a) <= sort (M.keys b)  = LT
-    | otherwise                               = GT
 
 data TreeData a = Empty  |
                   Leaf (LeafData a) |

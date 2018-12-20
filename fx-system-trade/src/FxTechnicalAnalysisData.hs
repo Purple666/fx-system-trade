@@ -60,7 +60,7 @@ data FxMovingAverageData = FxMovingAverageData
   , thresholdM :: FxTradePosition
   }  deriving (Show, Read)
 
-data FxTradePosition = None | Buy | Sell deriving (Show, Eq, Read)
+data FxTradePosition = None | Buy | Sell deriving (Show, Read, Eq)
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
@@ -68,7 +68,7 @@ data FxTechnicalAnalysisSetting =
                              , treeAnaAndRate :: Int
                              , treeAnaOrRate  :: Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
-                             } deriving (Show, Read, Eq, Ord)
+                             } deriving (Show, Read)
 
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
@@ -83,7 +83,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read)
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
@@ -92,7 +92,7 @@ data FxAlMaSetting = FxAlMaSetting
   , prevSetting         :: Int
   , thresholdSetting    :: Double
   , thresholdMaxSetting :: Double
-  }  deriving (Show, Read, Eq, Ord)
+  }  deriving (Show, Read)
 
 
 data FxalgorithmListCount =

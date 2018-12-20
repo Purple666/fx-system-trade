@@ -22,7 +22,7 @@ module FxSetting
 import           Control.Monad
 import           Control.Monad.Random
 import           Data.List
-import           Data.List.Unique 
+import           Data.List.Unique
 import qualified Data.Map                as M
 import qualified Data.Set                as S
 import           Debug.Trace
@@ -122,10 +122,12 @@ updateFxSettingLog plsf fsl =
            c = M.restrictKeys fsl a
            b = M.withoutKeys fsl a
            d = S.fromList  . map (\(x, (_, _)) -> x) $ M.toList fsl
-           g = S.fromList . unique $ M.keys fsl
+           g = S.fromList $ M.keys fsl
            e = M.withoutKeys fsl g
            f = M.restrictKeys fsl g
-       in traceShow(length fsl, length a, length b, length c, length g, length e, length f) $ b 
+           h = M.filterWithKey (\k _ -> k `M.member` fsl) fsl
+           i = (M.keys fsl) !! 0
+       in traceShow(length fsl, length a, length b, length c, length g, length e, length f, length h, show (i == i)) $ b 
   else fsl
   
 updateFxSettingData :: [Fad.FxChartTaData] ->

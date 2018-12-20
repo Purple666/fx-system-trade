@@ -16,7 +16,7 @@ data FxChartData = FxChartData
   , low   :: Double
   , close :: Double
   }
-  deriving (Show, Read, Eq)
+  deriving (Show, Read, Eq, Ord)
 
 initFxChartData :: FxChartData
 initFxChartData =
