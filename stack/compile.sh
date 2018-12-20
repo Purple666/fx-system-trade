@@ -1,5 +1,5 @@
 #!/bin/bash -x
 
-stack clean && stack solver && stack build  
+stack clean && stack build  
 
 
