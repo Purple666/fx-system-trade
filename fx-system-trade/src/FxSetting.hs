@@ -130,21 +130,21 @@ updateFxSettingData :: [Fad.FxChartTaData] ->
                        Fsd.FxSettingData
 updateFxSettingData ctdl plsf td tdt acc fsd =
   let p = Ftd.profit tdt - Ftd.profit td
+      ls = Fsd.learningSetting $ Fsd.fxSetting fsd
       fslu = updateFxSettingLog plsf (Fsd.fxSettingLog fsd)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) fslu
                                             else M.insert (Fsd.fxSetting fsd) (p, 1) fslu
-      ls = Fsd.FxLearningSetting { Fsd.learningTestTimes = Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.trTrade         = Fsd.trTrade       . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.trTradeDate     = Fsd.trTradeDate   . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.trSuccess       = Fsd.trSuccess     . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.trFail          = Fsd.trFail        . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.successProfit   = Fsd.successProfit . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 , Fsd.failProfit      = Fsd.failProfit    . Fsd.learningSetting $ Fsd.fxSetting fsd
-                                 }
+      ls' = ls { Fsd.trTrade         = Fsd.trTrade       ls + Ftd.alcTrade     acc
+               , Fsd.trTradeDate     = Fsd.trTradeDate   ls + alcTradeDate     acc
+               , Fsd.trSuccess       = Fsd.trSuccess     ls + alcSuccess       acc
+               , Fsd.trFail          = Fsd.trFail        ls + alcFail          acc
+               , Fsd.successProfit   = Fsd.successProfit ls + alcSuccessProfit acc
+               , Fsd.failProfit      = Fsd.failProfit    ls + alcFailProfit    acc
+               }
   in if 0 < p
      then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                { Fsd.learningSetting = ls
+                                { Fsd.learningSetting = ls'
                                 , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
                                                          ctdl (Fad.listCount $ Ftd.alcOpen acc) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
                                 , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit ctdl
@@ -155,7 +155,7 @@ updateFxSettingData ctdl plsf td tdt acc fsd =
               , Fsd.fxSettingLog = fsl
               }
      else fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                { Fsd.learningSetting = ls
+                                { Fsd.learningSetting = ls'
                                 }
               , Fsd.fxSettingLog = fsl
               }
