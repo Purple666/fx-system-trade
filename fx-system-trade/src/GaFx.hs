@@ -99,9 +99,11 @@ learningLoop c cl ce fsd fsds = do
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt  -- ( && Ft.evaluationOk2 tdl tdlt)
     then return (0, True, tdl, tdlt, fsd')
-    else if Fs.getLearningTestTimes fsd' < fromIntegral c ||  fsd == fsd'
+    else if Fs.getLearningTestTimes fsd' < fromIntegral c
          then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) cl ce fsd' $ map (\(_, _, _, x) -> x) fsds'
+         else if fsd == fsd'
+              then return (0, False, tdl, tdlt, fsd') 
+              else learningLoop (c + 1) cl ce fsd' $ map (\(_, _, _, x) -> x) fsds'
 
 learning :: Int ->
             Fsd.FxSettingData ->
