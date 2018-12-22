@@ -135,8 +135,8 @@ updateFxSettingData ctdl plsf td tdt acc fsd =
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) fslu
                                             else M.insert (Fsd.fxSetting fsd) (p, 1) fslu
-      ls' = ls { Fsd.trTrade         = Fsd.trTrade       ls + (toInteger $ Ftd.alcTrade         acc)
-               , Fsd.trTradeDate     = Fsd.trTradeDate   ls + (toInteger $ Ftd.alcTradeDate     acc)
+      ls' = ls { Fsd.trTrade         = Fsd.trTrade       ls + (toInteger $ Ftd.alcTrade     acc)
+               , Fsd.trTradeDate     = Fsd.trTradeDate   ls + (toInteger $ Ftd.alcTradeDate acc)
                , Fsd.trSuccess       = Fsd.trSuccess     ls + Ftd.alcSuccess       acc
                , Fsd.trFail          = Fsd.trFail        ls + Ftd.alcFail          acc
                , Fsd.successProfit   = Fsd.successProfit ls + Ftd.alcSuccessProfit acc

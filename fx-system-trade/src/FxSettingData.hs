@@ -26,15 +26,12 @@ data FxSetting =
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
-            } deriving (Show, Read)
+            } deriving (Show, Read, Eq)
 
 data FxChart =
   FxChart { chart       :: [Fcd.FxChartData]
           , chartLength :: Int
           } deriving (Show)
-
-instance Eq FxSetting where
-  a == b = learningSetting a == learningSetting b
 
 instance Ord FxSetting where
   compare a b
