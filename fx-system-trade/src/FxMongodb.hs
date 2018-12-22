@@ -17,6 +17,7 @@ module FxMongodb
 
 import           Control.Monad.Trans.Reader
 import           Database.MongoDB
+import           Control.Exception.Extra
 import Debug.Trace
 import qualified Data.Map                   as M
 import qualified Data.Text                  as T
@@ -50,7 +51,7 @@ getChartListForward s l rl = do
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
 getOneChart f = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" f
+  r <- retry 100 $ access pipe master "fx" f
   close pipe
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                              , Fcd.date  = typed $ valueAt "time"  x
@@ -65,7 +66,7 @@ getOneChart f = do
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s e = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getChartListFromDB  s e
+  r <- retry 100 . access pipe master "fx" $ getChartListFromDB  s e
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
@@ -91,13 +92,13 @@ getEndChartFromDB =
 setFxTradeData :: String-> Ftd.FxTradeData -> IO ()
 setFxTradeData coName td = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxTradeDataToDB (T.pack coName) td
+  _ <- retry 100 . access pipe master "fx" $ setFxTradeDataToDB (T.pack coName) td
   close pipe
 
 updateFxTradeData :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData coName td = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack coName)
+  r <- retry 100 . access pipe master "fx" $ getDataFromDB (T.pack coName)
   close pipe
   if null r
     then return td
@@ -110,7 +111,7 @@ updateFxTradeData coName td = do
 readFxSettingData :: String -> IO Fsd.FxSettingData
 readFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
+  r <- retry 100 . access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
   close pipe
   if null r
     then return $ Fsd.initFxSettingData
@@ -121,7 +122,7 @@ readFxSettingData coName = do
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
+  r <- retry 100 . access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
   close pipe
   if null r
     then return True
@@ -130,7 +131,7 @@ checkFxSettingData coName = do
 writeFxSettingData :: String -> Fsd.FxSettingData -> IO ()
 writeFxSettingData coName fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+  _ <- retry 100 . access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return ()
 
