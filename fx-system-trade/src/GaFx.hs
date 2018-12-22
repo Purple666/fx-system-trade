@@ -156,7 +156,9 @@ backTestLoop latest n endN td = do
                       Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd) 0 <*>
                       Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd tdt tdl tdlt plsf lsf
+  if latest
+    then return ()
+    else Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd tdt tdl tdlt plsf lsf
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return $ Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
     else backTestLoop latest n' endN tdt
@@ -234,7 +236,7 @@ tradeLoop p sleep td fsd coName a = do
                              then do (a1, fsd1) <- checkTradeLearning a fsd
                                      td1 <- tradeEvaluate td fsd1 coName =<<
                                             ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
-                                     Fp.printProgressFxTradeData td1 e                                 
+                                     -- Fp.printProgressFxTradeData td1 e                                 
                                      return (0, td1, a1, fsd1)
                              else return (sleep + 1, td, a, fsd)
   if 3600 < sleep'
