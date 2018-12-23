@@ -14,7 +14,6 @@ module FxMongodb
   , checkFxSettingData
   ) where
 
-
 import           Control.Monad.Trans.Reader
 import           Database.MongoDB
 import           Control.Exception.Extra
@@ -26,7 +25,6 @@ import qualified FxSetting                  as Fs
 import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
-
 
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do

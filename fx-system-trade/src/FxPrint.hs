@@ -40,7 +40,7 @@ printLearningFxTradeData p n fsd tdl tdlt plsf lsf = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
   printf "%s " =<< Ftm.getLogTime
-  printf "%8.0f " p
+  printf "%10.0f " p
   printf "| %8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
@@ -56,14 +56,14 @@ printProgressFxTradeData td e = do
 printTradeResult :: Ftd.FxSide -> Ftd.FxSide -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
 printTradeResult open close td td' units = do
   printf "%s : " =<< Ftm.getLogTime
-  printf "%4s %4s | "
+  printf "%5s %5s | "
     (show open)
     (show close)
   nd <- Fcd.getDate . Fcd.date $ Ftd.chart td'
   printf "%s %8d | "
     nd
     ((Fcd.no $ Ftd.chart td') - (Fcd.no $ Ftd.tradeRate td))
-  printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %8.0f (%+8.0f) %6d %6d %6.2f\n"
+  printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     (Ftd.profit $ td' - td)
     (Fcd.close $ Ftd.tradeRate td')
@@ -77,7 +77,7 @@ printTradeResult open close td td' units = do
 
 printFxTradeData :: Ftd.FxTradeData -> IO ()
 printFxTradeData td =
-  printf "| %8.3f  %8.0f %8.0f : %4d %4d %3.0f "
+  printf "| %8.3f  %10.0f %10.0f : %4d %4d %3.0f "
   (Ftd.profit td)
   (Ftd.unrealizedPL td)
   (Ftd.realizedPL td)
