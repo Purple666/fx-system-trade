@@ -552,7 +552,7 @@ items:
     source:
       contextDir: get_rate_data
       git:
-        uri: https://github.com/andesm/fx-system-trade
+        uri: https://github.com/andesm/fx-system-trade.git
       type: Git
     strategy:
       dockerStrategy:
@@ -595,8 +595,9 @@ items:
               parrent: get-rate-data
           spec:    
             containers:
-            - image: get-rate-data:latest
+            - image: docker-registry.default.svc:5000/flg/get-rate-data:latest
               name: get-rate-data
+              namespace: flg
               resources: {}
               volumeMounts:
               - name: nfs-share
