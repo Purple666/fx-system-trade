@@ -126,12 +126,12 @@ checkFxSettingData coName = do
     then return True
     else return False
 
-writeFxSettingData :: String -> Fsd.FxSettingData -> IO ()
+writeFxSettingData :: String -> Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 writeFxSettingData coName fsd = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   _ <- retry 100 . access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
-  return ()
+  return fsd
 
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
 getDataFromDB coName =
