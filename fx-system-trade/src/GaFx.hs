@@ -119,7 +119,7 @@ learning n fsd = do
                                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
                                          in ((Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                              (p / fromIntegral c), Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
-              M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
+              M.insert (Fsd.fxSetting fsd) (10000, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')
