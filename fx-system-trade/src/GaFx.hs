@@ -143,7 +143,8 @@ backTestLoop :: Bool ->
                 Ftd.FxTradeData ->
                 IO Bool
 backTestLoop latest n endN td = do
-  (plsf, lsf, tdl, tdlt, fsd) <- learning n =<< Fm.readFxSettingData "backtest"
+  fsdo <- Fm.readFxSettingData "backtest"
+  (plsf, lsf, tdl, tdlt, fsd) <- learning n fsdo
   tdt <- if latest
          then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd
               =<< ((++) <$>
@@ -156,7 +157,7 @@ backTestLoop latest n endN td = do
                       Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd) 0 <*>
                       Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd tdt tdl tdlt plsf lsf
+  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd fsdo tdt tdl tdlt plsf lsf
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return $ Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
     else backTestLoop latest n' endN tdt
