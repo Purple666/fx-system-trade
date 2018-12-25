@@ -131,17 +131,18 @@ updateFxSettingData :: [Fad.FxChartTaData] ->
                        Fsd.FxSettingData
 updateFxSettingData ctdl plsf td tdt acc fsd fsdo =
   let p = Ftd.profit tdt - Ftd.profit td
-      ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-      fslu = updateFxSettingLog plsf (Fsd.fxSettingLog fsd)
+      lso = Fsd.learningSetting $ Fsd.fxSetting fsdo
+      ls  = Fsd.learningSetting $ Fsd.fxSetting fsd 
+      fslu = updateFxSettingLog plsf (Fsd.fxSettingLog fsdo)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) fslu
                                             else M.insert (Fsd.fxSetting fsd) (p, 1) fslu
-      ls' = ls { Fsd.trTrade         = Fsd.trTrade       ls + (toInteger $ Ftd.alcTrade     acc)
-               , Fsd.trTradeDate     = Fsd.trTradeDate   ls + (toInteger $ Ftd.alcTradeDate acc)
-               , Fsd.trSuccess       = Fsd.trSuccess     ls + Ftd.alcSuccess       acc
-               , Fsd.trFail          = Fsd.trFail        ls + Ftd.alcFail          acc
-               , Fsd.successProfit   = Fsd.successProfit ls + Ftd.alcSuccessProfit acc
-               , Fsd.failProfit      = Fsd.failProfit    ls + Ftd.alcFailProfit    acc
+      ls' = ls { Fsd.trTrade         = max (Fsd.trTrade       lso) (Fsd.trTrade       ls) + (toInteger $ Ftd.alcTrade     acc)
+               , Fsd.trTradeDate     = max (Fsd.trTradeDate   lso) (Fsd.trTradeDate   ls) + (toInteger $ Ftd.alcTradeDate acc)
+               , Fsd.trSuccess       = max (Fsd.trSuccess     lso) (Fsd.trSuccess     ls) + Ftd.alcSuccess       acc
+               , Fsd.trFail          = max (Fsd.trFail        lso) (Fsd.trFail        ls) + Ftd.alcFail          acc
+               , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls) + Ftd.alcSuccessProfit acc
+               , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls) + Ftd.alcFailProfit    acc
                }
   in if 0 < p
      then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
