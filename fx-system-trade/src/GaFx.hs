@@ -81,11 +81,11 @@ learningLoop :: Int ->
                 [Fcd.FxChartData] ->
                 [[Fcd.FxChartData]] ->
                 Fsd.FxSettingData ->
+                Int ->
+                Int ->
                 [Fsd.FxSettingData] ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c cl ce fsd fsds = do
-  let lt  = Fs.getLearningTime     fsd
-      ltt = Fs.getLearningTestTime fsd
+learningLoop c cl ce fsd lt ltt fsds = do
   fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
                           tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
@@ -98,7 +98,7 @@ learningLoop c cl ce fsd fsds = do
     then return (0, True, tdl, tdlt, fsd')
     else if Fs.getLearningTestTimes fsd' < fromIntegral c || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
          then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) cl ce fsd' (fsd:fsds ++ map (\(_, _, _, x) -> x) fsds')
+         else learningLoop (c + 1) cl ce fsd' lt ltt (fsd:fsds ++ map (\(_, _, _, x) -> x) fsds')
 
 learning :: Int ->
             Fsd.FxSettingData ->
@@ -120,7 +120,7 @@ learning n fsd = do
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')
-    else learningLoop 0 cl ce fsd . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
+    else learningLoop 0 cl ce fsd lt ltt . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
