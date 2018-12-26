@@ -89,9 +89,7 @@ learningLoop c cl ce fsd fsds = do
   fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
                           tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                          p = if Ftd.getEvaluationValue tdl < 0 && Ftd.getEvaluationValueList tdlt < 0
-                              then - (Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt)
-                              else Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt
+                          p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                       in (p, tdl, tdlt, x)) . (++) (fsd:fsds) . Ga.getGaDataList <$>
            Ga.learning (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
   let (p, tdl, tdlt, fsd') = maximum fsds'
