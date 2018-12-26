@@ -94,8 +94,8 @@ learningLoop c cl ce fsd fsds = do
                               else Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt
                       in (p, tdl, tdlt, x)) . (++) (fsd:fsds) . Ga.getGaDataList <$>
            Ga.learning (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
-  let (_, tdl, tdlt, fsd') = maximum fsds'
-  --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
+  let (p, tdl, tdlt, fsd') = maximum fsds'
+  Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
     else if Fs.getLearningTestTimes fsd' < fromIntegral c || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
