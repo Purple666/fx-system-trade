@@ -40,7 +40,7 @@ printLearningFxTradeData p n fsd tdl tdlt plsf ok lsf = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
   printf "%s " =<< Ftm.getLogTime
-  printf "%10.0f " p
+  printf "%10.3f " p
   printf "| %8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
