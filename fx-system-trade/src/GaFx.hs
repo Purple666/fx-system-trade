@@ -88,7 +88,7 @@ learningLoop :: Int ->
 learningLoop c cl ce fsd lt ltt fsds = do
   fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
-                          tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
+2                          tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
                           p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                       in (p, tdl, tdlt, x)) . (++) (fsd:fsds) . Ga.getGaDataList <$>
            Ga.learning (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
@@ -96,7 +96,7 @@ learningLoop c cl ce fsd lt ltt fsds = do
   -- Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
-    else if Fs.getLearningTestTimes fsd' < fromIntegral c || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
+    else if Fs.getLearningTestTimes fsd' < fromIntegral c -- || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
          then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
          else learningLoop (c + 1) cl ce fsd' lt ltt (fsd:fsds ++ map (\(_, _, _, x) -> x) fsds')
 
