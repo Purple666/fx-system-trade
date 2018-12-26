@@ -92,15 +92,15 @@ learningLoop c cl ce fsd fsds = do
                           p = if Ftd.getEvaluationValue tdl < 0 && Ftd.getEvaluationValueList tdlt < 0
                               then - (Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt)
                               else Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt
-                      in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList <$>
+                      in (p, tdl, tdlt, x)) . (++) (fsd:fsds) . Ga.getGaDataList <$>
            Ga.learning (Fsd.nextFxSettingData lt cl fsd) (map (Fsd.nextFxSettingData lt cl) fsds)
   let (_, tdl, tdlt, fsd') = maximum fsds'
   --Fp.printLearningFxTradeData p 0 fsd' tdl tdlt 0 (Gsf.evaluationOk tdl tdlt) (fsd == fsd')
-  if Ft.evaluationOk tdl tdlt || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
+  if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
-    else if Fs.getLearningTestTimes fsd' < fromIntegral c
+    else if Fs.getLearningTestTimes fsd' < fromIntegral c || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
          then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) cl ce fsd' $ map (\(_, _, _, x) -> x) fsds'
+         else learningLoop (c + 1) cl ce fsd' (fsd:fsds ++ map (\(_, _, _, x) -> x) fsds')
 
 learning :: Int ->
             Fsd.FxSettingData ->
