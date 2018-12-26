@@ -133,7 +133,7 @@ updateFxSettingData ctdl plsf td tdt acc fsd fsdo =
   let p = Ftd.profit tdt - Ftd.profit td
       lso = Fsd.learningSetting $ Fsd.fxSetting fsdo
       ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
-      fslu = updateFxSettingLog plsf $  M.unionWith (\(a, b) (a', b') -> (max a a', max b b')) (Fsd.fxSetting fsd) (Fsd.fxSetting fsdo)
+      fslu = updateFxSettingLog plsf $  M.unionWith (\(a, b) (a', b') -> (max a a', max b b')) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)
       fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
                                             then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) fslu
                                             else M.insert (Fsd.fxSetting fsd) (p, 1) fslu
