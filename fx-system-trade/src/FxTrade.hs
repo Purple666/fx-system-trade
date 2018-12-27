@@ -324,7 +324,7 @@ backTest latest l plsf td fsd xcd = do
       acc = Ftd.initFxTradeAlgorithmListCount
   (acc'', td'') <- foldl (\a ctd -> do (acc', td') <- a
                                        let (open, close, acc3, td3) = evaluate ctd fsd getQuantityBacktest False acc' td'
-                                       Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
+                                       -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                        return (acc3, td3))
                    (pure (acc, td)) ctdl
   fsd' <- (Fm.writeFxSettingData "backtest" . Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd) =<< Fm.readFxSettingData "backtest"
