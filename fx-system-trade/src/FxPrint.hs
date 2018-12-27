@@ -15,11 +15,9 @@ import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
 import           Text.Printf
 
-printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
-printTestProgress n n' fsd fsdo tdt tdl tdlt plsf lsf = do
-  let lt  = Fs.getLearningTime     fsd
-      ltt = Fs.getLearningTestTime fsd
-      ls = Fsd.learningSetting $ Fsd.fxSetting fsd
+printTestProgress :: Int -> Int -> Int -> Int -> Fsd.FxSettingData -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
+printTestProgress n n' lt ltt fsd fsdo tdt tdl tdlt plsf lsf = do
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   printf "%s : " =<< Ftm.getLogTime
   nd  <-  Fcd.getDate n
   nd' <-  Fcd.getDate n'
