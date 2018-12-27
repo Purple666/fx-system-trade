@@ -84,7 +84,7 @@ learningLoop :: Int ->
                 Int ->
                 Int ->
                 [Fsd.FxSettingData] ->
-                IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
+                IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData, Int, Int)
 learningLoop c cl ce fsd lt ltt fsds = do
   fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
@@ -95,14 +95,14 @@ learningLoop c cl ce fsd lt ltt fsds = do
   let (p, tdl, tdlt, fsd') = maximum fsds'
   Fp.printLearningFxTradeData p 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
-    then return (0, True, tdl, tdlt, fsd')
+    then return (0, True, tdl, tdlt, fsd', lt, ltt)
     else if Fs.getLearningTestTimes fsd' < fromIntegral c || fsd == fsd' -- || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
-         then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
+         then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd', lt, ltt)
          else learningLoop (c + 1) cl ce fsd' lt ltt (fsd:fsds ++ map (\(_, _, _, x) -> x) fsds')
 
 learning :: Int ->
             Fsd.FxSettingData ->
-            IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
+            IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData, Int, Int)
 learning n fsd = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
@@ -119,13 +119,13 @@ learning n fsd = do
               M.insert (Fsd.fxSetting fsd) (10000, 1) $ Fsd.fxSettingLog fsd
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
-    then return (length tdlts, True, tdl', tdlt',  fsd'')
+    then return (length tdlts, True, tdl', tdlt',  fsd'', lt, ltt)
     else learningLoop 0 cl ce fsd lt ltt . map (\x -> fsd { Fsd.fxSetting = x }) . M.keys $ Fsd.fxSettingLog fsd
 
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB 
-  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) =<< Fm.readFxSettingData "backtest"
+  (plsf, lsf, tdl, tdlt, fsd', _, _) <- learning (Fcd.no e) =<< Fm.readFxSettingData "backtest"
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return fsd'
 
@@ -141,18 +141,13 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsd = do
-  (plsf, lsf, tdl, tdlt, fsd1) <- learning n fsd
-  (fsd2, tdt) <- if latest
-                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd1
-                      =<< ((++) <$>
-                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                            Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
-                 else let lt  = Fs.getLearningTime     fsd1
-                          ltt = Fs.getLearningTestTime fsd1
-                      in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd1
-                         =<< ((++) <$>
-                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                              Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
+  (plsf, lsf, tdl, tdlt, fsd1, lt, ltt) <- learning n fsd
+  (fsd2, tdt) <- let lt  = Fs.getLearningTime     fsd1
+                     ltt = Fs.getLearningTestTime fsd1
+                 in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd1
+                    =<< ((++) <$>
+                          Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
+                          Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lsf
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
