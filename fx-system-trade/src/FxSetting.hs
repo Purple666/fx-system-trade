@@ -240,10 +240,10 @@ createRandomGaData reset ix = do
 
 createInitialGaData :: MonadRandom m =>
                        Int ->
-                       Fsd.FxSettingData ->
+                       Ga.LearningData Fsd.FxSettingData ->
                        m (Ga.LearningData Fsd.FxSettingData)
-createInitialGaData n ifsd =
-  Ga.learningDataList <$> mapM (\_ -> createRandomGaData False ifsd) [1..n]
+createInitialGaData n x =
+  Ga.learningDataList <$> mapM (\_ -> createRandomGaData False $ Ga.getHeadGaData x) [1..n]
 
 copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
@@ -256,7 +256,7 @@ mutationFxSettingData :: MonadRandom m =>
                          Ga.LearningData Fsd.FxSettingData ->
                          m (Ga.LearningData Fsd.FxSettingData)
 mutationFxSettingData x _ =
-  createInitialGaData 1 (Ga.getHeadGaData x)
+  createInitialGaData 1 x
 
 resetFxSettingData :: MonadRandom m =>
                          Fsd.FxSettingData ->

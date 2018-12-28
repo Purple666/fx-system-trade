@@ -36,7 +36,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   copy :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   mutation :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
-  createInitialData :: MonadRandom m => Int -> a -> m (LearningData a)
+  createInitialData :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
   learningEvaluate :: a -> (a, Rational)
   getGaLoopMax :: a -> Int
   plusGaLoopMax :: a -> a
@@ -101,23 +101,22 @@ learningLoop c glm x = do
               then learningLoop (c + 1) glm x
               else learningLoop (c + 1) glm x'
 
-createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> [a] -> LearningData a -> m (LearningData a)
-createInitialDataLoop c glm ixs x = do
-  x' <- mappend x . evaluate . learningDataList <$> mapM (createInitialData glm) ixs
+createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> m (LearningData a)
+createInitialDataLoop c glm x = do
+  x' <- mappend x . evaluate <$> createInitialData glm x 
   --traceShow("create", glm, c, length ixs, length x, length x') $ return ()
   if glm < length x'
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
          else if null x'
-              then createInitialDataLoop (c + 1) glm ixs x'
-              else createInitialDataLoop (c + 1) glm (getGaDataList x') x'
+              then createInitialDataLoop (c + 1) glm x
+              else createInitialDataLoop (c + 1) glm x'
 
-learning :: (Ga a, MonadRandom m) => a -> [a] -> m (LearningData a)
-learning ix ixs = do
-  let x = learningDataList . map learningData $ ix:ixs
-      glm = getGaLoopMax ix
-  x' <- createInitialDataLoop 0 glm [ix] (evaluate x)
+learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
+learning x = do
+  let glm = getGaLoopMax $ getHeadGaData x
+  x' <- createInitialDataLoop 0 glm x
   if null x'
     then return x
     else learningLoop 0 glm x'
