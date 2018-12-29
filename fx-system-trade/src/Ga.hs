@@ -111,9 +111,7 @@ createInitialDataLoop c glm ix x = do
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
-         else if null x'
-              then createInitialDataLoop (c + 1) glm ix x
-              else createInitialDataLoop (c + 1) glm ix x'
+         else createInitialDataLoop (c + 1) glm ix x'
 
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
