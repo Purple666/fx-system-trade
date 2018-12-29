@@ -92,9 +92,9 @@ learningLoop c n fsd = do
                          let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                             p    = 10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
+                             p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
                                     fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd)
-                         return (p, tdl, tdlt, x)) . Ga.getGaDataList <$>
+                         return (p, tdl, tdlt, x)) . (fsd : Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
   let (p, tdl, tdlt, fsd') = maximum fsds''
