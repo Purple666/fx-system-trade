@@ -87,10 +87,10 @@ learningLoop c n fsd = do
   fsds' <- (map (\x -> do let lt'   = Fs.getLearningTime     x
                               ltt'  = Fs.getLearningTestTime x
                           cl' <-              Fm.getChartListBack n (Fs.getPrepareTimeAll x + lt') 0
-                          ce' <- mapM ((\y -> Fm.getChartListBack (n - y) (Fs.getPrepareTimeAll y + ltt') 0) .
+                          ce' <- mapM ((\y -> Fm.getChartListBack (n - y) (Fs.getPrepareTimeAll x + ltt') 0) .
                                        (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                           let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                                Fsd.nextFxSettingData ltt y x) ce'
+                                                Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt' cl' x
                               p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
                                      fromIntegral (lt' + ltt' * Gsd.learningTestCount Gsd.gsd)
