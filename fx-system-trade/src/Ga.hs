@@ -62,7 +62,9 @@ evaluate (LearningData y) =
 
 selection :: MonadRandom m => LearningData a -> m (LearningData a)
 selection x = do
-  x' <- fromList $ getLearningData x
+  x' <- if (sum . map snd $ getLearningData x) == 0
+        then fromList . map (\(f, _) -> (f, 1)) $ getLearningData x
+        else fromList $ getLearningData x
   return $ learningData x'
 
 selection2 :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a, LearningData a)
