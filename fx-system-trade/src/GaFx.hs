@@ -84,17 +84,17 @@ learningLoop :: Int ->
 learningLoop c n fsd = do
   let lt   = Fs.getLearningTime     fsd
   cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
-  fsds' <- map (\x -> do let lt   = Fs.getLearningTime     fsd
-                             ltt  = Fs.getLearningTestTime fsd
-                         cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
-                         ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) .
-                                     (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
-                         let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                            Fsd.nextFxSettingData ltt y x) ce
-                             tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                             p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
-                                    fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd)
-                         return (p, tdl, tdlt, x)) . (fsd : Ga.getGaDataList) <$>
+  fsds' <- (map (\x -> do let lt   = Fs.getLearningTime     fsd
+                              ltt  = Fs.getLearningTestTime fsd
+                          cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
+                          ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) .
+                                      (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
+                          let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
+                                                Fsd.nextFxSettingData ltt y x) ce
+                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
+                              p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
+                                     fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd)
+                          return (p, tdl, tdlt, x)) . (fsd :) .  Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
   let (p, tdl, tdlt, fsd') = maximum fsds''
