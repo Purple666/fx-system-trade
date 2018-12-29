@@ -83,17 +83,23 @@ learningLoop :: Int ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n fsd = do
   let lt   = Fs.getLearningTime     fsd
-      ltt  = Fs.getLearningTestTime fsd
   cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
-  ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) .
-              (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
-  fsds' <- map (\x -> let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
+  fsds' <- map (\x -> do let lt   = Fs.getLearningTime     fsd
+                             ltt  = Fs.getLearningTestTime fsd
+                         cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
+                         ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd + ltt) 0) .
+                                     (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
+                         let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                             Fsd.nextFxSettingData ltt y x) ce
-                          tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
-                          p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
-                      in (p, tdl, tdlt, x)) . Ga.getGaDataList <$>
+                             tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl x
+                             p    = 10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
+                                    fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd)
+                         return (p, tdl, tdlt, x)) . Ga.getGaDataList <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
-  let (p, tdl, tdlt, fsd') = maximum fsds'
+  fsds'' <- sequence $ fsds'
+  let (p, tdl, tdlt, fsd') = maximum fsds''
+      lt   = Fs.getLearningTime     fsd'
+      ltt  = Fs.getLearningTestTime fsd'
   Fp.printLearningFxTradeData p 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
