@@ -118,7 +118,7 @@ createInitialDataLoop c glm x = do
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
   let glm = getGaLoopMax $ getHeadGaData x
-  x' <- createInitialDataLoop 0 glm x
+  x' <- createInitialDataLoop 0 glm $ evaluate x
   if null x'
     then return x
     else learningLoop 0 glm x'
