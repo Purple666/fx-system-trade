@@ -100,7 +100,7 @@ learningLoop c n fsd = do
   let (p, tdl, tdlt, fsd') = maximum fsds''
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
-  Fp.printLearningFxTradeData p 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
+  -- Fp.printLearningFxTradeData p 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
     else if Fs.getLearningTestTimes fsd' < fromIntegral c || fsd == fsd' -- && Ft.evaluationOk2 tdl tdlt)
