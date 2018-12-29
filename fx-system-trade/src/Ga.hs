@@ -103,22 +103,22 @@ learningLoop c glm x = do
               then learningLoop (c + 1) glm x
               else learningLoop (c + 1) glm x'
 
-createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> m (LearningData a)
-createInitialDataLoop c glm x = do
-  x' <- mappend x . evaluate <$> createInitialData glm x 
+createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> LearningData a -> m (LearningData a)
+createInitialDataLoop c glm ix x = do
+  x' <- mappend x . evaluate <$> createInitialData glm ix 
   --traceShow("create", glm, c, length ixs, length x, length x') $ return ()
   if glm < length x'
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
          else if null x'
-              then createInitialDataLoop (c + 1) glm x
-              else createInitialDataLoop (c + 1) glm x'
+              then createInitialDataLoop (c + 1) glm ix x
+              else createInitialDataLoop (c + 1) glm ix x'
 
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
   let glm = getGaLoopMax $ getHeadGaData x
-  x' <- createInitialDataLoop 0 glm $ evaluate x
+  x' <- createInitialDataLoop 0 glm x $ evaluate x
   if null x'
     then return x
     else learningLoop 0 glm x'
