@@ -23,11 +23,11 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 5
-                    , makeTreeCount         = 5
-                    , algorithmRepeat       = 5
-                    , countUpListMax        = 5
-                    , learningTestCount     = 3
+  GlobalSettingData { taMargin              = 10
+                    , makeTreeCount         = 10
+                    , algorithmRepeat       = 10
+                    , countUpListMax        = 10
+                    , learningTestCount     = 10
                     , taAndRate             = 2
                     , quantityRate          = 5
                     , thresholdRate         = 0.01
