@@ -151,12 +151,17 @@ backTestLoop :: Bool ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsd = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning n fsd
-  (fsd2, tdt) <- let lt  = Fs.getLearningTime     fsd1
-                     ltt = Fs.getLearningTestTime fsd1
-                 in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd1
+  (fsd2, tdt) <- if latest
+                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd1
                     =<< ((++) <$>
                           Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                          Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
+                          Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
+                 else let lt  = Fs.getLearningTime     fsd1
+                          ltt = Fs.getLearningTestTime fsd1
+                      in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd1
+                         =<< ((++) <$>
+                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
+                              Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lsf
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
