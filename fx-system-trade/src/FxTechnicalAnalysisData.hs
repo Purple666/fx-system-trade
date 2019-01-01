@@ -6,15 +6,12 @@ module FxTechnicalAnalysisData
   , FxAlMaSetting (..)
   , FxChartTaData (..)
   , FxTradePosition (..)
-  , FxalgorithmListCount (..)
   , initFxTechnicalAnalysisSetting
   , initFxAlgorithmSetting
   , initTechAnaLeafData
   , initFxTechnicalAnalysisData
   , initFxMovingAverageData
   , initAlgoLeafData
-  , zeroFxalgorithmListCount
-  , resetFxalgorithmListCount
   ) where
 
 import qualified Data.Map          as M
@@ -99,13 +96,6 @@ data FxAlMaSetting = FxAlMaSetting
   , thresholdMaxSetting :: Double
   }  deriving (Show, Read, Eq)
 
-
-data FxalgorithmListCount =
-  FxalgorithmListCount { prev      :: ([Tr.LeafData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)],
-                                       M.Map Int [Tr.LeafData FxTechnicalAnalysisData])
-                       , listCount :: (Tr.LeafDataMap (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData),
-                                       M.Map Int (Tr.LeafDataMap FxTechnicalAnalysisData))
-                       } deriving (Show, Read)
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =
@@ -252,15 +242,4 @@ initFxMovingAverageData =
                       , thresholdL = None
                       , thresholdM = None
                       }
-
-resetFxalgorithmListCount :: FxalgorithmListCount -> FxalgorithmListCount
-resetFxalgorithmListCount falc =
-   falc { listCount = (Tr.emptyLeafDataMap, M.empty)
-        }
-
-zeroFxalgorithmListCount :: FxalgorithmListCount
-zeroFxalgorithmListCount =
-  FxalgorithmListCount { prev      = ([], M.empty)
-                       , listCount = (Tr.emptyLeafDataMap, M.empty)
-                       }
 

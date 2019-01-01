@@ -11,14 +11,19 @@ module FxTradeData
   ) where
 
 --import Debug.Trace
+import qualified Data.Map          as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
+import qualified Tree              as Tr
 
 data FxTradeAlgorithmListCount =
-  FxTradeAlgorithmListCount { alcOpen            :: Fad.FxalgorithmListCount
-                            , alcCloseProfit     :: Fad.FxalgorithmListCount
-                            , alcCloseLoss       :: Fad.FxalgorithmListCount
+  FxTradeAlgorithmListCount { alcOpen            :: (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                                                     M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData))
+                            , alcCloseProfit     :: (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                                                     M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData))
+                            , alcCloseLoss       :: (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
+                                                     M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData))
                             , alcTradeDate       :: Int
                             , alcTrade           :: Int
                             , alcFailProfit      :: Double
@@ -28,7 +33,9 @@ data FxTradeAlgorithmListCount =
                             }
 
 data FxTradeData =
-  FxTradeData { chart              :: Fcd.FxChartData
+  FxTradeData { prevOpen           :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                                       M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
+              , chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
               , side               :: FxSide
               , trSuccess          :: Int
@@ -75,9 +82,9 @@ instance Ord FxTradeData where
 
 initFxTradeAlgorithmListCount :: FxTradeAlgorithmListCount
 initFxTradeAlgorithmListCount =
-  FxTradeAlgorithmListCount{ alcOpen             = Fad.zeroFxalgorithmListCount
-                           , alcCloseProfit      = Fad.zeroFxalgorithmListCount
-                           , alcCloseLoss        = Fad.zeroFxalgorithmListCount
+  FxTradeAlgorithmListCount{ alcOpen             = (Tr.emptyLeafDataMap, M.empty)
+                           , alcCloseProfit      = (Tr.emptyLeafDataMap, M.empty)
+                           , alcCloseLoss        = (Tr.emptyLeafDataMap, M.empty)
                            , alcTradeDate        = 0
                            , alcTrade            = 0 
                            , alcFailProfit       = 0
@@ -88,7 +95,8 @@ initFxTradeAlgorithmListCount =
 
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
-  FxTradeData { chart               = Fcd.initFxChartData
+  FxTradeData { prevOpen            = ([], M.empty)
+              , chart               = Fcd.initFxChartData
               , tradeRate           = Fcd.initFxChartData
               , side                = None
               , profit              = 0
