@@ -71,7 +71,7 @@ instance Eq FxTechnicalAnalysisSetting where
   a == b = techAnaTree    a == techAnaTree    b &&
            treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
-           (length $ algoSetting    a) == (length $ algoSetting    b)
+           (sort . elems $ algoSetting    a) == (sort . elem $ algoSetting    b)
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
