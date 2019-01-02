@@ -317,10 +317,10 @@ backTest :: Bool ->
 backTest latest l plsf td fsd xcd = do
   let ctdl = makeChart fsd l xcd
   (fsd3, td3) <- foldl (\a ctd -> do (fsd1, td1) <- a
-                                       let (open, close, fsd2, td2) = evaluate ctd fsd1 plsf getQuantityBacktest False td1
+                                     let (open, close, fsd2, td2) = evaluate ctd fsd1 plsf getQuantityBacktest False td1
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
-                                       return (fsd2, td2))
-                   (pure (fsd, td)) ctdl
+                                     return (fsd2, td2))
+                 (pure (fsd, td)) ctdl
   -- fsd' <- (Fm.writeFxSettingData "backtest" . Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd) =<< Fm.readFxSettingData "backtest"
   return (fsd3, td3)
 
