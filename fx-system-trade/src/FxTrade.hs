@@ -132,11 +132,11 @@ evaluate ctd fsd plsf f1 forceSell td =
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
                       fslu = Fs.updateFxSettingLog plsf $ Fsd.fxSettingLog fsd
-                      fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
-                                                            then M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fslu
-                                                            else if plsf == 0
-                                                                 then M.insert (Fsd.fxSetting fsd) (profits, 1) fslu
-                                                                 else fslu
+                      fsl = M.filter (\(p, _) -> 0 < p) $ if M.member (Fsd.fxSetting fsd) fslu
+                                                          then M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fslu
+                                                          else if plsf == 0
+                                                               then M.insert (Fsd.fxSetting fsd) (profits, 1) fslu
+                                                               else fslu
                       ls' = ls { Fsd.trTrade         = Fsd.trTrade ls + 1
                                , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
                                , Fsd.trSuccess       = if 0 < profits
@@ -316,13 +316,13 @@ backTest :: Bool ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest latest l plsf td fsd xcd = do
   let ctdl = makeChart fsd l xcd
-  (fsd'', td'') <- foldl (\a ctd -> do (fsd', td') <- a
-                                       let (open, close, fsd3, td3) = evaluate ctd fsd plsf getQuantityBacktest False td'
+  (fsd3, td3) <- foldl (\a ctd -> do (fsd1, td1) <- a
+                                       let (open, close, fsd2, td2) = evaluate ctd fsd1 plsf getQuantityBacktest False td1
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
-                                       return (fsd3, td3))
+                                       return (fsd2, td2))
                    (pure (fsd, td)) ctdl
   -- fsd' <- (Fm.writeFxSettingData "backtest" . Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd) =<< Fm.readFxSettingData "backtest"
-  return (fsd'', td'')
+  return (fsd3, td3)
 
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->
