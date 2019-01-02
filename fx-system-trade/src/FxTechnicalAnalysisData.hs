@@ -68,16 +68,22 @@ data FxTechnicalAnalysisSetting =
                              } deriving (Show, Read)
 
 instance Eq FxTechnicalAnalysisSetting where
-  a == b = techAnaTree a == techAnaTree b &&
-           algoSetting a == algoSetting b
+  a == b = techAnaTree    a == techAnaTree    b &&
+           treeAnaAndRate a == treeAnaAndRate b &&
+           treeAnaOrRate  a == treeAnaOrRate  b &&
+           algoSetting    a == algoSetting    b
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
-    | techAnaTree a == techAnaTree b &&
-      algoSetting a == algoSetting b    = EQ
-    | techAnaTree a <= techAnaTree b &&
-      algoSetting a <= algoSetting b    = LT
-    | otherwise                         = GT
+    | techAnaTree    a == techAnaTree    b &&
+      treeAnaAndRate a == treeAnaAndRate b &&
+      treeAnaOrRate  a == treeAnaOrRate  b &&
+      algoSetting    a == algoSetting    b    = EQ
+    | techAnaTree    a <= techAnaTree    b &&
+      treeAnaAndRate a <= treeAnaAndRate b &&
+      treeAnaOrRate  a <= treeAnaOrRate  b &&
+      algoSetting    a <= algoSetting    b    = LT
+    | otherwise                               = GT
 
 instance Eq FxAlgorithmSetting where
   a == b = algorithmTree    a == algorithmTree    b &&
