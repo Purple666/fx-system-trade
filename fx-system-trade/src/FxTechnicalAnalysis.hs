@@ -65,7 +65,6 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
           , Fad.algoSetting   = as'
           }
 
-
 makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
                            ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
