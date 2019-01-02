@@ -79,7 +79,7 @@ instance Ord FxTechnicalAnalysisSetting where
     | techAnaTree    a == techAnaTree    b &&
       treeAnaAndRate a == treeAnaAndRate b &&
       treeAnaOrRate  a == treeAnaOrRate  b &&
-      (lngth $ algoSetting    a) == (length $ algoSetting    b) = EQ
+      (length $ algoSetting    a) == (length $ algoSetting    b) = EQ
     | techAnaTree    a <= techAnaTree    b &&
       treeAnaAndRate a <= treeAnaAndRate b &&
       treeAnaOrRate  a <= treeAnaOrRate  b &&
