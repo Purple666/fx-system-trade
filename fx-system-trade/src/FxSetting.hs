@@ -121,8 +121,8 @@ updateFxSettingLog plsf fsl =
        sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
   else fsl
 
-unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-unionFxSettingData fsd fsdo = 
+unionFxSettingData :: Int -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+unionFxSettingData plsf fsd fsdo = 
   let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
       lso = Fsd.learningSetting $ Fsd.fxSetting fsdo
       ls' = ls { Fsd.trTrade         = max (Fsd.trTrade       lso) (Fsd.trTrade       ls)
@@ -135,7 +135,7 @@ unionFxSettingData fsd fsdo =
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
-         , Fsd.fxSettingLog = M.union (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd) 
+         , Fsd.fxSettingLog = updateFxSettingLog plsf $ M.union (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd) 
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b
