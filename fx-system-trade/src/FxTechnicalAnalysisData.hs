@@ -68,13 +68,55 @@ data FxTechnicalAnalysisSetting =
                              } deriving (Show, Read)
 
 instance Eq FxTechnicalAnalysisSetting where
-  a == b = techAnaTree a == techAnaTree b 
+  a == b = techAnaTree a == techAnaTree b &&
+           algoSetting a == algoSetting b
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
-    | techAnaTree a == techAnaTree b = EQ
-    | techAnaTree a <= techAnaTree b = LT
-    | otherwise                      = GT
+    | techAnaTree a == techAnaTree b &&
+      algoSetting a == algoSetting b    = EQ
+    | techAnaTree a <= techAnaTree b &&
+      algoSetting a <= algoSetting b    = LT
+    | otherwise                         = GT
+
+instance Eq FxAlgorithmSetting where
+  a == b = algorithmTree    a == algorithmTree    b &&
+           algorithmAndRate a == algorithmAndRate b &&
+           algorithmOrRate  a == algorithmOrRate  b &&
+           smaSetting       a == smaSetting       b &&
+           emaSetting       a == emaSetting       b &&
+           wmaSetting       a == wmaSetting       b &&
+           macdSetting      a == macdSetting      b &&
+           stSetting        a == stSetting        b &&
+           rciSetting       a == rciSetting       b &&
+           rsiSetting       a == rsiSetting       b &&
+           simChart         a == simChart         b
+
+instance Ord FxAlgorithmSetting where
+  compare a b
+    | algorithmTree    a == algorithmTree    b &&
+      algorithmAndRate a == algorithmAndRate b &&
+      algorithmOrRate  a == algorithmOrRate  b &&
+      smaSetting       a == smaSetting       b &&
+      emaSetting       a == emaSetting       b &&
+      wmaSetting       a == wmaSetting       b &&
+      macdSetting      a == macdSetting      b &&
+      stSetting        a == stSetting        b &&
+      rciSetting       a == rciSetting       b &&
+      rsiSetting       a == rsiSetting       b &&
+      simChart         a == simChart         b     = EQ
+    | algorithmTree    a <= algorithmTree    b &&
+      algorithmAndRate a <= algorithmAndRate b &&
+      algorithmOrRate  a <= algorithmOrRate  b &&
+      smaSetting       a <= smaSetting       b &&
+      emaSetting       a <= emaSetting       b &&
+      wmaSetting       a <= wmaSetting       b &&
+      macdSetting      a <= macdSetting      b &&
+      stSetting        a <= stSetting        b &&
+      rciSetting       a <= rciSetting       b &&
+      rsiSetting       a <= rsiSetting       b &&
+      simChart         a <= simChart         b     = LT
+    | otherwise                                    = GT
 
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
@@ -89,7 +131,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read)
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
