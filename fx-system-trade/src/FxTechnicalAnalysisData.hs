@@ -19,6 +19,7 @@ import qualified Data.Map          as M
 import qualified FxChartData       as Fcd
 import qualified GlobalSettingData as Gsd
 import qualified Tree              as Tr
+import Data.List
 
 data FxChartTaData = FxChartTaData
   { taChart     :: Fcd.FxChartData
