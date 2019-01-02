@@ -72,6 +72,16 @@ instance Eq FxTechnicalAnalysisSetting where
            treeAnaOrRate  a == treeAnaOrRate  b &&
            algoSetting    a == algoSetting    b 
 
+instance Ord FxTechnicalAnalysisSetting where
+  compare a b
+    | treeAnaAndRate a == treeAnaAndRate b &&
+      treeAnaOrRate  a == treeAnaOrRate  b &&
+      algoSetting    a == algoSetting    b    = EQ
+    | treeAnaAndRate a <= treeAnaAndRate b &&
+      treeAnaOrRate  a <= treeAnaOrRate  b &&
+      algoSetting    a <= algoSetting    b    = LT
+    | otherwise                               = GT
+
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
   , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
@@ -85,7 +95,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Eq)
+  } deriving (Show, Read, Eq, Ord)
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
@@ -94,7 +104,7 @@ data FxAlMaSetting = FxAlMaSetting
   , prevSetting         :: Int
   , thresholdSetting    :: Double
   , thresholdMaxSetting :: Double
-  }  deriving (Show, Read, Eq)
+  }  deriving (Show, Read, Eq, Ord)
 
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]

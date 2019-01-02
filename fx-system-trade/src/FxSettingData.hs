@@ -35,9 +35,13 @@ data FxChart =
 
 instance Ord FxSetting where
   compare a b
-    | learningSetting a == learningSetting b  = EQ
-    | learningSetting a <= learningSetting b  = LT
-    | otherwise                               = GT
+    | fxTaOpen        a == fxTaOpen        b &&
+      fxTaCloseProfit a == fxTaCloseProfit b &&
+      fxTaCloseLoss   a == fxTaCloseLoss   b    = EQ
+    | fxTaOpen        a <= fxTaOpen        b &&
+      fxTaCloseProfit a <= fxTaCloseProfit b &&
+      fxTaCloseLoss   a <= fxTaCloseLoss   b    = LT
+    | otherwise                                 = GT
 
 instance Eq FxSetting where
   a == b = fxTaOpen        a == fxTaOpen        b &&
