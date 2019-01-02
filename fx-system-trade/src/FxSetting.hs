@@ -3,7 +3,6 @@ module FxSetting
   , getLearningTime
   , getLearningTestTime
   , getLearningTestTimes
-  , updateFxSettingData
   , createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
@@ -121,49 +120,6 @@ updateFxSettingLog plsf fsl =
        sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
   else fsl
   
-updateFxSettingData :: [Fad.FxChartTaData] ->
-                       Int ->
-                       Ftd.FxTradeData ->
-                       Ftd.FxTradeData ->
-                       Ftd.FxTradeAlgorithmListCount ->
-                       Fsd.FxSettingData ->
-                       Fsd.FxSettingData ->
-                       Fsd.FxSettingData
-updateFxSettingData ctdl plsf td tdt acc fsd fsdo =
-  let p = Ftd.profit tdt - Ftd.profit td
-      lso = Fsd.learningSetting $ Fsd.fxSetting fsdo
-      ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
-      fslu = updateFxSettingLog plsf (Fsd.fxSettingLog fsdo)
-      fsl = M.filter (\(pp, _) -> 0 < pp) $ if M.member (Fsd.fxSetting fsd) fslu
-                                            then M.adjust (\(a, b) -> (a + p, b + 1)) (Fsd.fxSetting fsd) fslu
-                                            else if plsf == 0
-                                                 then M.insert (Fsd.fxSetting fsd) (p, 1) fslu
-                                                 else fslu
-      ls' = ls { Fsd.trTrade         = max (Fsd.trTrade       lso) (Fsd.trTrade       ls) + (toInteger $ Ftd.alcTrade     acc)
-               , Fsd.trTradeDate     = max (Fsd.trTradeDate   lso) (Fsd.trTradeDate   ls) + (toInteger $ Ftd.alcTradeDate acc)
-               , Fsd.trSuccess       = max (Fsd.trSuccess     lso) (Fsd.trSuccess     ls) + Ftd.alcSuccess       acc
-               , Fsd.trFail          = max (Fsd.trFail        lso) (Fsd.trFail        ls) + Ftd.alcFail          acc
-               , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls) + Ftd.alcSuccessProfit acc
-               , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls) + Ftd.alcFailProfit    acc
-               }
-  in if 0 < p
-     then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                { Fsd.learningSetting  = ls'
-                                , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                         ctdl (Ftd.alcOpen acc) (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
-                                , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit
-                                                         ctdl (Ftd.alcCloseProfit acc) (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
-                                , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss
-                                                         ctdl (Ftd.alcCloseLoss acc) (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
-                                }
-              , Fsd.fxSettingLog = fsl
-              }
-     else fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                { Fsd.learningSetting = ls'
-                                }
-              , Fsd.fxSettingLog = fsl
-              }
-
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
 

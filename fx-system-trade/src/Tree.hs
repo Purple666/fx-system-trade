@@ -11,7 +11,7 @@ module Tree
   , setFunctionToLeafDataMap
   , setFunctionToTree
   , makeValidLeafDataList
-  , addValidLeafDataList
+  , calcValidLeafDataList
   , addLeafDataMap
   , checkLeafDataMap
   , emptyLeafDataMap
@@ -183,9 +183,9 @@ addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
                                 then 1
                                 else x) ab
 
-addValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a -> LeafDataMap a
-addValidLeafDataList p lds xs =
-  foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k p) acc) xs lds
+calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
+calcValidLeafDataList p lds =
+  foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k p) acc) emptyLeafDataMap lds
 
 makeValidLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 makeValidLeafDataList f s tl =
