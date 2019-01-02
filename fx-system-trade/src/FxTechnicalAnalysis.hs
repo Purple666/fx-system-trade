@@ -11,7 +11,7 @@ module FxTechnicalAnalysis
 
 import           Data.List
 import qualified Data.Map                as M
---import           Debug.Trace
+import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
@@ -57,13 +57,14 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                  , Fad.algoSetting   = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                                                        y' = y { Fad.algorithmListCount =
                                                                                 Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                                                    in M.union (M.singleton k y') acc) (Fad.algoSetting fts) ldla
+                                                                   in M.union (M.singleton k y') acc) (Fad.algoSetting fts) ldla
                  }
-      as = updateThreshold f ctd (Fad.algoSetting fts')
+      as = updateThreshold f ctd (Fad.algoSetting fts)
       (as', tlc) = checkAlgoSetting as (Fad.techListCount fts')
   in fts' { Fad.techListCount = tlc
           , Fad.algoSetting   = as'
           }
+
 
 makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
