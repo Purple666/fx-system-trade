@@ -86,8 +86,7 @@ instance Ord FxTechnicalAnalysisSetting where
     | otherwise                               = GT
 
 instance Eq FxAlgorithmSetting where
-  a == b = algorithmTree    a == algorithmTree    b &&
-           algorithmAndRate a == algorithmAndRate b &&
+  a == b = algorithmAndRate a == algorithmAndRate b &&
            algorithmOrRate  a == algorithmOrRate  b &&
            smaSetting       a == smaSetting       b &&
            emaSetting       a == emaSetting       b &&
@@ -100,8 +99,7 @@ instance Eq FxAlgorithmSetting where
 
 instance Ord FxAlgorithmSetting where
   compare a b
-    | algorithmTree    a == algorithmTree    b &&
-      algorithmAndRate a == algorithmAndRate b &&
+    | algorithmAndRate a == algorithmAndRate b &&
       algorithmOrRate  a == algorithmOrRate  b &&
       smaSetting       a == smaSetting       b &&
       emaSetting       a == emaSetting       b &&
@@ -111,8 +109,7 @@ instance Ord FxAlgorithmSetting where
       rciSetting       a == rciSetting       b &&
       rsiSetting       a == rsiSetting       b &&
       simChart         a == simChart         b     = EQ
-    | algorithmTree    a <= algorithmTree    b &&
-      algorithmAndRate a <= algorithmAndRate b &&
+    | algorithmAndRate a <= algorithmAndRate b &&
       algorithmOrRate  a <= algorithmOrRate  b &&
       smaSetting       a <= smaSetting       b &&
       emaSetting       a <= emaSetting       b &&
