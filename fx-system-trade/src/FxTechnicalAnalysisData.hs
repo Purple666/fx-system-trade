@@ -68,22 +68,46 @@ data FxTechnicalAnalysisSetting =
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
                              } deriving (Show, Read)
 
+data FxAlgorithmSetting = FxAlgorithmSetting
+  { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
+  , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
+  , algorithmAndRate   :: Int
+  , algorithmOrRate    :: Int
+  , smaSetting         :: FxAlMaSetting
+  , emaSetting         :: FxAlMaSetting
+  , wmaSetting         :: FxAlMaSetting
+  , macdSetting        :: FxAlMaSetting
+  , stSetting          :: FxAlMaSetting
+  , rciSetting         :: FxAlMaSetting
+  , rsiSetting         :: FxAlMaSetting
+  , simChart           :: Int
+  } deriving (Show, Read)
+
+data FxAlMaSetting = FxAlMaSetting
+  { shortSetting        :: Int
+  , middleSetting       :: Int
+  , longSetting         :: Int
+  , prevSetting         :: Int
+  , thresholdSetting    :: Double
+  , thresholdMaxSetting :: Double
+  }  deriving (Show, Read, Eq, Ord)
+
 instance Eq FxTechnicalAnalysisSetting where
   a == b = techAnaTree    a == techAnaTree    b &&
            treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
-           (length $ algoSetting    a) == (length $ algoSetting    b)
+           (length $ algoSetting a) == (length $ algoSetting b)
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
     | techAnaTree    a == techAnaTree    b &&
       treeAnaAndRate a == treeAnaAndRate b &&
       treeAnaOrRate  a == treeAnaOrRate  b &&
-      (length $ algoSetting    a) == (length $ algoSetting    b) = EQ
+      (length $ algoSetting a) == (length $ algoSetting b) = EQ
     | techAnaTree    a <= techAnaTree    b &&
       treeAnaAndRate a <= treeAnaAndRate b &&
       treeAnaOrRate  a <= treeAnaOrRate  b &&
-      (length $ algoSetting    a) <= (length $ algoSetting    b) = LT
+      (length $ algoSetting a) <= (length $ algoSetting b) = LT
     | otherwise                               = GT
 
 instance Eq FxAlgorithmSetting where
@@ -121,31 +145,6 @@ instance Ord FxAlgorithmSetting where
       rsiSetting       a <= rsiSetting       b &&
       simChart         a <= simChart         b     = LT
     | otherwise                                    = GT
-
-data FxAlgorithmSetting = FxAlgorithmSetting
-  { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
-  , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
-  , algorithmAndRate   :: Int
-  , algorithmOrRate    :: Int
-  , smaSetting         :: FxAlMaSetting
-  , emaSetting         :: FxAlMaSetting
-  , wmaSetting         :: FxAlMaSetting
-  , macdSetting        :: FxAlMaSetting
-  , stSetting          :: FxAlMaSetting
-  , rciSetting         :: FxAlMaSetting
-  , rsiSetting         :: FxAlMaSetting
-  , simChart           :: Int
-  } deriving (Show, Read)
-
-data FxAlMaSetting = FxAlMaSetting
-  { shortSetting        :: Int
-  , middleSetting       :: Int
-  , longSetting         :: Int
-  , prevSetting         :: Int
-  , thresholdSetting    :: Double
-  , thresholdMaxSetting :: Double
-  }  deriving (Show, Read, Eq, Ord)
-
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =

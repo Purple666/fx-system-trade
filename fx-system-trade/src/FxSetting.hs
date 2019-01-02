@@ -16,6 +16,7 @@ module FxSetting
   , getLossCutRate
   , getProfitRate
   , updateFxSettingLog
+  , unionFxSettingData
   ) where
 
 import           Control.Monad
@@ -119,7 +120,24 @@ updateFxSettingLog plsf fsl =
   then M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
        sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
   else fsl
-  
+
+unionFxSettingData :: Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+unionFxSettingData fsd fsdo = 
+  let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
+      lso = Fsd.learningSetting $ Fsd.fxSetting fsdo
+      ls' = ls { Fsd.trTrade         = max (Fsd.trTrade       lso) (Fsd.trTrade       ls)
+               , Fsd.trTradeDate     = max (Fsd.trTradeDate   lso) (Fsd.trTradeDate   ls)
+               , Fsd.trSuccess       = max (Fsd.trSuccess     lso) (Fsd.trSuccess     ls)
+               , Fsd.trFail          = max (Fsd.trFail        lso) (Fsd.trFail        ls)
+               , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls)
+               , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls)
+               }
+  in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                           { Fsd.learningSetting = ls'
+                           }
+         , Fsd.fxSettingLog = M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)
+         }
+
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
 

@@ -321,7 +321,7 @@ backTest latest l plsf td fsd xcd = do
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                      return (fsd2, td2))
                  (pure (fsd, td)) ctdl
-  -- fsd' <- (Fm.writeFxSettingData "backtest" . Fs.updateFxSettingData ctdl plsf td td'' acc'' fsd) =<< Fm.readFxSettingData "backtest"
+  fsd' <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData fsd3) =<< Fm.readFxSettingData "backtest"
   return (fsd3, td3)
 
 learning :: Ftd.FxTradeData ->
@@ -341,11 +341,12 @@ learning td fsd =
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          [Fcd.FxChartData] ->
-         (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
-trade td fsd xcd =
+         IO (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
+trade td fsd xcd = do
   let ctdl = makeChart fsd 1 xcd
-      (open, close, _, td') =  evaluate (last ctdl) fsd 0 getQuantityBacktest False td
-  in (open, close, td')
+      (open, close, fsd', td') =  evaluate (last ctdl) fsd 0 getQuantityBacktest False td
+  fsd' <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData fsd') =<< Fm.readFxSettingData "backtest"
+  return (open, close, fsd', td')
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
