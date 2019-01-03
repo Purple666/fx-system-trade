@@ -71,7 +71,9 @@ makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
 makeValidLeafDataMapInc fts ftad =
   let l = Tr.makeValidLeafDataList fst (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
   in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
-                                 in (n, Tr.makeValidLeafDataList fst (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))) l)
+                                 in if M.member n ftad && (M.member n $ Fad.algoSetting fts)
+                                    then (n, Tr.makeValidLeafDataList fst (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))
+                                    else (n, [])) l)
 
 makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
@@ -80,7 +82,9 @@ makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
 makeValidLeafDataMapDec fts ftad =
   let l = Tr.makeValidLeafDataList snd (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
   in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
-                                 in (n, Tr.makeValidLeafDataList snd (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))) l)
+                                 in if M.member n ftad && (M.member n $ Fad.algoSetting fts)
+                                    then (n, Tr.makeValidLeafDataList snd (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))
+                                    else (n, [])) l)
 
 calcFxalgorithmListCount :: Double ->
                            ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
