@@ -128,8 +128,8 @@ checkFxSettingData coName = do
 
 writeFxSettingData :: String -> Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 writeFxSettingData coName fsd = do
-  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- retry 100 . access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return fsd
 
