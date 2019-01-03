@@ -69,12 +69,13 @@ initFxTradeData Ftd.Production =
 
 evaluate :: Fad.FxChartTaData ->
             Fsd.FxSettingData ->
+            Fsd.FxSettingData ->
             Int ->
             (Ftd.FxTradeData -> Double -> Double) ->
             Bool ->
             Ftd.FxTradeData ->
             (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
-evaluate ctd fsd plsf f1 forceSell td =
+evaluate ctd fsdo fsd plsf f1 forceSell td =
 {-    
         | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
@@ -98,36 +99,36 @@ evaluate ctd fsd plsf f1 forceSell td =
       ftado     = Fad.open        ctd
       ftadcp    = Fad.closeProfit ctd
       ftadcl    = Fad.closeLoss   ctd
-      fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-      ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-      ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+      fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsdo
+      ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdo
+      ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsdo
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
         | otherwise = Ftd.realizedPL td
       (position, open)
         | (Ftd.side td == Ftd.None ||
-           (0 < tradeRate - chart && Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
+           (0 < tradeRate - chart && Fs.getTradeHoldTime fsdo < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | (Ftd.side td == Ftd.None ||
-           (0 < chart - tradeRate && Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy)) &&
+           (0 < chart - tradeRate && Fs.getTradeHoldTime fsdo < tradeDate && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Close)
-        | Ftd.side td == Ftd.Buy && (forceSell || Fs.getLearningTestTime fsd < tradeDate ||
-                                     (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
+        | Ftd.side td == Ftd.Buy && (forceSell || Fs.getLearningTestTime fsdo < tradeDate ||
+                                     (Fs.getTradeHoldTime fsdo < Fcd.no cd - tradeNo &&
                                       (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
                                        chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl ||
-                                       Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td ||
-                                       unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd))) = (chart - tradeRate, Ftd.Buy)
-        | Ftd.side td == Ftd.Sell && (forceSell || Fs.getLearningTestTime fsd < tradeDate ||
-                                      (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
+                                       Fs.getProfitRate fsdo < unrealizedPL - Ftd.realizedPL td ||
+                                       unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsdo))) = (chart - tradeRate, Ftd.Buy)
+        | Ftd.side td == Ftd.Sell && (forceSell || Fs.getLearningTestTime fsdo < tradeDate ||
+                                      (Fs.getTradeHoldTime fsdo < Fcd.no cd - tradeNo &&
                                        (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp ||
                                         tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
-                                        Fs.getProfitRate fsd < unrealizedPL - Ftd.realizedPL td || 
-                                        unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
+                                        Fs.getProfitRate fsdo < unrealizedPL - Ftd.realizedPL td || 
+                                        unrealizedPL - Ftd.realizedPL td < Fs.getLossCutRate fsdo))) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
@@ -322,10 +323,10 @@ backTest :: Bool ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest latest l plsf td fsd xcd = do
-  let ctdl = makeChart fsd l xcd
+backTest latest l plsf td fsdo xcd = do
+  let ctdl = makeChart fsdo l xcd
   (fsd3, td3) <- foldl (\a ctd -> do (fsd1, td1) <- a
-                                     let (open, close, fsd2, td2) = evaluate ctd fsd1 plsf getQuantityBacktest False td1
+                                     let (open, close, fsd2, td2) = evaluate ctd fsdo fsd1 plsf getQuantityBacktest False td1
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                      return (fsd2, td2))
                  (pure (fsd, td)) ctdl
@@ -338,7 +339,7 @@ learning :: Ftd.FxTradeData ->
 learning td fsd =
   let fc = Fsd.fxChart fsd
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, _, td'') = foldl (\(_, _, _, td') ctd -> evaluate ctd fsd 0 getQuantityLearning False td')
+      (_, _, _, td'') = foldl (\(_, _, _, td') ctd -> evaluate ctd fsd fsd 0 getQuantityLearning False td')
                         (Ftd.None, Ftd.None, fsd, td) $ init ctdl
       (_, _, _, td''') = evaluate (last ctdl) fsd 0 getQuantityLearning True td''
   in if null ctdl
@@ -352,7 +353,7 @@ trade :: Ftd.FxTradeData ->
          IO (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
 trade td fsd xcd = do
   let ctdl = makeChart fsd 1 xcd
-      (open, close, fsd', td') =  evaluate (last ctdl) fsd 0 getQuantityBacktest False td
+      (open, close, fsd', td') =  evaluate (last ctdl) fsd fsd 0 getQuantityBacktest False td
   fsd'' <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData 0 fsd') =<< Fm.readFxSettingData "backtest"
   return (open, close, fsd'', td')
 
