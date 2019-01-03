@@ -178,10 +178,7 @@ evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (eval
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  let ab = M.unionWith (+) a b
-  in LeafDataMap $ M.map (\x -> if x < 1
-                                then 1
-                                else x) ab
+  LeafDataMap $ M.unionWith (+) a b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
 calcValidLeafDataList p lds =
