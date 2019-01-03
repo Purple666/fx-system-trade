@@ -13,7 +13,6 @@ import qualified Data.Map          as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
-import qualified Tree              as Tr
 
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData

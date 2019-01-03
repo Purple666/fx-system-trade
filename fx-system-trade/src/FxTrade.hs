@@ -163,9 +163,7 @@ evaluate ctd fsd plsf f1 forceSell td =
                                                                     then Ta.makeValidLeafDataMapInc fto ftado
                                                                     else if open == Ftd.Sell
                                                                          then Ta.makeValidLeafDataMapDec fto ftado
-                                                                         else if close /= Ftd.None
-                                                                              then ([], M.empty)
-                                                                              else Ftd.prevOpen td
+                                                                         else ([], M.empty)
                                                    , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
                                                                             ctd alcOpen        (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
                                                    , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit
@@ -182,9 +180,16 @@ evaluate ctd fsd plsf f1 forceSell td =
                                  else fslu
                   in fsd1 { Fsd.fxSettingLog = fsl
                           }
-                             
-             else fsd
-
+             else if open /= Ftd.None
+                  then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                             { Fsd.prevOpen = if open == Ftd.Buy
+                                                              then Ta.makeValidLeafDataMapInc fto ftado
+                                                              else if open == Ftd.Sell
+                                                                   then Ta.makeValidLeafDataMapDec fto ftado
+                                                                   else ([], M.empty)
+                                             }
+                           }
+                  else fsd
       td' = td { Ftd.chart     = cd
                , Ftd.tradeRate = if open == Ftd.Buy || open == Ftd.Sell
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd

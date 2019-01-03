@@ -15,6 +15,7 @@ module FxSettingData
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
+import qualified Tree                    as Tr
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
