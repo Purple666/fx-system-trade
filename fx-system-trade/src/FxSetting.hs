@@ -135,7 +135,8 @@ unionFxSettingData plsf fsd fsdo =
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
-         , Fsd.fxSettingLog = updateFxSettingLog plsf . M.filter (\(p, _) -> 0 < p) $ M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)
+         , Fsd.fxSettingLog = updateFxSettingLog plsf . M.filter (\(p, _) -> 0 < p) $
+                              M.union (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd) 
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b

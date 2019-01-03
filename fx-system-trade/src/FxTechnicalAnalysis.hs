@@ -91,27 +91,31 @@ calcFxalgorithmListCount :: Double ->
 calcFxalgorithmListCount p (ptat, pat) =
   (Tr.calcValidLeafDataList p ptat, M.map (\x -> Tr.calcValidLeafDataList p x) pat)
 
-getThreshold :: Int ->
+getThreshold :: Double ->
+                Int ->
                 Fad.FxChartTaData ->
                 (Fad.FxTechnicalAnalysisData -> Fad.FxMovingAverageData) ->
                 (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                 Double
-getThreshold k x f1 f2 =
-  (abs . Fad.short  . f1 $ f2 x M.! k) +
-  (abs . Fad.middle . f1 $ f2 x M.! k) +
-  (abs . Fad.long   . f1 $ f2 x M.! k)
+getThreshold a k x f1 f2 =
+  ((abs (Fad.short  . f1 $ f2 x M.! k) - a) +
+   (abs (Fad.middle . f1 $ f2 x M.! k) - a) +
+   (abs (Fad.long   . f1 $ f2 x M.! k) - a)) / 3
 
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                    Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
-                            { Fad.thresholdMaxSetting = (getThreshold k ctd Fad.st  f + Fad.thresholdMaxSetting (Fad.stSetting x)) / 4
+                            { Fad.thresholdMaxSetting = (50 - (getThreshold 50 k ctd Fad.st  f)
+                                                         + Fad.thresholdMaxSetting (Fad.stSetting x)) / 2
                             }
                           , Fad.rciSetting = (Fad.rciSetting x)
-                            { Fad.thresholdMaxSetting = (getThreshold k ctd Fad.rci f + Fad.thresholdMaxSetting (Fad.rciSetting x)) / 4
+                            { Fad.thresholdMaxSetting = (100 - (getThreshold 0 k ctd Fad.rci f)
+                                                         + Fad.thresholdMaxSetting (Fad.rciSetting x)) / 2
                             }
                           , Fad.rsiSetting = (Fad.rsiSetting x)
-                            { Fad.thresholdMaxSetting = (getThreshold k ctd Fad.rsi f + Fad.thresholdMaxSetting (Fad.rsiSetting x)) / 4
+                            { Fad.thresholdMaxSetting = (50 - (getThreshold 50 k ctd Fad.rsi f)
+                                                          + Fad.thresholdMaxSetting (Fad.rsiSetting x)) / 2
                             }
                           })
 
