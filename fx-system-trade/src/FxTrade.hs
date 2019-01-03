@@ -132,11 +132,11 @@ evaluate ctd fsd plsf f1 forceSell td =
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
                       fslu = Fsd.fxSettingLog fsd
-                      fsl = M.filter (\(p, _) -> 0 < p) $ if M.member (Fsd.fxSetting fsd) fslu
-                                                          then M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fslu
-                                                          else if plsf == 0
-                                                               then M.insert (Fsd.fxSetting fsd) (profits, 1) fslu
-                                                               else fslu
+                      fsl = if M.member (Fsd.fxSetting fsd) fslu
+                            then M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fslu
+                            else if plsf == 0
+                                 then M.insert (Fsd.fxSetting fsd) (profits, 1) fslu
+                                 else fslu
                       ls' = ls { Fsd.trTrade         = Fsd.trTrade ls + 1
                                , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
                                , Fsd.trSuccess       = if 0 < profits

@@ -90,16 +90,7 @@ data FxAlMaSetting = FxAlMaSetting
   , prevSetting         :: Int
   , thresholdSetting    :: Double
   , thresholdMaxSetting :: Double
-  }  deriving (Show, Read, Eq, Ord)
-
-instance Eq FxTechnicalAnalysisSetting where
-  a == b = (length $ algoSetting a) == (length $ algoSetting b)
-
-instance Ord FxTechnicalAnalysisSetting where
-  compare a b
-    | (length $ algoSetting a) == (length $ algoSetting b) = EQ
-    | (length $ algoSetting a) <= (length $ algoSetting b) = LT
-    | otherwise                               = GT
+  }  deriving (Show, Read)
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =

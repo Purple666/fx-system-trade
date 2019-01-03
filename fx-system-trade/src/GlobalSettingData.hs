@@ -5,7 +5,6 @@ data GlobalSettingData = GlobalSettingData
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
-  , thresholdRate         :: Double
   , countUpListMax        :: Int
   , taAndRate             :: Int
   , backtestLatestTime    :: Int
@@ -30,7 +29,6 @@ gsd =
                     , learningTestCount     = 3
                     , taAndRate             = 2
                     , quantityRate          = 5
-                    , thresholdRate         = 0.01
                     , fxSettingLogNum       = 10
                     , backtestLatestTime    = 60
                     , initalProperty        = 5000000
