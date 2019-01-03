@@ -58,7 +58,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
                                         in M.insert k y' acc)
-            (updateThreshold f ctd (Fad.algoSetting fts)) ldla
+            (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
   in fts { Fad.techListCount = tlc'
          , Fad.algoSetting   = as'
@@ -91,30 +91,31 @@ calcFxalgorithmListCount p (ptat, pat) =
   (Tr.calcValidLeafDataList p ptat, M.map (\x -> Tr.calcValidLeafDataList p x) pat)
 
 getThreshold :: Double ->
+                Double -> 
                 Int ->
                 Fad.FxChartTaData ->
                 (Fad.FxTechnicalAnalysisData -> Fad.FxMovingAverageData) ->
                 (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
+                Double ->
                 Double
-getThreshold a k x f1 f2 =
-  ((abs (Fad.short  . f1 $ f2 x M.! k) - a) +
-   (abs (Fad.middle . f1 $ f2 x M.! k) - a) +
-   (abs (Fad.long   . f1 $ f2 x M.! k) - a)) / 3
+getThreshold a b k x f1 f2 p =
+  if M.member k $ f2 x
+  then ((b - abs ((Fad.short  . f1 $ f2 x M.! k) - a)) +
+        (b - abs ((Fad.middle . f1 $ f2 x M.! k) - a)) +
+        (b - abs ((Fad.long   . f1 $ f2 x M.! k) - a)) + p) / 4
+  else p
 
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                    Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
-                            { Fad.thresholdMaxSetting = ((50 - (getThreshold 50 k ctd Fad.st  f))
-                                                         + Fad.thresholdMaxSetting (Fad.stSetting x)) / 2
+                            { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.st f . Fad.thresholdMaxSetting $ Fad.stSetting x
                             }
                           , Fad.rciSetting = (Fad.rciSetting x)
-                            { Fad.thresholdMaxSetting = ((100 - (getThreshold 0 k ctd Fad.rci f))
-                                                         + Fad.thresholdMaxSetting (Fad.rciSetting x)) / 2
+                            { Fad.thresholdMaxSetting = getThreshold 0 100 k ctd Fad.rci f . Fad.thresholdMaxSetting $ Fad.rciSetting x
                             }
                           , Fad.rsiSetting = (Fad.rsiSetting x)
-                            { Fad.thresholdMaxSetting = ((50 - (getThreshold 50 k ctd Fad.rsi f))
-                                                          + Fad.thresholdMaxSetting (Fad.rsiSetting x)) / 2
+                            { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.rsi f . Fad.thresholdMaxSetting $ Fad.rsiSetting x
                             }
                           })
 
