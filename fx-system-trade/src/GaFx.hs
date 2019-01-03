@@ -131,17 +131,17 @@ learning n fsd = do
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n fsd
 
-tradeLearning :: IO Fsd.FxSettingData
-tradeLearning = do
+tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
+tradeLearning fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB 
-  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) =<< Fm.readFxSettingData "backtest"
+  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return fsd'
 
-tradeLearningThread :: IO Fsd.FxSettingData
-tradeLearningThread = do
+tradeLearningThread :: Fsd.FxSettingData -> IO Fsd.FxSettingData
+tradeLearningThread fsd = do
   -- threadDelay (5 * 60 * 1000 * 1000)
-  tradeLearning
+  tradeLearning fsd
 
 backTestLoop :: Bool ->
                 Int ->
@@ -207,9 +207,9 @@ tradeWeeklyLoop :: Ftd.FxTradeData ->
                    IO ()
 tradeWeeklyLoop td coName fsd = do
   waitTrade
-  fsd' <- tradeLearning
+  fsd' <- tradeLearning fsd
   e <- Foa.getNowPrices td
-  td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread)
+  td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread fsd')
   tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
   Ftw.tweetWeek tdw td'
   Fm.setFxTradeData (coName ++ "_weekly") td'
@@ -223,7 +223,7 @@ checkTradeLearning a fsd = do
   case e of
     Nothing -> return (a, fsd)
     Just _  -> do fsd' <- wait a
-                  a' <- async $ tradeLearningThread
+                  a' <- async $ tradeLearningThread fsd
                   return (a', fsd')
 
 tradeLoop :: Fcd.FxChartData ->
