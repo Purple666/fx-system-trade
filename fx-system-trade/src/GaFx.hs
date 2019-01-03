@@ -113,19 +113,19 @@ learning :: Int ->
 learning n fsd = do
   tdlts <- (M.elems .
             M.filter (\(x, y, _, _, _) -> 0 < x && y)) <$>
-           (sequence . M.mapWithKey (\y (p, c) -> do let fsd' = fsd { Fsd.fxSetting = y }
-                                                         lt   = Fs.getLearningTime     fsd'
-                                                         ltt  = Fs.getLearningTestTime fsd'
-                                                     cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd' + lt) 0
-                                                     ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd' + ltt) 0) .
-                                                                 (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
-                                                     let tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                                                          Fsd.nextFxSettingData ltt x fsd') ce
-                                                         tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
-                                                     return (10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
-                                                             (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
-                                                             Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
-            M.insert (Fsd.fxSetting fsd) (10000, 1) $ Fsd.fxSettingLog fsd)
+           (sequence . M.map (\(y, p, c) -> do let fsd' = fsd { Fsd.fxSetting = y }
+                                                   lt   = Fs.getLearningTime     fsd'
+                                                   ltt  = Fs.getLearningTestTime fsd'
+                                               cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd' + lt) 0
+                                               ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd' + ltt) 0) .
+                                                           (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
+                                               let tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
+                                                                    Fsd.nextFxSettingData ltt x fsd') ce
+                                                   tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
+                                               return (10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
+                                                       (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
+                                                        Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
+            M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 10000, 1) $ Fsd.fxSettingLog fsd)
   let (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')

@@ -131,12 +131,6 @@ evaluate ctd fsd plsf f1 forceSell td =
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
-                      fslu = Fsd.fxSettingLog fsd
-                      fsl = if M.member (Fsd.fxSetting fsd) fslu
-                            then M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fslu
-                            else if plsf == 0
-                                 then M.insert (Fsd.fxSetting fsd) (profits, 1) fslu
-                                 else fslu
                       ls' = ls { Fsd.trTrade         = Fsd.trTrade ls + 1
                                , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
                                , Fsd.trSuccess       = if 0 < profits
@@ -163,17 +157,25 @@ evaluate ctd fsd plsf f1 forceSell td =
                         | close == Ftd.Buy  && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapDec ftcl ftadcl
                         | close == Ftd.Sell && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapInc ftcl ftadcl
                         | otherwise         = (Tr.emptyLeafDataMap, M.empty)
-                  in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                           { Fsd.learningSetting  = ls'
-                                           , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
-                                                                    ctd alcOpen        (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
-                                           , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit
-                                                                    ctd alcCloseProfit (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
-                                           , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss
-                                                                    ctd alcCloseLoss   (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
-                                           }
-                         , Fsd.fxSettingLog = fsl
-                         }
+                      fsd1 = fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                                   { Fsd.learningSetting  = ls'
+                                                   , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
+                                                                            ctd alcOpen        (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
+                                                   , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit
+                                                                            ctd alcCloseProfit (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
+                                                   , Fsd.fxTaCloseLoss    = Ta.updateAlgorithmListCount Fad.closeLoss
+                                                                            ctd alcCloseLoss   (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
+                                                   }
+                                 }
+                      fslu = Fsd.fxSettingLog fsd1
+                      fsl = if M.member (Fsd.no $ Fsd.fxSetting fsd1) fslu
+                            then M.adjust (\(_, a, b) -> (Fsd.fxSetting fsd1, a + profits, b + 1)) (Fsd.no $ Fsd.fxSetting fsd1) fslu
+                            else if plsf == 0
+                                 then M.insert (Fsd.no $ Fsd.fxSetting fsd1) (Fsd.fxSetting fsd1, profits, 1) fslu
+                                 else fslu
+                  in fsd1 { Fsd.fxSettingLog = fsl
+                          }
+                             
              else fsd
       td' = td { Ftd.prevOpen = if open == Ftd.Buy
                                 then Ta.makeValidLeafDataMapInc fto ftado

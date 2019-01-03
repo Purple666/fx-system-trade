@@ -146,7 +146,7 @@ setFxTradeDataToDB coName td =
                             , "profit"         =: (show $ Ftd.profit        td)       
                             ]
 
-setFxSettingToDB :: T.Text -> Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
+setFxSettingToDB :: T.Text -> Fsd.FxSetting -> M.Map Int (Fsd.FxSetting, Double, Int) -> Action IO ()
 setFxSettingToDB coName fs fsl =
   upsert (select [] coName ) [ "fs"  =: show fs
                              , "fsl" =: show fsl
