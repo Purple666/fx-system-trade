@@ -329,7 +329,7 @@ backTest latest l plsf td fsdo xcd = do
                                      let (open, close, fsd2, td2) = evaluate ctd fsdo fsd1 plsf getQuantityBacktest False td1
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                      return (fsd2, td2))
-                 (pure (fsd, td)) ctdl
+                 (pure (fsdo, td)) ctdl
   fsd4 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd3) =<< Fm.readFxSettingData "backtest"
   return (fsd4, td3)
 
@@ -341,7 +341,7 @@ learning td fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, _, td'') = foldl (\(_, _, _, td') ctd -> evaluate ctd fsd fsd 0 getQuantityLearning False td')
                         (Ftd.None, Ftd.None, fsd, td) $ init ctdl
-      (_, _, _, td''') = evaluate (last ctdl) fsd 0 getQuantityLearning True td''
+      (_, _, _, td''') = evaluate (last ctdl) fsd fsd 0 getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''
