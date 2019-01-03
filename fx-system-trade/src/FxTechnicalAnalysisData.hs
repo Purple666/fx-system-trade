@@ -93,15 +93,12 @@ data FxAlMaSetting = FxAlMaSetting
   }  deriving (Show, Read, Eq, Ord)
 
 instance Eq FxTechnicalAnalysisSetting where
-  a == b = techAnaTree a    == techAnaTree b &&
-           (length $ algoSetting a) == (length $ algoSetting b)
+  a == b = (length $ algoSetting a) == (length $ algoSetting b)
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
-    | techAnaTree    a == techAnaTree    b &&
-      (length $ algoSetting a) == (length $ algoSetting b) = EQ
-    | techAnaTree    a <= techAnaTree    b &&
-      (length $ algoSetting a) <= (length $ algoSetting b) = LT
+    | (length $ algoSetting a) == (length $ algoSetting b) = EQ
+    | (length $ algoSetting a) <= (length $ algoSetting b) = LT
     | otherwise                               = GT
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]

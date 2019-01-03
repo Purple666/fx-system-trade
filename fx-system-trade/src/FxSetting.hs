@@ -132,8 +132,7 @@ unionFxSettingData plsf fsd fsdo =
                , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls)
                , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls)
                }
-  in traceShow(length (Fsd.fxSettingLog fsdo), length (Fsd.fxSettingLog fsd), length $ M.union (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd)) $ 
-     fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+  in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
          , Fsd.fxSettingLog = updateFxSettingLog plsf $ M.unionWith (\(a, b) (a', b') -> (max a a', max b b')) (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd) 
