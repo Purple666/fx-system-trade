@@ -150,7 +150,7 @@ createRandomFxAlMaSetting ix = do
   middle <- getRandomR (max 5 (Fad.middleSetting    ix - Gsd.taMargin Gsd.gsd), Fad.middleSetting    ix + Gsd.taMargin Gsd.gsd)
   long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), Fad.longSetting      ix + Gsd.taMargin Gsd.gsd)
   prev   <- getRandomR (max 3 (Fad.prevSetting      ix - Gsd.taMargin Gsd.gsd), Fad.prevSetting      ix + Gsd.taMargin Gsd.gsd)
-  ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - fromIntegral (Gsd.taMargin Gsd.gsd)),
+  ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - fromIntegral (Gsd.taMargin Gsd.gsd) * 2),
                         Fad.thresholdSetting ix + fromIntegral (Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
