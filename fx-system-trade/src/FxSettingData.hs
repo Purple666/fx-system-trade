@@ -24,6 +24,8 @@ data FxSettingData =
 
 data FxSetting =
   FxSetting { no              :: Int
+            , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                                   M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
             , learningSetting :: FxLearningSetting
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
@@ -69,6 +71,7 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , fxSetting = FxSetting { no = 0
+                                        , prevOpen            = ([], M.empty)
                                         , learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                                               , trSuccess          = 0
                                                                               , trFail             = 0

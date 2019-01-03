@@ -16,9 +16,7 @@ import qualified GlobalSettingData       as Gsd
 import qualified Tree              as Tr
 
 data FxTradeData =
-  FxTradeData { prevOpen           :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
-                                       M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
-              , chart              :: Fcd.FxChartData
+  FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
               , side               :: FxSide
               , trSuccess          :: Int
@@ -65,8 +63,7 @@ instance Ord FxTradeData where
 
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
-  FxTradeData { prevOpen            = ([], M.empty)
-              , chart               = Fcd.initFxChartData
+  FxTradeData { chart               = Fcd.initFxChartData
               , tradeRate           = Fcd.initFxChartData
               , side                = None
               , profit              = 0
