@@ -110,7 +110,6 @@ getThreshold a b k x f1 f2 p =
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                    Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
-  traceShow(ctd) $
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
                             { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.st f . Fad.thresholdMaxSetting $ Fad.stSetting x
                             }
