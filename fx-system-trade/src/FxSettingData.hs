@@ -19,14 +19,14 @@ import qualified Tree                    as Tr
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
+                , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+                                       M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
                 , fxSetting       :: FxSetting
                 , fxSettingLog    :: M.Map Int (FxSetting, Double, Int)
                 } deriving (Show)
 
 data FxSetting =
   FxSetting { no              :: Int
-            , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
-                                   M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
             , learningSetting :: FxLearningSetting
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
@@ -71,8 +71,8 @@ initFxSettingData =
   FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
                                     , chartLength = 0
                                     }
+                , prevOpen            = ([], M.empty)
                 , fxSetting = FxSetting { no = 0
-                                        , prevOpen            = ([], M.empty)
                                         , learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                                               , trSuccess          = 0
                                                                               , trFail             = 0

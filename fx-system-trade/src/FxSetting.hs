@@ -104,6 +104,7 @@ setFxSettingData fs fsl =
   setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
                                                                   , Fsd.chartLength = 0
                                                                   }
+                                      , Fsd.prevOpen     = ([], M.empty)
                                       , Fsd.fxSetting    = fs
                                       , Fsd.fxSettingLog = fsl
                                       }

@@ -147,7 +147,7 @@ evaluate ctd fsd plsf f1 forceSell td =
                                                        else Fsd.failProfit ls
                                }
                       alcOpen
-                        | 0 < profits = Ta.calcFxalgorithmListCount profits . Fsd.prevOpen $ Fsd.fxSetting fsd
+                        | 0 < profits = Ta.calcFxalgorithmListCount profits $ Fsd.prevOpen fsd
                         | otherwise   = (Tr.emptyLeafDataMap, M.empty)
                       alcCloseProfit
                         | close == Ftd.Buy  && 0 < profits = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapDec ftcp ftadcp
@@ -157,13 +157,13 @@ evaluate ctd fsd plsf f1 forceSell td =
                         | close == Ftd.Buy  && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapDec ftcl ftadcl
                         | close == Ftd.Sell && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapInc ftcl ftadcl
                         | otherwise         = (Tr.emptyLeafDataMap, M.empty)
-                      fsd1 = fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                      fsd1 = fsd { Fsd.prevOpen = if open == Ftd.Buy
+                                                  then Ta.makeValidLeafDataMapInc fto ftado
+                                                  else if open == Ftd.Sell
+                                                       then Ta.makeValidLeafDataMapDec fto ftado
+                                                       else ([], M.empty)
+                                 , Fsd.fxSetting = (Fsd.fxSetting fsd)
                                                    { Fsd.learningSetting  = ls'
-                                                   , Fsd.prevOpen = if open == Ftd.Buy
-                                                                    then Ta.makeValidLeafDataMapInc fto ftado
-                                                                    else if open == Ftd.Sell
-                                                                         then Ta.makeValidLeafDataMapDec fto ftado
-                                                                         else ([], M.empty)
                                                    , Fsd.fxTaOpen         = Ta.updateAlgorithmListCount Fad.open
                                                                             ctd alcOpen        (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
                                                    , Fsd.fxTaCloseProfit  = Ta.updateAlgorithmListCount Fad.closeProfit
@@ -181,13 +181,11 @@ evaluate ctd fsd plsf f1 forceSell td =
                   in fsd1 { Fsd.fxSettingLog = fsl
                           }
              else if open /= Ftd.None
-                  then fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                             { Fsd.prevOpen = if open == Ftd.Buy
-                                                              then Ta.makeValidLeafDataMapInc fto ftado
-                                                              else if open == Ftd.Sell
-                                                                   then Ta.makeValidLeafDataMapDec fto ftado
-                                                                   else ([], M.empty)
-                                             }
+                  then fsd { Fsd.prevOpen = if open == Ftd.Buy
+                                            then Ta.makeValidLeafDataMapInc fto ftado
+                                            else if open == Ftd.Sell
+                                                 then Ta.makeValidLeafDataMapDec fto ftado
+                                                 else ([], M.empty)
                            }
                   else fsd
       td' = td { Ftd.chart     = cd
