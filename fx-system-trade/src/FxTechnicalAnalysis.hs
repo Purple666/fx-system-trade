@@ -106,15 +106,15 @@ updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) 
                    Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
-                            { Fad.thresholdMaxSetting = (50 - (getThreshold 50 k ctd Fad.st  f)
+                            { Fad.thresholdMaxSetting = ((50 - (getThreshold 50 k ctd Fad.st  f)) / 2
                                                          + Fad.thresholdMaxSetting (Fad.stSetting x)) / 2
                             }
                           , Fad.rciSetting = (Fad.rciSetting x)
-                            { Fad.thresholdMaxSetting = (100 - (getThreshold 0 k ctd Fad.rci f)
+                            { Fad.thresholdMaxSetting = ((100 - (getThreshold 0 k ctd Fad.rci f)) / 2 
                                                          + Fad.thresholdMaxSetting (Fad.rciSetting x)) / 2
                             }
                           , Fad.rsiSetting = (Fad.rsiSetting x)
-                            { Fad.thresholdMaxSetting = (50 - (getThreshold 50 k ctd Fad.rsi f)
+                            { Fad.thresholdMaxSetting = ((50 - (getThreshold 50 k ctd Fad.rsi f)) / 2
                                                           + Fad.thresholdMaxSetting (Fad.rsiSetting x)) / 2
                             }
                           })

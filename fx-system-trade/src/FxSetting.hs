@@ -60,7 +60,6 @@ getLearningTestTime fsd =
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
   (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 2)
-  -- 
   
 getTradeHoldTime :: Fsd.FxSettingData -> Int
 getTradeHoldTime fsd =
@@ -136,7 +135,7 @@ unionFxSettingData plsf fsd fsdo =
                            { Fsd.learningSetting = ls'
                            }
          , Fsd.fxSettingLog = updateFxSettingLog plsf . M.filter (\(p, _) -> 0 < p) $
-                              M.union (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd) 
+                              M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo) 
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b
