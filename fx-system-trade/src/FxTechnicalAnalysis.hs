@@ -103,11 +103,14 @@ getThreshold a b k x f1 f2 p =
   then ((b - abs ((Fad.short  . f1 $ f2 x M.! k) - a)) +
         (b - abs ((Fad.middle . f1 $ f2 x M.! k) - a)) +
         (b - abs ((Fad.long   . f1 $ f2 x M.! k) - a)) + p) / 4
-  else p
+  else if isNaN p
+       then 30
+       else p
 
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                    Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
+  traceShow(ctd) $
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
                             { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.st f . Fad.thresholdMaxSetting $ Fad.stSetting x
                             }
