@@ -152,20 +152,20 @@ backTestLoop :: Bool ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsd = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning n fsd
-  (fsd2, tdt) <- if latest
-                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd1
+  fsd2 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd1) =<< Fm.readFxSettingData "backtest"
+  (fsd3, tdt) <- if latest
+                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd2
                     =<< ((++) <$>
-                          Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
+                          Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                           Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
-                 else let lt  = Fs.getLearningTime     fsd1
-                          ltt = Fs.getLearningTestTime fsd1
-                      in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd1
+                 else let lt  = Fs.getLearningTime     fsd2
+                          ltt = Fs.getLearningTestTime fsd2
+                      in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd2
                          =<< ((++) <$>
-                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
+                              Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                               Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lsf
-  fsd3 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd2) =<< Fm.readFxSettingData "backtest"
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
     else backTestLoop latest n' endN tdt fsd3

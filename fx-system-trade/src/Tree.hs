@@ -80,7 +80,7 @@ initLeafDataMap k = LeafDataMap $ M.singleton k 0
 
 setFunctionToLeafDataMap :: [LeafData a] -> LeafDataMap a -> LeafDataMap a
 setFunctionToLeafDataMap ix (LeafDataMap xs) =
-  LeafDataMap . M.fromList . map (\(LeafData k, x) -> (ix !! fst k, x)) $ M.toList xs
+  LeafDataMap . M.fromList . map (\(LeafData k, x) -> (ix !! fst k, x)) . traceShow(ix, xs) $ M.toList xs
 
 setFunctionToTree :: [LeafData a] -> TreeData a -> TreeData a
 setFunctionToTree ix (Leaf (LeafData (k, _))) = Leaf (ix !! k)
