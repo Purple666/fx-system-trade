@@ -329,8 +329,7 @@ backTest latest l plsf td fsd xcd = do
                                        -- Control.Monad.when (latest && (open /= Ftd.None || close /= Ftd.None)) $ Fp.printTradeResult open close td' td3 0
                                      return (fsd2, td2))
                  (pure (fsd, td)) ctdl
-  fsd4 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd3) =<< Fm.readFxSettingData "backtest"
-  return (fsd4, td3)
+  return (fsd3, td3)
 
 learning :: Ftd.FxTradeData ->
             Fsd.FxSettingData ->
