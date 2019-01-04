@@ -40,7 +40,9 @@ checkAlgoSetting as tlc =
                                             x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p
                                                    , Fad.algorithmTree = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
                                                    }
-                                        in (M.adjust (const x') k acc, a)) (as, Tr.emptyLeafDataMap)
+                                        in if M.member k as
+                                           then (M.adjust (const x') k acc, a)
+                                           else (acc, p)) (as, Tr.emptyLeafDataMap)
                   . sort $ M.keys as
   in if not . M.null $ Tr.getLeafDataMap pr
      then let nk = fst (M.findMax as) + 1
