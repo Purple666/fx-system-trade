@@ -5,8 +5,8 @@ data GlobalSettingData = GlobalSettingData
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
-  , countUpList           :: Int
-  , countUpListMax        :: Int
+  , countUpList           :: Double
+  , countUpListMax        :: Double
   , taAndRate             :: Int
   , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
