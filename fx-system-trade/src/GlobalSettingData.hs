@@ -5,6 +5,7 @@ data GlobalSettingData = GlobalSettingData
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
+  , countUpList           :: Int
   , countUpListMax        :: Int
   , taAndRate             :: Int
   , backtestLatestTime    :: Int
@@ -25,7 +26,8 @@ gsd =
   GlobalSettingData { taMargin              = 10
                     , makeTreeCount         = 3
                     , algorithmRepeat       = 3
-                    , countUpListMax        = 2
+                    , countUpList           = 2
+                    , countUpListMax        = 3
                     , learningTestCount     = 3
                     , taAndRate             = 2
                     , quantityRate          = 5
