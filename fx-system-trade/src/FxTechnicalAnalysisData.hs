@@ -163,11 +163,15 @@ initTechAnaLeafData x =
 
 isProfitInc :: Int -> (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData) -> Bool
 isProfitInc n (fts, ftad) =
-  Tr.evaluateTree fst (ftad M.! n) $ algorithmTree (fts M.! n)
+  if M.member n ftad && M.member n fts
+  then Tr.evaluateTree fst (ftad M.! n) $ algorithmTree (fts M.! n)
+  else False
 
 isProfitDec :: Int -> (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData) -> Bool
 isProfitDec n (fts, ftad) =
-  Tr.evaluateTree snd (ftad M.! n) $ algorithmTree (fts M.! n)
+  if M.member n ftad && M.member n fts
+  then Tr.evaluateTree snd (ftad M.! n) $ algorithmTree (fts M.! n)
+  else False
 
 initFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting
 initFxTechnicalAnalysisSetting =
