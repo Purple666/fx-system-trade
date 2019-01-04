@@ -135,12 +135,13 @@ tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 tradeLearning fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB 
   (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) fsd
+  fsd'' <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd') =<< Fm.readFxSettingData "backtest"
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
-  return fsd'
+  return fsd''
 
 tradeLearningThread :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 tradeLearningThread fsd = do
-  -- threadDelay (5 * 60 * 1000 * 1000)
+  threadDelay (5 * 60 * 1000 * 1000)
   tradeLearning fsd
 
 backTestLoop :: Bool ->
@@ -164,9 +165,10 @@ backTestLoop latest n endN td fsd = do
                               Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lsf
+  fsd3 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd2) =<< Fm.readFxSettingData "backtest"
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else backTestLoop latest n' endN tdt fsd2
+    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
+    else backTestLoop latest n' endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
@@ -234,8 +236,8 @@ tradeLoop :: Fcd.FxChartData ->
              Async Fsd.FxSettingData ->
              IO Ftd.FxTradeData
 tradeLoop p sleep td fsd coName a = do
-  -- t <- getCurrentTime
-  -- threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
+  t <- getCurrentTime
+  threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   -- (a', fsd') <- return (a, fsd)
   e <- Foa.getNowPrices td
   (sleep', td2, a2, fsd2) <- if (Fcd.close e) /= (Fcd.close p)
@@ -245,7 +247,7 @@ tradeLoop p sleep td fsd coName a = do
                                      -- Fp.printProgressFxTradeData td1 e                                 
                                      return (0, td1, a1, fsd2)
                              else return (sleep + 1, td, a, fsd)
-  if 3600 < sleep'
+  if 240 < sleep'
     then do cancel a2
             return td2
     else tradeLoop e sleep' td2 fsd2 coName a2

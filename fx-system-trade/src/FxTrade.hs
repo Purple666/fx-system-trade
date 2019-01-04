@@ -353,8 +353,7 @@ trade :: Ftd.FxTradeData ->
 trade td fsd xcd = do
   let ctdl = makeChart fsd 1 xcd
       (open, close, fsd', td') =  evaluate (last ctdl) fsd 0 getQuantityBacktest False td
-  fsd'' <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData 0 fsd') =<< Fm.readFxSettingData "backtest"
-  return (open, close, fsd'', td')
+  return (open, close, fsd', td')
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
