@@ -62,7 +62,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                                         in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
-  in if length ldla == (length $ Fad.algoSetting fts)
+  in if length ldla <= (length $ Fad.algoSetting fts)
      then (False, fts { Fad.techListCount = tlc'
                       , Fad.algoSetting   = as'
                       })
