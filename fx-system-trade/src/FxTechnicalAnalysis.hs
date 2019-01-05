@@ -56,13 +56,15 @@ updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnaly
                             (Bool, Fad.FxTechnicalAnalysisSetting)
 updateAlgorithmListCount f ctd (ldlt, ldla) fts =
   let tlc = Tr.addLeafDataMap (Fad.techListCount fts) ldlt
-      as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
-                                            y' = y { Fad.algorithmListCount =
-                                                     Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in M.insert k y' acc)
-            (updateThreshold f ctd $ Fad.algoSetting fts) ldla
+      (c', as)  = M.foldrWithKey (\k x (c, acc) -> let y = acc M.! k
+                                                       y' = y { Fad.algorithmListCount =
+                                                                Tr.addLeafDataMap x (Fad.algorithmListCount y) }
+                                                   in if not c && M.member k acc
+                                                      then (False, M.insert k y' acc)
+                                                      else (True, acc))
+                  (False, updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
-  in if length ldla <= (length $ Fad.algoSetting fts)
+  in if not c'
      then (False, fts { Fad.techListCount = tlc'
                       , Fad.algoSetting   = as'
                       })
