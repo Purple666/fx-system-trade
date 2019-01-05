@@ -178,7 +178,7 @@ evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (eval
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  LeafDataMap . M.map (\x -> if (Gsd.counUtpListMax $ Gsd.gsd) < x
+  LeafDataMap . M.map (\x -> if (Gsd.counUpListMax $ Gsd.gsd) < x
                              then Gsd.countUpListMax $ Gsd.gsd
                              else x) $ M.unionWith (+) a b
 
