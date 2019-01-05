@@ -62,9 +62,11 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                                         in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
-  in (length as /= length as', fts { Fad.techListCount = tlc'
-                                   , Fad.algoSetting  = as'
-                                   })
+  in if length ldla == (length $ Fad.algoSetting fts)
+     then (False, fts { Fad.techListCount = tlc'
+                      , Fad.algoSetting   = as'
+                      })
+     else (True, fts)
 
 makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
