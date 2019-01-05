@@ -46,7 +46,7 @@ debugLoop :: Ftd.FxTradeData ->
 debugLoop td fsd = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.no e) (Fs.getPrepareTimeAll fsd + 1) 0) <*> pure [e]
-  (_, _, fsd', td') <- Ft.trade td fsd ct
+  let (_, _, fsd', td') = Ft.trade td fsd ct
   debugLoop td' fsd'
 
 backTest :: Int -> Int -> Bool -> IO ()
@@ -154,14 +154,14 @@ backTestLoop latest n endN td fsd = do
   (plsf, lsf, tdl, tdlt, fsd1) <- learning n fsd
   fsd2 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd1) =<< Fm.readFxSettingData "backtest"
   (fsd3, tdt) <- if latest
-                 then Ft.backTest latest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd2
-                    =<< ((++) <$>
-                          Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
-                          Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
+                 then Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd2
+                      <$> ((++) <$>
+                           Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
+                           Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
                  else let lt  = Fs.getLearningTime     fsd2
                           ltt = Fs.getLearningTestTime fsd2
-                      in Ft.backTest latest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd2
-                         =<< ((++) <$>
+                      in Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd2
+                         <$> ((++) <$>
                               Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                               Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
