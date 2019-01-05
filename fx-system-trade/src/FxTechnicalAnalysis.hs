@@ -48,10 +48,12 @@ checkAlgoSetting as tlc =
               Tr.LeafDataMap . M.insert (Fad.initTechAnaLeafData nk) 1 $ Tr.getLeafDataMap tlc)
      else (as', tlc)
 
-updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) -> Fad.FxChartTaData ->
+updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
+                            Fad.FxChartTaData ->
                             (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
                              M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData)) ->
-                            Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
+                            Fad.FxTechnicalAnalysisSetting ->
+                            Fad.FxTechnicalAnalysisSetting
 updateAlgorithmListCount f ctd (ldlt, ldla) fts =
   let tlc = Tr.addLeafDataMap (Fad.techListCount fts) ldlt
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
@@ -60,9 +62,11 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                                         in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
-  in fts { Fad.techListCount = tlc'
-         , Fad.algoSetting   = as'
-         }
+  in if length ldla == (length $ Fad.algoSetting fts)
+     then fts { Fad.techListCount = tlc'
+              , Fad.algoSetting  = as'
+              }
+     else fts
 
 makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
@@ -71,9 +75,7 @@ makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
 makeValidLeafDataMapInc fts ftad =
   let l = Tr.makeValidLeafDataList fst (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
   in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
-                                 in if M.member n ftad && (M.member n $ Fad.algoSetting fts)
-                                    then (n, Tr.makeValidLeafDataList fst (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))
-                                    else (n, [])) l)
+                                 in (n, Tr.makeValidLeafDataList fst (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))) l)
 
 makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
@@ -82,9 +84,7 @@ makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
 makeValidLeafDataMapDec fts ftad =
   let l = Tr.makeValidLeafDataList snd (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
   in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
-                                 in if M.member n ftad && (M.member n $ Fad.algoSetting fts)
-                                    then (n, Tr.makeValidLeafDataList snd (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))
-                                    else (n, [])) l)
+                                 in (n, Tr.makeValidLeafDataList snd (ftad M.! n) (Fad.algorithmTree $ Fad.algoSetting fts M.! n))) l)
 
 calcFxalgorithmListCount :: Double ->
                            ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
@@ -112,7 +112,9 @@ getThreshold a b k x f1 f2 p =
        else p
 
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
-                   Fad.FxChartTaData -> M.Map Int Fad.FxAlgorithmSetting -> M.Map Int Fad.FxAlgorithmSetting
+                   Fad.FxChartTaData ->
+                   M.Map Int Fad.FxAlgorithmSetting ->
+                   M.Map Int Fad.FxAlgorithmSetting
 updateThreshold f ctd =
   M.mapWithKey (\k x -> x { Fad.stSetting  = (Fad.stSetting x)
                             { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.st f . Fad.thresholdMaxSetting $ Fad.stSetting x
