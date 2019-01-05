@@ -40,9 +40,7 @@ checkAlgoSetting as tlc =
                                             x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p
                                                    , Fad.algorithmTree = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
                                                    }
-                                        in if M.member k as
-                                           then (M.adjust (const x') k acc, a)
-                                           else (acc, p)) (as, Tr.emptyLeafDataMap)
+                                        in (M.adjust (const x') k acc, a)) (as, Tr.emptyLeafDataMap)
                   . sort $ M.keys as
   in if not . M.null $ Tr.getLeafDataMap pr
      then let nk = fst (M.findMax as) + 1
@@ -59,9 +57,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in if M.member k acc
-                                           then M.insert k y' acc
-                                           else acc)
+                                        in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
   in fts { Fad.techListCount = tlc'
