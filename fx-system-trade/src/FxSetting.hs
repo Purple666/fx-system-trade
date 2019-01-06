@@ -143,7 +143,6 @@ unionFxSettingData plsf fsd fsdo =
          , Fsd.fxSettingLog = fsl
          }
 
-
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
 
