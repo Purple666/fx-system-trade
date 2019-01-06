@@ -239,10 +239,10 @@ mutationFxSettingData x _ =
   createInitialGaData 1 x
 
 resetFxSettingData :: MonadRandom m =>
-                         Fsd.FxSettingData ->
-                         m Fsd.FxSettingData
-resetFxSettingData ifsd =
-  Ga.getHeadGaData <$> createRandomGaData True ifsd
+                      Ga.LearningData Fsd.FxSettingData ->
+                      m (Ga.LearningData  Fsd.FxSettingData)
+resetFxSettingData x =
+  createRandomGaData True $ Ga.getHeadGaData x
 
 crossoverFxSettingData :: MonadRandom m =>
                           Ga.LearningData Fsd.FxSettingData ->

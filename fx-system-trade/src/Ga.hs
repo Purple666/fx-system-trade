@@ -40,6 +40,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningEvaluate :: a -> (a, Rational)
   getGaLoopMax :: a -> Int
   plusGaLoopMax :: a -> a
+  reset :: MonadRandom m => LearningData a -> m (LearningData a)
 
 getGaDataList :: LearningData a -> [a]
 getGaDataList (LearningData x) = map fst x
@@ -116,7 +117,8 @@ createInitialDataLoop c glm ix x = do
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
   let glm = getGaLoopMax $ getHeadGaData x
-  x' <- createInitialDataLoop 0 glm x $ evaluate x
+  r <- reset x
+  x' <- createInitialDataLoop 0 glm x . evaluate $ mappend x r
   if null x'
     then return x
     else learningLoop 0 glm x'

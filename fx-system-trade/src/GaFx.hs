@@ -32,6 +32,7 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   getGaLoopMax      = Fsd.getLearningTestTimes
   plusGaLoopMax     = Fsd.plusLearningTestTimes
+  reset             = Fs.resetFxSettingData
 
 debug :: IO ()
 debug = do
