@@ -151,21 +151,21 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsd = do
-  (plsf, lsf, tdl, tdlt, fsd1) <- learning n fsd
+  (plsf, lok, tdl, tdlt, fsd1) <- learning n fsd
   fsd2 <- (Fm.writeFxSettingData "backtest" . Fs.unionFxSettingData plsf fsd1) =<< Fm.readFxSettingData "backtest"
   (fsd3, tdt) <- if latest
-                 then Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) plsf td fsd2
+                 then Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) lok td fsd2
                       <$> ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                            Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
                  else let lt  = Fs.getLearningTime     fsd2
                           ltt = Fs.getLearningTestTime fsd2
-                      in Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) plsf td fsd2
+                      in Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) lok td fsd2
                          <$> ((++) <$>
                               Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                               Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lsf
+  Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lok
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
     else backTestLoop latest n' endN tdt fsd3
