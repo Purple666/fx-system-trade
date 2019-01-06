@@ -132,13 +132,14 @@ unionFxSettingData plsf fsd fsdo =
                , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls)
                , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls)
                }
+      fsl  = updateFxSettingLog plsf . M.filter (\(_, p, _) -> 0 < p) $ Fsd.fxSettingLog fsd
+      fslo = Fsd.fxSettingLog fsdo
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
-         , Fsd.fxSettingLog = updateFxSettingLog plsf . M.filter (\(_, p, _) -> 0 < p) $
-                              if (length $ Fsd.fxSettingLog fsd) < (length $ Fsd.fxSettingLog fsdo)
-                              then Fsd.fxSettingLog fsd
-                              else M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)
+         , Fsd.fxSettingLog = if length fsl < length fslo
+                              then fsl
+                              else M.union fsl fslo 
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b

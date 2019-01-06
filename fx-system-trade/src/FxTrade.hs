@@ -177,10 +177,10 @@ evaluate ctd fsd plsf f1 forceSell td =
                                       }
                            fslu = Fsd.fxSettingLog fsd1
                            fsl = if M.member (Fsd.no $ Fsd.fxSetting fsd1) fslu
-                             then M.adjust (\(_, a, b) -> (Fsd.fxSetting fsd1, a + profits, b + 1)) (Fsd.no $ Fsd.fxSetting fsd1) fslu
-                             else if plsf == 0
-                                  then M.insert (Fsd.no $ Fsd.fxSetting fsd1) (Fsd.fxSetting fsd1, profits, 1) fslu
-                                  else fslu
+                                 then M.adjust (\(_, a, b) -> (Fsd.fxSetting fsd1, a + profits, b + 1)) (Fsd.no $ Fsd.fxSetting fsd1) fslu
+                                 else if plsf == 0
+                                      then M.insert (Fsd.no $ Fsd.fxSetting fsd1) (Fsd.fxSetting fsd1, profits, 1) fslu
+                                      else fslu
                        in (co || ccp || ccl, fsd1 { Fsd.fxSettingLog = fsl
                                                   })
                   else if open /= Ftd.None
