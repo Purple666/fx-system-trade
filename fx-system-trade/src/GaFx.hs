@@ -105,7 +105,7 @@ learningLoop c n fsd = do
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if Fs.getLearningTestTimes fsd' < fromIntegral c || (fsd == fsd' && Ft.evaluationOk2 tdl tdlt)
-         then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
+         then return (0, False, tdl, tdlt, Fsd.setNo n fsd')
          else learningLoop (c + 1) n fsd' 
 
 learning :: Int ->
