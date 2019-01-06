@@ -106,11 +106,11 @@ evaluate ctd fsd lok f1 forceSell td =
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
         | otherwise = Ftd.realizedPL td
       (position, open)
-        | (Ftd.side td == Ftd.None ||
-           ({- 0 < tradeRate - chart && -} Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
+        | (Ftd.side td == Ftd.None {- ||
+           ( 0 < tradeRate - chart && Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell) -}) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           ({- 0 < chart - tradeRate && -} Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy)) &&
+        | (Ftd.side td == Ftd.None {- ||
+           ( 0 < chart - tradeRate && Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy) -}) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
