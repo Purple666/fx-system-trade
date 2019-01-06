@@ -134,7 +134,7 @@ unionFxSettingData plsf fsd fsdo =
                }
       fsl = M.withoutKeys (M.filter (\(_, p, _) -> 0 < p) . updateFxSettingLog plsf $
                            M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)) .
-            S.fromList . M.keys . M.filter (\(_, _, c) -> c /= 1) $
+            S.fromList . M.keys . M.filter (\(_, _, c) -> 4 < c) $
             M.union (M.difference (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo))
             (M.difference (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd))
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
