@@ -51,7 +51,8 @@ getProfitRate fsd =
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
-  truncate $ getLearningTestTimes fsd * fromIntegral (getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
+  in truncate $ getLearningTestTimes fsd * (fromIntegral $ getTradeHoldTime fsd) * (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
