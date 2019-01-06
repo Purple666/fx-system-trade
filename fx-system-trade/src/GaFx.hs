@@ -126,7 +126,7 @@ learning n fsd = do
                                                return (10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                                        (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
                                                         Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
-            M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 10000, 1) $ Fsd.fxSettingLog fsd)
+            M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
   let (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')

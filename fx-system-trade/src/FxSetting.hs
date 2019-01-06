@@ -114,13 +114,12 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Int -> M.Map Int (Fsd.FxSetting, Double, Int) -> (S.Set Int, M.Map Int (Fsd.FxSetting, Double, Int))
+updateFxSettingLog :: Int -> M.Map Int (Fsd.FxSetting, Double, Int) -> M.Map Int (Fsd.FxSetting, Double, Int)
 updateFxSettingLog plsf fsl =
   if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-  then let d = S.fromList . map (\(x, (_, _, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-               sortBy (\(_, (_, a, a')) (_, (_, b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
-       in (d, M.withoutKeys fsl d)
-  else (S.empty, fsl)
+  then M.withoutKeys fsl . S.fromList . map (\(x, (_, _, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+       sortBy (\(_, (_, a, a')) (_, (_, b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $ M.toList fsl
+  else fsl
 
 unionFxSettingData :: Int -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 unionFxSettingData plsf fsd fsdo = 
@@ -133,14 +132,14 @@ unionFxSettingData plsf fsd fsdo =
                , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls)
                , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls)
                }
-      (dfsl, fsl)  = updateFxSettingLog plsf $ Fsd.fxSettingLog fsd
-      dfsl' = S.union dfsl. S.fromList . M.keys . M.filter (\(_, p, _) -> p <= 0) $ Fsd.fxSettingLog fsd
-      fsl' = M.filter (\(_, p, _) -> 0 < p) fsl
-      fslo = M.withoutKeys (Fsd.fxSettingLog fsdo) dfsl'
+      fsl = M.withoutKeys (updateFxSettingLog plsf $ M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)) .
+            S.fromList . M.keys . M.filter (\(_, _, c) -> c /= 1) $
+            M.union (M.difference (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo))
+            (M.difference (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd))
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
-         , Fsd.fxSettingLog = M.union fsl' fslo 
+         , Fsd.fxSettingLog = fsl
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b
