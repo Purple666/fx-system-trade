@@ -132,7 +132,8 @@ unionFxSettingData plsf fsd fsdo =
                , Fsd.successProfit   = max (Fsd.successProfit lso) (Fsd.successProfit ls)
                , Fsd.failProfit      = max (Fsd.failProfit    lso) (Fsd.failProfit    ls)
                }
-      fsl = M.withoutKeys (updateFxSettingLog plsf $ M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)) .
+      fsl = M.withoutKeys (M.filter (\(_, p, _) -> 0 < p) . updateFxSettingLog plsf $
+                           M.union (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo)) .
             S.fromList . M.keys . M.filter (\(_, _, c) -> c /= 1) $
             M.union (M.difference (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo))
             (M.difference (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd))
