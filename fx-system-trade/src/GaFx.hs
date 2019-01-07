@@ -94,7 +94,7 @@ learningLoop c n p fsd = do
                           let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                 Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt' cl' x
-                              p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
+                              p    = 10000000 * (Ftd.profit tdl + getProfitList tdlt) /
                                      fromIntegral (lt' + ltt' * Gsd.learningTestCount Gsd.gsd)
                           return (p, tdl, tdlt, x))  .  Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
@@ -124,7 +124,7 @@ learning n fsd = do
                                                let tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                                     Fsd.nextFxSettingData ltt x fsd') ce
                                                    tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
-                                               return (10000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
+                                               return (10000000 * (Ftd.profit tdl + getProfitList tdlt) *
                                                        (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
                                                         Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
