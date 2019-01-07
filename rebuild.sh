@@ -1,4 +1,5 @@
 #!/bin/bash -x
+git add . && git commit -m "Experiment" && git push
 ./scaledown.sh
 oc start-build fx-system-trade
 oc get pods | grep 'fx-system-trade.*Terminating'
