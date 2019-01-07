@@ -66,7 +66,7 @@ getLearningTestTimes fsd =
   
 getTradeHoldTime :: Fsd.FxSettingData -> Int
 getTradeHoldTime fsd =
-  getSimChartMax fsd * getLearningTestTimes fsd
+  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes fsd
 
 getSimChartMax :: Fsd.FxSettingData -> Int
 getSimChartMax fsd =
