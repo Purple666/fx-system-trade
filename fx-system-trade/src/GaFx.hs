@@ -80,9 +80,10 @@ trade environment coName = do
 
 learningLoop :: Int ->
                 Int ->
+                Double ->
                 Fsd.FxSettingData ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c n fsd = do
+learningLoop c n p fsd = do
   let lt   = Fs.getLearningTime     fsd
   cl <- Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   fsds' <- (map (\x -> do let lt'   = Fs.getLearningTime     x
@@ -95,18 +96,18 @@ learningLoop c n fsd = do
                               tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt' cl' x
                               p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
                                      fromIntegral (lt' + ltt' * Gsd.learningTestCount Gsd.gsd)
-                          return (p, tdl, tdlt, x)) . (fsd :) .  Ga.getGaDataList) <$>
+                          return (p, tdl, tdlt, x))  .  Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
-  let (p, tdl, tdlt, fsd') = maximum fsds''
+  let (p', tdl, tdlt, fsd') = maximum fsds''
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
-  Fp.printLearningFxTradeData p 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
+  Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
          then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) n fsd'
+         else learningLoop (c + 1) n p' fsd' 
 
 learning :: Int ->
             Fsd.FxSettingData ->
