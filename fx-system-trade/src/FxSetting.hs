@@ -52,7 +52,7 @@ getProfitRate fsd =
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in truncate $ (fromIntegral $ getTradeHoldTime fsd) * if Fsd.trTrade ls == 0
+  in truncate $ (fromIntegral $ getTradeHoldTime fsd) + if Fsd.trTrade ls == 0
                                                         then 60
                                                         else (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls)
 
