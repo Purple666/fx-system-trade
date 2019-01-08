@@ -53,7 +53,7 @@ items:
     output:
       to:
         kind: ImageStreamTag
-        name: fx-system-trade:8.2
+        name: fx-system-trade:latest
     postCommit: {}
     resources: {}
     source:
