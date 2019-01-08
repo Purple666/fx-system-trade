@@ -20,7 +20,7 @@ items:
         name: haskell
       generation: null
       importPolicy: {}
-      name: latest
+      name: "8.2"
       referencePolicy:
         type: ""
   status:
@@ -53,7 +53,7 @@ items:
     output:
       to:
         kind: ImageStreamTag
-        name: fx-system-trade:latest
+        name: fx-system-trade:8.2
     postCommit: {}
     resources: {}
     source:
@@ -65,7 +65,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: haskell:latest
+          name: haskell:8.2
       type: Docker
     triggers:
     - github:

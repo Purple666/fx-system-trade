@@ -22,7 +22,6 @@ module FxSetting
 import           Control.Monad
 import           Control.Monad.Random
 import           Data.List
-import           Data.List.Unique
 import qualified Data.Map                as M
 import qualified Data.Set                as S
 import           Debug.Trace
