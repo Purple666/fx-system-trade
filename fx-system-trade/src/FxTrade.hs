@@ -115,7 +115,7 @@ evaluate ctd fsd lok f1 forceSell td =
                                      (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
                                       (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
                                        chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl ||
-                                       Fs.getProfitRate fsd < chart - tradeRate td ||
+                                       Fs.getProfitRate fsd < chart - tradeRate ||
                                        chart - tradeRate < Fs.getLossCutRate fsd))) = (chart - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell && (forceSell || Fs.getLearningTestTime fsd < tradeDate ||
                                       (Fs.getTradeHoldTime fsd < Fcd.no cd - tradeNo &&
