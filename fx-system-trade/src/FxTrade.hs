@@ -262,40 +262,19 @@ makeSimChart _ [] = []
 makeSimChart c xs =
   let (chart, xs') = break (\x -> Fcd.no x `mod` c == 0) xs
   in if null xs'
-     then let high = maximum $ map (\x -> (Fcd.high x, Fcd.no x)) chart
-              low  = minimum $ map (\x -> (Fcd.low x, Fcd.no x)) chart
-              fcdHigh  = (head chart) { Fcd.no = snd high
-                                      , Fcd.close = fst high
-                                      }
-              fcdLow   = (head chart) { Fcd.no = snd low
-                                      , Fcd.close = fst low
-                                      }
-              fcdClose = last chart
-          in [fcdClose]
-{-
-          in if snd high < snd low
-             then [fcdHigh, fcdLow, fcdClose]
-             else [fcdLow,  fcdHigh, fcdClose]
--}
+     then let high = maximum $ map (\x -> Fcd.high x) chart
+              low  = minimum $ map (\x -> Fcd.low x) chart
+              fcd  = (head chart) { Fcd.close = (high + low + (Fcd.close $ head chart)) / 3
+                                  }
+          in [fcd]
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
-                   high = maximum $ map (\x -> (Fcd.high x, Fcd.no x)) chart'
-                   low  = minimum $ map (\x -> (Fcd.low x, Fcd.no x)) chart'
-                   fcdHigh  = (head xs') { Fcd.no = snd high
-                                         , Fcd.close = fst high
-                                         }
-                   fcdLow   = (head xs') { Fcd.no = snd low
-                                         , Fcd.close = fst low
-                                         }
-
-                   fcdClose = head xs'
-               in fcdClose : makeSimChart c (tail xs')
-{-
-               in if snd high < snd low
-                  then fcdHigh : fcdLow : fcdClose : (makeSimChart c $ tail xs')
-                  else fcdLow : fcdHigh : fcdClose : (makeSimChart c $ tail xs')
--}
+                   high = maximum $ map (\x -> Fcd.high x) chart'
+                   low  = minimum $ map (\x -> Fcd.low x) chart'
+                   fcd  = (head xs') { Fcd.close = (high + low + (Fcd.close $ head xs')) / 3
+                                     }
+               in fcd : makeSimChart c (tail xs')
 
 {-
 xcd [old .. new]
