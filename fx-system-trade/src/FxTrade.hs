@@ -317,7 +317,7 @@ learning td fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, _, _, td'') = foldl (\(_, _, _, _, td') ctd -> evaluate ctd fsd False getQuantityLearning False td')
                            (False, Ftd.None, Ftd.None, fsd, td) $ init ctdl
-      (_, _, _, _, td''') = evaluate (last ctdl) fsd False getQuantityLearning False td''
+      (_, _, _, _, td''') = evaluate (last ctdl) fsd False getQuantityLearning True td''
   in if null ctdl
      then td
      else td'''

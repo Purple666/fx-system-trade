@@ -85,7 +85,7 @@ getPrepareTimeAll fsd =
   maximum [ Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ]
+          ] * 10
 
 setTreeFunction :: Fsd.FxSettingData -> Fsd.FxSettingData
 setTreeFunction fs =
