@@ -84,12 +84,12 @@ learningLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n p fsd = do
-  let lt   = Fs.getLearningTime     fsd
+  let lt   = Fs.getLearningTime     fsd * 10
   cl <- Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   fsds' <- (map (\x -> do let lt'   = Fs.getLearningTime     x
                               ltt'  = Fs.getLearningTestTime x
                           cl' <-              Fm.getChartListBack n (Fs.getPrepareTimeAll x + lt') 0
-                          ce' <- mapM ((\y -> Fm.getChartListBack (n - y) (Fs.getPrepareTimeAll x + ltt') 0) .
+                          ce' <- mapM ((\y -> Fm.getChartListBack (n - y - lt') (Fs.getPrepareTimeAll x + ltt') 0) .
                                        (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                           let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                 Fsd.nextFxSettingData ltt' y x) ce'
@@ -121,7 +121,7 @@ learning n fsd = do
                                                    lt   = Fs.getLearningTime     fsd'
                                                    ltt  = Fs.getLearningTestTime fsd'
                                                cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd' + lt) 0
-                                               ce <- mapM ((\x -> Fm.getChartListBack (n - x) (Fs.getPrepareTimeAll fsd' + ltt) 0) .
+                                               ce <- mapM ((\x -> Fm.getChartListBack (n - x - lt) (Fs.getPrepareTimeAll fsd' + ltt) 0) .
                                                            (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                                                let tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
                                                                     Fsd.nextFxSettingData ltt x fsd') ce
