@@ -84,7 +84,7 @@ learningLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n p fsd = do
-  let lt   = Fs.getLearningTime     fsd * 10
+  let lt   = Fs.getLearningTime     fsd
   cl <- Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   fsds' <- (map (\x -> do let lt'   = Fs.getLearningTime     x
                               ltt'  = Fs.getLearningTestTime x
