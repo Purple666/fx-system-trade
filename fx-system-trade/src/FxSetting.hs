@@ -58,11 +58,11 @@ getLearningTime fsd =
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
-  truncate $ fromIntegral (getLearningTime fsd) * (sqrt $ getLearningTestTimes fsd)
+  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
 
 getLearningTestTimes :: Fsd.FxSettingData -> Double
 getLearningTestTimes fsd =
-  {- (log :: (Double -> Double)) $ -} ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 0)
+  (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 0)
   
 getTradeHoldTime :: Fsd.FxSettingData -> Int
 getTradeHoldTime fsd =
