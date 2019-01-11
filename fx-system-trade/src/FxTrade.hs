@@ -320,7 +320,7 @@ learning td fsd =
       (_, _, _, _, td''') = evaluate (last ctdl) fsd False getQuantityLearning True td''
   in if null ctdl
      then td
-     else td'''
+     else tracdShow(length ctdl) $ td'''
 
 
 trade :: Ftd.FxTradeData ->
