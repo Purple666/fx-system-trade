@@ -335,6 +335,6 @@ trade td fsd xcd =
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
   let td = learning (initFxTradeData Ftd.Backtest) fsd
-  in (fsd, toRational $ Ftd.getEvaluationValue td)
+  in traceShow(td) $ (fsd, toRational $ Ftd.getEvaluationValue td)
 
 
