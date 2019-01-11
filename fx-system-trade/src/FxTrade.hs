@@ -138,7 +138,7 @@ evaluate ctd fsd lok f1 forceSell td =
                                                             then Fsd.successProfit ls + profits
                                                             else Fsd.successProfit ls
                                     , Fsd.failProfit      = if profits <= 0
-                                                            then Fsd.failProfit ls +  profits
+                                                            then Fsd.failProfit ls +  abs profits
                                                             else Fsd.failProfit ls
                                     }
                            alcOpen
