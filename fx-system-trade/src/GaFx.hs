@@ -101,7 +101,7 @@ learningLoop c n p fsd = do
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
-  if 0 < p' && p == p'
+  if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
          then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
@@ -125,7 +125,7 @@ learning n fsd = do
                                                return (p', tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
   let (p, tdl', tdlt', fsd'') = maximum tdlts
-  if 0 < p 
+  if Ft.evaluationOk tdl' tdlt'
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n 0 fsd
 

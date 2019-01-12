@@ -24,7 +24,7 @@ import qualified Tree                    as Tr
 
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
-  all (\x -> 0 < Ftd.getEvaluationValue x) tdlt && 0 < Ftd.getEvaluationValue tdl -- && 0 < Ftd.profit tdl && 0 < getProfitList tdlt 
+  0 < Ftd.profit tdl && 0 < getProfitList tdlt 
 
 evaluationOk2 :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk2 tdl tdlt =
