@@ -309,11 +309,11 @@ backTest l lok td fsd xcd =
                        (False, fsd, td) ctdl
   in (fsd3, td3)
 
-learning :: Ftd.FxTradeData ->
-            Fsd.FxSettingData ->
+learning :: Fsd.FxSettingData ->
             Ftd.FxTradeData
-learning td fsd =
+learning fsd =
   let fc = Fsd.fxChart fsd
+      td = initFxTradeData Ftd.Backtest) 
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, _, _, td'') = foldl (\(_, _, _, _, td') ctd -> evaluate ctd fsd False getQuantityLearning False td')
                            (False, Ftd.None, Ftd.None, fsd, td) $ init ctdl
@@ -334,7 +334,7 @@ trade td fsd xcd =
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
-  let td = learning (initFxTradeData Ftd.Backtest) fsd
+  let td = learning fsd
   in (fsd, toRational $ Ftd.getEvaluationValue td)
 
 

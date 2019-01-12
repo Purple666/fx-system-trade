@@ -91,9 +91,8 @@ learningLoop c n p fsd = do
                           cl' <-              Fm.getChartListBack n (Fs.getPrepareTimeAll x + lt') 0
                           ce' <- mapM ((\y -> Fm.getChartListBack (n - y - lt') (Fs.getPrepareTimeAll x + ltt') 0) .
                                        (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
-                          let tdlt = map (\y -> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                                Fsd.nextFxSettingData ltt' y x) ce'
-                              tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt' cl' x
+                          let tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
+                              tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
                               p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
                                      fromIntegral (lt' + ltt' * Gsd.learningTestCount Gsd.gsd)
                           return (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
@@ -123,9 +122,8 @@ learning n fsd = do
                                                cl <-              Fm.getChartListBack n (Fs.getPrepareTimeAll fsd' + lt) 0
                                                ce <- mapM ((\x -> Fm.getChartListBack (n - x - lt) (Fs.getPrepareTimeAll fsd' + ltt) 0) .
                                                            (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
-                                               let tdlt = map (\x-> Ft.learning (Ft.initFxTradeData Ftd.Backtest) $
-                                                                    Fsd.nextFxSettingData ltt x fsd') ce
-                                                   tdl  = Ft.learning (Ft.initFxTradeData Ftd.Backtest) $ Fsd.nextFxSettingData lt cl fsd'
+                                               let tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt x fsd') ce
+                                                   tdl  = Ft.learning $ Fsd.nextFxSettingData lt cl fsd'
                                                return (10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                                        (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
                                                         Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
