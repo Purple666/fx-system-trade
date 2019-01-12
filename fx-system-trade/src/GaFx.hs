@@ -124,7 +124,7 @@ learning n fsd = do
                                                           (p / fromIntegral c)
                                                return (p', Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
-  let (p, tdl', tdlt', fsd'') = maximum tdlts
+  let (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts) && Ft.evaluationOk tdl' tdlt'
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n fsd
