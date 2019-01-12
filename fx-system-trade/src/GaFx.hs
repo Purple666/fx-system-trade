@@ -105,7 +105,7 @@ learningLoop c n p fsd = do
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
-    else if Ft.evaluationOk2 tdl tdlt && p == p'
+    else if {- Ft.evaluationOk2 tdl tdlt && -} p == p'
          then return (0, False, tdl, tdlt, Fsd.setNo n fsd')
          else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
               then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
