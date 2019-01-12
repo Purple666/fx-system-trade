@@ -80,10 +80,9 @@ trade environment coName = do
 
 learningLoop :: Int ->
                 Int ->
-                Double ->
                 Fsd.FxSettingData ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c n p fsd = do
+learningLoop c n fsd = do
   let lt   = Fs.getLearningTime     fsd
   cl <- Fm.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) 0
   fsds' <- (map (\x -> do let lt'   = Fs.getLearningTime     x
@@ -97,7 +96,7 @@ learningLoop c n p fsd = do
                           return (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
-  let (p', tdl, tdlt, fsd') = maximum fsds''
+  let (_, tdl, tdlt, fsd') = maximum fsds''
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
@@ -105,13 +104,14 @@ learningLoop c n p fsd = do
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
          then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) n p' fsd' 
+         else learningLoop (c + 1) n fsd' 
 
 learning :: Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n fsd = do
-  tdlts <- M.elems <$>
+  tdlts <- (M.elems .
+            M.filter (\(x, _, _, _) -> 0 < x)) <$>
            (sequence . M.map (\(y, p, c) -> do let fsd' = fsd { Fsd.fxSetting = y }
                                                    lt   = Fs.getLearningTime     fsd'
                                                    ltt  = Fs.getLearningTestTime fsd'
@@ -125,9 +125,9 @@ learning n fsd = do
                                                return (p', tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
   let (p, tdl', tdlt', fsd'') = maximum tdlts
-  if Ft.evaluationOk tdl' tdlt'
+  if (not $ null tdlts) && Ft.evaluationOk tdl' tdlt'
     then return (length tdlts, True, tdl', tdlt',  fsd'')
-    else learningLoop 0 n 0 fsd
+    else learningLoop 0 n fsd
 
 tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 tradeLearning fsd = do
