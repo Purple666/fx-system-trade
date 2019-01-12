@@ -35,14 +35,14 @@ printTestProgress n n' fsd fsdo tdt tdl tdlt plsf lsf = do
   printFxTradeData $ sum tdlt
   printf "| %3d %c %c %3d %3d\n" plsf (head $ show (fsd == fsdo)) (head $ show lsf) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
-printLearningFxTradeData :: Double -> Int -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printLearningFxTradeData p n lt ltt fsd tdl tdlt plsf ok lsf = do
+printLearningFxTradeData :: Double -> Int -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
+printLearningFxTradeData p n lt ltt fsd tdl tdlt plsf ok = do
   printf "%s " =<< Ftm.getLogTime
   printf "%10.3f " p
   printf "| %8d %6d %6d " n lt ltt
   printFxTradeData tdl
   printFxTradeData $ sum tdlt
-  printf "| %3d %c %c %3d\n" plsf (head $ show ok) (head $ show lsf) (length $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %3d\n" plsf (head $ show ok) (length $ Fsd.fxSettingLog fsd)
 
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
