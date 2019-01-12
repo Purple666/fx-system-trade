@@ -71,6 +71,7 @@ initFxTradeDataCommon =
               , trFail              = 0
               , realizedPL          = Gsd.initalProperty Gsd.gsd
               , unrealizedPL        = Gsd.initalProperty Gsd.gsd
+              , chartLength         = 0
               , environment         = Backtest
               , bearer              = ""
               , url                 = ""
