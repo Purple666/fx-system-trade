@@ -13,7 +13,7 @@ module Ga
 import           Control.Monad.Random
 import qualified Data.Foldable        as F
 import           Data.List
--- import           Debug.Trace
+import           Debug.Trace
 
 newtype LearningData a = LearningData { getLearningData :: [(a, Rational)] } deriving (Show, Eq, Ord)
 
