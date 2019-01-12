@@ -111,8 +111,7 @@ learning :: Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n fsd = do
-  tdlts <- (M.elems .
-            M.filter (\(x, y, _, _, _) -> 0 < x && y)) <$>
+  tdlts <- M.elems <$>
            (sequence . M.map (\(y, p, c) -> do let fsd' = fsd { Fsd.fxSetting = y }
                                                    lt   = Fs.getLearningTime     fsd'
                                                    ltt  = Fs.getLearningTestTime fsd'
@@ -123,10 +122,10 @@ learning n fsd = do
                                                    tdl  = Ft.learning $ Fsd.nextFxSettingData lt cl fsd'
                                                    p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                                           (p / fromIntegral c)
-                                               return (p', Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
+                                               return (p', tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
-  let (_, _, tdl', tdlt', fsd'') = maximum tdlts
-  if not $ null tdlts
+  let (p, tdl', tdlt', fsd'') = maximum tdlts
+  if 0 < p 
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n 0 fsd
 
