@@ -108,7 +108,7 @@ createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -
 createInitialDataLoop c glm ix x = do
   x' <- mappend x . evaluate <$> createInitialData glm ix 
   traceShow("create", glm, c, length ix, length x, length x') $ return ()
-  if glm `div` 2 < length x' 
+  if glm `div` 3 < length x' 
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
