@@ -23,6 +23,7 @@ data FxTradeData =
               , profit             :: Double
               , unrealizedPL       :: Double
               , realizedPL         :: Double
+              , chartLength        :: Int
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
@@ -77,7 +78,7 @@ initFxTradeDataCommon =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  profit x * (unrealizedPL x / Gsd.initalProperty Gsd.gsd) * (getWinRatePure x) ^ (2 :: Int) 
+  (profit x * unrealizedPL x * (getWinRatePure x) ^ (2 :: Int)) / (fromIntegral $ chartLength x)
   -- (abs $ ) * ((unrealizedPL x / Gsd.initalProperty Gsd.gsd) - 1) * (getWinRatePure x) ^ (4 :: Int) * (fromIntegral $ trSuccess x)
 {-  
   if unrealizedPL x < Gsd.initalProperty Gsd.gsd && profit x < 0

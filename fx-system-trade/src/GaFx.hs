@@ -93,8 +93,7 @@ learningLoop c n p fsd = do
                                        (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                           let tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
-                              p    = 10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) /
-                                     fromIntegral (lt' + ltt' * Gsd.learningTestCount Gsd.gsd)
+                              p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                           return (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
@@ -124,9 +123,9 @@ learning n fsd = do
                                                            (ltt *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                                                let tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt x fsd') ce
                                                    tdl  = Ft.learning $ Fsd.nextFxSettingData lt cl fsd'
-                                               return (10000000 * (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
-                                                       (p / fromIntegral c) / fromIntegral (lt + ltt * Gsd.learningTestCount Gsd.gsd),
-                                                        Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
+                                                   p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
+                                                          (p / fromIntegral c)
+                                               return (p', Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) .
             M.insert (Fsd.no $ Fsd.fxSetting fsd) (Fsd.fxSetting fsd, 1, 1) $ Fsd.fxSettingLog fsd)
   let (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
