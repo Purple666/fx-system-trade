@@ -112,7 +112,7 @@ createInitialDataLoop c glm ix x = do
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
-         else if null x
+         else if null x'
               then createInitialDataLoop (c + 1) glm ix x'
               else createInitialDataLoop (c + 1) glm (learningData $ maximum x') x'
 
