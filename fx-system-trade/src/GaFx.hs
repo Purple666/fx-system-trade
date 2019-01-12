@@ -94,13 +94,13 @@ learningLoop c n p fsd = do
                           let tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
                               p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
-                          return (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
+                          return (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   fsds'' <- sequence $ fsds'
   let (p', tdl, tdlt, fsd') = maximum fsds''
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
-  Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
+  -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd == fsd')
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if Ft.evaluationOk2 tdl tdlt && p == p'
