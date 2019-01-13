@@ -3,6 +3,7 @@ module FxChartData
   , initFxChartData
   , getDate
   , getYear
+  , getChartListBack
   ) where
 
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
@@ -34,3 +35,6 @@ getDate n = LC.unpack <$> formatUnixTime (LC.pack "%Y/%m/%d %H:%M") (UnixTime (f
 getYear :: FxChartData -> Int
 getYear c = read . LC.unpack . formatUnixTimeGMT (LC.pack "%Y%m%d") $ UnixTime (fromInteger (fromIntegral (date c) * 60)) 0
 
+getChartListBack :: Int -> Int -> [FxChartData] -> [FxChartData]
+getChartListBack s l x =  reverse . take l . drop s $ reverse x
+   
