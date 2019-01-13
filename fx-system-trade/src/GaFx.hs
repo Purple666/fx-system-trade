@@ -88,8 +88,8 @@ learningLoop c n xcd fsd = do
       cl = Fcd.getChartListBack n (Fs.getPrepareTimeAll fsd + lt) xcd
   fsds' <- (map (\x -> let lt'  = Fs.getLearningTime     x
                            ltt' = Fs.getLearningTestTime x
-                           cl'  = Fcd.getChartListBack n (Fs.getPrepareTimeAll x + lt') xcd
-                           ce'  = map ((\y -> Fcd.getChartListBack (n - y - lt') (Fs.getPrepareTimeAll x + ltt') xcd) .
+                           cl'  = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll x + lt') xcd
+                           ce'  = map ((\y -> Fcd.getChartListBack (y + lt') (Fs.getPrepareTimeAll x + ltt') xcd) .
                                         (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                            tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                            tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
@@ -118,8 +118,8 @@ learning n fsd = do
               M.map (\(y, p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
                                        lt'  = Fs.getLearningTime     fsd'
                                        ltt' = Fs.getLearningTestTime fsd'
-                                       cl   = Fcd.getChartListBack n (Fs.getPrepareTimeAll fsd' + lt') xcd
-                                       ce   =  map ((\x -> Fcd.getChartListBack (n - x - lt')
+                                       cl   = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd' + lt') xcd
+                                       ce   =  map ((\x -> Fcd.getChartListBack (x + lt')
                                                            (Fs.getPrepareTimeAll fsd' + ltt') xcd) . 
                                                     (ltt' *)) [0..Gsd.learningTestCount Gsd.gsd - 1]
                                        tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
