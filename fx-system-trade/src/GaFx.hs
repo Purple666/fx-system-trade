@@ -98,20 +98,20 @@ learningLoop c n xcd fsd fsdm pm = do
                            p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                        in (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
-  let (pm', tdl, tdlt, fsd') = maximum fsds'
-      lt   = Fs.getLearningTime     fsd'
-      ltt  = Fs.getLearningTestTime fsd'
-      (pm'', fsdm') = if pm < pm'
-                      then (pm', fsd')
-                      else (pm, fsdm)
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
   if null fsds'
     then learningLoop (c + 1) n xcd fsd fsdm pm
-    else if Ft.evaluationOk tdl tdlt
-         then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
-         else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
-              then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsdm')
-              else learningLoop (c + 1) n xcd fsd' fsdm' pm''
+    else let (pm', tdl, tdlt, fsd') = maximum fsds'
+             lt   = Fs.getLearningTime     fsd'
+             ltt  = Fs.getLearningTestTime fsd'
+             (pm'', fsdm') = if pm < pm'
+                             then (pm', fsd')
+                             else (pm, fsdm)
+         in if Ft.evaluationOk tdl tdlt
+            then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
+            else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
+                 then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsdm')
+                 else learningLoop (c + 1) n xcd fsd' fsdm' pm''
 
 learning :: Int ->
             Fsd.FxSettingData ->
