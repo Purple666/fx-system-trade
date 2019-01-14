@@ -82,8 +82,10 @@ learningLoop :: Int ->
                 Int ->
                 [Fcd.FxChartData] -> 
                 Fsd.FxSettingData ->
+                Fsd.FxSettingData ->
+                Double ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c n xcd fsd = do
+learningLoop c n xcd fsd fsdm pm = do
   let lt = Fs.getLearningTime fsd
       cl = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd + lt) xcd
   fsds' <- (map (\x -> let lt'  = Fs.getLearningTime     x
@@ -96,15 +98,18 @@ learningLoop c n xcd fsd = do
                            p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                        in (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
-  let (_, tdl, tdlt, fsd') = maximum fsds'
+  let (pm', tdl, tdlt, fsd') = maximum fsds'
       lt   = Fs.getLearningTime     fsd'
       ltt  = Fs.getLearningTestTime fsd'
+      (pm'', fsdm') = if pm < pm'
+                      then (pm', fsd')
+                      else (pm, fsdm)
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
-         then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) n xcd fsd' 
+         then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsdm')
+         else learningLoop (c + 1) n xcd fsd' fsdm' pm''
 
 learning :: Int ->
             Fsd.FxSettingData ->
@@ -132,7 +137,7 @@ learning n fsd = do
       (_, _, tdl', tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts) && Ft.evaluationOk tdl' tdlt'
     then return (length tdlts, True, tdl', tdlt',  fsd'')
-    else learningLoop 0 n xcd fsd
+    else learningLoop 0 n xcd fsd fsd 0
 
 tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 tradeLearning fsd = do
