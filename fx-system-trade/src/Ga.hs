@@ -99,7 +99,7 @@ learningLoop c glm x = do
   if not (null x') && not (null x) && maximum x' == maximum x
     then return x'
     else if glm < c
-         then return $ fmap plusGaLoopMax x'
+         then return x' -- $ fmap plusGaLoopMax x'
          else if null x'
               then learningLoop (c + 1) glm x
               else learningLoop (c + 1) glm x'
@@ -111,7 +111,7 @@ createInitialDataLoop c glm ix x = do
   if glm < length x' 
     then return x'
     else if glm  < c
-         then return $ fmap plusGaLoopMax x'
+         then return x' -- $ fmap plusGaLoopMax x'
          else if null x'
               then createInitialDataLoop (c + 1) glm ix x'
               else createInitialDataLoop (c + 1) glm (learningData $ maximum x') x'
