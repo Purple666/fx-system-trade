@@ -100,7 +100,7 @@ learningLoop c n xcd fsd fsdm pm = do
            (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
   if null fsds'
-    then learningLoop (c + 1) n xcd fsd fsdm pm
+    then learningLoop (c + 1) n xcd (Fsd.plusLearningTestTimes fsd) fsdm pm
     else let (pm', tdl, tdlt, fsd') = maximum fsds'
              lt   = Fs.getLearningTime     fsd'
              ltt  = Fs.getLearningTestTime fsd'
