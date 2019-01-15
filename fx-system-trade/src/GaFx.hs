@@ -91,8 +91,8 @@ learningLoop c n xcd fsd fsdm pm = do
   fsds' <- (map (\x -> let lt'  = Fs.getLearningTime     x
                            ltt' = Fs.getLearningTestTime x
                            cl'  = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll x + lt') xcd
-                           ce'  = map ((\y -> Fcd.getChartListBack (ltt' * y + lt') (Fs.getPrepareTimeAll x + ltt') xcd)
-                                       [0..Gsd.learningTestCount Gsd.gsd - 1]
+                           ce'  = map (\y -> Fcd.getChartListBack (ltt' * y + lt') (Fs.getPrepareTimeAll x + ltt') xcd)
+                                  [0..Gsd.learningTestCount Gsd.gsd - 1]
                            tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                            tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
                            p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
@@ -128,9 +128,9 @@ learning n fsd = do
                                        lt'  = Fs.getLearningTime     fsd'
                                        ltt' = Fs.getLearningTestTime fsd'
                                        cl   = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd' + lt') xcd
-                                       ce   =  map ((\x -> Fcd.getChartListBack (ltt' * x + lt')
-                                                           (Fs.getPrepareTimeAll fsd' + ltt') xcd) 
-                                                    [0..Gsd.learningTestCount Gsd.gsd - 1]
+                                       ce   =  map (\x -> Fcd.getChartListBack (ltt' * x + lt')
+                                                           (Fs.getPrepareTimeAll fsd' + ltt') xcd)
+                                               [0..Gsd.learningTestCount Gsd.gsd - 1]
                                        tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
                                        tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl fsd'
                                        p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
