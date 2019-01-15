@@ -210,6 +210,9 @@ evaluate ctd fsd lok f1 forceSell td =
                                  else if close /= Ftd.None
                                       then Fcd.initFxChartData
                                       else Ftd.tradeRate td
+               , Ftd.tradeDateAve = (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd') /
+                                    (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd')
+                 
                , Ftd.side  = if open == Ftd.Buy
                              then Ftd.Buy
                              else if open == Ftd.Sell
