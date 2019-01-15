@@ -123,7 +123,7 @@ learning n fsd = do
       pre = maximum . M.elems $ M.map (\(x, _, _) -> Fs.getPrepareTimeAll   fsd { Fsd.fxSetting = x }) fs
   xcd <- Fm.getChartListBack n ((pre + lt + ltt * Gsd.learningTestCount Gsd.gsd) * 2) 0
   let tdlts = M.elems .
-              M.filter (\(x, y, _, _, _) -> 0 < x && y) $
+              M.filter (\(y, _, _, _) -> y) $
               M.map (\(y, p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
                                        lt'  = Fs.getLearningTime     fsd'
                                        ltt' = Fs.getLearningTestTime fsd'
@@ -135,8 +135,8 @@ learning n fsd = do
                                        tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl fsd'
                                        p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                               (p / fromIntegral c)
-                                   in (p', Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fs
-      (_, _, tdl', tdlt', fsd'') = maximum tdlts
+                                   in (Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fs
+      (_, tdl', tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts) && Ft.evaluationOk tdl' tdlt'
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n xcd fsd fsd 0
