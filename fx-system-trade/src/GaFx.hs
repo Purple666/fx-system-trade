@@ -168,7 +168,7 @@ backTestLoop latest n endN td fsd = do
                            <$> ((++) <$>
                                 Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
                                 Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
-                 else do fsd2 <- Fm.writeFxSettingData "backtest" fsd1
+                 else do fsd2 <- Fm.writeFxSettingData "backtest"  $ Fs.unionFxSettingData plsf fsd1
                          let lt  = Fs.getLearningTime     fsd2
                              ltt = Fs.getLearningTestTime fsd2
                          Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) lok td fsd2
