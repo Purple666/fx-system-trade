@@ -139,11 +139,15 @@ unionFxSettingData plsf fsd fsdo =
             S.fromList . M.keys . M.filter (\(_, _, c) -> 4 < c) $
             M.union (M.difference (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdo))
             (M.difference (Fsd.fxSettingLog fsdo) (Fsd.fxSettingLog fsd))
+  in fsd { Fsd.fxSettingLog = fsl
+         }
+{- 
   in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                            { Fsd.learningSetting = ls'
                            }
          , Fsd.fxSettingLog = fsl
          }
+-}
 
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
