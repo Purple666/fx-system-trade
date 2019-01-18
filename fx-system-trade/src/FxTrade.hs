@@ -188,7 +188,8 @@ evaluate ctd fsd lok f1 forceSell td =
                                       }
                            fslu = Fsd.fxSettingLog fsd1
                            fsl = if M.member (Fsd.no $ Fsd.fxSetting fsd1) fslu
-                                 then M.adjust (\(_, a, b) -> (Fsd.fxSetting fsd1, a + profits, b + 1)) (Fsd.no $ Fsd.fxSetting fsd1) fslu
+                                 then M.filter(\(_, a, _) -> 0 < a) $
+                                      M.adjust (\(_, a, b) -> (Fsd.fxSetting fsd1, a + profits, b + 1)) (Fsd.no $ Fsd.fxSetting fsd1) fslu
                                  else if 0 < profits
                                       then M.insert (Fsd.no $ Fsd.fxSetting fsd1) (Fsd.fxSetting fsd1, profits, 1) fslu
                                       else fslu
