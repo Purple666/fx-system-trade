@@ -216,7 +216,6 @@ waitTradeLoop p = do
 
 tradeWeeklyLoop :: Ftd.FxTradeData ->
                    String ->
-                   Fsd.FxSettingData ->
                    IO ()
 tradeWeeklyLoop td coName = do
   waitTrade
