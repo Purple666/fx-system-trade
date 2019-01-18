@@ -76,7 +76,7 @@ trade environment coName = do
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Foa.updateFxTradeData =<< (Fm.updateFxTradeData coName $ (Ft.initFxTradeData environment) { Ftd.chart = c })
   Fp.printProgressFxTradeData td c
-  tradeWeeklyLoop td coName =<< Fm.readFxSettingData "backtest"
+  tradeWeeklyLoop td coName
 
 learningLoop :: Int ->
                 Int ->
@@ -141,18 +141,18 @@ learning n fsd = do
     then return (length tdlts, True, tdl', tdlt',  fsd'')
     else learningLoop 0 n xcd fsd fsd 0
 
-tradeLearning :: Fsd.FxSettingData -> IO Fsd.FxSettingData
-tradeLearning fsd = do
+tradeLearning :: IO Fsd.FxSettingData
+tradeLearning = do
+  fsd <- Fm.readFxSettingData "backtest"
   e <- Fm.getOneChart Fm.getEndChartFromDB 
   (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) fsd
-  fsd'' <- Fm.readFxSettingData "backtest"
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
-  return fsd''
+  return fsd'
 
-tradeLearningThread :: Fsd.FxSettingData -> IO Fsd.FxSettingData
-tradeLearningThread fsd = do
+tradeLearningThread :: IO Fsd.FxSettingData
+tradeLearningThread = do
   threadDelay (5 * 60 * 1000 * 1000)
-  tradeLearning fsd
+  tradeLearning
 
 backTestLoop :: Bool ->
                 Int ->
@@ -218,15 +218,15 @@ tradeWeeklyLoop :: Ftd.FxTradeData ->
                    String ->
                    Fsd.FxSettingData ->
                    IO ()
-tradeWeeklyLoop td coName fsd = do
+tradeWeeklyLoop td coName = do
   waitTrade
-  fsd' <- tradeLearning fsd
+  fsd' <- tradeLearning
   e <- Foa.getNowPrices td
-  td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread fsd')
+  td' <- tradeLoop e 0 td fsd' coName =<< (async $ tradeLearningThread)
   tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
   Ftw.tweetWeek tdw td'
   Fm.setFxTradeData (coName ++ "_weekly") td'
-  tradeWeeklyLoop td' coName fsd'
+  tradeWeeklyLoop td' coName
 
 checkTradeLearning :: Async Fsd.FxSettingData ->
                       Fsd.FxSettingData ->
@@ -236,7 +236,7 @@ checkTradeLearning a fsd = do
   case e of
     Nothing -> return (a, fsd)
     Just _  -> do fsd' <- wait a
-                  a' <- async $ tradeLearningThread fsd'
+                  a' <- async $ tradeLearningThread
                   return (a', fsd')
 
 tradeLoop :: Fcd.FxChartData ->
