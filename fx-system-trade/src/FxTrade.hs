@@ -40,7 +40,7 @@ getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) /
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = Gsd.initalProperty Gsd.gsd -- Ftd.realizedPL td
+getQuantityLearning = getQuantityBacktest -- td chart = Gsd.initalProperty Gsd.gsd -- Ftd.realizedPL td
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
