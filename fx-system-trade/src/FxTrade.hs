@@ -24,7 +24,7 @@ import qualified Tree                    as Tr
 
 evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
-  0 < Ftd.profit tdl && 0 < (and $ map (\x -> 0 < Ftd.getProfit x) tdlt)
+  0 < Ftd.profit tdl && 0 < (and $ map (\x -> 0 < Ftd.profit x) tdlt)
   -- 0 < Ftd.getEvaluationValue tdl && (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- 
 
 evaluationOk2 :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
