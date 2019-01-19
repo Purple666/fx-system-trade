@@ -82,6 +82,7 @@ initFxTradeDataCommon =
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   (unrealizedPL x * (getWinRatePure x) ^ (2 :: Int)) / ((fromIntegral $ chartLength x) * tradeDateAve x)
+
   
   --(fromIntegral $ trSuccess x)
   -- (abs $ ) * ((unrealizedPL x / Gsd.initalProperty Gsd.gsd) - 1) * (getWinRatePure x) ^ (4 :: Int) * (fromIntegral $ trSuccess x)
