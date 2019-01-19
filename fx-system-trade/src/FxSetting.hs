@@ -242,7 +242,7 @@ mutationFxSettingData :: MonadRandom m =>
                          Ga.LearningData Fsd.FxSettingData ->
                          m (Ga.LearningData Fsd.FxSettingData)
 mutationFxSettingData x _ =
-  createInitialGaData 1 x
+  resetFxSettingData x
 
 resetFxSettingData :: MonadRandom m =>
                       Ga.LearningData Fsd.FxSettingData ->

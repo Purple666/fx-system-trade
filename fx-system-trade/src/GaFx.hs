@@ -88,30 +88,28 @@ learningLoop :: Int ->
 learningLoop c n xcd fsd fsdm pm = do
   let lt = Fs.getLearningTime fsd
       cl = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd + lt) xcd
-  fsds' <- (map (\x -> let lt'  = Fs.getLearningTime     x
-                           ltt' = Fs.getLearningTestTime x
-                           cl'  = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll x + lt') xcd
-                           ce'  = map (\y -> Fcd.getChartListBack (ltt' * y + lt') (Fs.getPrepareTimeAll x + ltt') xcd)
-                                  [0..Gsd.learningTestCount Gsd.gsd - 1]
-                           tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
-                           tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
-                           p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
-                       in (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
-           (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
-  -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) 
-  if null fsds'
-    then learningLoop (c + 1) n xcd (Fsd.plusLearningTestTimes fsd) fsdm pm
-    else let (pm', tdl, tdlt, fsd') = maximum fsds'
-             lt   = Fs.getLearningTime     fsd'
-             ltt  = Fs.getLearningTestTime fsd'
-             (pm'', fsdm') = if pm < pm'
-                             then (pm', fsd')
-                             else (pm, fsdm)
-         in if Ft.evaluationOk tdl tdlt
-            then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
-            else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
-                 then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsdm')
-                 else learningLoop (c + 1) n xcd fsd' fsdm' pm''
+  (pm', tdl, tdlt, fsd') <-
+    (maximum . map (\x -> let lt'  = Fs.getLearningTime     x
+                              ltt' = Fs.getLearningTestTime x
+                              cl'  = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll x + lt') xcd
+                              ce'  = map (\y -> Fcd.getChartListBack (ltt' * y + lt') (Fs.getPrepareTimeAll x + ltt') xcd)
+                                     [0..Gsd.learningTestCount Gsd.gsd - 1]
+                              tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
+                              tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
+                              p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
+                          in (p, tdl, tdlt, x)) . Ga.getGaDataList) <$>
+    (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
+  -- Fp.printLearningFxTradeData p' 0 lt ltt fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt)
+  let lt   = Fs.getLearningTime     fsd'
+      ltt  = Fs.getLearningTestTime fsd'
+      (pm'', fsdm') = if pm < pm'
+                      then (pm', fsd')
+                      else (pm, fsdm)
+  if Ft.evaluationOk tdl tdlt
+    then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
+    else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c
+         then return (0, False, tdl, tdlt, Fsd.setNo n $ Fsd.plusLearningTestTimes fsdm')
+         else learningLoop (c + 1) n xcd fsd' fsdm' pm''
 
 learning :: Int ->
             Fsd.FxSettingData ->
