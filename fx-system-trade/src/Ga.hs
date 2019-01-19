@@ -99,7 +99,7 @@ learningLoop c glm x = do
   if not (null x') && not (null x) && maximum x' == maximum x
     then return x'
     else if glm < c
-         then return x' -- $ fmap plusGaLoopMax x'
+         then return $ fmap plusGaLoopMax x'
          else if null x'
               then learningLoop (c + 1) glm x
               else learningLoop (c + 1) glm x'
@@ -111,17 +111,17 @@ createInitialDataLoop c glm ix x = do
   if glm < length x' 
     then return x'
     else if glm  < c
-         then return x' -- $ fmap plusGaLoopMax x'
+         then return $ fmap plusGaLoopMax x'
          else if null x'
               then createInitialDataLoop (c + 1) glm ix x'
               else createInitialDataLoop (c + 1) glm (learningData $ maximum x') x'
 
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
-  let glm = (getGaLoopMax $ getHeadGaData x) + 6
+  let glm = (getGaLoopMax $ getHeadGaData x) + 4
   r <- reset x
-  x1 <- createInitialDataLoop 0 glm x emptyLearningData -- . evaluate $ mappend x r
-  x2 <- createInitialDataLoop 0 glm r emptyLearningData -- . evaluate $ mappend x r
+  x1 <- createInitialDataLoop 0 glm x . evaluate $ mappend x r
+  x2 <- createInitialDataLoop 0 glm r emptyLearningData
   if null x1 && null x2
     then return x
     else learningLoop 0 glm $ mappend x1 x2
