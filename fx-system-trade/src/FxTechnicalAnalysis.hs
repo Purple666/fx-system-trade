@@ -262,7 +262,7 @@ getST n m x p =
       k  = ((head s1 - minimum s1) * 100 / (maximum s1 - minimum s1)) -- short
       d  = sum (map (Fad.short  . Fad.st) s2) / fromIntegral m        -- middle
       sd = sum (map (Fad.middle . Fad.st) s2) / fromIntegral m        -- long
-  in if length s1 < n || length s2 < m
+  in if length s1 < n || length s2 < m || maximum s1 == minimum s1
      then (50, 50, 50)
      else (k, d, sd)
 

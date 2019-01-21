@@ -68,21 +68,6 @@ data FxTechnicalAnalysisSetting =
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
                              } deriving (Show, Read, Ord, Eq)
 
-{-
-instance Eq FxTechnicalAnalysisSetting where
-  a == b =traceShow("FxTechnicalAnalysisSetting", M.keys $ algoSetting    a,M.keys $ algoSetting    b) $ algoSetting    a == algoSetting    b
-
-instance Ord FxTechnicalAnalysisSetting where
-  compare a b
-    |  treeAnaAndRate a == treeAnaAndRate b &&
-       treeAnaOrRate  a == treeAnaOrRate  b &&
-       algoSetting    a == algoSetting    b    = EQ
-    |  treeAnaAndRate a <= treeAnaAndRate b &&
-       treeAnaOrRate  a <= treeAnaOrRate  b &&
-       algoSetting    a <= algoSetting    b    = LT
-    | otherwise                                = GT
--}
-
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
   , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
@@ -97,45 +82,6 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
   } deriving (Show, Read, Ord, Eq)
-
-{-
-instance Eq FxAlgorithmSetting where
-  a == b = traceShow("FxAlgorithmSetting", stSetting          a == stSetting          b ) $
-           algorithmAndRate   a == algorithmAndRate   b &&   
-           algorithmOrRate    a == algorithmOrRate    b &&  
-           smaSetting         a == smaSetting         b &&   
-           emaSetting         a == emaSetting         b &&  
-           wmaSetting         a == wmaSetting         b &&  
-           macdSetting        a == macdSetting        b &&  
-           stSetting          a == stSetting          b &&  
-           rciSetting         a == rciSetting         b &&  
-           rsiSetting         a == rsiSetting         b &&  
-           simChart           a == simChart           b   
-
-instance Ord FxAlgorithmSetting where
-  compare a b
-    | algorithmAndRate   a == algorithmAndRate   b &&
-      algorithmOrRate    a == algorithmOrRate    b &&
-      smaSetting         a == smaSetting         b &&
-      emaSetting         a == emaSetting         b &&
-      wmaSetting         a == wmaSetting         b &&
-      macdSetting        a == macdSetting        b &&
-      stSetting          a == stSetting          b &&
-      rciSetting         a == rciSetting         b &&
-      rsiSetting         a == rsiSetting         b &&
-      simChart           a == simChart           b    = EQ
-    | algorithmAndRate   a <= algorithmAndRate   b &&
-      algorithmOrRate    a <= algorithmOrRate    b &&
-      smaSetting         a <= smaSetting         b &&
-      emaSetting         a <= emaSetting         b &&
-      wmaSetting         a <= wmaSetting         b &&
-      macdSetting        a <= macdSetting        b &&
-      stSetting          a <= stSetting          b &&
-      rciSetting         a <= rciSetting         b &&
-      rsiSetting         a <= rsiSetting         b &&
-      simChart           a <= simChart           b    = LT
-    | otherwise                                       = GT
--}
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
