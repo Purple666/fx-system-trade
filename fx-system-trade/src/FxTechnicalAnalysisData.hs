@@ -69,7 +69,7 @@ data FxTechnicalAnalysisSetting =
                              } deriving (Show, Read, Ord)
 
 instance Eq FxTechnicalAnalysisSetting where
-  a == b =traceShow("FxTechnicalAnalysisSetting", algoSetting    a == algoSetting    b) $ algoSetting    a == algoSetting    b
+  a == b =traceShow("FxTechnicalAnalysisSetting", M.keys $ algoSetting    a,M.keys $ algoSetting    b) $ algoSetting    a == algoSetting    b
 
 {-
 instance Ord FxTechnicalAnalysisSetting where
