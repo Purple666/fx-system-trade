@@ -102,7 +102,7 @@ learningLoop c n pm xcd fsd = do
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, Fsd.setNo n fsd')
     else if pm' == pm
-         then return (0, False, tdl, tdlt, fsd')
+         then return (0, False, tdl, tdlt, Fsd.setNo n fsd')
          else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c 
               then return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
               else learningLoop (c + 1) n pm' xcd fsd' 
