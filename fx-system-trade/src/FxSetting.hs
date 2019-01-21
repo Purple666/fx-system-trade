@@ -116,15 +116,20 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Int -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog plsf fsd =
+updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog plsf profits fsd =
   let fsl = Fsd.fxSettingLog fsd
-  in fsd { Fsd.fxSettingLog =
-             if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-             then M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                  sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
-                  M.toList fsl
-             else fsl
+      fsl' = if M.member (Fsd.fxSetting fsd) fsl
+             then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fsl
+             else if 0 < profits
+                  then M.insert (Fsd.fxSetting fsd) (profits, 1) fsl
+                  else fsl
+      fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
+              then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+                   sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
+                   M.toList fsl'
+              else fsl'
+  in fsd { Fsd.fxSettingLog = fsl''
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b

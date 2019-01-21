@@ -191,14 +191,7 @@ evaluate ctd fsd lok f1 forceSell td =
                                                         , Fsd.fxTaCloseLoss    = fxTaCloseLoss  
                                                         }
                                       }
-                           fslu = Fsd.fxSettingLog fsd1
-                           fsl = if M.member (Fsd.fxSetting fsd1) fslu
-                                 then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd1) fslu
-                                 else if 0 < profits
-                                      then M.insert (Fsd.fxSetting fsd1) (profits, 1) fslu
-                                      else fslu
-                       in (co || ccp || ccl, fsd1 { Fsd.fxSettingLog = fsl
-                                                  })
+                       in (co || ccp || ccl, fsd1)
                   else if open /= Ftd.None
                        then (False, fsd { Fsd.prevOpen = if open == Ftd.Buy
                                                          then Ta.makeValidLeafDataMapInc fto ftado

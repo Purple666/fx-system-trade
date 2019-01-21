@@ -169,7 +169,7 @@ backTestLoop latest n endN td fsd = do
                                 Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                                 Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
   fsd3 <- if latest
-          then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf fsd2
+          then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           else return fsd2
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lok

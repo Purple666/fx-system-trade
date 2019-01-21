@@ -50,7 +50,7 @@ instance Show NodeData where
 instance Eq (LeafData a) where
   a == b = fst (getLeafData a) == fst (getLeafData b)
 
-instance Eq NodeData where
+instance Eq NodeData where  
   a == b = fst (getNodeData a) == fst (getNodeData b)
 
 instance Ord (LeafData a) where
