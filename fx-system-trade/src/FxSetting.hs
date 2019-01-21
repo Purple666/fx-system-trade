@@ -116,12 +116,12 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog plsf profits fsd =
+updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Bool -> Fsd.FxSettingData
+updateFxSettingLog plsf profits fsd lok =
   let fsl = Fsd.fxSettingLog fsd
       fsl' = if M.member (Fsd.fxSetting fsd) fsl
              then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsd) fsl
-             else if 0 < profits
+             else if 0 < profits && lok
                   then M.insert (Fsd.fxSetting fsd) (profits, 1) fsl
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf

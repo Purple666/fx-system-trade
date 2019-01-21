@@ -67,12 +67,11 @@ initFxTradeData Ftd.Production =
 
 evaluate :: Fad.FxChartTaData ->
             Fsd.FxSettingData ->
-            Bool ->
             (Ftd.FxTradeData -> Double -> Double) ->
             Bool ->
             Ftd.FxTradeData ->
             (Bool, Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
-evaluate ctd fsd lok f1 forceSell td =
+evaluate ctd fsd f1 forceSell td =
 {-    
         | (Ftd.side td == Ftd.None ||
            (Fs.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
@@ -311,17 +310,16 @@ makeChart fsd chartLength xcd  =
   in makeChartTa (take chartLength $ reverse xcd) ftado ftadcp ftadcl []
 
 backTest :: Int ->
-            Bool ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest l lok td fsd xcd =
+backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (_, fsd3, td3) = foldl (\(c, fsd1, td1) ctd ->
                                 let (c', _, _, fsd2, td2) = if c
                                                             then (True, Ftd.None, Ftd.None, fsd1, td1)
-                                                            else evaluate ctd fsd1 lok getQuantityBacktest False td1
+                                                            else evaluate ctd fsd1 getQuantityBacktest False td1
                                 in (c', fsd2, td2))
                        (False, fsd, td) ctdl
   in (fsd3, td3 { Ftd.chartLength = l })
@@ -332,9 +330,9 @@ learning fsd =
   let fc = Fsd.fxChart fsd
       td = initFxTradeData Ftd.Backtest
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, _, _, td'') = foldl (\(_, _, _, _, td') ctd -> evaluate ctd fsd False getQuantityLearning False td')
+      (_, _, _, _, td'') = foldl (\(_, _, _, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td')
                            (False, Ftd.None, Ftd.None, fsd, td) $ init ctdl
-      (_, _, _, _, td''') = evaluate (last ctdl) fsd False getQuantityLearning True td''
+      (_, _, _, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
   in if null ctdl
      then td
      else td''' { Ftd.chartLength = Fsd.chartLength fc }
@@ -346,7 +344,7 @@ trade :: Ftd.FxTradeData ->
          (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
-      (_, open, close, fsd', td') = evaluate (last ctdl) fsd False getQuantityBacktest False td
+      (_, open, close, fsd', td') = evaluate (last ctdl) fsd getQuantityBacktest False td
   in (open, close, fsd', td')
 
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
