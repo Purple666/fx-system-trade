@@ -78,7 +78,7 @@ getSimChartMax fsd =
 
 getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
-  let (_, p, c) = M.foldl (\(_, ac, bc) (_, a, b) -> (0, ac + a, bc + b)) (0, 0, 0) $ Fsd.fxSettingLog fsd
+  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ Fsd.fxSettingLog fsd
   in (p, c, p / fromIntegral c)
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
@@ -91,7 +91,7 @@ getPrepareTimeAll fsd =
 setTreeFunction :: Fsd.FxSettingData -> Fsd.FxSettingData
 setTreeFunction fs =
   fs { Fsd.fxSetting = setFxSetting $ Fsd.fxSetting fs
-     , Fsd.fxSettingLog  = M.map (\(a, b, c) -> (setFxSetting a, b, c)) $ Fsd.fxSettingLog fs
+     , Fsd.fxSettingLog  = M.mapKeys setFxSetting $ Fsd.fxSettingLog fs
      }
 
 setFxSetting :: Fsd.FxSetting -> Fsd.FxSetting
@@ -101,7 +101,7 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
-setFxSettingData :: Fsd.FxSetting -> M.Map Int (Fsd.FxSetting, Double, Int) -> Fsd.FxSettingData
+setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fs fsl =
   setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
                                                                   , Fsd.chartLength = 0
@@ -121,8 +121,8 @@ updateFxSettingLog plsf fsd =
   let fsl = Fsd.fxSettingLog fsd
   in fsd { Fsd.fxSettingLog =
              if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-             then M.withoutKeys fsl . S.fromList . map (\(x, (_, _, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                  sortBy (\(_, (_, a, a')) (_, (_, b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
+             then M.withoutKeys fsl . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
+                  sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                   M.toList fsl
              else fsl
          }

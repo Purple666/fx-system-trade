@@ -8,7 +8,6 @@ module FxSettingData
   , nextFxSettingData
   , getLearningTestTimes
   , plusLearningTestTimes
-  , setNo
   ) where
 
 --import Debug.Trace
@@ -22,30 +21,16 @@ data FxSettingData =
                 , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
                                        M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
                 , fxSetting       :: FxSetting
-                , fxSettingLog    :: M.Map Int (FxSetting, Double, Int)
+                , fxSettingLog    :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
-  FxSetting { no              :: Int
-            , learningSetting :: FxLearningSetting
+  FxSetting { learningSetting :: FxLearningSetting
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
-            } deriving (Show, Read)
+            } deriving (Show, Read, Eq, Ord)
 
-data FxChart =
-  FxChart { chart       :: [Fcd.FxChartData]
-          , chartLength :: Int
-          } deriving (Show)
-
-instance Ord FxSetting where
-  compare a b
-    | no a == no b = EQ
-    | no a <= no b = LT
-    | otherwise    = GT
-
-instance Eq FxSetting where
-  a == b = no a == no b
 
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
@@ -55,6 +40,11 @@ instance Ord FxSettingData where
     | fxSetting a == fxSetting b  = EQ
     | fxSetting a <= fxSetting b  = LT
     | otherwise                   = GT
+
+data FxChart =
+  FxChart { chart       :: [Fcd.FxChartData]
+          , chartLength :: Int
+          } deriving (Show)
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
@@ -72,8 +62,7 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , prevOpen            = ([], M.empty)
-                , fxSetting = FxSetting { no = 0
-                                        , learningSetting = FxLearningSetting { learningTestTimes  = 1
+                , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                                               , trSuccess          = 0
                                                                               , trFail             = 0
                                                                               , successProfit      = 0 
@@ -107,13 +96,6 @@ getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting . fxSetting $ fsd
 
-setNo :: Int -> FxSettingData -> FxSettingData
-setNo n fsd = 
-  fsd { fxSetting = (fxSetting fsd) {
-          no = n
-          }
-      }
-          
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = (fxSetting fsd) {
