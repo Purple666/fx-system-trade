@@ -71,16 +71,16 @@ data FxTechnicalAnalysisSetting =
 instance Eq FxTechnicalAnalysisSetting where
   a == b = treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
-           algoSetting    a == algoSetting    b 
+           (M.toList $ algoSetting a) == (M.toList $ algoSetting b)
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
     |  treeAnaAndRate a == treeAnaAndRate b &&
        treeAnaOrRate  a == treeAnaOrRate  b &&
-       algoSetting    a == algoSetting    b    = EQ
+       (M.toList $ algoSetting a) == (M.toList $ algoSetting b)    = EQ
     |  treeAnaAndRate a <= treeAnaAndRate b &&
        treeAnaOrRate  a <= treeAnaOrRate  b &&
-       algoSetting    a <= algoSetting    b    = LT
+       (M.toList $ algoSetting a) <= (M.toList $ algoSetting b)    = LT
     | otherwise                                = GT
        
 data FxAlgorithmSetting = FxAlgorithmSetting
