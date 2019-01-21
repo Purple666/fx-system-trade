@@ -111,7 +111,11 @@ getThreshold a b k x f1 f2 p =
                  (b - abs ((Fad.long   . f1 $ f2 x M.! k) - a)) + p) / 4
            else p
   in if isNaN p'
-     then traceShow(p) $ 30
+     then if M.member k $ f2 x
+          then traceShow(Fad.short  . f1 $ f2 x M.! k,
+                         Fad.middle . f1 $ f2 x M.! k,
+                         Fad.long   . f1 $ f2 x M.! k) $ p
+          else p
      else p'
 
 updateThreshold :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
