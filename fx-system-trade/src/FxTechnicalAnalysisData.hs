@@ -71,16 +71,13 @@ data FxTechnicalAnalysisSetting =
 instance Eq FxTechnicalAnalysisSetting where
   a == b = treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
-           algoSetting    a == algoSetting    b 
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
     |  treeAnaAndRate a == treeAnaAndRate b &&
-       treeAnaOrRate  a == treeAnaOrRate  b &&
-       algoSetting    a == algoSetting    b    = EQ
+       treeAnaOrRate  a == treeAnaOrRate  b = EQ
     |  treeAnaAndRate a <= treeAnaAndRate b &&
-       treeAnaOrRate  a <= treeAnaOrRate  b &&
-       algoSetting    a <= algoSetting    b    = LT
+       treeAnaOrRate  a <= treeAnaOrRate  b = LT
     | otherwise                                = GT
        
 data FxAlgorithmSetting = FxAlgorithmSetting
