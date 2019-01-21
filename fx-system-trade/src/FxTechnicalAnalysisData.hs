@@ -69,19 +69,16 @@ data FxTechnicalAnalysisSetting =
                              } deriving (Show, Read)
 
 instance Eq FxTechnicalAnalysisSetting where
-  a == b = techAnaTree    a == techAnaTree    b && 
-           treeAnaAndRate a == treeAnaAndRate b &&
+  a == b = treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
            algoSetting    a == algoSetting    b 
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
-    |  techAnaTree    a == techAnaTree    b && 
-       treeAnaAndRate a == treeAnaAndRate b &&
+    |  treeAnaAndRate a == treeAnaAndRate b &&
        treeAnaOrRate  a == treeAnaOrRate  b &&
        algoSetting    a == algoSetting    b    = EQ
-    |  techAnaTree    a <= techAnaTree    b && 
-       treeAnaAndRate a <= treeAnaAndRate b &&
+    |  treeAnaAndRate a <= treeAnaAndRate b &&
        treeAnaOrRate  a <= treeAnaOrRate  b &&
        algoSetting    a <= algoSetting    b    = LT
     | otherwise                                = GT
@@ -101,10 +98,8 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , simChart           :: Int
   } deriving (Show, Read)
 
-
 instance Eq FxAlgorithmSetting where
-  a == b = algorithmTree      a == algorithmTree      b && 
-           algorithmAndRate   a == algorithmAndRate   b &&   
+  a == b = algorithmAndRate   a == algorithmAndRate   b &&   
            algorithmOrRate    a == algorithmOrRate    b &&  
            smaSetting         a == smaSetting         b &&   
            emaSetting         a == emaSetting         b &&  
@@ -117,8 +112,7 @@ instance Eq FxAlgorithmSetting where
 
 instance Ord FxAlgorithmSetting where
   compare a b
-    | algorithmTree      a == algorithmTree      b &&
-      algorithmAndRate   a == algorithmAndRate   b &&
+    | algorithmAndRate   a == algorithmAndRate   b &&
       algorithmOrRate    a == algorithmOrRate    b &&
       smaSetting         a == smaSetting         b &&
       emaSetting         a == emaSetting         b &&
@@ -128,8 +122,7 @@ instance Ord FxAlgorithmSetting where
       rciSetting         a == rciSetting         b &&
       rsiSetting         a == rsiSetting         b &&
       simChart           a == simChart           b    = EQ
-    | algorithmTree      a <= algorithmTree      b &&
-      algorithmAndRate   a <= algorithmAndRate   b &&
+    | algorithmAndRate   a <= algorithmAndRate   b &&
       algorithmOrRate    a <= algorithmOrRate    b &&
       smaSetting         a <= smaSetting         b &&
       emaSetting         a <= emaSetting         b &&
