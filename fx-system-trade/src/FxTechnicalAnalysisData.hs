@@ -96,7 +96,46 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read, Ord)
+
+
+instance Eq FxAlgorithmSetting where
+  a == b = algorithmAndRate   a == algorithmAndRate   b &&   
+           algorithmOrRate    a == algorithmOrRate    b &&  
+           smaSetting         a == smaSetting         b &&   
+           emaSetting         a == emaSetting         b &&  
+           wmaSetting         a == wmaSetting         b &&  
+           macdSetting        a == macdSetting        b &&  
+           stSetting          a == stSetting          b &&  
+           rciSetting         a == rciSetting         b &&  
+           rsiSetting         a == rsiSetting         b &&  
+           simChart           a == simChart           b   
+
+{-
+instance Ord FxAlgorithmSetting where
+  compare a b
+    | algorithmAndRate   a == algorithmAndRate   b &&
+      algorithmOrRate    a == algorithmOrRate    b &&
+      smaSetting         a == smaSetting         b &&
+      emaSetting         a == emaSetting         b &&
+      wmaSetting         a == wmaSetting         b &&
+      macdSetting        a == macdSetting        b &&
+      stSetting          a == stSetting          b &&
+      rciSetting         a == rciSetting         b &&
+      rsiSetting         a == rsiSetting         b &&
+      simChart           a == simChart           b    = EQ
+    | algorithmAndRate   a <= algorithmAndRate   b &&
+      algorithmOrRate    a <= algorithmOrRate    b &&
+      smaSetting         a <= smaSetting         b &&
+      emaSetting         a <= emaSetting         b &&
+      wmaSetting         a <= wmaSetting         b &&
+      macdSetting        a <= macdSetting        b &&
+      stSetting          a <= stSetting          b &&
+      rciSetting         a <= rciSetting         b &&
+      rsiSetting         a <= rsiSetting         b &&
+      simChart           a <= simChart           b    = LT
+    | otherwise                                       = GT
+-}
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
