@@ -7,7 +7,7 @@ data GlobalSettingData = GlobalSettingData
   , learningTestCount     :: Int
   , countUpList           :: Double
   , countUpListMax        :: Double
-  , taAndRate             :: Int
+  , taAndRate             :: Double
   , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
@@ -26,8 +26,8 @@ gsd =
   GlobalSettingData { taMargin              = 10
                     , algorithmRepeat       = 10
                     , makeTreeCount         = 10
-                    , learningTestCount     = 3
-                    , taAndRate             = 2
+                    , learningTestCount     = 10
+                    , taAndRate             = 1.5
                     , countUpList           = 2
                     , countUpListMax        = 3
                     , fxSettingLogNum       = 3
