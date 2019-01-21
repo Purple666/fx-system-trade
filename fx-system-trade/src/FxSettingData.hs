@@ -50,8 +50,8 @@ instance Ord FxSetting where
     | fxTaOpen a        == fxTaOpen        b &&
       fxTaCloseProfit a == fxTaCloseProfit b &&
       fxTaCloseLoss   a == fxTaCloseLoss   b    = EQ
-    | fxTaOpen a        <= fxTaOpen        b &&
-      fxTaCloseProfit a <= fxTaCloseProfit b &&
+    | fxTaOpen a        <= fxTaOpen        b ||
+      fxTaCloseProfit a <= fxTaCloseProfit b ||
       fxTaCloseLoss   a <= fxTaCloseLoss   b    = LT
     | otherwise                                 = GT
 
