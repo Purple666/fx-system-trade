@@ -29,7 +29,7 @@ data FxSetting =
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
-            } deriving (Show, Read)
+            } deriving (Show, Read, Ord, Eq)
 
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
@@ -40,6 +40,7 @@ instance Ord FxSettingData where
     | fxSetting a <  fxSetting b  = LT
     | otherwise                   = GT
 
+{-
 instance Eq FxSetting where
   a == b = fxTaOpen        a == fxTaOpen        b &&
            fxTaCloseProfit a == fxTaCloseProfit b &&
@@ -50,10 +51,11 @@ instance Ord FxSetting where
     | fxTaOpen a        == fxTaOpen        b &&
       fxTaCloseProfit a == fxTaCloseProfit b &&
       fxTaCloseLoss   a == fxTaCloseLoss   b    = EQ
-    | fxTaOpen a        <  fxTaOpen        b &&
+    | fxTaOpen        a <  fxTaOpen        b &&
       fxTaCloseProfit a <  fxTaCloseProfit b &&
       fxTaCloseLoss   a <  fxTaCloseLoss   b    = LT
     | otherwise                                 = GT
+-}
 
 data FxChart =
   FxChart { chart       :: [Fcd.FxChartData]
