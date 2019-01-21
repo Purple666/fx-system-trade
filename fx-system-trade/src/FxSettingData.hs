@@ -32,7 +32,7 @@ data FxSetting =
             } deriving (Show, Read, Ord, Eq)
 
 instance Eq FxSettingData where
-  a == b = traceShow(fxSetting a == fxSetting b) $ fxSetting a == fxSetting b
+  a == b = traceShow(fxSetting a, fxSetting b) $ fxSetting a == fxSetting b
 
 {-
 instance Ord FxSettingData where
