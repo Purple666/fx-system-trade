@@ -66,23 +66,8 @@ data FxTechnicalAnalysisSetting =
                              , treeAnaAndRate :: Int
                              , treeAnaOrRate  :: Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
-                             } deriving (Show, Read)
+                             } deriving (Show, Read, Eq, Ord)
 
-instance Eq FxTechnicalAnalysisSetting where
-  a == b = treeAnaAndRate a == treeAnaAndRate b &&
-           treeAnaOrRate  a == treeAnaOrRate  b &&
-           (M.elems $ algoSetting a) == (M.elems $ algoSetting b)
-
-instance Ord FxTechnicalAnalysisSetting where
-  compare a b
-    |  treeAnaAndRate a == treeAnaAndRate b &&
-       treeAnaOrRate  a == treeAnaOrRate  b &&
-       (M.elems $ algoSetting a) == (M.elems $ algoSetting b)    = EQ
-    |  treeAnaAndRate a <= treeAnaAndRate b &&
-       treeAnaOrRate  a <= treeAnaOrRate  b &&
-       (M.elems $ algoSetting a) <= (M.elems $ algoSetting b)    = LT
-    | otherwise                                = GT
-       
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
   , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
@@ -96,43 +81,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read)
-
-instance Eq FxAlgorithmSetting where
-  a == b = algorithmAndRate   a == algorithmAndRate   b &&   
-           algorithmOrRate    a == algorithmOrRate    b &&  
-           smaSetting         a == smaSetting         b &&   
-           emaSetting         a == emaSetting         b &&  
-           wmaSetting         a == wmaSetting         b &&  
-           macdSetting        a == macdSetting        b &&  
-           stSetting          a == stSetting          b &&  
-           rciSetting         a == rciSetting         b &&  
-           rsiSetting         a == rsiSetting         b &&  
-           simChart           a == simChart           b   
-
-instance Ord FxAlgorithmSetting where
-  compare a b
-    | algorithmAndRate   a == algorithmAndRate   b &&
-      algorithmOrRate    a == algorithmOrRate    b &&
-      smaSetting         a == smaSetting         b &&
-      emaSetting         a == emaSetting         b &&
-      wmaSetting         a == wmaSetting         b &&
-      macdSetting        a == macdSetting        b &&
-      stSetting          a == stSetting          b &&
-      rciSetting         a == rciSetting         b &&
-      rsiSetting         a == rsiSetting         b &&
-      simChart           a == simChart           b    = EQ
-    | algorithmAndRate   a <= algorithmAndRate   b &&
-      algorithmOrRate    a <= algorithmOrRate    b &&
-      smaSetting         a <= smaSetting         b &&
-      emaSetting         a <= emaSetting         b &&
-      wmaSetting         a <= wmaSetting         b &&
-      macdSetting        a <= macdSetting        b &&
-      stSetting          a <= stSetting          b &&
-      rciSetting         a <= rciSetting         b &&
-      rsiSetting         a <= rsiSetting         b &&
-      simChart           a <= simChart           b    = LT
-    | otherwise                                       = GT
+  } deriving (Show, Read, Eq, Ord)
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
