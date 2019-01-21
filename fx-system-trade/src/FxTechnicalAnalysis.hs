@@ -196,7 +196,9 @@ rsi n x =
   let (up, down) = rsiUpDown (last x) (tail $ reverse x)
       upa = up / fromIntegral n
       downa = down / fromIntegral n
-  in (100 * upa) / (upa + downa)
+  in if upa + downa == 0
+     then 50
+     else (100 * upa) / (upa + downa)
 
 getRsi :: Int -> [Fcd.FxChartData] -> Double
 getRsi n x =
