@@ -38,14 +38,14 @@ getLossCutRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.failProfit ls == 0 || Fsd.trFail ls == 0
      then -Gsd.initalProperty Gsd.gsd
-     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * 1.5 -- getLearningTestTimes fsd
+     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * ((log :: (Double -> Double)) $ getLearningTestTimes fsd)
 
 getProfitRate :: Fsd.FxSettingData -> Double
 getProfitRate fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in if Fsd.successProfit ls == 0 || Fsd.trSuccess ls == 0
      then Gsd.initalProperty Gsd.gsd
-     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * 1.5 -- * getLearningTestTimes fsd
+     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * ((log :: (Double -> Double)) $ getLearningTestTimes fsd)
 
 getLearningTime :: Fsd.FxSettingData -> Int
 getLearningTime fsd =
