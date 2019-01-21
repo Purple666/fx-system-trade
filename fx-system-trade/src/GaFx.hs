@@ -99,7 +99,6 @@ learningLoop c n xcd fsd = do
                           in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
     (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   -- Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
-  traceShow(fsd == fsd) $ return ()
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c || fsd' == fsd
