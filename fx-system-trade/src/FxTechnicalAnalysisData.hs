@@ -66,12 +66,12 @@ data FxTechnicalAnalysisSetting =
                              , treeAnaAndRate :: Int
                              , treeAnaOrRate  :: Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
-                             } deriving (Show, Read, Ord)
+                             } deriving (Show, Read, Ord, Eq)
 
+{-
 instance Eq FxTechnicalAnalysisSetting where
   a == b =traceShow("FxTechnicalAnalysisSetting", M.keys $ algoSetting    a,M.keys $ algoSetting    b) $ algoSetting    a == algoSetting    b
 
-{-
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
     |  treeAnaAndRate a == treeAnaAndRate b &&
@@ -96,11 +96,12 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Ord)
+  } deriving (Show, Read, Ord, Eq)
 
-
+{-
 instance Eq FxAlgorithmSetting where
-  a == b = algorithmAndRate   a == algorithmAndRate   b &&   
+  a == b = traceShow("FxAlgorithmSetting", stSetting          a == stSetting          b ) $
+           algorithmAndRate   a == algorithmAndRate   b &&   
            algorithmOrRate    a == algorithmOrRate    b &&  
            smaSetting         a == smaSetting         b &&   
            emaSetting         a == emaSetting         b &&  
@@ -111,7 +112,6 @@ instance Eq FxAlgorithmSetting where
            rsiSetting         a == rsiSetting         b &&  
            simChart           a == simChart           b   
 
-{-
 instance Ord FxAlgorithmSetting where
   compare a b
     | algorithmAndRate   a == algorithmAndRate   b &&
