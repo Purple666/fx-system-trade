@@ -35,10 +35,7 @@ instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
 
 instance Ord FxSettingData where
-  compare a b
-    | fxSetting a == fxSetting b  = EQ
-    | fxSetting a <  fxSetting b  = LT
-    | otherwise                   = GT
+  compare a b = compare (fxSetting a) (fxSetting b) 
 
 {-
 instance Eq FxSetting where
