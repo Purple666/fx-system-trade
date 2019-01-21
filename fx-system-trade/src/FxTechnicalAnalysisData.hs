@@ -70,7 +70,7 @@ data FxTechnicalAnalysisSetting =
 
 instance Eq FxTechnicalAnalysisSetting where
   a == b = treeAnaAndRate a == treeAnaAndRate b &&
-           treeAnaOrRate  a == treeAnaOrRate  b &&
+           treeAnaOrRate  a == treeAnaOrRate  b
 
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
