@@ -70,7 +70,6 @@ data FxTechnicalAnalysisSetting =
 
 instance Eq FxTechnicalAnalysisSetting where
   a == b = techAnaTree    a == techAnaTree    b && 
-           techListCount  a == techListCount  b &&
            treeAnaAndRate a == treeAnaAndRate b &&
            treeAnaOrRate  a == treeAnaOrRate  b &&
            algoSetting    a == algoSetting    b 
@@ -78,12 +77,10 @@ instance Eq FxTechnicalAnalysisSetting where
 instance Ord FxTechnicalAnalysisSetting where
   compare a b
     |  techAnaTree    a == techAnaTree    b && 
-       techListCount  a == techListCount  b &&
        treeAnaAndRate a == treeAnaAndRate b &&
        treeAnaOrRate  a == treeAnaOrRate  b &&
        algoSetting    a == algoSetting    b    = EQ
     |  techAnaTree    a <= techAnaTree    b && 
-       techListCount  a <= techListCount  b &&
        treeAnaAndRate a <= treeAnaAndRate b &&
        treeAnaOrRate  a <= treeAnaOrRate  b &&
        algoSetting    a <= algoSetting    b    = LT

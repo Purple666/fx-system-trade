@@ -41,7 +41,7 @@ instance Ord FxSettingData where
     | otherwise                   = GT
 
 instance Eq FxSetting where
-  a == b = fxTaOpen a        == fxTaOpen        b &&
+  a == b = fxTaOpen        a == fxTaOpen        b &&
            fxTaCloseProfit a == fxTaCloseProfit b &&
            fxTaCloseLoss   a == fxTaCloseLoss   b   
 
