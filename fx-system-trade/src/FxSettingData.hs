@@ -10,7 +10,7 @@ module FxSettingData
   , plusLearningTestTimes
   ) where
 
---import Debug.Trace
+import Debug.Trace
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
@@ -32,8 +32,7 @@ data FxSetting =
             } deriving (Show, Read, Ord, Eq)
 
 instance Eq FxSettingData where
-  a == b = fxSetting a == fxSetting b
-
+  a == b = traceShow(fxSetting a, fxSetting b) $ fxSetting a == fxSetting b
 
 {-
 instance Ord FxSettingData where
