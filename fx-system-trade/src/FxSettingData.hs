@@ -22,7 +22,7 @@ data FxSettingData =
                                        M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
                 , fxSetting       :: FxSetting
                 , fxSettingLog    :: M.Map FxSetting (Double, Int)
-                } deriving (Show, Ord, Eq)
+                } deriving (Show, Ord)
 
 data FxSetting =
   FxSetting { learningSetting :: FxLearningSetting
@@ -31,10 +31,11 @@ data FxSetting =
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Ord, Eq)
 
-{-
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
 
+
+{-
 instance Ord FxSettingData where
   compare a b = compare (fxSetting a) (fxSetting b) 
 
