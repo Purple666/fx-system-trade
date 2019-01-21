@@ -48,10 +48,10 @@ instance Show NodeData where
   show a = show . fst $ getNodeData a
 
 instance Eq (LeafData a) where
-  a == b = traceShow("LeafData", fst (getLeafData a) == fst (getLeafData b)) $ fst (getLeafData a) == fst (getLeafData b)
+  a == b = fst (getLeafData a) == fst (getLeafData b)
 
 instance Eq NodeData where  
-  a == b = traceShow("NodeData", fst (getNodeData a) == fst (getNodeData b)) $ fst (getNodeData a) == fst (getNodeData b)
+  a == b = fst (getNodeData a) == fst (getNodeData b)
 
 instance Ord (LeafData a) where
   compare (LeafData a) (LeafData b) = compare (fst a) (fst b)

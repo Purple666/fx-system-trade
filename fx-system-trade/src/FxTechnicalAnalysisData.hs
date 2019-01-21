@@ -15,7 +15,7 @@ module FxTechnicalAnalysisData
   ) where
 
 import qualified Data.Map          as M
--- import           Debug.Trace
+import           Debug.Trace
 import qualified FxChartData       as Fcd
 import qualified GlobalSettingData as Gsd
 import qualified Tree              as Tr
@@ -66,7 +66,22 @@ data FxTechnicalAnalysisSetting =
                              , treeAnaAndRate :: Int
                              , treeAnaOrRate  :: Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
-                             } deriving (Show, Read, Eq, Ord)
+                             } deriving (Show, Read, Ord)
+
+instance Eq FxTechnicalAnalysisSetting where
+  a == b =traceShow("FxTechnicalAnalysisSetting", algoSetting    a == algoSetting    b) $ algoSetting    a == algoSetting    b
+
+{-
+instance Ord FxTechnicalAnalysisSetting where
+  compare a b
+    |  treeAnaAndRate a == treeAnaAndRate b &&
+       treeAnaOrRate  a == treeAnaOrRate  b &&
+       algoSetting    a == algoSetting    b    = EQ
+    |  treeAnaAndRate a <= treeAnaAndRate b &&
+       treeAnaOrRate  a <= treeAnaOrRate  b &&
+       algoSetting    a <= algoSetting    b    = LT
+    | otherwise                                = GT
+-}
 
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
