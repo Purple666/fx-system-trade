@@ -56,13 +56,13 @@ instance Eq NodeData where
 instance Ord (LeafData a) where
   compare (LeafData a) (LeafData b)
     | fst a == fst b  = EQ
-    | fst a <= fst b  = LT
+    | fst a <  fst b  = LT
     | otherwise       = GT
 
 instance Ord NodeData where
   compare (NodeData a) (NodeData b)
     | fst a == fst b  = EQ
-    | fst a <= fst b  = LT
+    | fst a <  fst b  = LT
     | otherwise       = GT
 
 data TreeData a = Empty  |

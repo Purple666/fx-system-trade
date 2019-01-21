@@ -37,7 +37,7 @@ instance Eq FxSettingData where
 instance Ord FxSettingData where
   compare a b
     | fxSetting a == fxSetting b  = EQ
-    | fxSetting a <= fxSetting b  = LT
+    | fxSetting a <  fxSetting b  = LT
     | otherwise                   = GT
 
 instance Eq FxSetting where
@@ -50,9 +50,9 @@ instance Ord FxSetting where
     | fxTaOpen a        == fxTaOpen        b &&
       fxTaCloseProfit a == fxTaCloseProfit b &&
       fxTaCloseLoss   a == fxTaCloseLoss   b    = EQ
-    | fxTaOpen a        <= fxTaOpen        b ||
-      fxTaCloseProfit a <= fxTaCloseProfit b ||
-      fxTaCloseLoss   a <= fxTaCloseLoss   b    = LT
+    | fxTaOpen a        <  fxTaOpen        b &&
+      fxTaCloseProfit a <  fxTaCloseProfit b &&
+      fxTaCloseLoss   a <  fxTaCloseLoss   b    = LT
     | otherwise                                 = GT
 
 data FxChart =
