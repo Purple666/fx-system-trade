@@ -152,20 +152,23 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop latest n endN td fsd = do
-  (plsf, lok, tdl, tdlt, fsd1) <- learning n fsd
-  (fsd3, tdt) <- if latest
-                 then do fsd2 <- Fm.readFxSettingData "backtest"
-                         Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) lok td fsd2
+  (plsf, lok, tdl, tdlt, fsd1) <- learning n =<< if latest
+                                                 then Fm.readFxSettingData "backtest"
+                                                 else return fsd
+  (fsd2, tdt) <- if latest
+                 then do Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) lok td fsd1
                            <$> ((++) <$>
-                                Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
+                                Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                                 Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
-                 else do fsd2 <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf fsd1
-                         let lt  = Fs.getLearningTime     fsd2
-                             ltt = Fs.getLearningTestTime fsd2
-                         Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) lok td fsd2
+                 else do let lt  = Fs.getLearningTime     fsd1
+                             ltt = Fs.getLearningTestTime fsd1
+                         Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) lok td fsd1
                            <$> ((++) <$>
-                                Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd2) 0 <*>
+                                Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                                 Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
+  fsd3 <- if latest
+          then Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf fsd2
+          else return fsd2
   let n' = Fcd.no (Ftd.chart tdt) + 1
   Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd tdt tdl tdlt plsf lok
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
