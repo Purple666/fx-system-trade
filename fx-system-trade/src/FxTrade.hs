@@ -25,8 +25,8 @@ evaluationOk :: Ftd.FxTradeData -> [Ftd.FxTradeData] -> Bool
 evaluationOk tdl tdlt =
   --0 < Ftd.getEvaluationValue tdl && 0 < Ftd.getEvaluationValueList tdlt
   --0 < Ftd.profit tdl && (and $ map (\x -> 0 < Ftd.profit x) tdlt)
-  0 < Ftd.profit tdl && 0 < getProfitList tdlt
-  --0 < Ftd.getEvaluationValue tdl && (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt)
+  --0 < Ftd.profit tdl && 0 < getProfitList tdlt
+  0 < Ftd.getEvaluationValue tdl && (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt)
 
 getProfitList :: [Ftd.FxTradeData] -> Double
 getProfitList tdlt =
