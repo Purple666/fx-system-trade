@@ -121,7 +121,7 @@ updateFxSettingLog plsf profits fsdo fsd lok =
   let fsl = Fsd.fxSettingLog fsd
       fsl' = if M.member (Fsd.fxSetting fsdo) fsl
              then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) (Fsd.fxSetting fsdo) fsl
-             else if 0 < profits && lok
+             else if 0 < profits
                   then M.insert (Fsd.fxSetting fsd) (profits, 1) fsl
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
