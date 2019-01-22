@@ -36,20 +36,9 @@ instance Ga.Ga Fsd.FxSettingData where
 
 debug :: IO ()
 debug = do
-  let td  = Ft.initFxTradeData Ftd.Backtest
   fsd <- Fm.readFxSettingData "backtest"
-  traceShow(fsd == fsd) $ return ()
-  -- debugLoop td fsd -- =<< async ()
+  traceShow(Fsd.fxTaOpen $ Fsd.fxSetting fsd) $ return ()
   return ()
-
-debugLoop :: Ftd.FxTradeData ->
-             Fsd.FxSettingData ->
-             IO Ftd.FxTradeData
-debugLoop td fsd = do
-  e <- Fm.getOneChart Fm.getEndChartFromDB
-  ct <- (++) <$> (init <$> Fm.getChartListBack (Fcd.no e) (Fs.getPrepareTimeAll fsd + 1) 0) <*> pure [e]
-  let (_, _, fsd', td') = Ft.trade td fsd ct
-  debugLoop td' fsd'
 
 backTest :: Int -> Int -> Bool -> IO ()
 backTest s f latest = do

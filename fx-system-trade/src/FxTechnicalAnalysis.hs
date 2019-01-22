@@ -80,7 +80,7 @@ makeValidLeafDataMapInc fts ftad =
 makeValidLeafDataMapDec :: Fad.FxTechnicalAnalysisSetting ->
                            M.Map Int Fad.FxTechnicalAnalysisData ->
                            ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
-                            M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
+                             M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
 makeValidLeafDataMapDec fts ftad =
   let l = Tr.makeValidLeafDataList snd (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
   in (l, M.fromList $ map (\x -> let n = fst $ Tr.getLeafData x
@@ -146,9 +146,8 @@ setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnic
 setFxTechnicalAnalysisSetting x =
   let mk = maximum . M.keys $ Fad.algoSetting x
       itad = map Fad.initTechAnaLeafData [0..mk]
-      itad' = traceShow(Fad.algoSetting x, Fad.techAnaTree x, itad) itad
-  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad' $ Fad.techAnaTree x
-       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad' $ Fad.techListCount x
+  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad $ Fad.techAnaTree x
+       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad $ Fad.techListCount x
        , Fad.algoSetting   = M.map setFxAlgorithmSetting $ Fad.algoSetting x
        }
 
