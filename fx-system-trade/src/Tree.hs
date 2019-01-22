@@ -177,7 +177,7 @@ addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   in LeafDataMap $ M.unionWith (\x y -> if M.size c == 1
                                         then 1.0
                                         else if minimum c * Gsd.countUpList Gsd.gsd < x || minimum c * Gsd.countUpList Gsd.gsd < y
-                                             then max x y
+                                             then minimum c * Gsd.countUpList Gsd.gsd
                                              else x + y) a b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
