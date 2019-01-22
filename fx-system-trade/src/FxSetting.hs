@@ -16,6 +16,7 @@ module FxSetting
   , getLossCutRate
   , getProfitRate
   , updateFxSettingLog
+  , checkAlgoSetting
   ) where
 
 import           Control.Monad
@@ -100,6 +101,14 @@ setFxSetting fts =
       , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
       }
 
+checkAlgoSetting :: Fsd.FxSettingData -> Fsd.FxSettingData
+checkAlgoSetting fsd =
+  fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+        { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+        , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+        , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+        }
+      }
 setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fs fsl =
   setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]

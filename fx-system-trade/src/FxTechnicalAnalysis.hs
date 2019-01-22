@@ -7,6 +7,7 @@ module FxTechnicalAnalysis
   , updateAlgorithmListCount
   , setFxTechnicalAnalysisSetting
   , getSimChartMax
+  , checkAlgoSetting
   ) where
 
 import           Data.List
@@ -30,23 +31,25 @@ getSimChartMax x =
                                ]
                          in {- prevSettingMax * -} Fad.simChart a) $ Fad.algoSetting x
 
-checkAlgoSetting :: M.Map Int Fad.FxAlgorithmSetting ->
-                    Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData) ->
-                    (M.Map Int Fad.FxAlgorithmSetting,
-                     Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData))
-checkAlgoSetting as tlc =
-  let (as', pr) = foldl (\(acc, p) k -> let x = as M.! k
+checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
+checkAlgoSetting fts =
+  let as  = Fad.algoSetting fts
+      tlc = Fad.techListCount fts
+      (as', pr) = foldl (\(acc, p) k -> let x = as M.! k
                                             (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                             x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p
                                                    , Fad.algorithmTree = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
                                                    }
                                         in (M.insert k x' acc, a)) (as, Tr.emptyLeafDataMap)
                   . sort $ M.keys as
-  in if not . M.null $ Tr.getLeafDataMap pr
-     then let nk = fst (M.findMax as) + 1
-          in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
-              Tr.LeafDataMap . M.map (\_ -> 1.0) . M.insert (Fad.initTechAnaLeafData nk) 1.0 $ Tr.getLeafDataMap tlc)
-     else (as', tlc)
+      (as'', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
+                      then let nk = fst (M.findMax as) + 1
+                           in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
+                               Tr.LeafDataMap . M.map (\_ -> 1.0) . M.insert (Fad.initTechAnaLeafData nk) 1.0 $ Tr.getLeafDataMap tlc)
+                      else (as', tlc)
+  in fts { Fad.techListCount = tlc'
+         , Fad.algoSetting   = as''
+         }
 
 updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                             Fad.FxChartTaData ->
@@ -61,9 +64,8 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
                                         in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
-      (as', tlc') = checkAlgoSetting as tlc
-  in fts { Fad.techListCount = tlc'
-         , Fad.algoSetting   = as'
+  in fts { Fad.techListCount = tlc
+         , Fad.algoSetting   = as
          }
 
 makeValidLeafDataMapInc :: Fad.FxTechnicalAnalysisSetting ->
