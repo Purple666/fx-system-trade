@@ -176,7 +176,7 @@ addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   let c = M.unionWith (+) a b
   in LeafDataMap $ M.unionWith (\x y -> if M.size c == 1
                                         then 1.0
-                                        else if Gsd.countUpList Gsd.gsd < maximum c / minimum c && minimum c * Gsd.countUpList Gsd.gsd < x + y
+                                        else if minimum c * Gsd.countUpList Gsd.gsd < x || minimum c * Gsd.countUpList Gsd.gsd < y
                                              then max x y
                                              else x + y) a b
 
