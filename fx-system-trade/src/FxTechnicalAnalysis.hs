@@ -59,9 +59,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in if M.member k acc
-                                           then M.insert k y' acc
-                                           else acc)
+                                        in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
       (as', tlc') = checkAlgoSetting as tlc
   in fts { Fad.techListCount = tlc'
@@ -146,8 +144,9 @@ setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnic
 setFxTechnicalAnalysisSetting x =
   let mk = maximum . M.keys $ Fad.algoSetting x
       itad = map Fad.initTechAnaLeafData [0..mk]
-  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad $ Fad.techAnaTree x
-       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad $ Fad.techListCount x
+      itad' = traceShow(Fad.algoSetting x, Fad.techAnaTree x, itad) itad
+  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad' $ Fad.techAnaTree x
+       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad' $ Fad.techListCount x
        , Fad.algoSetting   = M.map setFxAlgorithmSetting $ Fad.algoSetting x
        }
 

@@ -191,14 +191,15 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                            , Fsd.fxTaCloseLoss    = fxTaCloseLoss  
                                            }
                          }
-             else if open /= Ftd.None
-                  then fsd { Fsd.prevOpen = if open == Ftd.Buy
-                                            then Ta.makeValidLeafDataMapInc fto ftado
-                                            else if open == Ftd.Sell
-                                                 then Ta.makeValidLeafDataMapDec fto ftado
-                                                 else ([], M.empty)
-                           }
-                  else fsd
+             else fsd
+      fsd'' = if open /= Ftd.None
+              then fsd' { Fsd.prevOpen = if open == Ftd.Buy
+                                         then Ta.makeValidLeafDataMapInc fto ftado
+                                         else if open == Ftd.Sell
+                                              then Ta.makeValidLeafDataMapDec fto ftado
+                                              else ([], M.empty)
+                        }
+              else fsd'
       td' = td { Ftd.chart     = cd
                , Ftd.tradeRate = if open == Ftd.Buy || open == Ftd.Sell
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
@@ -235,7 +236,7 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                            then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                            else Ftd.realizedPL td'
                  }
-  in (open, close, fsd', td'')
+  in (open, close, fsd'', td'')
 
 {-
 (x:xcd), ftado, ftadcp, ftadcl [new .. old]
