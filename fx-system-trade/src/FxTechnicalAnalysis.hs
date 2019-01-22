@@ -45,7 +45,7 @@ checkAlgoSetting as tlc =
   in if not . M.null $ Tr.getLeafDataMap pr
      then let nk = fst (M.findMax as) + 1
           in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
-              Tr.LeafDataMap . M.insert (Fad.initTechAnaLeafData nk) 1 $ Tr.getLeafDataMap tlc)
+              Tr.LeafDataMap . M.map (\_ -> 1.0) . M.insert (Fad.initTechAnaLeafData nk) 1.0 $ Tr.getLeafDataMap tlc)
      else (as', tlc)
 
 updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
