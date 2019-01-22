@@ -179,12 +179,7 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                         ctd alcCloseProfit (Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd)
                       fxTaCloseLoss   = Ta.updateAlgorithmListCount Fad.closeLoss
                                         ctd alcCloseLoss   (Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
-                  in fsd { Fsd.prevOpen = if open == Ftd.Buy
-                                          then Ta.makeValidLeafDataMapInc fto ftado
-                                          else if open == Ftd.Sell
-                                               then Ta.makeValidLeafDataMapDec fto ftado
-                                               else ([], M.empty)
-                         , Fsd.fxSetting = (Fsd.fxSetting fsd)
+                  in fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
                                            { Fsd.learningSetting  = ls'
                                            , Fsd.fxTaOpen         = fxTaOpen       
                                            , Fsd.fxTaCloseProfit  = fxTaCloseProfit
