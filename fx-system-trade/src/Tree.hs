@@ -83,11 +83,11 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  let ave = (sum $ M.elems xs) / (fromIntegral $ M.size xs)
-      (a, b) = if (Gsd.countUpList $ Gsd.gsd) <= maximum xs / minimum xs
-               then M.partition (\x -> ave < x) xs
-               else (M.empty, xs)
-  in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap b)
+  if (Gsd.countUpList $ Gsd.gsd) <= maximum xs / minimum xs
+  then let ave = (sum $ M.elems xs) / (fromIntegral $ M.size xs)
+           (a, b) = M.partition (\x -> ave < x) xs
+       in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap $ M.map (\_ -> 1.0) b)
+  else (LeafDataMap M.empty, LeafDataMap xs)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =
@@ -149,7 +149,7 @@ divideTree (Node x l r) = do
   die <- R.getRandomR (True, False)
   if die
     then do die2 <- R.getRandomR (True, False)
-            if die2
+            if die
               then return (r, l)
               else return (l, r)
     else do die2 <- R.getRandomR (True, False)
