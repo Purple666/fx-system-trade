@@ -6,7 +6,6 @@ data GlobalSettingData = GlobalSettingData
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
   , countUpList           :: Double
-  , countUpListMax        :: Double
   , taAndRate             :: Double
   , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
@@ -29,7 +28,6 @@ gsd =
                     , learningTestCount     = 3
                     , taAndRate             = 1
                     , countUpList           = 2
-                    , countUpListMax        = 3
                     , fxSettingLogNum       = 3
                     , quantityRate          = 5
                     , backtestLatestTime    = 60

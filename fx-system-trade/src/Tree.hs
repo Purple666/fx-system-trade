@@ -87,7 +87,7 @@ checkLeafDataMap (LeafDataMap xs) =
       (a, b) = if (Gsd.countUpList $ Gsd.gsd) <= maximum xs / minimum xs
                then M.partition (\x -> ave < x) xs
                else (M.empty, xs)
-  in (LeafDataMap $ M.map (\_ -> 0) a, LeafDataMap b)
+  in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap b)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =

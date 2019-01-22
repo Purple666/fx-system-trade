@@ -207,9 +207,10 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                  else if close /= Ftd.None
                                       then Fcd.initFxChartData
                                       else Ftd.tradeRate td
-               , Ftd.tradeDateAve = (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsdi) /
-                                    (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsdi)
-                 
+               , Ftd.tradeDateAve = if (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsdi) == 0
+                                    then 1.0
+                                    else (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsdi) /
+                                         (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsdi)
                , Ftd.side  = if open == Ftd.Buy
                              then Ftd.Buy
                              else if open == Ftd.Sell
