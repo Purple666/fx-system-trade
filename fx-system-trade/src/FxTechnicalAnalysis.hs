@@ -175,10 +175,7 @@ getRci n x =
   let s = take n $ map Fcd.close x
   in if length s < n
      then 0
-     else let a = rci n s
-          in if isNaN a
-             then traceShow("rci nan", n) $ a
-             else a
+     else rci n s
 
 rsiUpDown :: Double ->  [Double] -> (Double, Double)
 rsiUpDown _ []     = (0, 0)
