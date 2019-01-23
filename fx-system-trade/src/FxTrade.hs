@@ -113,14 +113,14 @@ evaluate ctd fsdi fsd f1 forceSell td =
         | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
-        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
--}
         | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
+-}
+        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
@@ -313,9 +313,7 @@ backTest :: Int ->
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (fsd3, td3) = foldl (\(fsd1, td1) ctd ->
-                              let (_, _, fsd2, td2) = if False {- Ftd.trFail td < Ftd.trFail td1 -}
-                                                      then (Ftd.None, Ftd.None, fsd1, td1)
-                                                      else evaluate ctd fsd fsd1 getQuantityBacktest False td1
+                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
                               in (fsd2, td2))
                     (fsd, td) ctdl
   in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
