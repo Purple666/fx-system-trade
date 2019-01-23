@@ -54,7 +54,7 @@ getLearningTime fsd =
   in truncate $ getLearningTestTimes fsd *
      (if Fsd.trTrade ls == 0
       then 60
-      else fromIntegral $ (Fsd.trTradeDate ls `div` Fsd.trTrade ls)
+      else fromIntegral $ (Fsd.trTradeDate ls `div` Fsd.trTrade ls))
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =

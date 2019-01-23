@@ -117,11 +117,9 @@ evaluate ctd fsdi fsd f1 forceSell td =
         | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 -}
-        | (Ftd.side td == Ftd.None ||
-           (0 < tradeRate - chart && Ftd.side td == Ftd.Sell)) &&
+        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           (0 < chart - tradeRate && Ftd.side td == Ftd.Buy)) &&
+        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
