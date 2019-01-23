@@ -147,12 +147,12 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                         Fs.getProfitRate fsdi < tradeRate - chart || 
                                         tradeRate - chart < Fs.getLossCutRate fsdi))) = (tradeRate - chart, Ftd.Sell)
 -}
-        | Ftd.side td == Ftd.Buy && (forceSell ||
-                                     (0 < chart - tradeRate && Fs.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
-                                      chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl) = (chart - tradeRate, Ftd.Buy)
-        | Ftd.side td == Ftd.Sell && (forceSell ||
-                                      (0 < tradeRate - chart && Fs.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
-                                      tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl) = (tradeRate - chart, Ftd.Sell)
+        | Ftd.side td == Ftd.Buy && (forceSell || (chart - tradeRate < 0 && Fs.getLearningTestTime fsdi < tradeDate) ||
+                                     (0 < chart - tradeRate && Fs.getTradeHoldTime fsdi < tradeDate && evaluateProfitDec ftcp ftadcp) ||
+                                     (evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
+        | Ftd.side td == Ftd.Sell && (forceSell || (tradeRate - chart < 0 && Fs.getLearningTestTime fsdi < tradeDate) ||
+                                      (0 < tradeRate - chart && Fs.getTradeHoldTime fsdi < tradeDate && evaluateProfitInc ftcp ftadcp) ||
+                                      (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
@@ -346,6 +346,7 @@ trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          [Fcd.FxChartData] ->
          (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
+
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
       (open, close, fsd', td') = evaluate (last ctdl) fsd fsd getQuantityBacktest False td
