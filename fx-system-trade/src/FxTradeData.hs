@@ -5,6 +5,7 @@ module FxTradeData
   , initFxTradeDataCommon
   , getWinRate
   , getEvaluationValue
+  , getLearningEvaluationValue
   , getEvaluationValueList
   ) where
 
@@ -82,6 +83,10 @@ initFxTradeDataCommon =
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   (profit x * unrealizedPL x * getWinRatePure x) / ((fromIntegral $ chartLength x) * tradeDateAve x)
+
+getLearningEvaluationValue :: FxTradeData -> Double
+getLearningEvaluationValue x =
+  (profit x * unrealizedPL x) / ((fromIntegral $ chartLength x) * tradeDateAve x * getWinRatePure x)
 
 getEvaluationValueList :: [FxTradeData] -> Double
 getEvaluationValueList tdlt =
