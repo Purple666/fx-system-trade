@@ -22,10 +22,10 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 5
-                    , algorithmRepeat       = 5
-                    , makeTreeCount         = 5
-                    , learningTestCount     = 5
+  GlobalSettingData { taMargin              = 1
+                    , algorithmRepeat       = 1
+                    , makeTreeCount         = 1
+                    , learningTestCount     = 3
                     , taAndRate             = 1
                     , countUpList           = 2
                     , fxSettingLogNum       = 5
@@ -33,7 +33,7 @@ gsd =
                     , backtestLatestTime    = 60
                     , initalProperty        = 5000000
                     , maxUnit               = 3000000
-                    , spread                = -0.004
+                    , spread                = 0.004
                     , dbHost                = "openshift.flg.jp:30017"
                     , tradePracticeBearer   = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
                     , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
