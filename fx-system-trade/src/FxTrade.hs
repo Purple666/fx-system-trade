@@ -95,6 +95,8 @@ evaluate ctd fsdi fsd f1 forceSell td =
       fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsdi
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdi
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsdi
+      lt  = Fs.getLearningTime     fsdi
+      ltt = Fs.getLearningTestTime fsdi
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
@@ -147,11 +149,11 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                         Fs.getProfitRate fsdi < tradeRate - chart || 
                                         tradeRate - chart < Fs.getLossCutRate fsdi))) = (tradeRate - chart, Ftd.Sell)
 -}
-        | Ftd.side td == Ftd.Buy && (forceSell || (chart - tradeRate < 0 && Fs.getLearningTestTime fsdi < tradeDate) ||
+        | Ftd.side td == Ftd.Buy && (forceSell || (chart - tradeRate < 0 && lt + ltt * Gsd.learningTestCount Gsd.gsd < tradeDate) ||
                                      (0 < chart - tradeRate && Fs.getTradeHoldTime fsdi < tradeDate && evaluateProfitDec ftcp ftadcp) ||
                                      (evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell && (forceSell || (tradeRate - chart < 0 && Fs.getLearningTestTime fsdi < tradeDate) ||
-                                      (0 < tradeRate - chart && Fs.getTradeHoldTime fsdi < tradeDate && evaluateProfitInc ftcp ftadcp) ||
+                                      (0 < tradeRate - chart && lt + ltt * Gsd.learningTestCount Gsd.gsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
                                       (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
