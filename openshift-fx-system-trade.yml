@@ -20,7 +20,7 @@ items:
         name: haskell
       generation: null
       importPolicy: {}
-      name: "8.2"
+      name: "latest"
       referencePolicy:
         type: ""
   status:
@@ -65,7 +65,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: haskell:8.2
+          name: haskell:latest
       type: Docker
     triggers:
     - github:
@@ -401,13 +401,13 @@ items:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: python:3
+        openshift.io/imported-from: python:latest
       from:
         kind: DockerImage
-        name: python:3
+        name: python:latest
       generation: null
       importPolicy: {}
-      name: "3"
+      name: "latest"
       referencePolicy:
         type: ""
   status:
@@ -452,7 +452,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:3
+          name: python:latest
       type: Docker
     triggers:
     - github:
@@ -558,7 +558,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:3
+          name: python:latest
           namespace: flg
       type: Docker
     triggers:
