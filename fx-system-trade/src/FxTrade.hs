@@ -32,6 +32,7 @@ getProfitList :: [Ftd.FxTradeData] -> Double
 getProfitList tdlt =
   sum $ map Ftd.profit tdlt
 
+{-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
                                then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
@@ -39,6 +40,12 @@ getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) /
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning = getQuantityBacktest -- td chart = Gsd.initalProperty Gsd.gsd -- Ftd.realizedPL td
+-}
+getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
+getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+
+getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
+getQuantityLearning _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
