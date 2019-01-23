@@ -278,7 +278,7 @@ makeSimChart c xs =
               low  = minimum $ map (\x -> Fcd.low x) chart
               fcd  = (head chart) { Fcd.close = (high + low + (Fcd.close $ head chart)) / 3
                                   }
-          in [head chart]
+          in [fcd]
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
@@ -286,7 +286,7 @@ makeSimChart c xs =
                    low  = minimum $ map (\x -> Fcd.low x) chart'
                    fcd  = (head xs') { Fcd.close = (high + low + (Fcd.close $ head xs')) / 3
                                      }
-               in head xs' : makeSimChart c (tail xs')
+               in fcd : makeSimChart c (tail xs')
 
 {-
 xcd [old .. new]
