@@ -94,13 +94,13 @@ getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   if tradeDateAve x == 0
   then 0
-  else (profit x * unrealizedPL x * getWinRatePure x ^ 4) / ((fromIntegral $ chartLength x) * tradeDateAve x)
+  else (profit x * unrealizedPL x * getWinRatePure x ^ 2) / ((fromIntegral $ chartLength x) * tradeDateAve x)
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
   if getWinRatePure x == 0 || tradeDateAve x == 0
   then 0
-  else (profit x * unrealizedPL x) / (getWinRatePure x ^ 4 * tradeDateAve x)
+  else (profit x * unrealizedPL x) / (getWinRatePure x * tradeDateAve x)
 
 getEvaluationValueList :: [FxTradeData] -> Double
 getEvaluationValueList tdlt =

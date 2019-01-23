@@ -48,8 +48,8 @@ getChartListForward s l rl = do
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
 getOneChart f = do
-  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" f
+  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- retry 100 $ access pipe master "fx" f
   close pipe
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                              , Fcd.date  = typed $ valueAt "time"  x
@@ -63,8 +63,8 @@ getOneChart f = do
 
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s e = do
-  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getChartListFromDB  s e
+  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- retry 100 . access pipe master "fx" $ getChartListFromDB  s e
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
