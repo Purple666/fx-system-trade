@@ -80,6 +80,7 @@ initFxTradeDataCommon =
               , url                 = ""
               }
 
+{-
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   profit x
@@ -87,8 +88,8 @@ getEvaluationValue x =
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
   profit x
+-}
 
-{-
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   if getWinRatePure x == 0 || tradeDateAve x == 0
@@ -98,7 +99,6 @@ getEvaluationValue x =
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
   profit x * (fromIntegral $ trFail x)
--}
 
 getEvaluationValueList :: [FxTradeData] -> Double
 getEvaluationValueList tdlt =
