@@ -86,7 +86,7 @@ getEvaluationValue x =
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
-  if getWinRatePure x ^ 4 == 0
+  if getWinRatePure x == 0
   then 0
   else profit x / getWinRatePure x ^ 4
 
