@@ -1,4 +1,4 @@
-From haskell:8.2
+From haskell
 RUN cabal new-update && cabal new-install wreq mongoDB unix-time MonadRandom extra lens aeson async 
 COPY src /fx
 WORKDIR /fx
