@@ -201,10 +201,10 @@ initFxAlgorithmSetting alc =
 
 initFxAlMaSetting :: FxAlMaSetting
 initFxAlMaSetting =
-  FxAlMaSetting { shortSetting        = Gsd.taMargin Gsd.gsd
-                , middleSetting       = Gsd.taMargin Gsd.gsd * 2
-                , longSetting         = Gsd.taMargin Gsd.gsd * 3
-                , prevSetting         = Gsd.taMargin Gsd.gsd
+  FxAlMaSetting { shortSetting        = 5 + Gsd.taMargin Gsd.gsd
+                , middleSetting       = 5 + Gsd.taMargin Gsd.gsd * 2
+                , longSetting         = 5 + Gsd.taMargin Gsd.gsd * 3
+                , prevSetting         = 3 + Gsd.taMargin Gsd.gsd
                 , thresholdSetting    = 30
                 , thresholdMaxSetting = 30
                 }

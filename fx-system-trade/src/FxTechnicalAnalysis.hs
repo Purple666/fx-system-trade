@@ -175,7 +175,10 @@ getRci n x =
   let s = take n $ map Fcd.close x
   in if length s < n
      then 0
-     else rci n s
+     else let a = rci n s
+          in if isNaN a
+             then traceShow("rci nan", n) $ a
+             else a
 
 rsiUpDown :: Double ->  [Double] -> (Double, Double)
 rsiUpDown _ []     = (0, 0)
@@ -203,7 +206,7 @@ getRsi n x =
   let s = take (n + 1) $ map Fcd.close x
   in if length s < n + 1
      then 50
-     else traceShow(n) $ rsi n s
+     else rsi n s
 
 getSma :: Int -> [Fcd.FxChartData] -> Double
 getSma n x =
