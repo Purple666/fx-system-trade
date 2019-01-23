@@ -217,10 +217,10 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                  else if close /= Ftd.None
                                       then Fcd.initFxChartData
                                       else Ftd.tradeRate td
-               , Ftd.tradeDateAve = if (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsdi) == 0
+               , Ftd.tradeDateAve = if (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd'') == 0
                                     then 1.0
-                                    else (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsdi) /
-                                         (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsdi)
+                                    else (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd'') /
+                                         (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd'')
                , Ftd.side  = if open == Ftd.Buy
                              then Ftd.Buy
                              else if open == Ftd.Sell
@@ -339,9 +339,9 @@ learning fsd =
   let fc = Fsd.fxChart fsd
       td = initFxTradeData Ftd.Backtest
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
-      (_, _, _, td'') = foldl (\(_, _, _, td') ctd -> evaluate ctd fsd fsd getQuantityLearning False td')
-                        (Ftd.None, Ftd.None, fsd, td) $ init ctdl
-      (_, _, _, td''') = evaluate (last ctdl) fsd fsd getQuantityLearning True td''
+      (_, _, fsd2, td'') = foldl (\(_, _, fsd1, td') ctd -> evaluate ctd fsd fsd1 getQuantityLearning False td')
+                           (Ftd.None, Ftd.None, fsd, td) $ init ctdl
+      (_, _, _, td''') = evaluate (last ctdl) fsd fsd2 getQuantityLearning True td''
   in if null ctdl
      then td
      else td''' { Ftd.chartLength = Fsd.chartLength fc }
