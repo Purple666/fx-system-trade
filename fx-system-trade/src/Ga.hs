@@ -62,7 +62,7 @@ learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
 
 evaluate :: (Ga a) => LearningData a -> LearningData a
 evaluate (LearningData y) =
-  LearningData . filter (\x -> 0 < snd x) . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
+  LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
 
 selection :: MonadRandom m => LearningData a -> m (LearningData a)
 selection x = do
