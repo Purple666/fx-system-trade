@@ -98,7 +98,9 @@ getEvaluationValue x =
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
-  profit x * (fromIntegral $ trFail x)
+  if tradeDateAve x == 0
+  then 0
+  else profit x * (fromIntegral $ trFail x) /  tradeDateAve x
 
 getEvaluationValueList :: [FxTradeData] -> Double
 getEvaluationValueList tdlt =
