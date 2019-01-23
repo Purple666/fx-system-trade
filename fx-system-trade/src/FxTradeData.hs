@@ -82,7 +82,7 @@ initFxTradeDataCommon =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  (profit x * unrealizedPL x * getWinRatePure x ^ 4) / ((fromIntegral $ chartLength x))
+  (profit x * unrealizedPL x * getWinRatePure x ^ 4) / ((fromIntegral $ chartLength x) * tradeDateAve x)
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
