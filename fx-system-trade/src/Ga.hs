@@ -67,8 +67,8 @@ evaluate (LearningData y) =
 selection :: MonadRandom m => LearningData a -> m (LearningData a)
 selection x = do
   let mp = minimum . map snd $ getLearningData x
-  x' <- if mp < 0
-        then fromList . map (\(f, p) -> (f, p + abs mp)) $ getLearningData x
+  x' <- if mp <= 0
+        then fromList . map (\(f, p) -> (f, 1 + p + abs mp)) $ getLearningData x
         else fromList $ getLearningData x
   return $ learningData x'
 
