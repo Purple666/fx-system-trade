@@ -334,14 +334,14 @@ backTest :: Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
-            (Fsd.FxSettingData, Ftd.FxTradeData)
+            (Bool, Fsd.FxSettingData, Ftd.FxTradeData)
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-      (fsd3, td3) = foldl (\(fsd1, td1) ctd ->
-                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
-                              in (fsd2, td2))
-                    (fsd, td) ctdl
-  in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
+      (oc' ,fsd3, td3) = foldl (\(oc, fsd1, td1) ctd -> 
+                                  let (open, close, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
+                                  in (oc || (open /= Ftd.None || close /= Ftd.None), fsd2, td2))
+                         (False, fsd, td) ctdl
+  in (oc', Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
 learning :: Fsd.FxSettingData ->
             Ftd.FxTradeData
