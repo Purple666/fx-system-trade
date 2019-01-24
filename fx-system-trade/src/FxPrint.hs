@@ -22,10 +22,10 @@ printTestProgress n n' fsd fsdo td tdt tdl tdlt plsf lsf = do
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate n
   nd' <-  Fcd.getDate n'
-  printf "%s : " =<< Ftm.getLogTime
   if Ftd.profit tdt < Ftd.profit td
     then printf " "
     else return ()
+  printf "%s : " =<< Ftm.getLogTime
   printf "%s-%s : %6d %6d %6.2f %4s "
     nd
     nd'
