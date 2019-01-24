@@ -137,7 +137,7 @@ updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData ->
 updateFxSettingLog plsf profits fsdo fsd fsdf =
   let fsl = Fsd.fxSettingLog fsd
       fsl' = if M.member (Fsd.fxSetting fsdo) fsl
-             then M.filter(\(a, _) -> 0 < a) $
+             then traceShow("a") . M.filter(\(a, _) -> 0 < a) .
                   M.insert (Fsd.fxSetting fsd) (fst (fsl M.! Fsd.fxSetting fsdo) + profits, snd (fsl M.! Fsd.fxSetting fsdo) + 1) $
                   M.delete (Fsd.fxSetting fsdo) fsl
              else if 0 < profits
