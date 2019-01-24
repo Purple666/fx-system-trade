@@ -128,17 +128,19 @@ emptyFxSettingLog fsd =
 
 unionFxSettingLog :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 unionFxSettingLog fsl fsl' =
-  traceShow(length fsl, length fsl') .
-  M.withoutKeys (M.unionWith (\(a, b) (a', b') -> if b < b'
-                                                  then (a', b')
-                                                  else (a, b)) fsl fsl') .
-  S.fromList . M.keys . M.filter (\(_, b) -> 1 < b) $ M.union (M.difference fsl fsl') (M.difference fsl' fsl)
+  let c = M.union (M.difference fsl fsl') (M.difference fsl' fsl)
+      a = S.fromList . M.keys $ M.filter (\(_, b) -> 1 < b) c
+      b = M.unionWith (\(a, b) (a', b') -> if b < b'
+                                           then (a', b')
+                                           else (a, b)) fsl fsl'
+  in traceShow(length fsl, length fsl', length a, length b, length c) $ M.withoutKeys b a
+  
   
 updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog plsf profits fsdo fsd fsdf =
-  let fsl = Fsd.fxSettingLog fsd
+  let fsl = unionFxSettingLog (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
       fsl' = if M.member (Fsd.fxSetting fsdo) fsl
-             then traceShow("a"). M.filter(\(a, _) -> 0 < a) .
+             then traceShow("a") . M.filter(\(a, _) -> 0 < a) .
                   M.insert (Fsd.fxSetting fsd) (fst (fsl M.! Fsd.fxSetting fsdo) + profits, snd (fsl M.! Fsd.fxSetting fsdo) + 1) $
                   M.delete (Fsd.fxSetting fsdo) fsl
              else if 0 < profits
@@ -149,7 +151,7 @@ updateFxSettingLog plsf profits fsdo fsd fsdf =
                    sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
               else fsl'
-  in fsd { Fsd.fxSettingLog = unionFxSettingLog fsl'' $ Fsd.fxSettingLog fsdf
+  in fsd { Fsd.fxSettingLog = fsl''
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b
