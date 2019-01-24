@@ -15,14 +15,15 @@ import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
 import           Text.Printf
 
-printTestProgress :: Int -> Int -> Fsd.FxSettingData -> Fsd.FxSettingData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
-printTestProgress n n' fsd fsdo td tdt tdl tdlt plsf lsf = do
+printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
+                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
+printTestProgress fsd fsdo td tdt tdl tdlt plsf lsf retry = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  nd  <-  Fcd.getDate n
-  nd' <-  Fcd.getDate n'
-  if Ftd.profit tdt < Ftd.profit td
+  nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
+  nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt
+  if retry
     then printf " "
     else return ()
   printf "%s : " =<< Ftm.getLogTime
