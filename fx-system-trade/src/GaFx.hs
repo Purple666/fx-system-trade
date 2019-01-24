@@ -54,8 +54,8 @@ backTest s f latest = do
                     getRandomR(s, s + ltt * 2)
   let n = startN + p
   (fs, fsd') <- if latest
-                then backTestLatestLoop n endN td
-                else backTestLoop n endN td fsd
+                then backTestLatestLoop n endN td fsd
+                else backTestLoop       n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
@@ -140,22 +140,25 @@ tradeLearningThread = do
 backTestLatestLoop :: Int ->
                       Int ->
                       Ftd.FxTradeData ->
+                      Fsd.FxSettingData ->
                       IO (Bool, Fsd.FxSettingData)
-backTestLatestLoop n endN td = do
-  fsd <- Fm.readFxSettingData "backtest"
+backTestLatestLoop n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- learning n fsd
   (oc, fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
                      <$> ((++) <$>
                           Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                           Fm.getChartListForward n       (Gsd.backtestLatestOneTime Gsd.gsd) 0)
-  if oc
-    then Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-    else return ()
+  fsd3 <- if oc
+          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
+                  Fm.writeFxSettingData "backtest"
+                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd fsd2
+                    =<< Fm.readFxSettingData "backtest"
+    else return fsd2
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-            return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else backTestLatestLoop n' endN tdt
+            return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
+    else backTestLatestLoop n' endN tdt fsd3
 
 backTestLoop :: Int ->
                 Int ->
@@ -176,7 +179,9 @@ backTestLoop n endN td fsd = do
     else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop n endN td $ Fsd.resetFxSettingData fsd
-         else do fsd3 <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd1 fsd2 lok
+         else do fsd3 <- Fm.writeFxSettingData "backtest"
+                   <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd1 fsd2
+                   =<< Fm.readFxSettingData "backtest"
                  Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                  backTestLoop n' endN tdt fsd3
 

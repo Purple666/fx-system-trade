@@ -126,8 +126,15 @@ emptyFxSettingLog fsd =
   fsd { Fsd.fxSettingLog    = M.empty
       }
 
-updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Bool -> Fsd.FxSettingData
-updateFxSettingLog plsf profits fsdo fsd lok =
+unionFxSettingLog :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
+unionFxSettingLog fsl fsl' =
+  M.withoutKeys (M.unionWith (\(a, b) (a', b') -> if b < b'
+                                                  then (a', b')
+                                                  else (a, b)) fsl fsl') .
+  S.fromList . M.keys . M.filter (\(_, b) -> 1 < b) $ M.union (M.difference fsl fsl') (M.difference fsl' fsl)
+  
+updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog plsf profits fsdo fsd fsdf =
   let fsl = Fsd.fxSettingLog fsd
       fsl' = if M.member (Fsd.fxSetting fsdo) fsl
              then M.filter(\(a, _) -> 0 < a) $
@@ -141,7 +148,7 @@ updateFxSettingLog plsf profits fsdo fsd lok =
                    sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
               else fsl'
-  in fsd { Fsd.fxSettingLog = fsl''
+  in fsd { Fsd.fxSettingLog = unionFxSettingLog fsl'' $ Fsd.fxSettingLog fsdf
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b
