@@ -128,19 +128,17 @@ emptyFxSettingLog fsd =
 
 unionFxSettingLog :: M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int) -> M.Map Fsd.FxSetting (Double, Int)
 unionFxSettingLog fsl fsl' =
-  let c = M.union (M.difference fsl fsl') (M.difference fsl' fsl)
-      a = S.fromList . M.keys $ M.filter (\(_, b) -> 1 < b) c
-      b = M.unionWith (\(a, b) (a', b') -> if b < b'
-                                           then (a', b')
-                                           else (a, b)) fsl fsl'
-  in traceShow(length fsl, length fsl', length a, length b, length c) $ M.withoutKeys b a
+  M.withoutKeys (M.unionWith (\(a, b) (a', b') -> if b < b'
+                                                  then (a', b')
+                                                  else (a, b)) fsl fsl')
+  . S.fromList . M.keys . M.filter (\(_, b) -> 1 < b) $ M.union (M.difference fsl fsl') (M.difference fsl' fsl)
   
   
 updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog plsf profits fsdo fsd fsdf =
   let fsl = unionFxSettingLog (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
       fsl' = if M.member (Fsd.fxSetting fsdo) fsl
-             then traceShow("a") . M.filter(\(a, _) -> 0 < a) .
+             then M.filter(\(a, _) -> 0 < a) .
                   M.insert (Fsd.fxSetting fsd) (fst (fsl M.! Fsd.fxSetting fsdo) + profits, snd (fsl M.! Fsd.fxSetting fsdo) + 1) $
                   M.delete (Fsd.fxSetting fsdo) fsl
              else if 0 < profits
