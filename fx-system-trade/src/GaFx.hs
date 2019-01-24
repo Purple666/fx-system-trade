@@ -154,7 +154,7 @@ backTestLatestLoop n endN td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else backTestLoop n' endN tdt fsd2
+    else backTestLatestLoop n' endN tdt fsd2
 
 backTestLoop :: Int ->
                 Int ->
