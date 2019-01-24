@@ -160,9 +160,7 @@ backTestLoop latest n endN td fsd = do
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
     else if Ftd.profit tdt < Ftd.profit td
-         then do nd  <-  Fcd.getDate n
-                 nd' <-  Fcd.getDate n'
-                 traceShow(nd, nd') $ backTestLoop latest n' endN td fsd
+         then backTestLoop latest n' endN td fsd
          else do Fp.printTestProgress (Fcd.date $ Ftd.chart td) (Fcd.date $ Ftd.chart tdt) fsd1 fsd td tdt tdl tdlt plsf lok
                  fsd3 <- if latest
                          then return fsd2
