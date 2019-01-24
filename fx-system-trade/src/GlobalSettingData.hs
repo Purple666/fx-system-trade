@@ -9,6 +9,7 @@ data GlobalSettingData = GlobalSettingData
   , taOpenAndRate         :: Double
   , taCloseProfitAndRate  :: Double
   , taCloseLossAndRate    :: Double
+  , backtestLatestOneTime    :: Int
   , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
@@ -34,7 +35,8 @@ gsd =
                     , countUpList           = 3
                     , fxSettingLogNum       = 10
                     , quantityRate          = 5
-                    , backtestLatestTime    = 60 * 24 * 5
+                    , backtestLatestOneTime = 60 * 24 * 5
+                    , backtestLatestTime    = 24 * 60 * 30
                     , initalProperty        = 5000000
                     , maxUnit               = 3000000
                     , spread                = 0 -- 0.004

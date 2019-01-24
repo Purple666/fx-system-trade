@@ -49,7 +49,7 @@ backTest s f latest = do
       p = Fs.getPrepareTimeAll fsd + lt + ltt * Gsd.learningTestCount Gsd.gsd
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- if latest
-            then return (endN - (p + 24 * 60 * 30 + ltt * Gsd.learningTestCount Gsd.gsd))
+            then return (endN - (p + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.backtestLatestTime Gsd.gsd))
             else do s <- Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
                     getRandomR(s, s + ltt * 2)
   let n = startN + p
@@ -140,14 +140,14 @@ tradeLearningThread = do
 backTestLatestLoop :: Int ->
                       Int ->
                       Ftd.FxTradeData ->
-                      Fsd.FxSettingData ->
                       IO (Bool, Fsd.FxSettingData)
 backTestLatestLoop n endN td = do
-  (plsf, lok, tdl, tdlt, fsd1) <- learning n =<< Fm.readFxSettingData "backtest"
-  (oc, fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestTime Gsd.gsd) td fsd1
+  fsd <- Fm.readFxSettingData "backtest"
+  (plsf, lok, tdl, tdlt, fsd1) <- learning n fsd
+  (oc, fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
                      <$> ((++) <$>
                           Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                          Fm.getChartListForward n       (Gsd.backtestLatestTime Gsd.gsd) 0)
+                          Fm.getChartListForward n       (Gsd.backtestLatestOneTime Gsd.gsd) 0)
   if oc
     then Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
     else return ()
