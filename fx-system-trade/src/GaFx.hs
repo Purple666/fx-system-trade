@@ -161,7 +161,7 @@ backTestLoop latest n endN td fsd = do
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
     else if Ftd.profit tdt < Ftd.profit td && not lok
-         then backTestLoop latest n endN td $ Fsd.resetFxSettingData fsd2
+         then backTestLoop latest n endN td $ Fsd.resetFxSettingData fsd
          else do fsd3 <- if latest
                          then return fsd2
                          else Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd1 fsd2 lok
