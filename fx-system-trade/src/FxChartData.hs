@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module FxChartData
   ( FxChartData (..)
   , initFxChartData
@@ -8,6 +10,8 @@ module FxChartData
 
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
 import           Data.UnixTime
+import GHC.Generics (Generic)
+import Data.Hashable
 
 data FxChartData = FxChartData
   { no    :: Int
@@ -17,7 +21,9 @@ data FxChartData = FxChartData
   , low   :: Double
   , close :: Double
   }
-  deriving (Show, Read, Eq, Ord)
+  deriving (Show, Read, Eq, Ord, Generic)
+
+instance Hashable FxChartData
 
 initFxChartData :: FxChartData
 initFxChartData =

@@ -31,7 +31,6 @@ instance F.Foldable LearningData where
 instance Functor LearningData where
   fmap f (LearningData x) = LearningData $ zip (map (f . fst) x) (map snd x)
 
-
 class (Show a, Eq a, Ord a) => Ga a where
   copy :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   mutation :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
@@ -41,6 +40,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   getGaLoopMax :: a -> Int
   plusGaLoopMax :: a -> a
   reset :: MonadRandom m => LearningData a -> m (LearningData a)
+  setHash :: LearningData a -> LearningData a
 
 getGaDataList :: LearningData a -> [a]
 getGaDataList (LearningData x) = map fst x
@@ -127,8 +127,8 @@ learning x = do
   let glm = (getGaLoopMax $ getHeadGaData x) + 4
   x' <- createInitialDataLoop 0 glm x emptyLearningData
   if null x'
-    then return x
-    else learningLoop 0 glm x'
+    then return $ setHash x
+    else setHash <$> learningLoop 0 glm x'
 
 
 

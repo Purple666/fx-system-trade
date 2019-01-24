@@ -41,6 +41,7 @@ executable fx-exe
                      , extra
                      , async
                      , deepseq
+                     , hashable
   default-language:    Haskell2010
 
 test-suite fx-test

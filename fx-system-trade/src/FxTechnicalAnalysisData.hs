@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module FxTechnicalAnalysisData
   ( FxTechnicalAnalysisData (..)
   , FxMovingAverageData (..)
@@ -19,7 +21,8 @@ import           Debug.Trace
 import qualified FxChartData       as Fcd
 import qualified GlobalSettingData as Gsd
 import qualified Tree              as Tr
-import Data.List
+import GHC.Generics (Generic)
+import Data.Hashable
 
 data FxChartTaData = FxChartTaData
   { taChart     :: Fcd.FxChartData
@@ -38,7 +41,7 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   , st    :: FxMovingAverageData
   , rsi   :: FxMovingAverageData
   , bb    :: FxMovingAverageData
-  }  deriving (Show, Read)
+  }  deriving (Show, Read, Generic)
 
 data FxMovingAverageData = FxMovingAverageData
   { short      :: Double
@@ -56,9 +59,13 @@ data FxMovingAverageData = FxMovingAverageData
   , thresholdS :: FxTradePosition
   , thresholdL :: FxTradePosition
   , thresholdM :: FxTradePosition
-  }  deriving (Show, Read)
+  }  deriving (Show, Read, Generic)
 
-data FxTradePosition = None | Buy | Sell deriving (Show, Read, Eq)
+data FxTradePosition = None | Buy | Sell deriving (Show, Read, Eq, Generic)
+
+instance Hashable FxTechnicalAnalysisData
+instance Hashable FxMovingAverageData
+instance Hashable FxTradePosition
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
@@ -66,7 +73,7 @@ data FxTechnicalAnalysisSetting =
                              , treeAnaAndRate :: Int
                              , treeAnaOrRate  :: Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
-                             } deriving (Show, Read, Ord, Eq)
+                             } deriving (Show, Read, Ord, Eq, Generic)
 
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
@@ -81,7 +88,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
   , simChart           :: Int
-  } deriving (Show, Read, Ord, Eq)
+  } deriving (Show, Read, Ord, Eq, Generic)
 
 data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
@@ -90,7 +97,11 @@ data FxAlMaSetting = FxAlMaSetting
   , prevSetting         :: Int
   , thresholdSetting    :: Double
   , thresholdMaxSetting :: Double
-  }  deriving (Show, Read, Eq, Ord)
+  }  deriving (Show, Read, Eq, Ord, Generic)
+
+instance Hashable FxTechnicalAnalysisSetting
+instance Hashable FxAlgorithmSetting
+instance Hashable FxAlMaSetting
 
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =

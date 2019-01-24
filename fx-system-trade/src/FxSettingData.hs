@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module FxSettingData
   ( FxSettingData (..)
   , FxSetting (..)
@@ -11,6 +13,8 @@ module FxSettingData
   ) where
 
 import Debug.Trace
+import GHC.Generics (Generic)
+import Data.Hashable
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
@@ -22,37 +26,29 @@ data FxSettingData =
                                        M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
                 , fxSetting       :: FxSetting
                 , fxSettingLog    :: M.Map FxSetting (Double, Int)
-                } deriving (Show, Ord)
+                } deriving (Show)
 
 data FxSetting =
-  FxSetting { learningSetting :: FxLearningSetting
+  FxSetting { settingHash     :: Int
+            , learningSetting :: FxLearningSetting
             , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
-            } deriving (Show, Read, Ord, Eq)
+            } deriving (Show, Read, Generic)
 
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
 
-{-
 instance Ord FxSettingData where
   compare a b = compare (fxSetting a) (fxSetting b) 
 
 instance Eq FxSetting where
-  a == b = fxTaOpen        a == fxTaOpen        b &&
-           fxTaCloseProfit a == fxTaCloseProfit b &&
-           fxTaCloseLoss   a == fxTaCloseLoss   b   
+  a == b = settingHash a == settingHash b
 
 instance Ord FxSetting where
-  compare a b
-    | fxTaOpen a        == fxTaOpen        b &&
-      fxTaCloseProfit a == fxTaCloseProfit b &&
-      fxTaCloseLoss   a == fxTaCloseLoss   b    = EQ
-    | fxTaOpen        a <  fxTaOpen        b &&
-      fxTaCloseProfit a <  fxTaCloseProfit b &&
-      fxTaCloseLoss   a <  fxTaCloseLoss   b    = LT
-    | otherwise                                 = GT
--}
+  compare a b = compare (settingHash a) (settingHash b) 
+
+instance Hashable FxSetting
 
 data FxChart =
   FxChart { chart       :: [Fcd.FxChartData]
@@ -67,7 +63,9 @@ data FxLearningSetting =
                     , failProfit         :: Double
                     , trTrade            :: Integer
                     , trTradeDate        :: Integer
-                    } deriving (Show, Read, Eq, Ord)
+                    } deriving (Show, Read, Eq, Ord, Generic)
+
+instance Hashable FxLearningSetting
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
@@ -75,7 +73,8 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , prevOpen            = ([], M.empty)
-                , fxSetting = FxSetting { learningSetting = FxLearningSetting { learningTestTimes  = 1
+                , fxSetting = FxSetting { settingHash = 0
+                                        , learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                                               , trSuccess          = 0
                                                                               , trFail             = 0
                                                                               , successProfit      = 0 

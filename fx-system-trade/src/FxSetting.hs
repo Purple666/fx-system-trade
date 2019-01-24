@@ -17,11 +17,13 @@ module FxSetting
   , getProfitRate
   , updateFxSettingLog
   , checkAlgoSetting
+  , setHashFxSettingData
   ) where
 
 import           Control.Monad
 import           Control.Monad.Random
-import           Data.List
+import           Data.Hashable
+import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified Data.Set                as S
 import           Debug.Trace
@@ -133,25 +135,23 @@ unionFxSettingLog fsl fsl' =
                                                   else (a, b)) fsl fsl')
   . S.fromList . M.keys . M.filter (\(_, b) -> 1 < b) $ M.union (M.difference fsl fsl') (M.difference fsl' fsl)
   
-  
-updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog plsf profits fsdo fsd fsdf =
-  let fsl = unionFxSettingLog (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
-      fsl' = if M.member (Fsd.fxSetting fsdo) fsl
-             then M.filter(\(a, _) -> 0 < a) .
-                  M.insert (Fsd.fxSetting fsd) (fst (fsl M.! Fsd.fxSetting fsdo) + profits, snd (fsl M.! Fsd.fxSetting fsdo) + 1) $
-                  M.delete (Fsd.fxSetting fsdo) fsl
+updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog plsf profits fsd fsdf = 
+  let fsl = Fsd.fxSettingLog fsd
+      fs  = Fsd.fxSetting fsd
+      fsl' = if M.member fs fsl
+             then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) fs fsl
              else if 0 < profits
-                  then M.insert (Fsd.fxSetting fsd) (profits, 1) fsl
+                  then M.insert fs (profits, 1) fsl
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                   sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
+                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
               else fsl'
-  in fsd { Fsd.fxSettingLog = fsl''
+  in fsd { Fsd.fxSettingLog = unionFxSettingLog fsl'' (Fsd.fxSettingLog fsdf)
          }
-
+  
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
 
@@ -254,6 +254,14 @@ resetFxSettingData :: MonadRandom m =>
                       m (Ga.LearningData  Fsd.FxSettingData)
 resetFxSettingData x =
   createRandomGaData True $ Ga.getHeadGaData x
+
+setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
+                        Ga.LearningData Fsd.FxSettingData
+setHashFxSettingData x =
+  Ga.LearningData . map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                             { Fsd.settingHash = hash (Fsd.fxSetting fsd)
+                                             }
+                                           }, p)) $ Ga.getLearningData x
 
 crossoverFxSettingData :: MonadRandom m =>
                           Ga.LearningData Fsd.FxSettingData ->

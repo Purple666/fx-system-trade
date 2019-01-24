@@ -33,6 +33,7 @@ instance Ga.Ga Fsd.FxSettingData where
   getGaLoopMax      = Fsd.getLearningTestTimes
   plusGaLoopMax     = Fsd.plusLearningTestTimes
   reset             = Fs.resetFxSettingData
+  setHash           = Fs.setHashFxSettingData
 
 debug :: IO ()
 debug = do
@@ -151,7 +152,7 @@ backTestLatestLoop n endN td fsd = do
   fsd3 <- if oc
           then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                   Fm.writeFxSettingData "backtest"
-                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd fsd2
+                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                     =<< Fm.readFxSettingData "backtest"
     else return fsd2
   let n' = Fcd.no (Ftd.chart tdt) + 1
@@ -180,7 +181,7 @@ backTestLoop n endN td fsd = do
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop n endN td $ Fsd.resetFxSettingData fsd
          else do fsd3 <- Fm.writeFxSettingData "backtest"
-                   <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd1 fsd2
+                   <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                    =<< Fm.readFxSettingData "backtest"
                  Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                  backTestLoop n' endN tdt fsd3

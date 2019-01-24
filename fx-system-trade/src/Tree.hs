@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 
 module Tree
   ( LeafData (..)
@@ -22,13 +23,26 @@ import qualified Control.Monad.Random as R
 import           Data.List
 import qualified Data.Map             as M
 import qualified GlobalSettingData    as Gsd
+import GHC.Generics (Generic)
+import Data.Hashable
 import Debug.Trace
 
-newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) } 
+newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) } deriving(Generic)
 
-newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } 
+newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } deriving(Generic)
 
-newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read, Eq, Ord)
+newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read, Eq, Ord, Generic)
+
+instance Hashable a => Hashable (LeafDataMap a)
+
+instance Hashable a => Hashable (LeafData a) where
+   hashWithSalt = hashUsing (fst . getLeafData)
+
+instance Hashable NodeData where
+   hashWithSalt = hashUsing (fst . getNodeData)
+
+instance (Hashable k, Hashable a) => Hashable (M.Map k a) where
+   hashWithSalt = hashUsing (hash . M.toList)
 
 instance Read (LeafData a) where
   readsPrec _ s = let (a, s') = break (\x -> x ==')' || x ==',' ) s
@@ -61,7 +75,9 @@ instance Ord NodeData where
 
 data TreeData a = Empty  |
                   Leaf (LeafData a) |
-                  Node NodeData (TreeData a) (TreeData a) deriving(Show, Read, Eq, Ord)
+                  Node NodeData (TreeData a) (TreeData a) deriving(Show, Read, Eq, Ord, Generic)
+
+instance Hashable a => Hashable (TreeData a)
 
 defaultFunction :: a -> Bool
 defaultFunction _ = True
