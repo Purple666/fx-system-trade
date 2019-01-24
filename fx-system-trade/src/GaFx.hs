@@ -120,7 +120,7 @@ learning n fsd = do
       (_, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')
-    else learningLoop 0 n xcd fsd 
+    else learningLoop 0 n xcd $ resetFxSettingData fsd 
 
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
