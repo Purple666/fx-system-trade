@@ -96,7 +96,7 @@ getEvaluationValue x =
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
-  profit x
+  (profit x * unrealizedPL x * getWinRatePure x ^ 2 * tradeDateAve x)
 {-  
   if getWinRatePure x == 0 || tradeDateAve x == 0
   then 0
