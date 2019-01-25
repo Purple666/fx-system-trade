@@ -41,8 +41,8 @@ debug = do
   traceShow(Fsd.fxTaOpen $ Fsd.fxSetting fsd) $ return ()
   return ()
 
-backTest :: Int -> Int -> Bool -> IO ()
-backTest s f latest = do
+backTest :: Int -> Int -> Bool -> Bool -> IO ()
+backTest s f latest retry = do
   fsd <- Fm.readFxSettingData "backtest"
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
@@ -56,13 +56,13 @@ backTest s f latest = do
   let n = startN + p
   (fs, fsd') <- if latest
                 then backTestLatestLoop n endN td fsd
-                else backTestLoop       False n endN td fsd
+                else backTestLoop       retry n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" s (f + 1) fsd'
                       return (s, f + 1)
-  backTest s' f' latest
+  backTest s' f' latest retry
 
 trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do

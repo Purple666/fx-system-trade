@@ -196,6 +196,61 @@ items:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
+      app: fx-system-trade-backtest-retry
+    name: fx-system-trade-backtest-retry
+  spec:
+    replicas: 1
+    selector:
+      app: fx-system-trade
+      deploymentconfig: fx-system-trade
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: fx-system-trade
+          deploymentconfig: fx-system-trade
+      spec:
+        containers:
+        - image: fx-system-trade
+          name: fx-system-trade
+          command: ["./Fx", "backtest-retry"]
+          resources: {}
+          volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+        volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - fx-system-trade
+        from:
+          kind: ImageStreamTag
+          name: fx-system-trade:latest
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
       app: fx-system-trade-trade-practice
     name: fx-system-trade-trade-practice
   spec:
