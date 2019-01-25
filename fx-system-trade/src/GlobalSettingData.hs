@@ -9,7 +9,7 @@ data GlobalSettingData = GlobalSettingData
   , taOpenAndRate         :: Double
   , taCloseProfitAndRate  :: Double
   , taCloseLossAndRate    :: Double
-  , backtestLatestOneTime    :: Int
+  , backtestLatestOneTime :: Int
   , backtestLatestTime    :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
