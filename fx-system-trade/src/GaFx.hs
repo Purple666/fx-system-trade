@@ -56,7 +56,7 @@ backTest s f latest = do
   let n = startN + p
   (fs, fsd') <- if latest
                 then backTestLatestLoop n endN td fsd
-                else backTestLoop       n endN td fsd
+                else backTestLoop       False n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
@@ -161,12 +161,13 @@ backTestLatestLoop n endN td fsd = do
             return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
     else backTestLatestLoop n' endN tdt fsd3
 
-backTestLoop :: Int ->
+backTestLoop :: Bool ->
+                Int ->
                 Int ->
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
-backTestLoop n endN td fsd = do
+backTestLoop retry n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- learning n fsd
   (_, fsd2, tdt) <- do let lt  = Fs.getLearningTime     fsd1
                            ltt = Fs.getLearningTestTime fsd1
@@ -177,14 +178,14 @@ backTestLoop n endN td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok
+    else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
-                 backTestLoop n endN td $ Fsd.resetFxSettingData fsd
+                 backTestLoop retry n endN td $ Fsd.resetFxSettingData fsd
          else do fsd3 <- Fm.writeFxSettingData "backtest"
                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                    =<< Fm.readFxSettingData "backtest"
                  Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-                 backTestLoop n' endN tdt fsd3
+                 backTestLoop retry n' endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
