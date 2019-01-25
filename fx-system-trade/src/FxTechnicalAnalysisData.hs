@@ -135,6 +135,9 @@ fxAlgorithmList =
   , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
   , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
   , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
+  ]
+
+{-
   , (isBuy (slopeSn    . rsi), isSell (slopeSn    . rsi)) -- 29
   , (isBuy (slopeMn    . rsi), isSell (slopeMn    . rsi)) -- 30
   , (isBuy (slopeLn    . rsi), isSell (slopeLn    . rsi)) -- 31
@@ -153,7 +156,7 @@ fxAlgorithmList =
   , (isBuy (slopeSn    . wma), isSell (slopeSn    . wma)) -- 44
   , (isBuy (slopeMn    . wma), isSell (slopeMn    . wma)) -- 45
   , (isBuy (slopeLn    . wma), isSell (slopeLn    . wma)) -- 46
-  ]
+-}
 
 
 isBuy :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool

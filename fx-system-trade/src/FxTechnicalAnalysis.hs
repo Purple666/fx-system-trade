@@ -20,7 +20,7 @@ import qualified Tree                    as Tr
 
 getSimChartMax :: Fad.FxTechnicalAnalysisSetting -> Int
 getSimChartMax x =
-  minimum $ M.map (\a -> let prevSettingMax = maximum
+  maximum $ M.map (\a -> let prevSettingMax = maximum
                                [ Fad.prevSetting $ Fad.smaSetting a
                                , Fad.prevSetting $ Fad.emaSetting a
                                , Fad.prevSetting $ Fad.wmaSetting a
@@ -29,7 +29,7 @@ getSimChartMax x =
                                , Fad.prevSetting $ Fad.rciSetting a
                                , Fad.prevSetting $ Fad.rsiSetting a
                                ]
-                         in prevSettingMax * Fad.simChart a) $ Fad.algoSetting x
+                         in {- prevSettingMax * -} Fad.simChart a) $ Fad.algoSetting x
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
