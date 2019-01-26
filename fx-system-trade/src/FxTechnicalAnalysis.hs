@@ -353,8 +353,7 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
                                       , Fad.rsi    = makeFxMovingAverageData getRsi 0 100 lr (Fad.rsiSetting ftas) Fad.rsi pdl
                                       , Fad.bb     = getBB (Fad.middleSetting $ Fad.smaSetting ftas) (Fad.middle $ Fad.sma x) lr
                                       }
-  in traceShow(lr) $
-     if null pdl
+  in if null pdl
      then Fad.initFxTechnicalAnalysisData
      else x
 
