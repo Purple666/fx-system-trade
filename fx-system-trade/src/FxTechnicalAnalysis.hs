@@ -239,19 +239,13 @@ getBB n ma x =
       sd = sqrt $ (fromIntegral n * foldl (\acc b -> (b ^ (2 :: Int) + acc)) 0 s - sum s ^ (2 :: Int)) / fromIntegral (n * (n - 1))
   in if length s < n || ma == 0
      then Fad.initFxMovingAverageData
-     else Fad.initFxMovingAverageData { Fad.thresholdS = if ma + sd * 2 < Fcd.close chart
-                                                         then Fad.Buy
-                                                         else if Fcd.close chart < ma - sd * 2
-                                                              then Fad.Sell
-                                                              else Fad.None 
-
-                                        {- if Fcd.close chart < ma - sd * 3 ||
+     else Fad.initFxMovingAverageData { Fad.thresholdS = if Fcd.close chart < ma - sd * 3 ||
                                                             (ma + sd * 2 < Fcd.close chart && Fcd.close chart < ma + sd * 3)
                                                          then Fad.Buy
                                                          else if ma + sd * 3 < Fcd.close chart ||
                                                                  (ma - sd * 3 < Fcd.close chart && Fcd.close chart < ma - sd * 2)
                                                               then Fad.Sell
-                                                              else Fad.None -}
+                                                              else Fad.None
                                       }
 
 getST :: Int -> Int -> [Fcd.FxChartData] -> [Fad.FxTechnicalAnalysisData] -> (Double, Double, Double)
