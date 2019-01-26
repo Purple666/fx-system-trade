@@ -353,7 +353,8 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
                                       , Fad.rsi    = makeFxMovingAverageData getRsi 0 100 lr (Fad.rsiSetting ftas) Fad.rsi pdl
                                       , Fad.bb     = getBB (Fad.middleSetting $ Fad.smaSetting ftas) (Fad.middle $ Fad.sma x) lr
                                       }
-  in if null pdl
+  in traceShow(lr) $
+     if null pdl
      then Fad.initFxTechnicalAnalysisData
      else x
 
@@ -369,6 +370,6 @@ makeFxTechnicalAnalysisDataList :: Fad.FxAlgorithmSetting ->
                                    [Fad.FxTechnicalAnalysisData]
 makeFxTechnicalAnalysisDataList _  _             [] x = x
 makeFxTechnicalAnalysisDataList fs lr (lf:lfs) x =
-  let d = makeFxTechnicalAnalysisData fs (lf:lr) lf x
+  let d = makeFxTechnicalAnalysisData fs (reverse $ (lf:lr)) lf x
   in  makeFxTechnicalAnalysisDataList fs (lf:lr) lfs (d:x)
 
