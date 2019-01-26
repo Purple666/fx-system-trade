@@ -120,9 +120,6 @@ fxAlgorithmList =
   , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 12
   , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 13
   , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 14
-  ]
-
-{-
   , (isBuy (crossSL    . rci), isSell (crossSL    . rci)) -- 5
   , (isBuy (crossSM    . rci), isSell (crossSM    . rci)) -- 6
   , (isBuy (crossML    . rci), isSell (crossML    . rci)) -- 7
@@ -156,6 +153,9 @@ fxAlgorithmList =
   , (isBuy (slopeSn    . wma), isSell (slopeSn    . wma)) -- 44
   , (isBuy (slopeMn    . wma), isSell (slopeMn    . wma)) -- 45
   , (isBuy (slopeLn    . wma), isSell (slopeLn    . wma)) -- 46
+  ]
+
+{-
 -}
 
 

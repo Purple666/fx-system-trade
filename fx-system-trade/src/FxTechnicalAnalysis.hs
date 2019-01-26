@@ -277,8 +277,12 @@ setCross s l ps pl
 
 lsmn :: [Double] -> Fad.FxTradePosition
 lsmn xs
+{- 
   | fst $ foldl (\(f, p) x -> (f && p <= x, p)) (True, 0) xs = Fad.Buy
   | fst $ foldl (\(f, p) x -> (f && x <= p, p)) (True, 0) xs = Fad.Sell
+-}
+  | and $ map (\x -> 0 <= x) xs = Fad.Buy
+  | and $ map (\x -> x <= 0) xs = Fad.Sell
   | otherwise = Fad.None
 
 setThreshold :: Double ->
@@ -369,6 +373,6 @@ makeFxTechnicalAnalysisDataList :: Fad.FxAlgorithmSetting ->
                                    [Fad.FxTechnicalAnalysisData]
 makeFxTechnicalAnalysisDataList _  _             [] x = x
 makeFxTechnicalAnalysisDataList fs lr (lf:lfs) x =
-  let d = makeFxTechnicalAnalysisData fs (reverse $ (lf:lr)) lf x
+  let d = makeFxTechnicalAnalysisData fs (lf:lr) lf x
   in  makeFxTechnicalAnalysisDataList fs (lf:lr) lfs (d:x)
 
