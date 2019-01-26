@@ -110,16 +110,16 @@ fxAlgorithmList =
   , (isBuy (crossSM    . sma), isSell (crossSM    . sma)) -- 2
   , (isBuy (crossML    . sma), isSell (crossML    . sma)) -- 3
   , (isBuy (crossSL   . macd), isSell (crossSL   . macd)) -- 4
-  , (isBuy (thresholdS . rci), isSell (thresholdS . rci)) -- 14
-  , (isBuy (thresholdM . rci), isSell (thresholdM . rci)) -- 15
-  , (isBuy (thresholdL . rci), isSell (thresholdL . rci)) -- 16
-  , (isBuy (thresholdS . rsi), isSell (thresholdS . rsi)) -- 17
-  , (isBuy (thresholdM . rsi), isSell (thresholdM . rsi)) -- 18
-  , (isBuy (thresholdL . rsi), isSell (thresholdL . rsi)) -- 19
-  , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 20
-  , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 21
-  , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 22
-  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 23
+  , (isBuy (thresholdS . rci), isSell (thresholdS . rci)) -- 5
+  , (isBuy (thresholdM . rci), isSell (thresholdM . rci)) -- 6
+  , (isBuy (thresholdL . rci), isSell (thresholdL . rci)) -- 7
+  , (isBuy (thresholdS . rsi), isSell (thresholdS . rsi)) -- 8
+  , (isBuy (thresholdM . rsi), isSell (thresholdM . rsi)) -- 9
+  , (isBuy (thresholdL . rsi), isSell (thresholdL . rsi)) -- 10
+  , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 11
+  , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 12
+  , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 13
+  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 14
   ]
 
 {-
