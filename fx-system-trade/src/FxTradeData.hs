@@ -92,7 +92,7 @@ getLearningEvaluationValue x =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-(profit x * unrealizedPL x * getWinRatePure x ^ 2) / ((fromIntegral $ chartLength x))
+  (profit x * unrealizedPL x * getWinRatePure x ^ 2) / ((fromIntegral $ chartLength x))
 
 getLearningEvaluationValue :: FxTradeData -> Double
 getLearningEvaluationValue x =
