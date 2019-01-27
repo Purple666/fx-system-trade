@@ -17,5 +17,5 @@ do
 done
 python get_rate_data/clear_fx-trade.py
 ./scaleup.sh
-sleep 5
+sleep 10
 ./log_trade-backtest.sh
