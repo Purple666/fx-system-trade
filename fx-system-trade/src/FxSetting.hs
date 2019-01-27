@@ -139,16 +139,16 @@ updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData ->
 updateFxSettingLog plsf profits fsd fsdf = 
   let fsl = Fsd.fxSettingLog fsd
       fs  = Fsd.fxSetting fsd
+{-      
       fsl' = if M.member fs fsl
              then M.adjust (\(a, b) -> (a + profits, b + 1)) fs fsl
              else M.insert fs (profits, 1) fsl
-{-      
+-}
       fsl' = if M.member fs fsl
              then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) fs fsl
              else if 0 < profits
                   then M.insert fs (profits, 1) fsl
                   else fsl
--}
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
                    L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
