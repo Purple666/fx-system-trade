@@ -329,7 +329,7 @@ backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (oc' ,fsd3, td3) = foldl (\(oc, fsd1, td1) ctd -> 
                                   let (open, close, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
-                                  in (oc || (open /= Ftd.None || close /= Ftd.None), fsd2, td2))
+                                  in (oc || close /= Ftd.None, fsd2, td2))
                          (False, fsd, td) ctdl
   in (oc', Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
