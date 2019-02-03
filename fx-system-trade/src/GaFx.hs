@@ -147,7 +147,7 @@ backTestLatestLoop :: Bool ->
 backTestLatestLoop oc n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if oc
                                   then learning n fsd
-                                  else return (0, False, initFxTradeDataCommon, [initFxTradeDataCommon], fsd)
+                                  else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
   (oc', fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
                       <$> ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
@@ -162,7 +162,7 @@ backTestLatestLoop oc n endN td fsd = do
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
             return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
-    else backTestLatestLoop n' endN tdt fsd3
+    else backTestLatestLoop oc' n' endN tdt fsd3
 
 backTestLoop :: Bool ->
                 Bool ->
@@ -174,7 +174,7 @@ backTestLoop :: Bool ->
 backTestLoop retry oc n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if oc
                                   then learning n fsd
-                                  else return (0, False, initFxTradeDataCommon, [initFxTradeDataCommon], fsd)
+                                  else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
   (oc', fsd2, tdt) <- do let lt  = Fs.getLearningTime     fsd1
                              ltt = Fs.getLearningTestTime fsd1
                          Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
