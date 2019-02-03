@@ -155,7 +155,7 @@ backTestLatestLoop oc n endN td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-            return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
+            return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
     else if oc'
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                  fsd3 <- Fm.writeFxSettingData "backtest"
