@@ -152,17 +152,17 @@ backTestLatestLoop oc n endN td fsd = do
                       <$> ((++) <$>
                            Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                            Fm.getChartListForward n       (Gsd.backtestLatestOneTime Gsd.gsd) 0)
-  fsd3 <- if oc'
-          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-                  Fm.writeFxSettingData "backtest"
-                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
-                    =<< Fm.readFxSettingData "backtest"
-    else return fsd2
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
             return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
-    else backTestLatestLoop oc' n' endN tdt fsd3
+    else if oc'
+         then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
+                 fsd3 <- Fm.writeFxSettingData "backtest"
+                         <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
+                         =<< Fm.readFxSettingData "backtest"
+                 backTestLatestLoop oc' n' endN tdt fsd3
+         else backTestLatestLoop oc' n' endN tdt fsd
 
 backTestLoop :: Bool ->
                 Bool ->
@@ -187,13 +187,13 @@ backTestLoop retry oc n endN td fsd = do
     else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop retry True n endN td $ Fsd.resetFxSettingData fsd
-         else do fsd3 <- if oc'
-                         then Fm.writeFxSettingData "backtest"
-                              <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
-                              =<< Fm.readFxSettingData "backtest"
-                         else return fsd2
-                 Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-                 backTestLoop retry oc' n' endN tdt fsd3
+         else do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
+                 if oc'
+                   then do fsd3 <- Fm.writeFxSettingData "backtest"
+                                   <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
+                                   =<< Fm.readFxSettingData "backtest"
+                           backTestLoop retry oc' n' endN tdt fsd3
+                   else backTestLoop retry oc' n' endN tdt fsd
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
