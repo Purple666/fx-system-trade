@@ -191,6 +191,7 @@ backTestLoop retry oc n endN td fsd = do
                          then Fm.writeFxSettingData "backtest"
                               <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                               =<< Fm.readFxSettingData "backtest"
+                         else return fsd2
                  Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                  backTestLoop retry oc' n' endN tdt fsd3
 
