@@ -179,7 +179,7 @@ backTestLoop retry n endN td tdi fsd = do
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
     else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry && Ftd.side tdt == Ftd.None
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
-                 backTestLoop retry n endN td tdi $ resetFxSettingData fsd2
+                 backTestLoop retry n endN td tdi fsd2
          else do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
                  if Ftd.side tdt == Ftd.None
                    then do fsd3 <- Fm.writeFxSettingData "backtest"
