@@ -188,7 +188,7 @@ backTestLoop retry oc n endN td fsd = do
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop retry True n endN td $ Fsd.resetFxSettingData fsd
          else do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-                 if oc'
+                 if oc' || Ftd.side tdt == Ftd.None
                    then do fsd3 <- Fm.writeFxSettingData "backtest"
                                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                                    =<< Fm.readFxSettingData "backtest"
