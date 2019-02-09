@@ -324,7 +324,7 @@ backTest :: Int ->
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
-                              let (_, _, fsd2, td2) = if Ftd.side td2 == Ftd.None &&
+                              let (_, _, fsd2, td2) = if Ftd.side td1 == Ftd.None &&
                                                          (Ftd.trSuccess td < Ftd.trSuccess td1 || Ftd.trFail td < Ftd.trFail td1)
                                                       then (Ftd.None, Ftd.None, fsd1, td1)
                                                       else evaluate ctd fsd fsd1 getQuantityBacktest False td1
@@ -359,6 +359,6 @@ trade td fsd xcd =
 gaLearningEvaluate :: Fsd.FxSettingData -> (Fsd.FxSettingData, Rational)
 gaLearningEvaluate fsd =
   let td = learning fsd
-  in (fsd, toRational $ Ftd.getLearningEvaluationValue td)
+  in (fsd, toRational $ Ftd.getEvaluationValue td)
 
 
