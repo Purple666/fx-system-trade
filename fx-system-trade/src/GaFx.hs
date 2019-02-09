@@ -192,8 +192,8 @@ backTestLoop retry oc n endN td fsd = do
                    then do fsd3 <- Fm.writeFxSettingData "backtest"
                                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
                                    =<< Fm.readFxSettingData "backtest"
-                           backTestLoop retry oc' n' endN tdt fsd3
-                   else backTestLoop retry oc' n' endN tdt fsd
+                           backTestLoop retry True n' endN tdt fsd3
+                   else backTestLoop retry False n' endN tdt fsd
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
