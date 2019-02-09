@@ -4,7 +4,6 @@ module FxTrade ( initFxTradeData
                , trade
                , gaLearningEvaluate
                , evaluationOk
-               , getProfitList
                ) where
 
 import           Control.Monad
@@ -27,10 +26,6 @@ evaluationOk tdl tdlt =
   --0 < Ftd.profit tdl && (and $ map (\x -> 0 < Ftd.profit x) tdlt)
   --0 < Ftd.profit tdl && 0 < getProfitList tdlt
   0 < Ftd.getEvaluationValue tdl && (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt)
-
-getProfitList :: [Ftd.FxTradeData] -> Double
-getProfitList tdlt =
-  sum $ map Ftd.profit tdlt
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
@@ -325,14 +320,14 @@ backTest :: Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
-            (Bool, Fsd.FxSettingData, Ftd.FxTradeData)
+            (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-      (oc' ,fsd3, td3) = foldl (\(oc, fsd1, td1) ctd -> 
-                                  let (open, close, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
-                                  in (oc || close /= Ftd.None, fsd2, td2))
-                         (False, fsd, td) ctdl
-  in (oc', Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
+      (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
+                              let (open, close, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
+                              in (fsd2, td2))
+                    (fsd, td) ctdl
+  in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
 learning :: Fsd.FxSettingData ->
             Ftd.FxTradeData
