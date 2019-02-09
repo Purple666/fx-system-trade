@@ -125,13 +125,10 @@ createInitialDataLoop c glm ix x = do
 learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 learning x = do
   let glm = (getGaLoopMax $ getHeadGaData x) + 4
-  x' <- reset x
-  x2 <- createInitialDataLoop 0 glm x emptyLearningData
-  x3 <- createInitialDataLoop 0 glm x' emptyLearningData
-  if null x2 && null x3
+  x' <- createInitialDataLoop 0 glm x emptyLearningData
+  if null x'
     then return $ setHash x
-    else setHash <$> (learningLoop 0 (glm * 2) $ mappend x2 x3)
+    else setHash <$> learningLoop 0 glm x'
 
-
-
+                     
 
