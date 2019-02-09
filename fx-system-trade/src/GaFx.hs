@@ -177,7 +177,7 @@ backTestLoop retry n endN td tdi fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry && Ftd.side td == Ftd.None
+    else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop retry n endN td tdi fsd2
          else do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
