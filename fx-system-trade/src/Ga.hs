@@ -130,7 +130,7 @@ learning x = do
   x3 <- createInitialDataLoop 0 glm x' emptyLearningData
   if null x2 && null x3
     then return $ setHash x
-    else setHash <$> (learningLoop 0 glm $ mappend x2 x3)
+    else setHash <$> (learningLoop 0 (glm * 2) $ mappend x2 x3)
 
 
 
