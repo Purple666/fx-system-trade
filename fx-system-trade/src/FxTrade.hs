@@ -357,10 +357,10 @@ backTest :: Bool ->
 backTest lok l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
-                              let (_, _, fsd2, td2) = if Ftd.side td1 == Ftd.None && not lok &&
+                              let (_, _, fsd2, td2) = {- if Ftd.side td1 == Ftd.None && not lok &&
                                                          (Ftd.trSuccess td < Ftd.trSuccess td1 || Ftd.trFail td < Ftd.trFail td1)
                                                       then (Ftd.None, Ftd.None, fsd1, td1)
-                                                      else evaluate ctd fsd fsd1 getQuantityBacktest False td1
+                                                      else -} evaluate ctd fsd fsd1 getQuantityBacktest False td1
                               in (fsd2, td2))
                     (fsd, td) ctdl
   in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
