@@ -153,7 +153,7 @@ backTestLatestLoop n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if Ftd.side td == Ftd.None
                                   then learning False n =<< Fm.readFxSettingData "backtest"
                                   else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
-  (fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
+  (fsd2, tdt) <- Ft.backTest lok (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (Gsd.backtestLatestOneTime Gsd.gsd) 0)

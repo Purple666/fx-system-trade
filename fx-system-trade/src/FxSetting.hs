@@ -139,11 +139,6 @@ updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData ->
 updateFxSettingLog plsf profits fsd fsdf = 
   let fsl = Fsd.fxSettingLog fsd
       fs  = Fsd.fxSetting fsd
-{-      
-      fsl' = if M.member fs fsl
-             then M.adjust (\(a, b) -> (a + profits, b + 1)) fs fsl
-             else M.insert fs (profits, 1) fsl
--}
       fsl' = if M.member fs fsl
              then M.filter(\(a, _) -> 0 < a) $ M.adjust (\(a, b) -> (a + profits, b + 1)) fs fsl
              else if 0 < profits
@@ -154,8 +149,14 @@ updateFxSettingLog plsf profits fsd fsdf =
                    L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
               else fsl'
-  in fsd { Fsd.fxSettingLog = unionFxSettingLog fsl' (Fsd.fxSettingLog fsdf)
-         }
+      fsd' = if length fsl' < length fsl && 0 < length fsl'
+             then fsd { Fsd.fxSetting = head . map (\(x, (_, _)) -> x) . 
+                                        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a') ) $
+                                        M.toList fsl'
+                      }
+             else fsd
+  in fsd' { Fsd.fxSettingLog = unionFxSettingLog fsl'' (Fsd.fxSettingLog fsdf)
+          }
   
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
