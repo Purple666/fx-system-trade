@@ -89,7 +89,9 @@ learningLoop retry c n xcd fsd = do
                               tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
                               p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
-                          in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
+                          in (p, tdl, tdlt, x)) . (if retry
+                                                   then (++) []
+                                                   else (++) [fsd]) . Ga.getGaDataList) <$>
     (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   --Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
   if Ft.evaluationOk tdl tdlt
