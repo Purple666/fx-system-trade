@@ -87,7 +87,7 @@ learningLoop c n xcd fsd = do
                                      [0..Gsd.learningTestCount Gsd.gsd - 1]
                               tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl' x
-                              p    = Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt
+                              p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                           in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
     (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
@@ -117,7 +117,7 @@ learning n fsd = do
                                                       [0..Gsd.learningTestCount Gsd.gsd - 1]
                                               tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
                                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl fsd'
-                                              p'   = Ftd.getEvaluationValue tdl * Ftd.getEvaluationValueList tdlt *
+                                              p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
                                                      (p / fromIntegral c)
                                           in (Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fsl
       (_, tdl', tdlt', fsd'') = maximum tdlts
