@@ -56,7 +56,7 @@ backTest s f latest retry = do
   let n = startN + p
   (fs, fsd') <- if latest
                 then backTestLatestLoop n endN td fsd
-                else backTestLoop       retry n endN td td fsd
+                else backTestLoop       retry n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
@@ -161,10 +161,9 @@ backTestLoop :: Bool ->
                 Int ->
                 Int ->
                 Ftd.FxTradeData ->
-                Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
-backTestLoop retry n endN td tdi fsd = do
+backTestLoop retry n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if Ftd.side td == Ftd.None
                                   then learning n fsd
                                   else return (0, True, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
@@ -174,19 +173,17 @@ backTestLoop retry n endN td tdi fsd = do
                       <$> ((++) <$>
                             Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                             Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
+  fsd3 <- Fm.writeFxSettingData "backtest"
+          <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
+          =<< Fm.readFxSettingData "backtest"
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
+    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
     else if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && not lok && retry
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
-                 backTestLoop retry n endN td tdi fsd2
+                 backTestLoop retry n endN td fsd3
          else do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-                 if Ftd.side tdt == Ftd.None
-                   then do fsd3 <- Fm.writeFxSettingData "backtest"
-                                   <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit tdi) fsd2
-                                   =<< Fm.readFxSettingData "backtest"
-                           backTestLoop retry n' endN tdt tdt fsd3
-                   else backTestLoop retry n' endN tdt tdi fsd2
+                 backTestLoop retry n' endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
