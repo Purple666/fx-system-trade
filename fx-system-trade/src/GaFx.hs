@@ -71,13 +71,12 @@ trade environment coName = do
   Fp.printProgressFxTradeData td c
   tradeWeeklyLoop td coName
 
-learningLoop :: Bool ->
-                Int ->
+learningLoop :: Int ->
                 Int ->
                 [Fcd.FxChartData] -> 
                 Fsd.FxSettingData ->
                 IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop retry c n xcd fsd = do
+learningLoop c n xcd fsd = do
   let lt = Fs.getLearningTime fsd
       cl = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd + lt) xcd
   (p', tdl, tdlt, fsd') <-
@@ -98,13 +97,12 @@ learningLoop retry c n xcd fsd = do
          then if retry
               then return (0, False, tdl, tdlt, fsd')
               else return (0, False, tdl, tdlt, Fsd.plusLearningTestTimes fsd')
-         else learningLoop retry (c + 1) n xcd fsd' 
+         else learningLoop (c + 1) n xcd fsd' 
 
-learning :: Bool ->
-            Int ->
+learning :: Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, Ftd.FxTradeData, [Ftd.FxTradeData], Fsd.FxSettingData)
-learning retry n fsd = do
+learning n fsd = do
   let fsl  = M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
       lt  = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getLearningTime     fsd { Fsd.fxSetting = x }) fsl
       ltt = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getLearningTestTime fsd { Fsd.fxSetting = x }) fsl
@@ -127,13 +125,13 @@ learning retry n fsd = do
       (_, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdl', tdlt',  fsd'')
-    else learningLoop retry 0 n xcd fsd 
+    else learningLoop 0 n xcd fsd 
 
 tradeLearning :: IO Fsd.FxSettingData
 tradeLearning = do
   fsd <- Fm.readFxSettingData "backtest"
   e <- Fm.getOneChart Fm.getEndChartFromDB 
-  (plsf, lsf, tdl, tdlt, fsd') <- learning False (Fcd.no e) fsd
+  (plsf, lsf, tdl, tdlt, fsd') <- learning (Fcd.no e) fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return fsd'
 
@@ -149,7 +147,7 @@ backTestLatestLoop :: Int ->
                       IO (Bool, Fsd.FxSettingData)
 backTestLatestLoop n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if Ftd.side td == Ftd.None
-                                  then learning False n =<< Fm.readFxSettingData "backtest"
+                                  then learning n =<< Fm.readFxSettingData "backtest"
                                   else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
   (fsd2, tdt) <- Ft.backTest (Gsd.backtestLatestOneTime Gsd.gsd) td fsd1
                  <$> ((++) <$>
@@ -169,7 +167,7 @@ backTestLoop :: Bool ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry n endN td fsd = do
   (plsf, lok, tdl, tdlt, fsd1) <- if Ftd.side td == Ftd.None
-                                  then learning retry n fsd
+                                  then learning n fsd
                                   else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
   (fsd2, tdt) <- do let lt  = Fs.getLearningTime     fsd1
                         ltt = Fs.getLearningTestTime fsd1
