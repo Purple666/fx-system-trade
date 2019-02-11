@@ -352,15 +352,16 @@ makeChart fsd chartLength xcd  =
                . Fad.algoSetting $ Fsd.fxTaCloseLoss fs
   in makeChartTa (take chartLength $ reverse xcd) ftado ftadcp ftadcl []
 
-backTest :: Int ->
+backTest :: Bool ->
+            Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest l td fsd xcd =
+backTest fe l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
-                              let (_, _, fsd2, td2) = if Ftd.side td1 == Ftd.None &&
+                              let (_, _, fsd2, td2) = if Ftd.side td1 == Ftd.None && not fe &&
                                                          (Ftd.trSuccess td < Ftd.trSuccess td1 || Ftd.trFail td < Ftd.trFail td1)
                                                       then (Ftd.None, Ftd.None, fsd1, td1)
                                                       else evaluate ctd fsd fsd1 getQuantityBacktest False td1
