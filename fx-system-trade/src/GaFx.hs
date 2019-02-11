@@ -90,7 +90,7 @@ learningLoop c n xcd fsd = do
                               p    = Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt
                           in (p, tdl, tdlt, x)) . (fsd:) . Ga.getGaDataList) <$>
     (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
-  Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
+  -- Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
   if Ft.evaluationOk tdl tdlt
     then return (0, True, tdl, tdlt, fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c || fsd' == fsd
@@ -176,7 +176,7 @@ backTestLoop retry n endN td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else if Ftd.realizedPL tdt < Ftd.realizedPL td && retry && not lok
+    else if Ftd.realizedPL tdt < Ftd.realizedPL td && retry && not lok && Ftd.side td == Ftd.None
          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
                  backTestLoop retry n endN td fsd
          else do fsd3 <- Fm.writeFxSettingData "backtest"
