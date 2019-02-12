@@ -152,12 +152,15 @@ backTestLatestLoop n endN td fsd = do
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (Gsd.backtestLatestOneTime Gsd.gsd) 0)
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  if Ftd.trSuccess td < Ftd.trSuccess tdt || Ftd.trFail td < Ftd.trFail tdt
-    then Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
-    else return()
+  fsd3 <- if Ftd.trSuccess td < Ftd.trSuccess tdt || Ftd.trFail td < Ftd.trFail tdt
+          then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
+                  Fm.writeFxSettingData "backtest"
+                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
+                    =<< Fm.readFxSettingData "backtest"
+          else return fsd2
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)
-    else backTestLatestLoop n' endN tdt fsd2
+    then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
+    else backTestLatestLoop n' endN tdt fsd3
 
 backTestLoop :: Bool ->
                 Int ->
