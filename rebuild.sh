@@ -1,5 +1,6 @@
 #!/bin/bash -x
 git add . && git commit -m "Experiment" && git push
+oc login -u andesm -p a
 ./scaledown.sh
 oc start-build fx-system-trade
 sleep 10
