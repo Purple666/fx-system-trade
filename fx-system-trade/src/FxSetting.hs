@@ -115,8 +115,8 @@ checkAlgoSetting fsd =
       }
 setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fs fsl =
-  let (fs', _) = M.foldrWithKey (\k (p, c) (ak, ap)-> if ap < p
-                                                      then (k, p)
+  let (fs', _) = M.foldrWithKey (\k (p, c) (ak, ap)-> if ap < p / fromIntegral c
+                                                      then (k, p / fromIntegral c)
                                                       else (ak, ap)) (fs, 0) fsl
   in setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
                                                                      , Fsd.chartLength = 0
