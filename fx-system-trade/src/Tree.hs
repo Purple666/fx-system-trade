@@ -99,10 +99,10 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  if (Gsd.countUpList $ Gsd.gsd) <= maximum xs / minimum xs
+  if (Gsd.countUpList $ Gsd.gsd) <= maximum xs - minimum xs
   then let ave = (sum $ M.elems xs) / (fromIntegral $ M.size xs)
-           (a, b) = M.partition (\x -> ave < x) xs
-       in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap $ M.map (\_ -> 1.0) b)
+           (a, b) = M.partition (\x -> maximum xs == x) xs
+       in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap b)
   else (LeafDataMap M.empty, LeafDataMap xs)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
@@ -189,12 +189,7 @@ evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (eval
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  let c = M.unionWith (+) a b
-  in LeafDataMap $ M.unionWith (\x y -> if M.size c == 1
-                                        then 1.0
-                                        else if minimum c * Gsd.countUpList Gsd.gsd < x || minimum c * Gsd.countUpList Gsd.gsd < y
-                                             then minimum c * Gsd.countUpList Gsd.gsd
-                                             else x + y) a b
+  LeafDataMap $ M.unionWith (+) a b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
 calcValidLeafDataList p lds =
