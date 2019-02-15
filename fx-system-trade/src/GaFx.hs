@@ -118,7 +118,7 @@ learning n fsd = do
                                               tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
                                               tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl fsd'
                                               p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
-                                                     (p / fromIntegral c)
+                                                     (p * fromIntegral c)
                                           in (Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fsl
       (_, tdl', tdlt', fsd'') = maximum tdlts
   if not $ null tdlts

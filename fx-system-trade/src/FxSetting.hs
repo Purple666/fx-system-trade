@@ -115,16 +115,19 @@ checkAlgoSetting fsd =
       }
 setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
 setFxSettingData fs fsl =
-  let (fs', _) = M.foldrWithKey (\k (p, c) (ak, ap)-> if ap < p / fromIntegral c
-                                                      then (k, p / fromIntegral c)
-                                                      else (ak, ap)) (fs, 0) fsl
-  in setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
-                                                                     , Fsd.chartLength = 0
-                                                                     }
-                                         , Fsd.prevOpen     = ([], M.empty)
-                                         , Fsd.fxSetting    = fs'
-                                         , Fsd.fxSettingLog = fsl                                         
-                                         }
+  setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
+                                                                  , Fsd.chartLength = 0
+                                                                  }
+                                      , Fsd.prevOpen     = ([], M.empty)
+                                      , Fsd.fxSetting    = maxFxSettingFrolLog fsl
+                                      , Fsd.fxSettingLog = fsl                                         
+                                      }
+
+maxFxSettingFrolLog :: M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSetting
+maxFxSettingFrolLog fsl = 
+  head . map (\(x, (_, _)) -> x) . 
+  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
+  M.toList fsl
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =
@@ -149,13 +152,11 @@ updateFxSettingLog plsf profits fsd fsdf =
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
+                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a * fromIntegral a') (b * fromIntegral b')) $
                    M.toList fsl'
               else fsl'
       fsd' = if length fsl' < length fsl && 0 < length fsl'
-             then fsd { Fsd.fxSetting = head . map (\(x, (_, _)) -> x) . 
-                                        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a') ) $
-                                        M.toList fsl'
+             then fsd { Fsd.fxSetting = maxFxSettingFrolLog fsl''
                       }
              else fsd
   in fsd' { Fsd.fxSettingLog = unionFxSettingLog fsl'' (Fsd.fxSettingLog fsdf)
