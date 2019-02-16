@@ -170,16 +170,18 @@ evaluate ctd fsdi fsd f1 forceSell td =
           (forceSell ||
             (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
             (tradeRate - chart < 0 && evaluateProfitDec ftcl ftadcl) ||
+            Fs.getProfitRate fsdi < chart - tradeRate || 
             lcd < tradeDate) = (chart - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell &&
           (forceSell ||
             (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
             (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl) ||
+            Fs.getProfitRate fsdi < tradeRate - chart || 
             lcd < tradeDate) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
-                      ls' = ls { Fsd.trTrade         = iFsd.trTrade ls + 1
+                      ls' = ls { Fsd.trTrade         = Fsd.trTrade ls + 1
                                , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
                                , Fsd.trSuccess       = if 0 < profits
                                                        then Fsd.trSuccess ls + 1
