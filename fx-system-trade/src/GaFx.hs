@@ -54,9 +54,7 @@ backTest s f latest retry = do
         else Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB
   startN <- getRandomR(sn, sn + ltt * 2)                  
   let n = startN + p
-  (fs, fsd') <- if latest
-                then backTestLatestLoop n endN td fsd
-                else backTestLoop       retry n endN td fsd
+  (fs, fsd') <- backTestLoop  retry n endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
