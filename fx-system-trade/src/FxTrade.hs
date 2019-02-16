@@ -179,12 +179,8 @@ evaluate ctd fsdi fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       fsd' = if close /= Ftd.None
              then let ls  = Fsd.learningSetting $ Fsd.fxSetting fsd
-                      ls' = ls { Fsd.trTrade         = if 0 < profits
-                                                       then Fsd.trTrade ls + 1
-                                                       else Fsd.trTrade ls
-                               , Fsd.trTradeDate     = if 0 < profits
-                                                       then Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
-                                                       else Fsd.trTradeDate ls
+                      ls' = ls { Fsd.trTrade         = iFsd.trTrade ls + 1
+                               , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
                                , Fsd.trSuccess       = if 0 < profits
                                                        then Fsd.trSuccess ls + 1
                                                        else Fsd.trSuccess ls
