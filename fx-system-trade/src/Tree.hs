@@ -100,18 +100,21 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
   if (Gsd.countUpList $ Gsd.gsd) <= maximum xs - minimum xs
-  then let ave = (sum $ M.elems xs) / (fromIntegral $ M.size xs)
-           (a, b) = M.partition (\x -> maximum xs == x) xs
-       in (LeafDataMap $ M.map (\_ -> 1.0) a, LeafDataMap b)
+  then let (a, b) = M.partition (\x -> maximum xs == x) xs
+       in (LeafDataMap a, LeafDataMap b)
   else (LeafDataMap M.empty, LeafDataMap xs)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
-    else foldl (\acc _ -> do l <- R.fromList . M.toList $ M.map toRational xs
-                             insertTree andRate orRate (Leaf l) =<< acc
-               ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
+    else do let mx = abs .minimum . map snd $ M.toList xs
+                xs' = if mx <= 0
+                      then M.map (\x -> toRational (x + abs mx + 1)) xs
+                      else M.map toRational xs
+            foldl (\acc _ -> do l <- R.fromList $ M.toList xs'
+                                insertTree andRate orRate (Leaf l) =<< acc
+                  ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
 
 adjustTree :: LeafDataMap a -> TreeData a -> TreeData a
 adjustTree _ Empty = Empty
