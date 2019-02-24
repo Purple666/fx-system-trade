@@ -41,9 +41,10 @@ debug = do
   traceShow(Fsd.fxTaOpen $ Fsd.fxSetting fsd) $ return ()
   return ()
 
-backTest :: Int -> Int -> Bool -> Bool -> IO ()
-backTest s f latest retry = do
+backTest :: String -> Bool -> Bool -> IO ()
+backTest coName latest retry = do
   fsd <- Fm.readFxSettingData "backtest"
+  (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fs.getLearningTestTime fsd
       lt  = Fs.getLearningTime fsd
@@ -60,7 +61,8 @@ backTest s f latest retry = do
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" s (f + 1) fsd'
                       return (s, f + 1)
-  backTest s' f' latest retry
+  Fm.writeResult coName s' f'
+  backTest coName latest retry
 
 trade :: Ftd.FxEnvironment -> String -> IO ()
 trade environment coName = do
@@ -215,9 +217,9 @@ tradeLoop :: Fcd.FxChartData ->
 tradeLoop p pl sleep td fsd coName = do
   t <- getCurrentTime
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
-  e <- Foa.getNowPrices td
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
+  e <- Foa.getNowPrices td
   (pl', fsd1) <- if Ftd.side td == Ftd.None && lt + ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)

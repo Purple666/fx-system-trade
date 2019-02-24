@@ -12,6 +12,8 @@ module FxMongodb
   , writeFxSettingData
   , readFxSettingData
   , checkFxSettingData
+  , readResult
+  , writeResult
   ) where
 
 import           Control.Monad.Trans.Reader
@@ -133,6 +135,24 @@ writeFxSettingData coName fsd = do
   close pipe
   return fsd
 
+readResult :: String -> IO (Int, Int)
+readResult coName = do
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "result_" ++ coName)
+  close pipe
+  if null r
+    then return (0, 0)
+    else do s <- head <$> mapM (\x -> return (read . typed $ valueAt "success" x)) r
+            f <- head <$> mapM (\x -> return (read . typed $ valueAt "fail"    x)) r
+            return (s , f)
+
+writeResult :: String -> Int -> Int -> IO ()
+writeResult coName s f = do
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  _ <- access pipe master "fx" $ setResultToDB (T.pack $ "result_" ++ coName) s f 
+  close pipe
+  return ()
+
 getDataFromDB :: T.Text -> ReaderT MongoContext IO [Document]
 getDataFromDB coName =
   rest =<< find (select [] coName)
@@ -151,3 +171,11 @@ setFxSettingToDB coName fs fsl =
   upsert (select [] coName ) [ "fs"  =: show fs
                              , "fsl" =: show fsl
                              ]
+
+setResultToDB :: T.Text -> Int -> Int -> Action IO ()
+setResultToDB coName s f = 
+  upsert (select [] coName ) [ "success" =: show s
+                             , "fail"    =: show f
+                             ]
+  
+

@@ -11,9 +11,9 @@ main = do
   (command:_) <- getArgs
   case command of
     "debug"            -> GaFx.debug
-    "backtest"         -> GaFx.backTest 0 0 False False
-    "backtest-retry"   -> GaFx.backTest 0 0 False True
-    "backtest-latest"  -> GaFx.backTest 0 0 True False
+    "backtest"         -> GaFx.backTest "normal" False False
+    "backtest-retry"   -> GaFx.backTest "retry"  False True
+    "backtest-latest"  -> GaFx.backTest "latest" True False
     "trade-practice"   -> GaFx.trade Ftd.Practice "trade_practice"
     "trade-production" -> GaFx.trade Ftd.Production "trade_production"
 
