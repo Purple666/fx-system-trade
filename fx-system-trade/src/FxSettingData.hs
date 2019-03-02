@@ -10,6 +10,7 @@ module FxSettingData
   , nextFxSettingData
   , getLearningTestTimes
   , plusLearningTestTimes
+  , initFxSetting
   ) where
 
 import Debug.Trace
@@ -73,21 +74,25 @@ initFxSettingData =
                                     , chartLength = 0
                                     }
                 , prevOpen            = ([], M.empty)
-                , fxSetting = FxSetting { settingHash = 0
-                                        , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                                              , trSuccess          = 0
-                                                                              , trFail             = 0
-                                                                              , successProfit      = 0 
-                                                                              , failProfit         = 0
-                                                                              , trTrade            = 0
-                                                                              , trTradeDate        = 0
-                                                                              }
-                                        , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
-                                        , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
-                                        , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
-                                        }
+                , fxSetting = initFxSetting
                 , fxSettingLog = M.empty
                 }
+
+initFxSetting :: FxSetting
+initFxSetting =
+  FxSetting { settingHash = 0
+            , learningSetting = FxLearningSetting { learningTestTimes  = 1
+                                                  , trSuccess          = 0
+                                                  , trFail             = 0
+                                                  , successProfit      = 0 
+                                                  , failProfit         = 0
+                                                  , trTrade            = 0
+                                                  , trTradeDate        = 0
+                                                  }
+            , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
+            , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
+            , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
+            }
 
 resetFxSettingData :: FxSettingData -> FxSettingData
 resetFxSettingData fsd =

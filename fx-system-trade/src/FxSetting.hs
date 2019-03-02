@@ -124,10 +124,12 @@ setFxSettingData fs fsl =
                                       }
 
 maxFxSettingFrolLog :: M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSetting
-maxFxSettingFrolLog fsl = 
-  head . map (\(x, (_, _)) -> x) . 
-  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
-  M.toList fsl
+maxFxSettingFrolLog fsl =
+  if null fsl == True
+  then Fsd.initFxSetting
+  else head . map (\(x, (_, _)) -> x) . 
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
+       M.toList fsl
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =
