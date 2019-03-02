@@ -204,7 +204,7 @@ evaluate ctd fsdi fsd f1 forceSell td =
                                                        then Fsd.failProfit ls +  abs profits
                                                        else Fsd.failProfit ls
                                }
-                      realProfits = Ftd.realizedPL td' - Ftd.realizedPL td
+                      realProfits = (Ftd.realizedPL td' - Ftd.realizedPL td) / (fromIntegral tradeDate)
                       alcOpen = Ta.calcFxalgorithmListCount realProfits $ Fsd.prevOpen fsd
                       alcCloseProfit
                         | close == Ftd.Buy  && 0 < profits = Ta.calcFxalgorithmListCount realProfits $ Ta.makeValidLeafDataMapDec ftcp ftadcp
