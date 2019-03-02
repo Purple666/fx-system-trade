@@ -212,8 +212,8 @@ evaluate ctd fsdi fsd f1 forceSell td =
                         | close == Ftd.Sell && 0 < profits = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapInc ftcp ftadcp
                         | otherwise         = (Tr.emptyLeafDataMap, M.empty)
                       alcCloseLoss
-                        | close == Ftd.Buy  && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapDec ftcl ftadcl
-                        | close == Ftd.Sell && profits <= 0 = Ta.calcFxalgorithmListCount (abs profits) $ Ta.makeValidLeafDataMapInc ftcl ftadcl
+                        | close == Ftd.Buy  && profits <= 0 = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapDec ftcl ftadcl
+                        | close == Ftd.Sell && profits <= 0 = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapInc ftcl ftadcl
                         | otherwise          = (Tr.emptyLeafDataMap, M.empty)
                       fxTaOpen        = Ta.updateAlgorithmListCount Fad.open
                                         ctd alcOpen        (Fsd.fxTaOpen $ Fsd.fxSetting fsd)
