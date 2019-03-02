@@ -99,10 +99,13 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  if (Gsd.countUpList $ Gsd.gsd) <= maximum xs - minimum xs
-  then let (a, b) = M.partition (\x -> maximum xs == x) xs
-       in (LeafDataMap a, LeafDataMap b)
-  else (LeafDataMap M.empty, LeafDataMap xs)
+  let xs' = if minimum xs < 0
+            then M.map (\x -> x + (abs $ minimum xs) + 1) xs
+            else xs
+  in if minimum xs' * (Gsd.countUpList $ Gsd.gsd) < maximum xs'
+     then let (a, b) = M.partition (\x -> minimum xs' * (Gsd.countUpList $ Gsd.gsd) < x) xs'
+          in (LeafDataMap a, LeafDataMap b)
+     else (LeafDataMap M.empty, LeafDataMap xs')
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =

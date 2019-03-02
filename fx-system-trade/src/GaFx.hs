@@ -153,7 +153,7 @@ backTestLoop retry n endN td fsd = do
     then do Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok True
             backTestLoop retry n endN td =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
     else do fsd3 <- Fm.writeFxSettingData "backtest"
-                    <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
+                    <$> Fs.updateFxSettingLog plsf (Ftd.realizedPL tdt - Ftd.realizedPL td) fsd2
                     =<< Fm.readFxSettingData "backtest"
             Fp.printTestProgress fsd1 fsd td tdt tdl tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
