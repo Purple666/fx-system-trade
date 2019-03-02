@@ -128,7 +128,7 @@ maxFxSettingFrolLog fsl =
   if null fsl == True
   then Fsd.initFxSetting
   else head . map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a') ) $
        M.toList fsl
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
@@ -154,7 +154,7 @@ updateFxSettingLog plsf profits fsd fsdf =
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a * fromIntegral a') (b * fromIntegral b')) $
+                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
               else fsl'
       fsd' = if length fsl' < length fsl && 0 < length fsl'
