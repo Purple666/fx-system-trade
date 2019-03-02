@@ -106,8 +106,8 @@ learning n fsd = do
       ltt = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getLearningTestTime fsd { Fsd.fxSetting = x }) fsl
       pre = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getPrepareTimeAll   fsd { Fsd.fxSetting = x }) fsl
   xcd <- Fm.getChartListBack n ((pre + lt + ltt * Gsd.learningTestCount Gsd.gsd) * 2) 0
-  let tdlts = M.elems .
-              M.filter (\(y, _, _, _) -> y) $
+  let tdlts = M.elems $
+              {- M.filter (\(y, _, _, _) -> y) $ -}
               M.mapWithKey (\y ( p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
                                               lt'  = Fs.getLearningTime     fsd'
                                               ltt' = Fs.getLearningTestTime fsd'
