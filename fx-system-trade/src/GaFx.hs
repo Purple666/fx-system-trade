@@ -203,7 +203,7 @@ tradeWeeklyLoop td coName = do
   e <- Foa.getNowPrices td
   td' <- tradeLoop e pl 0 td fsd' coName
   tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
-  Ftw.tweetWeek tdw td'
+  -- Ftw.tweetWeek tdw td'
   Fm.setFxTradeData (coName ++ "_weekly") td'
   tradeWeeklyLoop td' coName
 
