@@ -377,18 +377,18 @@ backTest :: Int ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-{-  
       (_, fsd3, td3) = foldl (\(c, fsd1, td1) ctd -> 
                                 let (_, _, fsd2, td2) = if fromIntegral l * 0.9 < c && Ftd.side td1 == Ftd.None
                                                         then (Ftd.None, Ftd.None, fsd1, td1)
                                                         else evaluate ctd fsd fsd1 getQuantityBacktest False td1
                                 in (c + 1, fsd2, td2))
                     (0, fsd, td) ctdl
--}
+{-  
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
                              in (fsd2, td2))
                     (fsd, td) ctdl
+-}
   in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
 learning :: Fsd.FxSettingData ->
