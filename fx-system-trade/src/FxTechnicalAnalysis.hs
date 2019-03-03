@@ -264,9 +264,9 @@ setCross :: Double ->
             Double ->
             Double ->
             Fad.FxTradePosition
-setCross s l ss sl
-  | 0 < ss && sl < 0 && l < s = Fad.Buy
-  | ss < 0 && 0 < sl && s < l = Fad.Sell
+setCross s l sp lp
+  | sp < lp && l < s = Fad.Buy
+  | lp < sp && s < l = Fad.Sell
   | otherwise = Fad.None
 
 lsmn :: [Double] -> Fad.FxTradePosition
@@ -310,9 +310,9 @@ setFxMovingAverageData short middle long tmin tmax ftms g pdl =
                                      , Fad.slopeSn    = lsmn $ map (Fad.slopeS . g) (take n pdl) ++ [Fad.slopeS fmad]
                                      , Fad.slopeMn    = lsmn $ map (Fad.slopeM . g) (take n pdl) ++ [Fad.slopeM fmad]
                                      , Fad.slopeLn    = lsmn $ map (Fad.slopeL . g) (take n pdl) ++ [Fad.slopeL fmad]
-                                     , Fad.crossSL    = setCross short  long   (Fad.slopeS fmad) (Fad.slopeL fmad)
-                                     , Fad.crossSM    = setCross short  middle (Fad.slopeS fmad) (Fad.slopeM fmad)
-                                     , Fad.crossML    = setCross middle long   (Fad.slopeM fmad) (Fad.slopeL fmad)
+                                     , Fad.crossSL    = setCross short  long   (Fad.short fmadp)  (Fad.long fmadp)  
+                                     , Fad.crossSM    = setCross short  middle (Fad.short fmadp)  (Fad.middle fmadp)
+                                     , Fad.crossML    = setCross middle long   (Fad.middle fmadp) (Fad.long fmadp)  
                                      , Fad.thresholdS = setThreshold short  tmin tmax ftms
                                      , Fad.thresholdL = setThreshold middle tmin tmax ftms
                                      , Fad.thresholdM = setThreshold long   tmin tmax ftms
