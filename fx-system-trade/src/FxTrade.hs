@@ -414,7 +414,6 @@ trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          [Fcd.FxChartData] ->
          (Ftd.FxSide, Ftd.FxSide, Fsd.FxSettingData, Ftd.FxTradeData)
-
 trade td fsd xcd =
   let ctdl = makeChart fsd 1 xcd
       (open, close, fsd', td') = evaluate (last ctdl) fsd fsd getQuantityBacktest False td
