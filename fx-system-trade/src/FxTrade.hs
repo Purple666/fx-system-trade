@@ -383,7 +383,7 @@ backTest :: Int ->
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (_, fsd3, td3) = foldl (\(c, fsd1, td1) ctd -> 
-                                let (_, _, fsd2, td2) = if fromIntegral l * 0.7 < c && Ftd.side td1 == Ftd.None
+                                let (_, _, fsd2, td2) = if fromIntegral l * 0.5 < c && Ftd.side td1 == Ftd.None
                                                         then (Ftd.None, Ftd.None, fsd1, td1)
                                                         else evaluate ctd fsd fsd1 getQuantityBacktest False td1
                                 in (c + 1, fsd2, td2))
