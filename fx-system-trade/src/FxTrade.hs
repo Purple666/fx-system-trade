@@ -153,8 +153,8 @@ evaluate ctd fsdi fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
 
 -}
-        | (Ftd.side td == Ftd.None) && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None)  && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)   
       (profits, close)
 {-
@@ -287,7 +287,7 @@ evaluate ctd fsdi fsd f1 forceSell td =
       td'' = td' { Ftd.unrealizedPL = if Ftd.side td' == Ftd.Buy
                                       then Ftd.realizedPL td' + 25 * f1 td' chart * ((chart / (Fcd.close $ Ftd.tradeRate td')) - 1)
                                       else if Ftd.side td' == Ftd.Sell
-                                           then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
+p                                           then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                            else Ftd.realizedPL td'
                  }
   in (open, close, fsd'', td'')
@@ -382,18 +382,18 @@ backTest :: Int ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-{-  
       (_, fsd3, td3) = foldl (\(c, fsd1, td1) ctd -> 
                                 let (_, _, fsd2, td2) = if fromIntegral l * 0.9 < c && Ftd.side td1 == Ftd.None
                                                         then (Ftd.None, Ftd.None, fsd1, td1)
                                                         else evaluate ctd fsd fsd1 getQuantityBacktest False td1
                                 in (c + 1, fsd2, td2))
                     (0, fsd, td) ctdl
--}
+{-  
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
                              in (fsd2, td2))
                     (fsd, td) ctdl
+-}
   in (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
 learning :: Fsd.FxSettingData ->
