@@ -29,7 +29,7 @@ getSimChartMax x =
                                , Fad.prevSetting $ Fad.rciSetting a
                                , Fad.prevSetting $ Fad.rsiSetting a
                                ]
-                         in {- prevSettingMax -} * Fad.simChart a) $ Fad.algoSetting x
+                         in {- prevSettingMax  * -} Fad.simChart a) $ Fad.algoSetting x
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
