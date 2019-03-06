@@ -3,5 +3,6 @@ From haskell
 COPY . /fx
 #WORKDIR /fx/src
 WORKDIR /fx/stack
-RUN stack setup && stack build
+RUN stack setup 
+RUN stack clean && stack build
 #RUN ghc -O2 Fx.hs 
