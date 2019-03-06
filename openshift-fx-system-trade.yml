@@ -106,7 +106,8 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          command: ["stack", "exec", "--", "fx-exe", "backtest"]
+          command: ["./Fx", "backtest"]
+          #command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
@@ -161,7 +162,8 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          command: ["stack", "exec", "--", "fx-exe", "backtest-latest"]
+          command: ["./Fx", "backtest-latest"]
+          #command: ["stack", "exec", "--", "fx-exe", "backtest-latest"]
           resources: {}
           volumeMounts:
           - name: localtime
@@ -216,7 +218,8 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
+          command: ["./Fx", "trade-practice"]
+          #command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
           resources: {}
           volumeMounts:
           - name: localtime
