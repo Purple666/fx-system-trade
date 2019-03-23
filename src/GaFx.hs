@@ -38,7 +38,7 @@ instance Ga.Ga Fsd.FxSettingData where
 debug :: IO ()
 debug = do
   fsd <- Fm.readFxSettingData "backtest"
-  traceShow(Fsd.fxTaOpen $ Fsd.fxSetting fsd) $ return ()
+  traceShow(M.elems $ Fsd.fxSettingLog fsd) $ return ()
   return ()
 
 backTest :: String -> Bool -> Bool -> IO ()
@@ -140,7 +140,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry n endN td fsd = do
-  (plsf, lok, tdl, tdlt, fsd1) <- if Ftd.side td == Ftd.None
+  (plsf, lok, tdl, tdlt, fsd1) <- if (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)) || Ftd.side td == Ftd.None
                                   then learning n fsd
                                   else return (0, False, Ftd.initFxTradeDataCommon, [Ftd.initFxTradeDataCommon], fsd)
   let lt  = Fs.getLearningTime     fsd1

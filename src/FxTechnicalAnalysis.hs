@@ -127,13 +127,13 @@ updateThreshold f ctd =
 
 getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
 getPrepareTime x =
-  maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a) + Gsd.taMargin Gsd.gsd
-                                 , Fad.longSetting (Fad.smaSetting a) + Gsd.taMargin Gsd.gsd
-                                 , Fad.longSetting (Fad.emaSetting a) + Gsd.taMargin Gsd.gsd
-                                 , Fad.longSetting (Fad.wmaSetting a) + Gsd.taMargin Gsd.gsd
-                                 , Fad.longSetting (Fad.rsiSetting a) + Gsd.taMargin Gsd.gsd
-                                 , Fad.longSetting (Fad.stSetting a)  + Gsd.taMargin Gsd.gsd
-                                 ] * (Fad.simChart a + Gsd.taMargin Gsd.gsd)) $ Fad.algoSetting x
+  maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
+                                 , Fad.longSetting (Fad.smaSetting a)
+                                 , Fad.longSetting (Fad.emaSetting a)
+                                 , Fad.longSetting (Fad.wmaSetting a)
+                                 , Fad.longSetting (Fad.rsiSetting a)
+                                 , Fad.longSetting (Fad.stSetting a) 
+                                 ] * getSimChartMax x) $ Fad.algoSetting x
 
 setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 setFxTechnicalAnalysisSetting x =

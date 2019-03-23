@@ -315,7 +315,7 @@ items:
         volumes:
         - name: nfs-share
           persistentVolumeClaim:
-            claimName: nfs-pvc
+            claimName: flg-pvc
     test: false
     triggers:
     - type: ConfigChange
@@ -608,7 +608,7 @@ items:
             volumes:
             - name: nfs-share
               persistentVolumeClaim:
-                claimName: nfs-pvc
+                claimName: flg-pvc
             restartPolicy: OnFailure 
 kind: List
 metadata: {}
