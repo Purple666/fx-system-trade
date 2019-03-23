@@ -16,8 +16,8 @@ import qualified FxTradeData   as Ftd
 import           Text.Printf
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
-                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printTestProgress fsd fsdo td tdt tdl tdlt plsf lok retry = do
+                     Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
+printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
   let lt  = Fs.getLearningTime     fsd
       ltt = Fs.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
@@ -35,7 +35,6 @@ printTestProgress fsd fsdo td tdt tdl tdlt plsf lok retry = do
     (Fcd.close $ Ftd.chart tdt)
     (show (Ftd.side tdt))
   printFxTradeData tdt
-  printFxTradeData tdl
   printFxTradeData $ sum tdlt
   printf "| %3d %c %c %3d %3d\n" plsf (head $ show (fsd == fsdo)) (head $ show lok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
