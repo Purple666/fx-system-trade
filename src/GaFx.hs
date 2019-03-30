@@ -78,7 +78,8 @@ learningLoop :: Int ->
                 IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n startN fsd = do
   let lt = Fs.getLearningTime fsd
-  cl <- Fm.getChartListBack 0 (Fs.getPrepareTimeAll fsd + lt) 0
+  n' <- getRandomR(startN, n)
+  cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd + lt) 0
   r <- (Ga.learning . Ga.learningData $ Fsd.nextFxSettingData lt cl fsd)
   (p', tdlt, fsd') <- maximum <$>
                       (sequence $
