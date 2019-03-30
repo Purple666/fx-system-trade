@@ -122,7 +122,9 @@ learning n startN fsd = do
                                                      (p / fromIntegral c)
                                           in (Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fsl
 -}
-  let fsl = M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
+  let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+            then Fsd.fxSettingLog fsd
+            else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
   tdlts <- (M.elems . M.filter (\(_, y, _, _) -> y)) <$>
            (sequence $
             M.mapWithKey (\y (p, c) -> do let fsd' = fsd { Fsd.fxSetting = y }
