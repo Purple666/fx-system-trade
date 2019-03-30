@@ -166,7 +166,7 @@ backTestLoop retry lf n startN endN td fsd = do
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let lt  = Fs.getLearningTime     fsd1
       ltt = Fs.getLearningTestTime fsd1
-  (fsd2, tdt) <- Ft.backTest (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
+  (fsd2, tdt) <- Ft.backTest (0 < plsf) (lt + ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (lt + ltt * Gsd.learningTestCount Gsd.gsd) 0)
