@@ -139,11 +139,6 @@ evaluate ctd fsdi fsd f1 forceSell td =
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 
-        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)   
-
--}
         | (Ftd.side td == Ftd.None ||
            (0 < tradeRate - chart && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
@@ -151,6 +146,12 @@ evaluate ctd fsdi fsd f1 forceSell td =
            (0 < chart - tradeRate && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
+
+
+-}
+        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)   
       (profits, close)
 {-
         | Ftd.side td == Ftd.Buy && (forceSell || Fs.getLearningTestTime fsdi < tradeDate ||
