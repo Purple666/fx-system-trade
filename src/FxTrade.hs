@@ -93,9 +93,9 @@ evaluate ctd fsdi fsd f1 forceSell td =
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsdi
       lt  = Fs.getLearningTime     fsdi
       ltt = Fs.getLearningTestTime fsdi
-      lcd = if 60 * 24 * 5 < lt
+      lcd = if 60 * 24 * 5 < lt + Fs.getTradeHoldTime fsdi
             then 60 * 24 * 5
-            else lt
+            else lt + Fs.getTradeHoldTime fsdi
 {-      
       lcd = 60 * 24 * 5 * 4 * 3
 -}
@@ -200,8 +200,6 @@ evaluate ctd fsdi fsd f1 forceSell td =
 -}
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Close)
-
-
         | Ftd.side td == Ftd.Buy && (forceSell || lcd < tradeDate ||
                                      (Fs.getTradeHoldTime fsdi < Fcd.no cd - tradeNo &&
                                       (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
