@@ -413,7 +413,7 @@ learning fsd =
       ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
       (_, _, fsd2, td'') = foldl (\(_, _, fsd1, td') ctd -> evaluate ctd fsd fsd1 getQuantityLearning False td')
                            (Ftd.None, Ftd.None, fsd, td) $ init ctdl
-      (_, _, _, td''') = evaluate (last ctdl) fsd fsd2 getQuantityLearning False td''
+      (_, _, _, td''') = evaluate (last ctdl) fsd fsd2 getQuantityLearning True td''
   in if null ctdl
      then td
      else td''' { Ftd.chartLength = Fsd.chartLength fc }
