@@ -384,7 +384,7 @@ backTest log l td fsd xcd =
                              in (fsd2, td2))
                     (fsd, td) ctdl
   in if log
-     then (fsd3, td3 { Ftd.chartLength = l })
+     then (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
      else (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
 
 learning :: Fsd.FxSettingData ->
