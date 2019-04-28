@@ -31,17 +31,20 @@ import qualified GlobalSettingData          as Gsd
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
   r <- getChartList (s - l) s
-  r' <- if rl + length r < l
+  minc <- getOneChart getStartChartFromDB
+  r' <- if rl + length r < l && Fcd.no minc < s
         then (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
         else return r
   if 0 < length r' - l
     then return $ drop (length r' - l) r'
     else return r'
 
+
 getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
   r <- getChartList s (s + l)
-  r' <- if rl + length r < l 
+  maxc <- getOneChart getEndChartFromDB
+  r' <- if rl + length r < l && s < Fcd.no maxc
         then (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
         else return r
   return $ take l r'
