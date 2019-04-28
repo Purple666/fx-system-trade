@@ -91,7 +91,7 @@ getLearningEvaluationValue x =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  profit x / (fromIntegral $ chartLength x)
+  (profit x * unrealizedPL x) / (fromIntegral $ chartLength x)
 {-  
   if profit x < 0 && unrealizedPL x < Gsd.initalProperty Gsd.gsd
   then - (profit x * (unrealizedPL x - Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
