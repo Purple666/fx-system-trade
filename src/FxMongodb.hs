@@ -30,23 +30,22 @@ import qualified GlobalSettingData          as Gsd
 
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
-  r <- getChartList (s - l) s
-  minc <- getOneChart getStartChartFromDB
-  if rl + length r < l && Fcd.no minc < s
-    then do r' <- (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
-            if 0 < length r' - l
-              then return $ drop (length r' - l) r'
-              else return r'
-    else return r
+  r <- getChartList (s - l * 2) s
+  r' <- if rl + length r < l
+        then (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
+        else return r
+  if 0 < length r' - l
+    then return $ drop (length r' - l) r'
+    else return r'
+
 
 getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
-  r <- getChartList s (s + l)
-  maxc <- getOneChart getEndChartFromDB
-  if rl + length r < l && s < Fcd.no maxc
-    then do r' <- (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
-            return $ take l r'
-    else return r
+  r <- getChartList s (s + l * 2)
+  r' <- if rl + length r < l 
+        then (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
+        else return r
+  return $ take l r'
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
 getOneChart f = do
