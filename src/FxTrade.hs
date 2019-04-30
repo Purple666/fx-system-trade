@@ -27,21 +27,22 @@ evaluationOk tdlt =
   --0 < Ftd.profit tdl && 0 < getProfitList tdlt
   and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt
 
-{-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
                                then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
+getQuantityLearning td chart = Ftd.realizedPL td
+
+{-
+getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
--}
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
 
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = Ftd.realizedPL td
+-}
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -339,23 +340,23 @@ makeSimChart _ [] = []
 makeSimChart c xs =
   let (chart, xs') = break (\x -> Fcd.no x `mod` c == 0) xs
   in if null xs'
-     then let {- fcd  = (head chart) { Fcd.close = ((sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart) +
+     then let fcd  = (head chart) { Fcd.close = ((sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart) +
                                                  (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart) +
                                                  (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)) / 3
                                   }
+{-               fcd  = head chart 
 -}
-              fcd  = head chart 
           in [fcd]
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
-{-                   
                    fcd  = (head xs') { Fcd.close = ((sum $ map (\x -> Fcd.close x) chart') / (fromIntegral $ length chart') +   
                                                     (sum $ map (\x -> Fcd.high  x) chart') / (fromIntegral $ length chart') +   
                                                     (sum $ map (\x -> Fcd.low   x) chart') / (fromIntegral $ length chart')) / 3
                                      }
--}
+{-                   
                    fcd  = head xs'
+-}
                in fcd : makeSimChart c (tail xs')
 
 {-
@@ -383,14 +384,6 @@ backTest :: Bool ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest log l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-{-  
-      (_, fsd3, td3) = foldl (\(c, fsd1, td1) ctd -> 
-                                let (_, _, fsd2, td2) = if fromIntegral l * 0.7 < c && Ftd.side td1 == Ftd.None
-                                                        then (Ftd.None, Ftd.None, fsd1, td1)
-                                                        else evaluate ctd fsd fsd1 getQuantityBacktest False td1
-                                in (c + 1, fsd2, td2))
-                    (0, fsd, td) ctdl
--}
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
                              in (fsd2, td2))
