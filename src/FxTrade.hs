@@ -109,32 +109,6 @@ evaluate ctd fsdi fsd f1 forceSell td =
 
 
 
-        | (Ftd.side td == Ftd.None ||
-           (tradeRate - chart < -0.1 && Ftd.side td == Ftd.Sell)) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           (chart - tradeRate < -0.1 && Ftd.side td == Ftd.Buy)) &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
-
-
-
-        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy) &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
-
-        | (Ftd.side td == Ftd.None ||
-           (0 < tradeRate - chart && Ftd.side td == Ftd.Sell)) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           (0 < chart - tradeRate && Ftd.side td == Ftd.Buy)) &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
-
-
-
         | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
 
@@ -148,10 +122,10 @@ evaluate ctd fsdi fsd f1 forceSell td =
 
 
         | (Ftd.side td == Ftd.None ||
-           (0 < tradeRate - chart && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Sell)) &&
+           (Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | (Ftd.side td == Ftd.None ||
-           (0 < chart - tradeRate && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Buy)) &&
+           (Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 
@@ -161,10 +135,10 @@ evaluate ctd fsdi fsd f1 forceSell td =
 
 -}
         | (Ftd.side td == Ftd.None ||
-           (Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Sell)) &&
+           (0 < tradeRate - chart && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | (Ftd.side td == Ftd.None ||
-           (Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Buy)) &&
+           (0 < chart - tradeRate && Fs.getTradeHoldTime fsdi < tradeDate && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
