@@ -134,7 +134,7 @@ learning n startN fsd = do
                                                                           Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt') 0) 
                                                  [0..Gsd.learningTestCount Gsd.gsd - 1]
                                           let tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
-                                              p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
+                                              p'   = Ftd.getEvaluationValueList tdlt * (p * fromIntegral c)
                                           return (p', Ft.evaluationOk tdlt, tdlt, fsd')) fsl)
   let (_, _, tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
