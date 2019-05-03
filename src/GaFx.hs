@@ -102,27 +102,6 @@ learning :: Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n startN fsd = do
-{-
-  
-      lt  = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getLearningTime     fsd { Fsd.fxSetting = x }) fsl
-      ltt = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getLearningTestTime fsd { Fsd.fxSetting = x }) fsl
-      pre = maximum . M.elems $ M.mapWithKey (\x (_, _) -> Fs.getPrepareTimeAll   fsd { Fsd.fxSetting = x }) fsl
-  xcd <- Fm.getChartListBack n ((pre + lt + ltt * Gsd.learningTestCount Gsd.gsd) * 2) 0
-  let tdlts = M.elems .
-              M.filter (\(y, _, _, _) -> y) $
-              M.mapWithKey (\y ( p, c) -> let fsd' = fsd { Fsd.fxSetting = y }
-                                              lt'  = Fs.getLearningTime     fsd'
-                                              ltt' = Fs.getLearningTestTime fsd'
-                                              cl   = Fcd.getChartListBack 0 (Fs.getPrepareTimeAll fsd' + lt') xcd
-                                              ce   =  map (\x -> Fcd.getChartListBack (ltt' * x + lt')
-                                                            (Fs.getPrepareTimeAll fsd' + ltt') xcd)
-                                                      [0..Gsd.learningTestCount Gsd.gsd - 1]
-                                              tdlt = map (\x-> Ft.learning $ Fsd.nextFxSettingData ltt' x fsd') ce
-                                              tdl  = Ft.learning $ Fsd.nextFxSettingData lt' cl fsd'
-                                              p'   = (Ftd.getEvaluationValue tdl + Ftd.getEvaluationValueList tdlt) *
-                                                     (p / fromIntegral c)
-                                          in (Ft.evaluationOk tdl tdlt, tdl, tdlt, fsd')) fsl
--}
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd

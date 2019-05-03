@@ -25,7 +25,7 @@ evaluationOk tdlt =
   --0 < Ftd.getEvaluationValue tdl && 0 < Ftd.getEvaluationValueList tdlt
   --0 < Ftd.profit tdl && (and $ map (\x -> 0 < Ftd.profit x) tdlt)
   --0 < Ftd.profit tdl && 0 < getProfitList tdlt
-  and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt
+  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
