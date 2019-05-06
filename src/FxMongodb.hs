@@ -30,6 +30,7 @@ import qualified GlobalSettingData          as Gsd
 
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
+  traceShow(s, l, rl) $ return ()
   r <- getChartList (s - l) s
   minc <- getOneChart getStartChartFromDB
   r' <- if rl + length r < l && Fcd.no minc < s
@@ -42,6 +43,7 @@ getChartListBack s l rl = do
 
 getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
+  traceShow(s, l, rl) $ return ()
   r <- getChartList s (s + l)
   maxc <- getOneChart getEndChartFromDB
   r' <- if rl + length r < l && s < Fcd.no maxc
