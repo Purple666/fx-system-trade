@@ -32,6 +32,7 @@ getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
   traceShow(s, l, rl) $ return ()
   r <- getChartList (s - l) s
+  traceShow(length r) $ return ()
   minc <- getOneChart getStartChartFromDB
   r' <- if rl + length r < l && Fcd.no minc < s
         then (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
