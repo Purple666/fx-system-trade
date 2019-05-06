@@ -30,32 +30,16 @@ import qualified GlobalSettingData          as Gsd
 
 getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l rl = do
-  traceShow(s, l, rl) $ return ()
-  r <- getChartList (s - l) s
-  traceShow(length r) $ return ()
-  minc <- getOneChart getStartChartFromDB
-  r' <- if rl + length r < l && Fcd.no minc < s
-        then (++) <$> getChartListBack (s - l) l (rl + length r) <*> pure r
-        else return r
-  if 0 < length r' - l
-    then return $ drop (length r' - l) r'
-    else return r'
-
+  getChartList (s - l) s
 
 getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
 getChartListForward s l rl = do
-  traceShow(s, l, rl) $ return ()
-  r <- getChartList s (s + l)
-  maxc <- getOneChart getEndChartFromDB
-  r' <- if rl + length r < l && s < Fcd.no maxc
-        then (++) <$> pure r <*> getChartListForward (s + l) l (rl + length r)
-        else return r
-  return $ take l r'
+  getChartList s (s + l)
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
 getOneChart f = do
-  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- retry 100 $ access pipe master "fx" f
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- access pipe master "fx" f
   close pipe
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                              , Fcd.date  = typed $ valueAt "time"  x
@@ -69,8 +53,8 @@ getOneChart f = do
 
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s e = do
-  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- retry 100 . access pipe master "fx" $ getChartListFromDB  s e
+  pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- access pipe master "fx" $ getChartListFromDB  s e
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
