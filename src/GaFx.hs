@@ -65,7 +65,7 @@ learningLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n startN fsd = do
-  r <- (Ga.learning . Ga.learningDataList) =<<
+  r <- (Ga.learning . Ga.learningDataList . ((Ga.learningData fsd):)) =<<
        (sequence . M.elems .
                        M.mapWithKey (\x (_, _) -> do let fsd' = fsd { Fsd.fxSetting = x }
                                                          lt   = Fsd.getLearningTime fsd'
@@ -79,7 +79,7 @@ learningLoop c n startN fsd = do
                                              [0..Gsd.learningTestCount Gsd.gsd - 1]
                                       let tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                                           p    = Ftd.getEvaluationValueList tdlt
-                                      return (p, tdlt, x)) . (fsd:) $ Ga.getGaDataList r)
+                                      return (p, tdlt, x)) $ Ga.getGaDataList r)
   -- Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
   if Ft.evaluationOk tdlt
     then return (0, True, tdlt, fsd')
