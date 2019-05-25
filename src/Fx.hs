@@ -1,5 +1,8 @@
-import qualified FxTradeData        as Ftd
+import qualified Ga
 import qualified GaFx
+import qualified FxSetting                as Fs
+import qualified FxSettingData            as Fsd
+import qualified FxTradeData              as Ftd
 import           System.Environment
 import           System.IO
 

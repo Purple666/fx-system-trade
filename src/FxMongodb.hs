@@ -23,7 +23,6 @@ import Debug.Trace
 import qualified Data.Map                   as M
 import qualified Data.Text                  as T
 import qualified FxChartData                as Fcd
-import qualified FxSetting                  as Fs
 import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
@@ -105,7 +104,7 @@ readFxSettingData coName = do
     then return $ Fsd.initFxSettingData
     else do fs <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fs.setFxSettingData fs fsl
+            return $ Fsd.setFxSettingData fs fsl
 
 checkFxSettingData :: String -> IO Bool
 checkFxSettingData coName = do

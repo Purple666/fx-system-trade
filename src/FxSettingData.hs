@@ -11,15 +11,26 @@ module FxSettingData
   , getLearningTestTimes
   , plusLearningTestTimes
   , initFxSetting
+  , getLearningTestTime
+  , getLearningTime
+  , getTradeHoldTime
+  , getLossCutRate
+  , getProfitRate
+  , setFxSettingData
+  , getFxSettingLogResult
+  , maxFxSettingFrolLog
   ) where
 
 import Debug.Trace
 import GHC.Generics (Generic)
 import Data.Hashable
+import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified Tree                    as Tr
+import qualified GlobalSettingData       as Gsd
+import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxChart         :: FxChart
@@ -109,10 +120,6 @@ nextFxSettingData cl c fsd =
                           }
       }
 
-getLearningTestTimes :: FxSettingData -> Int
-getLearningTestTimes fsd =
-  learningTestTimes . learningSetting . fxSetting $ fsd
-
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = (fxSetting fsd) {
@@ -121,4 +128,86 @@ plusLearningTestTimes fsd =
               }
           }
       }
+
+getLossCutRate :: FxSettingData -> Double
+getLossCutRate fsd =
+  let ls = learningSetting $ fxSetting fsd
+  in if failProfit ls == 0 || trFail ls == 0
+     then -Gsd.initalProperty Gsd.gsd
+     else -(failProfit ls / (fromIntegral $ trFail ls)) * getLearningTestTimes2 fsd
+
+getProfitRate :: FxSettingData -> Double
+getProfitRate fsd =
+  let ls = learningSetting $ fxSetting fsd
+  in if successProfit ls == 0 || trSuccess ls == 0
+     then Gsd.initalProperty Gsd.gsd
+     else (successProfit ls / (fromIntegral $ trSuccess ls)) * getLearningTestTimes2 fsd
+
+getLearningTime :: FxSettingData -> Int
+getLearningTime fsd =
+  let ls = learningSetting $ fxSetting fsd
+  in truncate $ getLearningTestTimes2 fsd * if trTrade ls == 0
+                                            then fromIntegral $ getTradeHoldTime fsd
+                                            else max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ (trTradeDate ls `div` trTrade ls))
+                                                
+getLearningTestTime :: FxSettingData -> Int
+getLearningTestTime fsd =
+  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
+
+getLearningTestTimes :: FxSettingData -> Double
+getLearningTestTimes fsd =
+  {- (sqrt :: (Double -> Double)) $ -} fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd
+
+getLearningTestTimes2 :: FxSettingData -> Double
+getLearningTestTimes2 fsd =
+  (log :: (Double -> Double)) $ ((fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd) + 3)
+  
+getTradeHoldTime :: FxSettingData -> Int
+getTradeHoldTime fsd =
+  -- getSimChartMax fsd
+  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes2 fsd
+
+getSimChartMax :: FxSettingData -> Int
+getSimChartMax fsd =
+  maximum [ Fad.getSimChartMax . fxTaOpen        $ fxSetting fsd
+          , Fad.getSimChartMax . fxTaCloseProfit $ fxSetting fsd
+          , Fad.getSimChartMax . fxTaCloseLoss   $ fxSetting fsd
+          ]
+
+setFxSetting :: FxSetting -> FxSetting
+setFxSetting fts =
+  fts { fxTaOpen        = Fad.setFxTechnicalAnalysisSetting $ fxTaOpen fts
+      , fxTaCloseProfit = Fad.setFxTechnicalAnalysisSetting $ fxTaCloseProfit fts
+      , fxTaCloseLoss   = Fad.setFxTechnicalAnalysisSetting $ fxTaCloseLoss fts
+      }
+
+setTreeFunction :: FxSettingData -> FxSettingData
+setTreeFunction fs =
+  fs { fxSetting = setFxSetting $ fxSetting fs
+     , fxSettingLog  = M.mapKeys setFxSetting $ fxSettingLog fs
+     }
+
+
+setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
+setFxSettingData fs fsl =
+  setTreeFunction $ FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
+                                                                  , chartLength = 0
+                                                                  }
+                                      , prevOpen     = ([], M.empty)
+                                      , fxSetting    = maxFxSettingFrolLog fsl
+                                      , fxSettingLog = fsl                                         
+                                      }
+
+maxFxSettingFrolLog :: M.Map FxSetting (Double, Int) -> FxSetting
+maxFxSettingFrolLog fsl =
+  if null fsl == True
+  then initFxSetting
+  else head . map (\(x, (_, _)) -> x) . 
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
+       M.toList fsl
+
+getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
+getFxSettingLogResult fsd =
+  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ fxSettingLog fsd
+  in (p, c, p / fromIntegral c)
 

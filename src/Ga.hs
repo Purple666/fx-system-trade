@@ -1,13 +1,6 @@
 module Ga
   ( LearningData (..)
   , Ga (..)
-  , evaluate
-  , learning
-  , emptyLearningData
-  , getGaDataList
-  , getHeadGaData
-  , learningData
-  , learningDataList
   ) where
 
 import           Control.Monad.Random
@@ -41,30 +34,32 @@ class (Show a, Eq a, Ord a) => Ga a where
   plusGaLoopMax :: a -> a
   reset :: MonadRandom m => LearningData a -> m (LearningData a)
   setHash :: LearningData a -> LearningData a
+  getGaDataList :: LearningData a -> [a]
+  maximumScore :: LearningData a -> Rational
+  getHeadGaData :: LearningData a -> a
+  emptyLearningData :: LearningData a
+  learningData :: a -> LearningData a
+  learningDataList :: [LearningData a] -> LearningData a
+  evaluate :: LearningData a -> LearningData a
+  learning :: MonadRandom m => LearningData a -> m (LearningData a)
+  
+  getGaDataList (LearningData x) = map fst x
+  maximumScore (LearningData x) = fst . maximum $ map (\y -> (snd y, fst y)) x
+  getHeadGaData (LearningData x) = fst $ head x
+  emptyLearningData = LearningData []
+  learningData x = LearningData [(x, 0)]
+  learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
+  evaluate (LearningData y) = LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
 
-getGaDataList :: LearningData a -> [a]
-getGaDataList (LearningData x) = map fst x
+  learning x = do
+    let glm = (getGaLoopMax $ getHeadGaData x) + 3
+    x <- createInitialDataLoop 0 glm x $ evaluate x
+    if null x
+      then return $ setHash x
+      else setHash <$> learningLoop 0 glm x
 
-maximumScore :: Ord a => LearningData a -> Rational
-maximumScore (LearningData x) = fst . maximum $ map (\y -> (snd y, fst y)) x
 
-getHeadGaData :: LearningData a -> a
-getHeadGaData (LearningData x) = fst $ head x
-
-emptyLearningData :: LearningData a
-emptyLearningData = LearningData []
-
-learningData :: a -> LearningData a
-learningData s = LearningData [(s, 0)]
-
-learningDataList :: [LearningData a] -> LearningData a
-learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-
-evaluate :: (Ga a) => LearningData a -> LearningData a
-evaluate (LearningData y) =
-  LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
-
-selection :: MonadRandom m => LearningData a -> m (LearningData a)
+selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
   let mp = minimum . map snd $ getLearningData x
   x' <- if mp <= 0
@@ -121,15 +116,6 @@ createInitialDataLoop c glm ix x = do
          else if null x'
               then createInitialDataLoop (c + 1) glm ix x'
               else createInitialDataLoop (c + 1) glm (learningData $ maximum x') x'
-
-learning :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
-learning x = do
-  let glm = (getGaLoopMax $ getHeadGaData x) + 3
-  x <- createInitialDataLoop 0 glm x emptyLearningData
-  if null x
-    then return $ setHash x
-    else setHash <$> learningLoop 0 glm x
-
 
 
 

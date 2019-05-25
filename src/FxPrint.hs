@@ -9,7 +9,6 @@ module FxPrint
 import Debug.Trace
 import           Control.Monad
 import qualified FxChartData   as Fcd
-import qualified FxSetting     as Fs
 import qualified FxSettingData as Fsd
 import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
@@ -18,8 +17,8 @@ import           Text.Printf
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
 printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
-  let lt  = Fs.getLearningTime     fsd
-      ltt = Fs.getLearningTestTime fsd
+  let lt  = Fsd.getLearningTime     fsd
+      ltt = Fsd.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
   nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt
@@ -88,6 +87,6 @@ printFxTradeData td =
 
 printBackTestResult :: String -> Int -> Int -> Fsd.FxSettingData ->  IO ()
 printBackTestResult bar s f fsd = do
-  let (p, c, a) = Fs.getFxSettingLogResult fsd
+  let (p, c, a) = Fsd.getFxSettingLogResult fsd
   printf (bar ++ " %d - %d : %6.2f %6d %6.2f\n") s f p c a
 

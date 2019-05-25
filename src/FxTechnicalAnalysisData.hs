@@ -14,6 +14,8 @@ module FxTechnicalAnalysisData
   , initFxTechnicalAnalysisData
   , initFxMovingAverageData
   , initAlgoLeafData
+  , getSimChartMax
+  , setFxTechnicalAnalysisSetting
   ) where
 
 import qualified Data.Map          as M
@@ -255,4 +257,34 @@ initFxMovingAverageData =
                       , thresholdL = None
                       , thresholdM = None
                       }
+
+
+getSimChartMax :: FxTechnicalAnalysisSetting -> Int
+getSimChartMax x =
+  maximum $ M.map (\a -> let prevSettingMax = maximum
+                               [ prevSetting $ smaSetting a
+                               , prevSetting $ emaSetting a
+                               , prevSetting $ wmaSetting a
+                               , prevSetting $ macdSetting a
+                               , prevSetting $ stSetting a
+                               , prevSetting $ rciSetting a
+                               , prevSetting $ rsiSetting a
+                               ]
+                         in {- prevSettingMax * -} simChart a) $ algoSetting x
+
+setFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting -> FxTechnicalAnalysisSetting
+setFxTechnicalAnalysisSetting x =
+  let mk = maximum . M.keys $ algoSetting x
+      itad = map initTechAnaLeafData [0..mk]
+  in x { techAnaTree   = Tr.setFunctionToTree        itad $ techAnaTree x
+       , techListCount = Tr.setFunctionToLeafDataMap itad $ techListCount x
+       , algoSetting   = M.map setFxAlgorithmSetting $ algoSetting x
+       }
+
+setFxAlgorithmSetting :: FxAlgorithmSetting -> FxAlgorithmSetting
+setFxAlgorithmSetting x =
+  x { algorithmTree      = Tr.setFunctionToTree        initAlgoLeafData $ algorithmTree   x
+    , algorithmListCount = Tr.setFunctionToLeafDataMap initAlgoLeafData $ algorithmListCount x
+    }
+
 

@@ -5,8 +5,6 @@ module FxTechnicalAnalysis
   , calcFxalgorithmListCount
   , getPrepareTime
   , updateAlgorithmListCount
-  , setFxTechnicalAnalysisSetting
-  , getSimChartMax
   , checkAlgoSetting
   ) where
 
@@ -17,19 +15,6 @@ import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
-
-getSimChartMax :: Fad.FxTechnicalAnalysisSetting -> Int
-getSimChartMax x =
-  maximum $ M.map (\a -> let prevSettingMax = maximum
-                               [ Fad.prevSetting $ Fad.smaSetting a
-                               , Fad.prevSetting $ Fad.emaSetting a
-                               , Fad.prevSetting $ Fad.wmaSetting a
-                               , Fad.prevSetting $ Fad.macdSetting a
-                               , Fad.prevSetting $ Fad.stSetting a
-                               , Fad.prevSetting $ Fad.rciSetting a
-                               , Fad.prevSetting $ Fad.rsiSetting a
-                               ]
-                         in {- prevSettingMax * -} Fad.simChart a) $ Fad.algoSetting x
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
@@ -133,23 +118,7 @@ getPrepareTime x =
                                  , Fad.longSetting (Fad.wmaSetting a)
                                  , Fad.longSetting (Fad.rsiSetting a)
                                  , Fad.longSetting (Fad.stSetting a) 
-                                 ] * getSimChartMax x) $ Fad.algoSetting x
-
-setFxTechnicalAnalysisSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
-setFxTechnicalAnalysisSetting x =
-  let mk = maximum . M.keys $ Fad.algoSetting x
-      itad = map Fad.initTechAnaLeafData [0..mk]
-  in x { Fad.techAnaTree   = Tr.setFunctionToTree        itad $ Fad.techAnaTree x
-       , Fad.techListCount = Tr.setFunctionToLeafDataMap itad $ Fad.techListCount x
-       , Fad.algoSetting   = M.map setFxAlgorithmSetting $ Fad.algoSetting x
-       }
-
-setFxAlgorithmSetting :: Fad.FxAlgorithmSetting -> Fad.FxAlgorithmSetting
-setFxAlgorithmSetting x =
-  x { Fad.algorithmTree      = Tr.setFunctionToTree        Fad.initAlgoLeafData $ Fad.algorithmTree   x
-    , Fad.algorithmListCount = Tr.setFunctionToLeafDataMap Fad.initAlgoLeafData $ Fad.algorithmListCount x
-    }
-
+                                 ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
 rci :: Int -> [Double] -> Double
 rci n x  =

@@ -1,22 +1,12 @@
 module FxSetting
   ( getPrepareTimeAll
-  , getLearningTime
-  , getLearningTestTime
-  , getLearningTestTimes
   , createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
   , crossoverFxSettingData
   , resetFxSettingData
-  , setFxSettingData
   , emptyFxSettingLog
-  , getFxSettingLogResult
-  , getSimChartMax
-  , getTradeHoldTime
-  , getLossCutRate
-  , getProfitRate
   , updateFxSettingLog
-  , checkAlgoSetting
   , setHashFxSettingData
   ) where
 
@@ -35,56 +25,18 @@ import qualified FxTradeData             as Ftd
 import qualified Ga
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
+import qualified FxTrade                 as Ft
 
-getLossCutRate :: Fsd.FxSettingData -> Double
-getLossCutRate fsd =
-  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in if Fsd.failProfit ls == 0 || Fsd.trFail ls == 0
-     then -Gsd.initalProperty Gsd.gsd
-     else -(Fsd.failProfit ls / (fromIntegral $ Fsd.trFail ls)) * getLearningTestTimes2 fsd
-
-getProfitRate :: Fsd.FxSettingData -> Double
-getProfitRate fsd =
-  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in if Fsd.successProfit ls == 0 || Fsd.trSuccess ls == 0
-     then Gsd.initalProperty Gsd.gsd
-     else (Fsd.successProfit ls / (fromIntegral $ Fsd.trSuccess ls)) * getLearningTestTimes2 fsd
-
-getLearningTime :: Fsd.FxSettingData -> Int
-getLearningTime fsd =
-  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in truncate $ getLearningTestTimes2 fsd * if Fsd.trTrade ls == 0
-                                            then fromIntegral $ getTradeHoldTime fsd
-                                            else max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ (Fsd.trTradeDate ls `div` Fsd.trTrade ls))
-                                                
-getLearningTestTime :: Fsd.FxSettingData -> Int
-getLearningTestTime fsd =
-  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
-
-getLearningTestTimes :: Fsd.FxSettingData -> Double
-getLearningTestTimes fsd =
-  {- (sqrt :: (Double -> Double)) $ -} fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd
-
-getLearningTestTimes2 :: Fsd.FxSettingData -> Double
-getLearningTestTimes2 fsd =
-  (log :: (Double -> Double)) $ ((fromIntegral . Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd) + 3)
-  
-getTradeHoldTime :: Fsd.FxSettingData -> Int
-getTradeHoldTime fsd =
-  -- getSimChartMax fsd
-  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes2 fsd
-
-getSimChartMax :: Fsd.FxSettingData -> Int
-getSimChartMax fsd =
-  maximum [ Ta.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-          , Ta.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-          , Ta.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ]
-
-getFxSettingLogResult :: Fsd.FxSettingData -> (Double, Int, Double)
-getFxSettingLogResult fsd =
-  let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ Fsd.fxSettingLog fsd
-  in (p, c, p / fromIntegral c)
+instance Ga.Ga Fsd.FxSettingData where
+  copy              = copyFxSettingData
+  mutation          = mutationFxSettingData
+  crossover         = crossoverFxSettingData
+  createInitialData = createInitialGaData
+  learningEvaluate  = Ft.gaLearningEvaluate
+  getGaLoopMax      = Fsd.getLearningTestTime
+  plusGaLoopMax     = Fsd.plusLearningTestTimes
+  reset             = resetFxSettingData
+  setHash           = setHashFxSettingData
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd =
@@ -93,46 +45,6 @@ getPrepareTimeAll fsd =
           , Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
           ]
 
-setTreeFunction :: Fsd.FxSettingData -> Fsd.FxSettingData
-setTreeFunction fs =
-  fs { Fsd.fxSetting = setFxSetting $ Fsd.fxSetting fs
-     , Fsd.fxSettingLog  = M.mapKeys setFxSetting $ Fsd.fxSettingLog fs
-     }
-
-setFxSetting :: Fsd.FxSetting -> Fsd.FxSetting
-setFxSetting fts =
-  fts { Fsd.fxTaOpen        = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaOpen fts
-      , Fsd.fxTaCloseProfit = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseProfit fts
-      , Fsd.fxTaCloseLoss   = Ta.setFxTechnicalAnalysisSetting $ Fsd.fxTaCloseLoss fts
-      }
-
-checkAlgoSetting :: Fsd.FxSettingData -> Fsd.FxSettingData
-checkAlgoSetting fsd =
-  fsd { Fsd.prevOpen  = ([], M.empty)
-      , Fsd.fxSetting = (Fsd.fxSetting fsd)
-                        { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-                        , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-                        , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-                        }
-      }
-  
-setFxSettingData :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSettingData
-setFxSettingData fs fsl =
-  setTreeFunction $ Fsd.FxSettingData { Fsd.fxChart = Fsd.FxChart { Fsd.chart       = [Fcd.initFxChartData]
-                                                                  , Fsd.chartLength = 0
-                                                                  }
-                                      , Fsd.prevOpen     = ([], M.empty)
-                                      , Fsd.fxSetting    = maxFxSettingFrolLog fsl
-                                      , Fsd.fxSettingLog = fsl                                         
-                                      }
-
-maxFxSettingFrolLog :: M.Map Fsd.FxSetting (Double, Int) -> Fsd.FxSetting
-maxFxSettingFrolLog fsl =
-  if null fsl == True
-  then Fsd.initFxSetting
-  else head . map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
-       M.toList fsl
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =
@@ -162,7 +74,7 @@ updateFxSettingLog plsf profits fsd fsdf =
                    M.toList fsl'
               else fsl'
       fsd' = if length fsl' < length fsl && 0 < length fsl'
-             then fsd { Fsd.fxSetting = maxFxSettingFrolLog fsl''
+             then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl''
                       }
              else fsd
   in fsd' { Fsd.fxSettingLog = unionFxSettingLog fsl'' (Fsd.fxSettingLog fsdf)
