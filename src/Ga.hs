@@ -50,7 +50,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   evaluate (LearningData y) = LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
   learning x = do
     let l = length x
-    traceShow("ler", l) $ return ()
+    -- traceShow("ler", l) $ return ()
     setHash <$> (LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData) <$> (learningLoop =<< ((evaluate . mappend x) <$> createInitialData l x))
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
@@ -88,7 +88,7 @@ learningLoop :: (Ga a, MonadRandom m) =>
                 LearningData a -> m (LearningData a)
 learningLoop x = do
   x' <- evaluate <$> (geneticOperators (length x) x . learningData $ maximum x)
-  traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+  -- traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else learningLoop x'
