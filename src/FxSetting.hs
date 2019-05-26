@@ -187,7 +187,8 @@ setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
 setHashFxSettingData x =
   Ga.LearningData . map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                             { Fsd.settingHash = hash (Fsd.fxSetting fsd)
+                                             { Fsd.settingHash = (hash . Fsd.fxTaOpen $ Fsd.fxSetting) fsd) + (hash . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd) + (hash . Fsd.fxTaCloseLoss $ Fsd.fxSetting fsd)
+                                             
                                              }
                                            }, p)) $ Ga.getLearningData x
 
