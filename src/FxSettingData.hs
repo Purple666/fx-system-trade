@@ -33,11 +33,11 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { fxChart         :: FxChart
-                , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
+  FxSettingData { fxChart           :: [FxChart]
+                , prevOpen          :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
                                        M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
-                , fxSetting       :: FxSetting
-                , fxSettingLog    :: M.Map FxSetting (Double, Int)
+                , fxSetting         :: FxSetting
+                , fxSettingLog      :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
@@ -81,9 +81,7 @@ instance Hashable FxLearningSetting
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
-                                    , chartLength = 0
-                                    }
+  FxSettingData { fxChart = []
                 , prevOpen            = ([], M.empty)
                 , fxSetting = initFxSetting
                 , fxSettingLog = M.empty
@@ -113,11 +111,9 @@ resetFxSettingData fsd =
                                     }
       }
 
-nextFxSettingData :: Int -> [Fcd.FxChartData] -> FxSettingData -> FxSettingData
-nextFxSettingData cl c fsd =
-  fsd { fxChart = FxChart { chart       = c
-                          , chartLength = cl
-                          }
+nextFxSettingData :: [FxChart] -> FxSettingData -> FxSettingData
+nextFxSettingData fc fsd =
+  fsd { fxChart = fc
       }
 
 {-
@@ -204,13 +200,11 @@ setTreeFunction fs =
 
 setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData fs fsl =
-  setTreeFunction $ FxSettingData { fxChart = FxChart { chart       = [Fcd.initFxChartData]
-                                                                  , chartLength = 0
-                                                                  }
-                                      , prevOpen     = ([], M.empty)
-                                      , fxSetting    = maxFxSettingFrolLog fsl
-                                      , fxSettingLog = fsl                                         
-                                      }
+  setTreeFunction $ FxSettingData { fxChart = []
+                                  , prevOpen     = ([], M.empty)
+                                  , fxSetting    = maxFxSettingFrolLog fsl
+                                  , fxSettingLog = fsl                                         
+                                  }
 
 maxFxSettingFrolLog :: M.Map FxSetting (Double, Int) -> FxSetting
 maxFxSettingFrolLog fsl =
