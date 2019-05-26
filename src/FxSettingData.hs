@@ -12,6 +12,7 @@ module FxSettingData
   , plusLearningTestTimes
   , initFxSetting
   , getLearningTestTime
+  , getLearningTestTimes
   , getLearningTime
   , getTradeHoldTime
   , getLossCutRate
@@ -144,38 +145,42 @@ getLossCutRate fsd =
   let ls = learningSetting $ fxSetting fsd
   in if failProfit ls == 0 || trFail ls == 0
      then -Gsd.initalProperty Gsd.gsd
-     else -(failProfit ls / (fromIntegral $ trFail ls)) * getLearningTestTimes2 fsd
+     else -(failProfit ls / (fromIntegral $ trFail ls)) * getLearningTestTimes3 fsd
 
 getProfitRate :: FxSettingData -> Double
 getProfitRate fsd =
   let ls = learningSetting $ fxSetting fsd
   in if successProfit ls == 0 || trSuccess ls == 0
      then Gsd.initalProperty Gsd.gsd
-     else (successProfit ls / (fromIntegral $ trSuccess ls)) * getLearningTestTimes2 fsd
+     else (successProfit ls / (fromIntegral $ trSuccess ls)) * getLearningTestTimes3 fsd
 
 getLearningTime :: FxSettingData -> Int
 getLearningTime fsd =
   let ls = learningSetting $ fxSetting fsd
-  in truncate $ getLearningTestTimes2 fsd * if trTrade ls == 0
+  in truncate $ getLearningTestTimes3 fsd * if trTrade ls == 0
                                             then fromIntegral $ getTradeHoldTime fsd
                                             else max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ (trTradeDate ls `div` trTrade ls))
                                                 
 getLearningTestTime :: FxSettingData -> Int
 getLearningTestTime fsd =
-  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes fsd
+  truncate $ fromIntegral (getLearningTime fsd) * getLearningTestTimes2 fsd
 
-getLearningTestTimes :: FxSettingData -> Double
+getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
-  {- (sqrt :: (Double -> Double)) $ -} fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd
+  learningTestTimes . learningSetting $ fxSetting fsd
 
 getLearningTestTimes2 :: FxSettingData -> Double
 getLearningTestTimes2 fsd =
+  {- (sqrt :: (Double -> Double)) $ -} fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd
+
+getLearningTestTimes3 :: FxSettingData -> Double
+getLearningTestTimes3 fsd =
   (log :: (Double -> Double)) $ ((fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd) + 3)
   
 getTradeHoldTime :: FxSettingData -> Int
 getTradeHoldTime fsd =
   -- getSimChartMax fsd
-  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes2 fsd
+  truncate $ (fromIntegral $ getSimChartMax fsd) * getLearningTestTimes3 fsd
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
