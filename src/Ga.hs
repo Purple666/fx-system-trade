@@ -108,7 +108,7 @@ learningLoop c glm x = do
 createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> LearningData a -> m (LearningData a)
 createInitialDataLoop c glm ix x = do
   x' <- mappend x . evaluate <$> createInitialData glm ix 
-  traceShow("create", glm, c, length x, length x') $ return ()
+  traceShow("create", glm, c, length ix, length x, length x') $ return ()
   if glm <= length x' 
     then return x'
     else if glm  < c
