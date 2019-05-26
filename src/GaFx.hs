@@ -63,15 +63,13 @@ learningLoop :: Int ->
                 Int ->
                 Int ->
                 Fsd.FxSettingData ->
+                [Ga.LearningData Fsd.FxSettingData] ->
                 IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c n startN fsd = do
-  r <- (Ga.learning . Ga.learningDataList . ((Ga.learningData fsd):)) =<<
-       (sequence . M.elems .
-                       M.mapWithKey (\x (_, _) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                                         lt   = Fsd.getLearningTime fsd'
-                                                     n' <- getRandomR(startN, n)
-                                                     cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + lt) 0
-                                                     return (Ga.learningData $ Fsd.nextFxSettingData lt cl fsd')) $ Fsd.fxSettingLog fsd)
+learningLoop c n startN fsd log = do
+  let lt = Fsd.getLearningTime fsd
+  n' <- getRandomR(startN, n)
+  cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd + lt) 0
+  r <- Ga.learning $ Ga.learningDataList ((Ga.learningData $ Fsd.nextFxSettingData lt cl fsd) : log)
   (p', tdlt, fsd') <- maximum <$>
                       (mapM (\x -> do let ltt' = Fsd.getLearningTestTime x
                                       ce' <- mapM (\_ -> do n' <- getRandomR(startN, n)
@@ -85,7 +83,7 @@ learningLoop c n startN fsd = do
     then return (0, True, tdlt, fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c || fsd' == fsd
          then return (0, False, tdlt, Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) n startN fsd' 
+         else learningLoop (c + 1) n startN fsd' log
 
 learning :: Int ->
             Int ->
@@ -108,7 +106,13 @@ learning n startN fsd = do
   let (_, _, tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdlt',  fsd'')
-    else learningLoop 0 n startN fsd 
+    else do log <- (sequence . M.elems .
+                    M.mapWithKey (\x (_, _) -> do let fsd' = fsd { Fsd.fxSetting = x }
+                                                      lt   = Fsd.getLearningTime fsd'
+                                                  n' <- getRandomR(startN, n)
+                                                  cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + lt) 0
+                                                  return (Ga.learningData $ Fsd.nextFxSettingData lt cl fsd')) $ Fsd.fxSettingLog fsd)
+            learningLoop 0 n startN fsd log
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do

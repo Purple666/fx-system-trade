@@ -120,6 +120,16 @@ nextFxSettingData cl c fsd =
                           }
       }
 
+{-
+chartResetFxSettingData :: FxSettingData -> FxSettingData
+chartResetFxSettingData fsd =
+  fsd { fxChart = FxChart { chart       = 0
+                          , chartLength = []
+                          }
+        fxSettingLog = M.mapWithKey (\k (_, _) -> 
+      }
+-}
+
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = (fxSetting fsd) {
