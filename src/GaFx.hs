@@ -65,6 +65,7 @@ learningLoop :: Int ->
                 IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c fsd fsl = do
   fsl' <- Ga.learning fsl
+  traceShow(length fsl, length fsl') $ return ()
   let (p', tdltm, fsd'') = maximum .
                            map (\fsd' -> let tdlt = Ft.learning fsd'
                                              p    = Ftd.getEvaluationValueList tdlt
