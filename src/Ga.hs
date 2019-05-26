@@ -56,7 +56,7 @@ class (Show a, Eq a, Ord a) => Ga a where
     x' <- createInitialDataLoop 0 glm x $ evaluate x
     if null x'
       then return $ setHash x'
-      else setHash <$> learningLoop 0 glm x'
+      else setHash <$> learningLoop 0 (length x') x'
 
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
