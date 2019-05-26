@@ -53,10 +53,10 @@ class (Show a, Eq a, Ord a) => Ga a where
 
   learning x = do
     let glm = (maximum . map getGaLoopMax $ getGaDataList x) + 3
-    x <- createInitialDataLoop 0 glm $ evaluate x
-    if null x
-      then return $ setHash x
-      else setHash <$> learningLoop 0 glm x
+    x' <- createInitialDataLoop 0 glm x $ evaluate x
+    if null x'
+      then return $ setHash x'
+      else setHash <$> learningLoop 0 glm x'
 
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
@@ -105,15 +105,15 @@ learningLoop c glm x = do
               then learningLoop (c + 1) glm x
               else learningLoop (c + 1) glm x'
 
-createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> m (LearningData a)
-createInitialDataLoop c glm x = do
-  x' <- mappend x . evaluate <$> createInitialData glm x 
+createInitialDataLoop :: (Ga a, MonadRandom m) => Int -> Int -> LearningData a -> LearningData a -> m (LearningData a)
+createInitialDataLoop c glm ix x = do
+  x' <- mappend x . evaluate <$> createInitialData glm ix 
   traceShow("create", glm, c, length x, length x') $ return ()
   if glm <= length x' 
     then return x'
     else if glm  < c
          then return $ fmap plusGaLoopMax x'
-         else createInitialDataLoop (c + 1) glm x'
+         else createInitialDataLoop (c + 1) glm ix x'
 
 
 
