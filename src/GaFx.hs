@@ -78,7 +78,7 @@ learningLoop c n startN fsd log = do
                                       let tdlt = map (\y -> Ft.learning $ Fsd.nextFxSettingData ltt' y x) ce'
                                           p    = Ftd.getEvaluationValueList tdlt
                                       return (p, tdlt, x)) $ Ga.getGaDataList r)
-  -- Fp.printLearningFxTradeData p' 0 fsd' tdl tdlt 0 (Ft.evaluationOk tdl tdlt) (fsd' == fsd)
+  Fp.printLearningFxTradeData p' 0 fsd' tdlt 0 (Ft.evaluationOk tdlt) (fsd' == fsd)
   if Ft.evaluationOk tdlt
     then return (0, True, tdlt, fsd')
     else if (Fsd.learningTestTimes . Fsd.learningSetting $ Fsd.fxSetting fsd') < fromIntegral c || fsd' == fsd

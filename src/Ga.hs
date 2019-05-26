@@ -30,8 +30,6 @@ class (Show a, Eq a, Ord a) => Ga a where
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   createInitialData :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
   learningEvaluate :: a -> (a, Rational)
-  getGaLoopMax :: a -> Int
-  plusGaLoopMax :: a -> a
   reset :: MonadRandom m => LearningData a -> m (LearningData a)
   setHash :: LearningData a -> LearningData a
   getGaDataList :: LearningData a -> [a]

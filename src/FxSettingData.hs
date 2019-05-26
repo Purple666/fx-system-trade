@@ -8,7 +8,6 @@ module FxSettingData
   , initFxSettingData
   , resetFxSettingData
   , nextFxSettingData
-  , getLearningTestTimes
   , plusLearningTestTimes
   , initFxSetting
   , getLearningTestTime
