@@ -12,7 +12,6 @@ module FxSettingData
   , initFxSetting
   , getLearningTestTime
   , getLearningTestTimes
-  , getLearningTime
   , getTradeHoldTime
   , getLossCutRate
   , getProfitRate

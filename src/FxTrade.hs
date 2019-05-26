@@ -87,7 +87,6 @@ evaluate ctd fsdi fsd f1 forceSell td =
       fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsdi
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdi
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsdi
-      lt  = Fsd.getLearningTime     fsdi
       ltt = Fsd.getLearningTestTime fsdi
 {-
       lcd = if 60 * 24 * 5 * 4  < lt + ltt + Fsd.getTradeHoldTime fsdi
