@@ -69,7 +69,7 @@ learningLoop c fsd fsl = do
                            map (\fsd' -> let tdlt = Ft.learning fsd'
                                              p    = Ftd.getEvaluationValueList tdlt
                                          in (p, tdlt, fsd')) $ Ga.getGaDataList fsl'
-  --Fp.printLearningFxTradeData p' 0 fsd' tdlt 0 (Ft.evaluationOk tdltm) (fsd' == fsd)
+  Fp.printLearningFxTradeData p' 0 fsd'' tdltm 0 (Ft.evaluationOk tdltm) (fsd'' == fsd)
   if Ft.evaluationOk tdltm
     then return (0, True, tdltm, fsd'')
     else if Fsd.getLearningTestTimes fsd < fromIntegral c || fsd == fsd''
