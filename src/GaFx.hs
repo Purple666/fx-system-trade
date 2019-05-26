@@ -60,21 +60,22 @@ trade environment coName = do
   tradeWeeklyLoop td coName
 
 learningLoop :: Int ->
+                Double ->
                 Fsd.FxSettingData ->
                 Ga.LearningData  Fsd.FxSettingData ->
                 IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c fsd fsl = do
+learningLoop c pp fsd fsl = do
   fsl' <- Ga.learning fsl
   let (p', tdltm, fsd'') = maximum .
                            map (\fsd' -> let tdlt = Ft.learning fsd'
                                              p    = Ftd.getEvaluationValueList tdlt
                                          in (p, tdlt, fsd')) $ Ga.getGaDataList fsl'
-  Fp.printLearningFxTradeData p' 0 fsd'' tdltm 0 (Ft.evaluationOk tdltm) (fsd'' == fsd)
+  Fp.printLearningFxTradeData p' 0 fsd'' tdltm 0 (Ft.evaluationOk tdltm) (pp == p')
   if Ft.evaluationOk tdltm
     then return (0, True, tdltm, fsd'')
-    else if Fsd.getLearningTestTimes fsd < fromIntegral c || fsd == fsd''
+    else if Fsd.getLearningTestTimes fsd < fromIntegral c || pp == p'
          then return (0, False, tdltm, Fsd.plusLearningTestTimes fsd'')
-         else learningLoop (c + 1) fsd'' fsl'
+         else learningLoop (c + 1) p' fsd'' fsl'
 
 learning :: Int ->
             Int ->
@@ -102,7 +103,7 @@ learning n startN fsd = do
       (_, _, tdlt', fsd'') = maximum tdlts
   if not $ null tdlts
     then return (length tdlts, True, tdlt',  fsd'')
-    else learningLoop 0 fsd . Ga.learningDataList . map Ga.learningData $ M.keys fsdl'
+    else learningLoop 0 0 fsd . Ga.learningDataList . map Ga.learningData $ M.keys fsdl'
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
