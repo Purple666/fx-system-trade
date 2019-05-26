@@ -51,7 +51,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learning x = do
     let l = length x
     traceShow("ler", l) $ return ()
-    (setHash . LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData) <$> (learningLoop =<< ((evaluate . mappend x) <$> createInitialData l x))
+    setHash <$> (LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData) <$> (learningLoop =<< ((evaluate . mappend x) <$> createInitialData l x))
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
