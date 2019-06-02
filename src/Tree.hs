@@ -45,7 +45,7 @@ instance (Hashable k, Hashable a) => Hashable (M.Map k a) where
    hashWithSalt = hashUsing (hash . M.toList)
 
 instance Read (LeafData a) where
-  readsPrec _ s = let (a, s') = break (\x -> x ==')' || x ==',' ) s
+  readsPrec _ s = let (a, s') = break (\x -> x ==')' || x ==',' || x ==']' ) s
                   in [(LeafData (read a, (defaultFunction, defaultFunction)), s')]
 
 instance Read NodeData where
