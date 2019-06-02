@@ -335,10 +335,12 @@ backTest :: Int ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
-      td3 = foldl (\td1 ctd -> let (_, _, td2) = evaluate ctd fsd getQuantityBacktest False td1
-                               in td2)
-            td ctdl
-  in checkAlgoSetting l fsd td3
+      td1 = td { Ftd.fxSetting = Fsd.fxSetting fsd
+               }
+      td4 = foldl (\td2 ctd -> let (_, _, td3) = evaluate ctd fsd getQuantityBacktest False td2
+                               in td3)
+            td1 ctdl
+  in checkAlgoSetting l fsd td4
 {-                    
   in if log
      then (fsd, td3 { Ftd.chartLength = l })
