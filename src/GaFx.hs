@@ -123,7 +123,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None -- || lf || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
+  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf -- || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
                              then learning n startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
@@ -141,7 +141,7 @@ backTestLoop retry lf n startN endN td fsd = do
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
-              else backTestLoop retry (Ftd.realizedPL tdt < Ftd.realizedPL td) n' startN endN tdt fsd3
+              else backTestLoop retry False n' startN endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
