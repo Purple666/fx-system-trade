@@ -151,9 +151,9 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
                  String ->
                  [Fcd.FxChartData] ->
-                 IO (Fsd.FxSettingData, Ftd.FxTradeData)
+                 IO (Ftd.FxTradeData)
 tradeEvaluate td fsd coName xcd = do
-  let (open, close, fsd1, td1) = Ft.trade td fsd xcd
+  let (open, close, td1) = Ft.trade td fsd xcd
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2
@@ -166,7 +166,7 @@ tradeEvaluate td fsd coName xcd = do
                  Fp.printTradeResult open close td td4 units
                  return td4
          else return td3
-  return (fsd1, td5)
+  return td5
 
 waitTrade :: IO ()
 waitTrade =
@@ -208,13 +208,13 @@ tradeLoop p pl sleep td fsd coName = do
   (pl', fsd1) <- if Ftd.side td == Ftd.None && ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)
-  (sleep', td2, fsd3) <- if (Fcd.close e) /= (Fcd.close p)
-                         then do (fsd2, td1) <- tradeEvaluate td fsd1 coName =<<
-                                                ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
+  (sleep', td2) <- if (Fcd.close e) /= (Fcd.close p)
+                         then do td1 <- tradeEvaluate td fsd1 coName =<<
+                                        ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
                                  -- Fp.printProgressFxTradeData td1 e                                 
-                                 return (0, td1, fsd2)
-                         else return (sleep + 1, td, fsd1)
+                                 return (0, td1)
+                   else return (sleep + 1, td)
   if 240 < sleep'
     then do return td2
-    else tradeLoop e pl' sleep' td2 fsd3 coName
+    else tradeLoop e pl' sleep' td2 fsd1 coName
 
