@@ -133,6 +133,7 @@ backTestLoop retry lf plsf n startN endN td fsd = do
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (ltt * Gsd.learningTestCount Gsd.gsd) 0)
+  traceShow('c', Fsd.getLearningTestTime fsd2) $ return ()
   if Ftd.realizedPL tdt < Ftd.realizedPL td && retry && not lok && Ftd.side td == Ftd.None
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf' lok True
             backTestLoop retry True plsf' n startN endN td =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
