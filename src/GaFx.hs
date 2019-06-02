@@ -128,7 +128,8 @@ backTestLoop retry lf plsf n startN endN td fsd = do
                              then learning n startN fsd
                              else return (plsf, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
-  (fsd2, tdt) <- Ft.backTest (0 < plsf') (ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
+  traceShow('a', Fsd.getLearningTestTime fsd1) $ return ()
+  (fsd2, tdt) <- Ft.backTest (ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
                        Fm.getChartListForward n       (ltt * Gsd.learningTestCount Gsd.gsd) 0)
@@ -139,6 +140,7 @@ backTestLoop retry lf plsf n startN endN td fsd = do
                     <$> Fs.updateFxSettingLog plsf' (Ftd.profit tdt - Ftd.profit td) fsd2
                     =<< Fm.readFxSettingData "backtest"
             Fp.printTestProgress fsd1 fsd td tdt tdlt plsf' lok False
+            traceShow('b', Fsd.getLearningTestTime fsd3) $ return ()
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd2)

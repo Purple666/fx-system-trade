@@ -87,8 +87,8 @@ evaluate ctd fsdi fsd f1 forceSell td =
       fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsdi
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsdi
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsdi
-      ltt = Fsd.getLearningTestTime fsdi
 {-
+      ltt = Fsd.getLearningTestTime fsdi
       lcd = if 60 * 24 * 5 * 4  < lt + ltt + Fsd.getTradeHoldTime fsdi
             then 60 * 24 * 5 * 4 
             else lt + ltt + Fsd.getTradeHoldTime fsdi
@@ -329,13 +329,12 @@ makeChart fsd chartLength xcd  =
                . Fad.algoSetting $ Fsd.fxTaCloseLoss fs
   in makeChartTa (take chartLength $ reverse xcd) ftado ftadcp ftadcl []
 
-backTest :: Bool ->
-            Int ->
+backTest :: Int ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             [Fcd.FxChartData] ->            
             (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest log l td fsd xcd =
+backTest l td fsd xcd =
   let ctdl = makeChart fsd l xcd
       (fsd3, td3) = foldl (\(fsd1, td1) ctd -> 
                              let (_, _, fsd2, td2) = evaluate ctd fsd fsd1 getQuantityBacktest False td1
