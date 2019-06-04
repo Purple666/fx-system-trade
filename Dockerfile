@@ -4,5 +4,4 @@ COPY . /fx
 #WORKDIR /fx/src
 #RUN ghc -O2 Fx.hs 
 WORKDIR /fx/stack
-RUN stack clean && stack build
-        
+RUN stack setup --allow-different-user && stack clean && stack build
