@@ -17,7 +17,7 @@ items:
         openshift.io/imported-from: haskell
       from:
         kind: DockerImage
-        name: haskell:8.2
+        name: haskell:8.4.3
       generation: null
       importPolicy: {}
       name: "latest"
