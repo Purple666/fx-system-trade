@@ -106,7 +106,7 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          command: ["bash"]
+          command: ["tail", "-f", "/dev/null"]
           #command: ["./Fx", "backtest"]
           #command: ["stack", "exec", "--", "fx-exe", "backtest"]
           #command: ["stack", "exec", "--", "fx-exe", "backtest"]
