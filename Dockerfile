@@ -5,6 +5,7 @@ From haskell
 #RUN ghc -O2 Fx.hs 
 COPY stack /fx
 WORKDIR /fx/stack
-RUN stack build wreq mongoDB unix-time MonadRandom extra lens aeson async hashable bson
+RUN stack build wreq mongoDB unix-time MonadRandom extra lens aeson async hashable
 COPY src /fx
+WORKDIR /fx/stack
 RUN stack clean && stack build
