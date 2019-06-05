@@ -3,7 +3,7 @@ From haskell
 #COPY . /fx
 #WORKDIR /fx/src
 #RUN ghc -O2 Fx.hs
-USER 1001:1001
+USER 0:0
 COPY stack /fx/stack
 WORKDIR /fx/stack
 RUN stack build wreq mongoDB unix-time MonadRandom extra lens aeson async hashable
