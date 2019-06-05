@@ -106,8 +106,10 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
+          command: ["bash"]
           #command: ["./Fx", "backtest"]
-          command: ["stack", "exec", "--", "fx-exe", "backtest"]
+          #command: ["stack", "exec", "--", "fx-exe", "backtest"]
+          #command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
