@@ -103,13 +103,14 @@ items:
           app: fx-system-trade
           deploymentconfig: fx-system-trade
       spec:
+        securityContext:
+          runAsUser: 0
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          command: ["tail", "-f", "/dev/null"]
+          #command: ["tail", "-f", "/dev/null"]
           #command: ["./Fx", "backtest"]
-          #command: ["stack", "exec", "--", "fx-exe", "backtest"]
-          #command: ["stack", "exec", "--", "fx-exe", "backtest"]
+          command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
@@ -161,6 +162,8 @@ items:
           app: fx-system-trade
           deploymentconfig: fx-system-trade
       spec:
+        securityContext:
+          runAsUser: 0
         containers:
         - image: fx-system-trade
           name: fx-system-trade
@@ -217,6 +220,8 @@ items:
           app: fx-system-trade
           deploymentconfig: fx-system-trade
       spec:
+        securityContext:
+          runAsUser: 0
         containers:
         - image: fx-system-trade
           name: fx-system-trade
@@ -273,6 +278,8 @@ items:
           app: fx-system-trade
           deploymentconfig: fx-system-trade
       spec:
+        securityContext:
+          runAsUser: 0
         containers:
         - image: fx-system-trade
           name: fx-system-trade
