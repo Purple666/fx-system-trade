@@ -123,7 +123,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf -- || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
+  (plsf, lok, tdlt, fsd1) <- if lf -- Ftd.side td == Ftd.None || lf -- || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
                              then learning n startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
@@ -134,7 +134,7 @@ backTestLoop retry lf n startN endN td fsd = do
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
-  if Ftd.realizedPL tdt < Ftd.realizedPL td && retry -- && not lok && Ftd.side td == Ftd.None
+  if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && retry -- && not lok && Ftd.side td == Ftd.None
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
             backTestLoop retry True n startN endN td fsd3 -- =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
