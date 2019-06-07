@@ -153,7 +153,7 @@ getLearningTime fsd =
   let ls = learningSetting $ fxSetting fsd
   in truncate $ getLearningTestTimes3 fsd * if trTrade ls == 0
                                             then fromIntegral $ getTradeHoldTime fsd
-                                            else max (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ (trTradeDate ls `div` trTrade ls))
+                                            else min (fromIntegral $ getTradeHoldTime fsd) (fromIntegral $ (trTradeDate ls `div` trTrade ls))
                                                 
 getLearningTestTime :: FxSettingData -> Int
 getLearningTestTime fsd =
