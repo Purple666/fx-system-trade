@@ -203,8 +203,7 @@ calcValidLeafDataList p lds =
 
 makeValidLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 makeValidLeafDataList f s tl =
-  let a = evaluateTrueLeafDataList f s tl
-  in traceShow(a) $ nub a
+  nub $ evaluateTrueLeafDataList f s tl
 
 evaluateTrueLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 evaluateTrueLeafDataList _ _ Empty = []
