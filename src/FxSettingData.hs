@@ -197,8 +197,8 @@ setTreeFunction fs =
      }
 
 
-setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
-setFxSettingData fs fsl =
+setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
+setFxSettingData  fsl =
   setTreeFunction $ FxSettingData { fxChart = []
                                   , fxSetting    = maxFxSettingFrolLog fsl
                                   , fxSettingLog = fsl                                         
