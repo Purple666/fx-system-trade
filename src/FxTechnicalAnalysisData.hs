@@ -194,9 +194,9 @@ initFxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    = Tr.Empty
                              , treeAnaAndRate = 1
                              , treeAnaOrRate  = 1
-                             , techListCount  = Tr.LeafDataMap $ M.singleton (initTechAnaLeafData 0) 1
-                             , algoSetting    = M.singleton 0 . initFxAlgorithmSetting . Tr.LeafDataMap . M.fromList $
-                                                zip initAlgoLeafData (repeat 1)
+                             , techListCount  = Tr.LeafDataMap $ M.singleton (initTechAnaLeafData 0) (1, 0)
+                             , algoSetting    = M.singleton 0 . initFxAlgorithmSetting . Tr.LeafDataMap . M.fromList .
+                                                zip initAlgoLeafData $ repeat (1, 0)
                              }
 
 initFxAlgorithmSetting :: Tr.LeafDataMap FxTechnicalAnalysisData -> FxAlgorithmSetting

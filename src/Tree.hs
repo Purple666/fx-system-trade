@@ -31,7 +31,7 @@ newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) } d
 
 newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } deriving(Generic)
 
-newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) Double } deriving(Show, Read, Eq, Ord, Generic)
+newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) (Double, Int) } deriving(Show, Read, Eq, Ord, Generic)
 
 instance Hashable a => Hashable (LeafDataMap a)
 
@@ -86,24 +86,24 @@ emptyLeafDataMap :: LeafDataMap a
 emptyLeafDataMap = LeafDataMap M.empty
 
 initLeafDataMap :: LeafData a -> LeafDataMap a
-initLeafDataMap k = LeafDataMap $ M.singleton k 0
+initLeafDataMap k = LeafDataMap $ M.singleton k (0, 0)
 
 setFunctionToLeafDataMap :: [LeafData a] -> LeafDataMap a -> LeafDataMap a
 setFunctionToLeafDataMap ix (LeafDataMap xs) =
-  LeafDataMap . M.fromList . map (\(LeafData k, x) -> (ix !! fst k, x)) $ M.toList xs
+  LeafDataMap . M.fromList . map (\(LeafData k, (x, y)) -> (ix !! fst k, (x, y))) $ M.toList xs
 
 setFunctionToTree :: [LeafData a] -> TreeData a -> TreeData a
-setFunctionToTree ix (Leaf (LeafData (k, _))) = Leaf (ix !! k)
+setFunctionToTree ix (Leaf (LeafData (k, (_, _)))) = Leaf (ix !! k)
 setFunctionToTree _ Empty = Empty
 setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunctionToTree ix r)
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  let xs' = if minimum xs < 0
-            then M.map (\x -> x + (abs $ minimum xs) + 1) xs
+  let xs' = if (fst $ minimum xs) < 0
+            then M.map (\(x, y) -> (x + (abs . fst $ minimum xs) + 1, y)) xs
             else xs
-  in if minimum xs' * (Gsd.countUpList $ Gsd.gsd) < maximum xs'
-     then let (a, b) = M.partition (\x -> minimum xs' * (Gsd.countUpList $ Gsd.gsd) < x) xs'
+  in if (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
+     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < x) xs'
           in (LeafDataMap a, LeafDataMap b)
      else (LeafDataMap M.empty, LeafDataMap xs')
 
@@ -111,10 +111,10 @@ makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (T
 makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
-    else do let mx = minimum . map snd $ M.toList xs
+    else do let mx = fst . minimum . map snd $ M.toList xs
                 xs' = if mx <= 0
-                      then M.map (\x -> toRational (x + abs mx + 1)) xs
-                      else M.map toRational xs
+                      then M.map (\(x, _) -> toRational (x + abs mx + 1)) xs
+                      else M.map (toRational . fst) xs
             foldl (\acc _ -> do l <- R.fromList $ M.toList xs'
                                 insertTree andRate orRate (Leaf l) =<< acc
                   ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
@@ -195,11 +195,11 @@ evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (eval
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  LeafDataMap $ M.unionWith (+) a b
+  LeafDataMap $ M.unionWith (\(x, y) (x', y') -> (x + x', y + y')) a b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
 calcValidLeafDataList p lds =
-  foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k p) acc) emptyLeafDataMap lds
+  foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k (p, 1)) acc) emptyLeafDataMap lds
 
 makeValidLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 makeValidLeafDataList f s tl =
