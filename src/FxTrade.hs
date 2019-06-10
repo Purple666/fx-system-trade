@@ -87,13 +87,13 @@ evaluate ctd fsd f1 forceSell td =
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       fs        = Ftd.fxSetting td
+      ltt = Fsd.getLearningTestTime fsd
+      lcd = if 60 * 24 * 5  < lt + ltt + Fsd.getTradeHoldTime fsd
+            then 60 * 24 * 54 
+            else lt + ltt + Fsd.getTradeHoldTime fsd
 {-
-      ltt = Fsd.getLearningTestTime fsdi
-      lcd = if 60 * 24 * 5 * 4  < lt + ltt + Fsd.getTradeHoldTime fsdi
-            then 60 * 24 * 5 * 4 
-            else lt + ltt + Fsd.getTradeHoldTime fsdi
--}
       lcd = 60 * 24 * 5 * 4
+-}
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
