@@ -30,7 +30,7 @@ checkAlgoSetting fts =
       (as'', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
                       then let nk = fst (M.findMax as) + 1
                            in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
-                               Tr.LeafDataMap . M.map (\(_, _) -> (1.0, 0)) . M.insert (Fad.initTechAnaLeafData nk) (1.0, 0) $ Tr.getLeafDataMap tlc)
+                               Tr.LeafDataMap . M.map (\(_, x) -> (1.0, x)) . M.insert (Fad.initTechAnaLeafData nk) (1.0, 0) $ Tr.getLeafDataMap tlc)
                       else (as', tlc)
   in fts { Fad.techListCount = tlc'
          , Fad.algoSetting   = as''
