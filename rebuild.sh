@@ -18,5 +18,5 @@ do
     oc get pods | grep 'fx-system-trade.*build.*Running'
 done
 ./scaleup.sh
-sleep 10
+sleep 15
 ./log_trade-backtest.sh
