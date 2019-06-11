@@ -25,4 +25,3 @@ do
     sleep 5
     oc get pods | grep 'fx-system-trade-backtest.*ContainerCreating'
 done
-./log_trade-backtest.sh
