@@ -96,7 +96,7 @@ learning n startN fsd = do
                                return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
   let tdlts = M.elems . M.filter (\(_, y, _, _) -> y) $
               M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                                p'   = Ftd.getEvaluationValueList tdlt * (p * fromIntegral c)
+                                                p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
                                             in (p', Ft.evaluationOk tdlt, tdlt, fsd')) fsdl'
       (_, _, tdlt', fsd'') = maximum tdlts
   if not $ null tdlts

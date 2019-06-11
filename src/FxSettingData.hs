@@ -209,7 +209,7 @@ maxFxSettingFrolLog fsl =
   if null fsl == True
   then initFxSetting
   else head . map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a') ) $
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a') ) $
        M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
