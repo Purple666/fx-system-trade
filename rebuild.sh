@@ -18,6 +18,7 @@ do
     oc get pods | grep 'fx-system-trade.*build.*Running'
 done
 ./scaleup.sh
+sleep 10
 oc get pods | grep 'fx-system-trade-backtest.*ContainerCreating'
 while [ $? = 0 ]
 do
