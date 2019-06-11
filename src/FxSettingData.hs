@@ -169,7 +169,8 @@ getLearningTestTimes2 fsd =
 
 getLearningTestTimes3 :: FxSettingData -> Double
 getLearningTestTimes3 fsd =
-  (log :: (Double -> Double)) $ ((fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd) + 3)
+  getLearningTestTimes2 fsd
+  -- (log :: (Double -> Double)) $ ((fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd) + 3)
   
 getTradeHoldTime :: FxSettingData -> Int
 getTradeHoldTime fsd =
