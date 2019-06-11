@@ -61,10 +61,11 @@ updateFxSettingLog plsf profits fsd fsdf =
       fs  = Fsd.fxSetting fsd
       fsl' = if M.member fs fsl
              then let (p, c) = fsl M.! fs
-                  in M.filter(\(a, _) -> 0 < a) . M.insert fs (p + profits, c + 1) $ M.delete fs fsl
-             else if 0 < profits
+                  in {- M.filter(\(a, _) -> 0 < a) . -} M.insert fs (p + profits, c + 1) $ M.delete fs fsl
+             else M.insert fs (profits, 1) fsl
+                  {- if 0 < profits
                   then M.insert fs (profits, 1) fsl
-                  else fsl
+                  else fsl -}
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
                    L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a * fromIntegral a') (b * fromIntegral b')) $
