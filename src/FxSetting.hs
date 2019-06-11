@@ -62,7 +62,7 @@ updateFxSettingLog plsf profits fsd fsdf =
       fsl' = if M.member fs fsl
              then let (p, c) = fsl M.! fs
                   in {- M.filter(\(a, _) -> 0 < a) . -} M.insert fs (p + profits, c + 1) $ M.delete fs fsl
-             else M.insert fs (profits, 1) fsl
+             else M.insert fs (profits, 1 :: Int) fsl
                   {- if 0 < profits
                   then M.insert fs (profits, 1) fsl
                   else fsl -}
