@@ -133,7 +133,7 @@ backTestLoop retry lf n startN endN td fsd = do
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
-  if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && retry -- && not lok && Ftd.side td == Ftd.None
+  if (Ftd.unrealizedPL tdt < Ftd.unrealizedPL td || Ftd.realizedPL tdt < Ftd.realizedPL td) && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
             backTestLoop retry True n startN endN td fsd3 -- =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
