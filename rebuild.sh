@@ -18,3 +18,4 @@ do
 done
 sleep 10
 python3 get_rate_data/clear_fx-trade.py
+./scaleup.sh
