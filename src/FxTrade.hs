@@ -180,8 +180,7 @@ evaluate ctd fsd f1 forceSell td =
                                        ctd alcCloseProfit $ Fsd.fxTaCloseProfit fs
                      fxTaCloseLoss   = Ta.updateAlgorithmListCount Fad.closeLoss
                                        ctd alcCloseLoss   $ Fsd.fxTaCloseLoss fs
-                 in traceShow(lcd, tradeDate) $
-                    fs { Fsd.learningSetting  = ls'
+                 in fs { Fsd.learningSetting  = ls'
                        , Fsd.fxTaOpen         = fxTaOpen       
                        , Fsd.fxTaCloseProfit  = fxTaCloseProfit
                        , Fsd.fxTaCloseLoss    = fxTaCloseLoss  
