@@ -143,8 +143,8 @@ evaluate ctd fsd f1 forceSell td =
                                       (Fsd.getTradeHoldTime fsd < tradeDate &&
                                        (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp ||
                                         tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
-                                        Fsd.getProfitRate fsd < tradeRate - chartHigh || 
-                                        tradeRate - chartLow < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
+                                        Fsd.getProfitRate fsd < tradeRate - chartLow || 
+                                        tradeRate - chartHigh < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
