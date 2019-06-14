@@ -43,7 +43,7 @@ gsd =
                     , tradePracticeBearer   = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
                     , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
                     , tradeProductionBearer = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
-0                    , tradeProductionUrl    = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
+                    , tradeProductionUrl    = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
                     }
 
 
