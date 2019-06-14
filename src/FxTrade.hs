@@ -196,11 +196,11 @@ evaluate ctd fsd f1 forceSell td =
                , Ftd.fxSetting = fs''
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                          , Fcd.close = position + Gsd.spread Gsd.gsd
                                                           }
                                  else if open == Ftd.Sell
                                       then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                               , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                               , Fcd.close = position - Gsd.spread Gsd.gsd
                                                                }
                                       else if close /= Ftd.None
                                            then Fcd.initFxChartData
