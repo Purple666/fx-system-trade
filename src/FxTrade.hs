@@ -72,11 +72,9 @@ evaluate :: Fad.FxChartTaData ->
             (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 evaluate ctd fsd f1 forceSell td =
   let cd        = Fad.taChart ctd
-      chart     = if Ftd.side td == Ftd.Buy
-                  then Fcd.close cd - Gsd.spread Gsd.gsd
-                  else if Ftd.side td == Ftd.Sell
-                       then Fcd.close cd + Gsd.spread Gsd.gsd
-                       else Fcd.close cd
+      chart     = Fcd.close cd
+      chartHigh = Fcd.high  cd
+      chartLow  = Fcd.low  cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeNo   = Fcd.no $ Ftd.tradeRate td
       tradeDate = Fcd.no cd - tradeNo
@@ -105,38 +103,24 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
 
         | (Ftd.side td == Ftd.None ||
-           (Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           (Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy)) &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
--}
-        | (Ftd.side td == Ftd.None ||
            (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
         | (Ftd.side td == Ftd.None ||
            (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy)) &&
           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
+-}
+        | (Ftd.side td == Ftd.None ||
+           (Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
+          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | (Ftd.side td == Ftd.None ||
+           (Fsd.getTradeHoldTime fsd < tradeDate && Ftd.side td == Ftd.Buy)) &&
+          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
       (profits, close)
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Close)
 {-
-        | Ftd.side td == Ftd.Buy && (forceSell || lcd < tradeDate ||
-                                     (Fsd.getTradeHoldTime fsd < tradeDate &&
-                                      (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
-                                       chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl ||
-                                       -- Fsd.getProfitRate fsd < chart - tradeRate ||
-                                       chart - tradeRate < Fsd.getLossCutRate fsd))) = (chart - tradeRate, Ftd.Buy)
-        | Ftd.side td == Ftd.Sell && (forceSell || lcd < tradeDate ||
-                                      (Fsd.getTradeHoldTime fsd < tradeDate &&
-                                       (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp ||
-                                        tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
-                                        -- Fsd.getProfitRate fsd < tradeRate - chart || 
-                                        tradeRate - chart < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
--}
         | Ftd.side td == Ftd.Buy &&
           (forceSell ||
             (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
@@ -147,6 +131,20 @@ evaluate ctd fsd f1 forceSell td =
             (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
             (tradeRate - chart < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcl ftadcl) ||
             lcd < tradeDate) = (tradeRate - chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
+-}
+        | Ftd.side td == Ftd.Buy && (forceSell || lcd < tradeDate ||
+                                     (Fsd.getTradeHoldTime fsd < tradeDate &&
+                                      (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
+                                       chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl ||
+                                       Fsd.getProfitRate fsd < chartHigh - tradeRate ||
+                                       chartLow - tradeRate < Fsd.getLossCutRate fsd))) = (chart - tradeRate, Ftd.Buy)
+        | Ftd.side td == Ftd.Sell && (forceSell || lcd < tradeDate ||
+                                      (Fsd.getTradeHoldTime fsd < tradeDate &&
+                                       (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp ||
+                                        tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
+                                        Fsd.getProfitRate fsd < tradeRate - chartHigh || 
+                                        tradeRate - chartLow < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
@@ -196,13 +194,17 @@ evaluate ctd fsd f1 forceSell td =
               else fs'
       td' = td { Ftd.chart     = cd
                , Ftd.fxSetting = fs''
-               , Ftd.tradeRate = if open == Ftd.Buy || open == Ftd.Sell
+               , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position
+                                                          , Fcd.close = position - Gsd.spread Gsd.gsd
                                                           }
-                                 else if close /= Ftd.None
-                                      then Fcd.initFxChartData
-                                      else Ftd.tradeRate td
+                                 else if open == Ftd.Sell
+                                      then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
+                                                               , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                               }
+                                      else if close /= Ftd.None
+                                           then Fcd.initFxChartData
+                                           else Ftd.tradeRate td
                , Ftd.tradeDateAve = if (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd) == 0
                                     then 1.0
                                     else (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd) /
@@ -275,17 +277,17 @@ makeSimChart _ [] = []
 makeSimChart c xs =
   let (chart, xs') = break (\x -> Fcd.no x `mod` c == 0) xs
   in if null xs'
-     then let fcd  = (head chart) { Fcd.close = ((sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart) +
-                                                 (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart) +
-                                                 (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)) / 3
+     then let fcd  = (head chart) { Fcd.close = (sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart)
+                                  , Fcd.high  = (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart)
+                                  , Fcd.low   = (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)
                                   }
           in [fcd]
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
-                   fcd  = (head xs') { Fcd.close = ((sum $ map (\x -> Fcd.close x) chart') / (fromIntegral $ length chart') +   
-                                                    (sum $ map (\x -> Fcd.high  x) chart') / (fromIntegral $ length chart') +   
-                                                    (sum $ map (\x -> Fcd.low   x) chart') / (fromIntegral $ length chart')) / 3
+                   fcd  = (head xs') { Fcd.close = (sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart)
+                                     , Fcd.high  = (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart)
+                                     , Fcd.low   = (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)
                                      }
                in fcd : makeSimChart c (tail xs')
 
