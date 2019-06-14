@@ -49,7 +49,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
   evaluate (LearningData y) = LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
   learning x = do
-    let l = length x
+    let l = (truncate . sqrt . fromIntegral $ length x) + 2
     -- traceShow("ler", l) $ return ()
     setHash <$> (LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData) <$> (learningLoop =<< ((evaluate . mappend x) <$> createInitialData l x))
 
@@ -70,8 +70,8 @@ selection2 x = do
 selectAlgorithm :: (Ga a, MonadRandom m) => m (LearningData a -> LearningData a -> m (LearningData a))
 selectAlgorithm = do
   die <- getRandomR (1, 100)
-  let x | 95 < (die :: Int) = copy
-        | die <= 5 = mutation
+  let x | 90 < (die :: Int) = copy
+        | die <= 10 = mutation
         | otherwise = crossover
   return x
 
