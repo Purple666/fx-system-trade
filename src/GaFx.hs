@@ -76,10 +76,11 @@ learningLoop c pp fsl = do
          else learningLoop (c + 1) p' fsl'
 
 learning :: Int ->
+            Bool -> 
             Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
-learning n startN fsd = do
+learning n retry startN fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
@@ -99,7 +100,7 @@ learning n startN fsd = do
                                                 p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
                                             in (p', Ft.evaluationOk tdlt, tdlt, fsd')) fsdl'
       (_, _, tdlt', fsd'') = maximum tdlts
-  if not $ null tdlts
+  if not $ null tdlts && not retry
     then return (length tdlts, True, tdlt',  fsd'')
     else learningLoop 0 0 . Ga.learningDataList . map Ga.learningData $ M.keys fsdl'
 
@@ -109,7 +110,7 @@ tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   let ltt = Fsd.getLearningTestTime fsd
       s = Fs.getPrepareTimeAll fsd + ltt * Gsd.learningTestCount Gsd.gsd
-  (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) s fsd
+  (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) False s fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return (Fcd.no e, fsd')
 
@@ -123,7 +124,7 @@ backTestLoop :: Bool ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if {- Ftd.side td == Ftd.None || -} lf -- || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
-                             then learning n startN fsd
+                             then learning n retry startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest (ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
