@@ -9,6 +9,7 @@ import           Control.Concurrent.Async
 import           Control.Monad.Random
 import           Control.DeepSeq
 import qualified Data.Map                 as M
+import qualified Data.List               as L
 import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace
@@ -84,25 +85,28 @@ learning n retry startN fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
-  fsdl' <- M.fromList <$>
-           (sequence $
-            map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                   ltt  = Fsd.getLearningTestTime fsd'
-                               fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
-                                                    cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt) 0
-                                                    return (Fsd.FxChart { Fsd.chart = cl
-                                                                        , Fsd.chartLength = ltt
-                                                                        }))
-                                     [1 .. Gsd.learningTestCount Gsd.gsd]
-                               return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
-  let tdlts = M.elems . M.filter (\(_, y, _, _) -> y) $
-              M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                                p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
-                                            in (p', Ft.evaluationOk tdlt, tdlt, fsd')) fsdl'
+  r <- M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
+                                         p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
+                                     in (p', Ft.evaluationOk tdlt, tdlt, fsd')) <$>
+       M.fromList <$>
+       (sequence $
+         map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
+                                ltt  = Fsd.getLearningTestTime fsd'
+                            fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
+                                                 cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt) 0
+                                                 return (Fsd.FxChart { Fsd.chart = cl
+                                                                     , Fsd.chartLength = ltt
+                                                                     }))
+                                  [1 .. Gsd.learningTestCount Gsd.gsd]
+                            return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
+  let tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts) && not retry
     then return (length tdlts, True, tdlt',  fsd'')
-    else learningLoop 0 0 . Ga.learningDataList . map Ga.learningData $ M.keys fsdl'
+    else learningLoop 0 0 . Ga.learningDataList .
+         take ((truncate . sqrt . fromIntegral $ length r) + 2) .
+         map (\(_, _, _, fsd4) -> Ga.learningData fsd4) .
+         L.sortBy (\(p, _, _, _) (p', _, _, _) -> compare p' p) $ M.elems r
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
