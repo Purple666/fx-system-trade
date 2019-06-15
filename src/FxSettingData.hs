@@ -151,7 +151,7 @@ getProfitRate fsd =
 getLearningTestTime :: FxSettingData -> Int
 getLearningTestTime fsd =
   let ls = learningSetting $ fxSetting fsd
-  in (truncate . sqrt . fromIntegral . length $ fxSettingLog fsd) * getLearningTestTimes fsd *
+  in ((truncate . sqrt . fromIntegral . length $ fxSettingLog fsd) + 1) * getLearningTestTimes fsd *
      if trTrade ls == 0
      then getTradeHoldTime fsd
      else max (getTradeHoldTime fsd) (fromIntegral $ trTradeDate ls `div` trTrade ls)
