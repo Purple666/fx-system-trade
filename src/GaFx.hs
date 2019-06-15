@@ -100,7 +100,7 @@ learning n retry startN fsd = do
                                                 p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
                                             in (p', Ft.evaluationOk tdlt, tdlt, fsd')) fsdl'
       (_, _, tdlt', fsd'') = maximum tdlts
-  if not $ null tdlts && not retry
+  if (not $ null tdlts) && not retry
     then return (length tdlts, True, tdlt',  fsd'')
     else learningLoop 0 0 . Ga.learningDataList . map Ga.learningData $ M.keys fsdl'
 
