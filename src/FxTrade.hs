@@ -278,16 +278,16 @@ makeSimChart c xs =
   let (chart, xs') = break (\x -> Fcd.no x `mod` c == 0) xs
   in if null xs'
      then let fcd  = (head chart) { Fcd.close = (sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart)
-                                  , Fcd.high  = (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart)
-                                  , Fcd.low   = (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)
+                                  , Fcd.high  = maximum $ map (\x -> Fcd.high  x) chart
+                                  , Fcd.low   = minimum $ map (\x -> Fcd.low   x) chart
                                   }
           in [fcd]
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
                    fcd  = (head xs') { Fcd.close = (sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart)
-                                     , Fcd.high  = (sum $ map (\x -> Fcd.high  x) chart) / (fromIntegral $ length chart)
-                                     , Fcd.low   = (sum $ map (\x -> Fcd.low   x) chart) / (fromIntegral $ length chart)
+                                     , Fcd.high  = maximum $ map (\x -> Fcd.high  x) chart
+                                     , Fcd.low   = minimum $ map (\x -> Fcd.low   x) chart
                                      }
                in fcd : makeSimChart c (tail xs')
 
