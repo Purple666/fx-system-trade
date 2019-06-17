@@ -349,7 +349,7 @@ learning fsd =
   map (\fc -> let td = initFxTradeData Ftd.Backtest
                   ctdl = makeChart fsd (Fsd.chartLength fc) (Fsd.chart fc)
                   (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td') (Ftd.None, Ftd.None, td) $ init ctdl
-                  (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
+                  (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning False td''
               in if null ctdl
                  then td
                  else td''' { Ftd.chartLength = Fsd.chartLength fc }) $ Fsd.fxChart fsd
