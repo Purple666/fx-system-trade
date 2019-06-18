@@ -66,7 +66,7 @@ learningLoop :: Int ->
 learningLoop c pp fsl = do
   fsl' <- Ga.learning fsl
   let (p', tdltm, fsd'') = maximum .
-X                           map (\fsd' -> let tdlt = Ft.learning fsd'
+                           map (\fsd' -> let tdlt = Ft.learning fsd'
                                              p    = Ftd.getEvaluationValueList tdlt
                                          in (p, tdlt, fsd')) $ Ga.getGaDataList fsl'
   -- Fp.printLearningFxTradeData p' 0 fsd'' tdltm 0 (Ft.evaluationOk tdltm) (pp == p')
