@@ -41,7 +41,7 @@ getPrepareTimeAll fsd =
   maximum [ Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ] * 2
+          ] 
 
 emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
 emptyFxSettingLog fsd =
