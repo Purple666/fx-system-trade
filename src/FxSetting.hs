@@ -69,12 +69,12 @@ updateFxSettingLog plsf profits fsd fsdf =
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
                    L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
                    M.toList fsl'
-              else fsl'
+              else unionFxSettingLog fsl' (Fsd.fxSettingLog fsdf)
       fsd' = if length fsl' < length fsl && 0 < length fsl'
              then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl''
                       }
              else fsd
-  in fsd' { Fsd.fxSettingLog = unionFxSettingLog fsl'' (Fsd.fxSettingLog fsdf)
+  in fsd' { Fsd.fxSettingLog = fsl''
           }
   
 choice1 :: [Bool] -> Int -> b -> b -> b

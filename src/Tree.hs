@@ -216,9 +216,11 @@ evaluateTrueLeafDataList f s (Leaf x) =
 evaluateTrueLeafDataList f s (Node x l r) =
   let l' = evaluateTrueLeafDataList f s l
       r' = evaluateTrueLeafDataList f s r
-  in case fst $ getNodeData x of
+  in l' ++ r'
+{-
+    case fst $ getNodeData x of
     0 -> if null l' || null r'
          then []
          else l' ++ r'
     _ -> l' ++ r'
-
+-}
