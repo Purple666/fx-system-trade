@@ -168,21 +168,22 @@ divideTree (Leaf x) = do
     then return (Leaf x, Empty)
     else return (Empty, Leaf x)
 divideTree (Node x l r) = do
-  die <- R.getRandomR (True, False)
-  if die
-    then do die2 <- R.getRandomR (True, False)
-            if die
+  die2 <- R.getRandomR (True, False)
+  if die2
+    then do die3 <- R.getRandomR (True, False)
+            if die3
               then return (r, l)
               else return (l, r)
-    else do die2 <- R.getRandomR (True, False)
-            if die2
+    else do die4 <- R.getRandomR (True, False)
+            if die4
               then do (o, d) <- divideTree l
-                      die3 <- R.getRandomR (True, False)
-                      if die3
+                      die5 <- R.getRandomR (True, False)
+                      if die5
                         then return (Node x r o, d)
                         else return (o, Node x r d)
               else do (o, d) <- divideTree r
-                      if die
+                      die6 <- R.getRandomR (True, False)
+                      if die6
                         then return (Node x l o, d)
                         else return (o, Node x l d)
 
