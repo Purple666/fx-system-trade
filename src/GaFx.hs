@@ -127,14 +127,14 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if {- Ftd.side td == Ftd.None || -} lf -- || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
+  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd))
                              then learning n retry startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
-  (fsd2, tdt) <- Ft.backTest (ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
+  (fsd2, tdt) <- Ft.backTest (ltt {- * Gsd.learningTestCount Gsd.gsd -}) td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                       Fm.getChartListForward n       (ltt * Gsd.learningTestCount Gsd.gsd) 0)
+                       Fm.getChartListForward n       (ltt {- * Gsd.learningTestCount Gsd.gsd -}) 0)
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
