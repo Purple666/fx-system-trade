@@ -29,8 +29,10 @@ checkAlgoSetting fts =
                   . sort $ M.keys as
       (as'', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
                       then let nk = fst (M.findMax as) + 1
+                               tlcl = Tr.getLeafDataMap tlc
+                               ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
                            in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
-                               Tr.LeafDataMap . M.insert (Fad.initTechAnaLeafData nk) (1.0, 0) $ Tr.getLeafDataMap tlc)
+                               Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
                       else (as', tlc)
   in fts { Fad.techListCount = tlc'
          , Fad.algoSetting   = as''
