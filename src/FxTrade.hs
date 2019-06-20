@@ -25,15 +25,15 @@ evaluationOk tdlt =
 
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = Ftd.realizedPL td
+getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = Ftd.realizedPL td
 
 {-
-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+getQuantityBacktest td chart = Ftd.realizedPL td
+
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
