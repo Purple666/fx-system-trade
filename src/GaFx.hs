@@ -43,7 +43,7 @@ backTest coName latest retry = do
            then endN - (p + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.backtestLatestTime Gsd.gsd)
            else p + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.backtestLatestTime Gsd.gsd
   startN <- (+) <$> getRandomR(sn, sn + ltt * 2) <*> pure p
-  (fs, fsd') <- backTestLoop retry False startN startN endN td fsd
+  (fs, fsd') <- backTestLoop retry False 0 startN startN endN td fsd
   (s', f') <- if fs
               then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
                       return (s + 1, f)
@@ -79,9 +79,10 @@ learningLoop c pp fsl = do
 learning :: Int ->
             Bool -> 
             Int ->
+            Int ->
             Fsd.FxSettingData ->
             IO (Int, Bool, [Ftd.FxTradeData], Fsd.FxSettingData)
-learning n retry startN fsd = do
+learning n retry rc startN fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
@@ -101,7 +102,7 @@ learning n retry startN fsd = do
                             return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
   let tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
-  if (not $ null tdlts) && not retry
+  if (not $ null tdlts) && (not retry || (retry && rc == 1)) 
     then return (length tdlts, True, tdlt',  fsd'')
     else learningLoop 0 0 . Ga.learningDataList .
          take ((truncate . sqrt . fromIntegral $ length r) + 2) .
@@ -114,7 +115,7 @@ tradeLearning = do
   e <- Fm.getOneChart Fm.getEndChartFromDB
   let ltt = Fsd.getLearningTestTime fsd
       s = Fs.getPrepareTimeAll fsd + ltt * Gsd.learningTestCount Gsd.gsd
-  (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) False s fsd
+  (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) False 0 s fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return (Fcd.no e, fsd')
 
@@ -123,12 +124,13 @@ backTestLoop :: Bool ->
                 Int ->
                 Int ->
                 Int ->
+                Int ->
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
-backTestLoop retry lf n startN endN td fsd = do
+backTestLoop retry lf rc n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || (retry && lf) {- || lf || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)) -}
-                             then learning n retry startN fsd
+                             then learning n retry rc startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Fsd.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest (ltt {- * Gsd.learningTestCount Gsd.gsd -}) td fsd1
@@ -140,12 +142,12 @@ backTestLoop retry lf n startN endN td fsd = do
           =<< Fm.readFxSettingData "backtest"
   if Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
-            backTestLoop retry True n startN endN td fsd3 -- =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
+            backTestLoop retry True (rc + 1) n startN endN td fsd3 -- =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
-              else backTestLoop retry (Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td) n' startN endN tdt fsd3
+              else backTestLoop retry (Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td) 0 n' startN endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
