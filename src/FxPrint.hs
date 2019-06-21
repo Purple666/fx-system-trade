@@ -18,7 +18,7 @@ import           Text.Printf
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
 printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
-  let ltt = Fsd.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+  let ltt = Fsd.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
   nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt

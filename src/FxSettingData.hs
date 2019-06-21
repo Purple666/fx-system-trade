@@ -151,7 +151,7 @@ getProfitRate fsd =
 getLearningTestTime :: FxSettingData -> Int
 getLearningTestTime fsd =
   let ls = learningSetting $ fxSetting fsd
-  in getLearningTestTimes fsd *
+  in getLearningTestTimes fsd * Gsd.learningTestCount Gsd.gsd *
      if trTrade ls == 0
      then getTradeHoldTime fsd
      else (getTradeHoldTime fsd) + (fromIntegral $ trTradeDate ls `div` trTrade ls)

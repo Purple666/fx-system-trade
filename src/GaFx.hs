@@ -37,11 +37,11 @@ backTest coName latest retry = do
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Fsd.getLearningTestTime fsd
-      p = Fs.getPrepareTimeAll fsd + ltt * Gsd.learningTestCount Gsd.gsd
+      p = Fs.getPrepareTimeAll fsd + ltt
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   let sn = if latest
-           then endN - (p + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.backtestLatestTime Gsd.gsd)
-           else p + ltt * Gsd.learningTestCount Gsd.gsd + Gsd.backtestLatestTime Gsd.gsd
+           then endN - (p + Gsd.backtestLatestTime Gsd.gsd)
+           else p + Gsd.backtestLatestTime Gsd.gsd
   startN <- (+) <$> getRandomR(sn, sn + ltt * 2) <*> pure p
   (fs, fsd') <- backTestLoop retry False startN startN endN td fsd
   (s', f') <- if fs
@@ -90,7 +90,7 @@ learning n startN fsd = do
        M.fromList <$>
        (sequence $
          map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                ltt  = Fsd.getLearningTestTime fsd' * Gsd.learningTestCount Gsd.gsd
+                                ltt  = Fsd.getLearningTestTime fsd'
                             fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
                                                  cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt) 0
                                                  return (Fsd.FxChart { Fsd.chart = cl
@@ -110,7 +110,7 @@ tradeLearning = do
   fsd <- Fm.readFxSettingData "backtest"
   e <- Fm.getOneChart Fm.getEndChartFromDB
   let ltt = Fsd.getLearningTestTime fsd
-      s = Fs.getPrepareTimeAll fsd + ltt * Gsd.learningTestCount Gsd.gsd
+      s = Fs.getPrepareTimeAll fsd + ltt 
   (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) s fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return (Fcd.no e, fsd')
@@ -127,7 +127,7 @@ backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || (retry && lf) {- || lf || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)) -}
                              then learning n startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
-  let ltt = Fsd.getLearningTestTime fsd1 * Gsd.learningTestCount Gsd.gsd
+  let ltt = Fsd.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest ltt td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
@@ -202,7 +202,7 @@ tradeLoop p pl sleep td fsd coName = do
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   let ltt = Fsd.getLearningTestTime fsd
   e <- Foa.getNowPrices td
-  (pl', fsd1) <- if Ftd.side td == Ftd.None && ltt * Gsd.learningTestCount Gsd.gsd < Fcd.no e - pl
+  (pl', fsd1) <- if Ftd.side td == Ftd.None && ltt < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)
   (sleep', td2) <- if (Fcd.close e) /= (Fcd.close p)
