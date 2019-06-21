@@ -67,7 +67,7 @@ updateFxSettingLog plsf profits fsd fsdf =
                   else fsl
       fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
               then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a / fromIntegral a') (b / fromIntegral b')) $
+                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
                    M.toList fsl'
               else unionFxSettingLog fsl' (Fsd.fxSettingLog fsdf)
       fsd' = if length fsl' < length fsl && 0 < length fsl'
