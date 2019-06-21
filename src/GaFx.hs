@@ -90,7 +90,7 @@ learning n startN fsd = do
        M.fromList <$>
        (sequence $
          map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                ltt  = Fsd.getLearningTestTime fsd'
+                                ltt  = Fsd.getLearningTestTime fsd' * Gsd.learningTestCount Gsd.gsd
                             fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
                                                  cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt) 0
                                                  return (Fsd.FxChart { Fsd.chart = cl
@@ -127,11 +127,11 @@ backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || (retry && lf) {- || lf || (not $ M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)) -}
                              then learning n startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
-  let ltt = Fsd.getLearningTestTime fsd1
-  (fsd2, tdt) <- Ft.backTest (ltt * Gsd.learningTestCount Gsd.gsd) td fsd1
+  let ltt = Fsd.getLearningTestTime fsd1 * Gsd.learningTestCount Gsd.gsd
+  (fsd2, tdt) <- Ft.backTest ltt td fsd1
                  <$> ((++) <$>
                        Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                       Fm.getChartListForward n       (ltt * Gsd.learningTestCount Gsd.gsd) 0)
+                       Fm.getChartListForward n       ltt 0)
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
