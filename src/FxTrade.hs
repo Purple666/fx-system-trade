@@ -94,7 +94,7 @@ evaluate ctd fsd f1 forceSell td =
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       fs        = Ftd.fxSetting td
-      lcd = Fsd.getLearningTestTime fsd
+      lcd = Fsd.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
 {-      
       lcd = if 60 * 24 * 5 < ltt * Gsd.learningTestCount Gsd.gsd + Fsd.getTradeHoldTime fsd
             then 60 * 24 * 5
@@ -130,16 +130,6 @@ evaluate ctd fsd f1 forceSell td =
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Close)
 {-
-        | Ftd.side td == Ftd.Buy &&
-          (forceSell || lcd < tradeDate ||
-            (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
-            (chart - tradeRate < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
-        | Ftd.side td == Ftd.Sell &&
-          (forceSell || lcd < tradeDate ||
-            (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
-            (tradeRate - chart < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
--}
         | Ftd.side td == Ftd.Buy && (forceSell || lcd < tradeDate ||
                                      (Fsd.getTradeHoldTime fsd < tradeDate &&
                                       (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
@@ -152,6 +142,16 @@ evaluate ctd fsd f1 forceSell td =
                                         tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
                                         Fsd.getProfitRate fsd < tradeRate - chartLow || 
                                         tradeRate - chartHigh < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
+-}
+        | Ftd.side td == Ftd.Buy &&
+          (forceSell || lcd < tradeDate ||
+            (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
+            (chart - tradeRate < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
+        | Ftd.side td == Ftd.Sell &&
+          (forceSell || lcd < tradeDate ||
+            (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
+            (tradeRate - chart < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
