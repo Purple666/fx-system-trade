@@ -12,12 +12,13 @@ import qualified FxChartData   as Fcd
 import qualified FxSettingData as Fsd
 import qualified FxTime        as Ftm
 import qualified FxTradeData   as Ftd
+import qualified GlobalSettingData       as Gsd
 import           Text.Printf
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
 printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
-  let ltt = Fsd.getLearningTestTime fsd
+  let ltt = Fsd.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
   nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt
