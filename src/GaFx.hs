@@ -103,9 +103,7 @@ learning n startN fsd = do
   if (not $ null tdlts)
     then return (length tdlts, True, tdlt',  fsd'')
     else learningLoop 0 0 . Ga.learningDataList .
-         take ((truncate . sqrt . fromIntegral $ length r) + 2) .
-         map (\(_, _, _, fsd4) -> Ga.learningData fsd4) .
-         L.sortBy (\(p, _, _, _) (p', _, _, _) -> compare p' p) $ M.elems r
+         map (\(_, _, _, fsd4) -> Ga.learningData fsd4) $ M.elems r
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
