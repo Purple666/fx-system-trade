@@ -27,12 +27,12 @@ import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
 
-getChartListBack :: Int -> Int -> Int -> IO [Fcd.FxChartData]
-getChartListBack s l rl = do
+getChartListBack :: Int -> Int -> IO [Fcd.FxChartData]
+getChartListBack s l = do
   getChartList (s - l) s
 
-getChartListForward :: Int -> Int -> Int -> IO [Fcd.FxChartData]
-getChartListForward s l rl = do
+getChartListForward :: Int -> Int -> IO [Fcd.FxChartData]
+getChartListForward s l = do
   getChartList s (s + l)
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
@@ -53,7 +53,7 @@ getOneChart f = do
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s e = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getChartListFromDB  s e
+  r <- access pipe master "fx" $ getChartListFromDB s e
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
@@ -66,7 +66,7 @@ getChartList s e = do
 
 getChartListFromDB :: Int -> Int -> ReaderT MongoContext IO [Document]
 getChartListFromDB s e =
-  rest =<< find (select ["no" =: ["$gte" =: s, "$lte" =: e]] "rate")
+  rest =<< find (select ["no" =: ["$gte" =: s, "$lt" =: e]] "rate")
 
 getStartChartFromDB :: ReaderT MongoContext IO [Document]
 getStartChartFromDB =

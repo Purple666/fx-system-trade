@@ -130,16 +130,6 @@ evaluate ctd fsd f1 forceSell td =
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Close)
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Close)
 {-
-        | Ftd.side td == Ftd.Buy &&
-          (forceSell || lcd < tradeDate ||
-            (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
-            (chart - tradeRate < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
-        | Ftd.side td == Ftd.Sell &&
-          (forceSell || lcd < tradeDate ||
-            (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
-            (tradeRate - chart < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
--}
         | Ftd.side td == Ftd.Buy && (forceSell || lcd < tradeDate ||
                                      (Fsd.getTradeHoldTime fsd < tradeDate &&
                                       (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp ||
@@ -152,6 +142,16 @@ evaluate ctd fsd f1 forceSell td =
                                         tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl || 
                                         Fsd.getProfitRate fsd < tradeRate - chartLow || 
                                         tradeRate - chartHigh < Fsd.getLossCutRate fsd))) = (tradeRate - chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
+-}
+        | Ftd.side td == Ftd.Buy &&
+          (forceSell || lcd < tradeDate ||
+            (0 < chart - tradeRate && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcp ftadcp) ||
+            (chart - tradeRate < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
+        | Ftd.side td == Ftd.Sell &&
+          (forceSell || lcd < tradeDate ||
+            (0 < tradeRate - chart && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcp ftadcp) ||
+            (tradeRate - chart < 0 && Fsd.getTradeHoldTime fsd < tradeDate && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
@@ -333,12 +333,12 @@ backTest l td fsd xcd =
       td4 = foldl (\td2 ctd -> let (_, _, td3) = evaluate ctd fsd getQuantityBacktest False td2
                                in td3)
             td1 ctdl
-  in checkAlgoSetting l fsd td4
-{-                    
-  in if log
-     then (fsd, td3 { Ftd.chartLength = l })
-     else (Fs.checkAlgoSetting fsd3, td3 { Ftd.chartLength = l })
--}
+  in printDebug ctdl $ checkAlgoSetting l fsd td4
+
+printDebug :: [Fad.FxChartTaData] -> (Fsd.FxSettingData, Ftd.FxTradeData) -> (Fsd.FxSettingData, Ftd.FxTradeData)
+printDebug ctdl r =
+  let a = map (\ctd -> (Fcd.no . Fad.chart $ (Fad.open ctd M.! 0), Fad.short . Fad.rci $ (Fad.open ctd M.! 0))) ctdl
+  in traceShow(a) $ r
 
 checkAlgoSetting :: Int ->
                     Fsd.FxSettingData ->

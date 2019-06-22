@@ -92,7 +92,7 @@ learning n startN fsd = do
          map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
                                 ltt  = Fsd.getLearningTestTime fsd'
                             fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
-                                                 cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt) 0
+                                                 cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt)
                                                  return (Fsd.FxChart { Fsd.chart = cl
                                                                      , Fsd.chartLength = ltt
                                                                      }))
@@ -130,14 +130,14 @@ backTestLoop retry lf n startN endN td fsd = do
   let ltt = Fsd.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest ltt td fsd1
                  <$> ((++) <$>
-                       Fm.getChartListBack    (n - 1) (Fs.getPrepareTimeAll fsd1) 0 <*>
-                       Fm.getChartListForward n       ltt 0)
+                       Fm.getChartListBack    n (Fs.getPrepareTimeAll fsd1) <*>
+                       Fm.getChartListForward n ltt)
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog plsf (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
   if Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
-            backTestLoop retry True n startN endN td fsd3 -- =<< (Ga.getHeadGaData <$> (Fs.resetFxSettingData $ Ga.learningData fsd))
+            backTestLoop retry True n startN endN td fsd3
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
@@ -207,7 +207,7 @@ tradeLoop p pl sleep td fsd coName = do
                  else return (pl, fsd)
   (sleep', td2) <- if (Fcd.close e) /= (Fcd.close p)
                          then do td1 <- tradeEvaluate td fsd1 coName =<<
-                                        ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) 0 <*> pure [e])
+                                        ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) <*> pure [e])
                                  -- Fp.printProgressFxTradeData td1 e                                 
                                  return (0, td1)
                    else return (sleep + 1, td)
