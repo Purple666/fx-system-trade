@@ -244,7 +244,7 @@ makeSimChart c xs =
      else if null chart
           then head xs' : makeSimChart c (tail xs')
           else let chart' = head xs' : chart
-                   fcd  = (head xs') { Fcd.close = (sum $ map (\x -> Fcd.close x) chart) / (fromIntegral $ length chart)
+                   fcd  = (head xs') { Fcd.close = (sum $ map (\x -> Fcd.close x) chart') / (fromIntegral $ length chart')
                                      }
                in fcd : makeSimChart c (tail xs')
 
