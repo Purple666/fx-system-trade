@@ -90,7 +90,6 @@ data FxAlMaSetting = FxAlMaSetting
   { shortSetting        :: Int
   , middleSetting       :: Int
   , longSetting         :: Int
-  , prevSetting         :: Int
   , thresholdSetting    :: Double
   , thresholdMaxSetting :: Double
   }  deriving (Show, Read, Eq, Ord, Generic)
@@ -186,7 +185,6 @@ initFxAlMaSetting =
   FxAlMaSetting { shortSetting        = 5 + Gsd.taMargin Gsd.gsd
                 , middleSetting       = 5 + Gsd.taMargin Gsd.gsd * 2
                 , longSetting         = 5 + Gsd.taMargin Gsd.gsd * 3
-                , prevSetting         = 3 + Gsd.taMargin Gsd.gsd
                 , thresholdSetting    = 30
                 , thresholdMaxSetting = 30
                 }
@@ -221,16 +219,7 @@ initFxMovingAverageData =
 
 getSimChartMax :: FxTechnicalAnalysisSetting -> Int
 getSimChartMax x =
-  maximum $ M.map (\a -> let prevSettingMax = maximum
-                               [ prevSetting $ smaSetting a
-                               , prevSetting $ emaSetting a
-                               , prevSetting $ wmaSetting a
-                               , prevSetting $ macdSetting a
-                               , prevSetting $ stSetting a
-                               , prevSetting $ rciSetting a
-                               , prevSetting $ rsiSetting a
-                               ]
-                         in prevSettingMax * simChart a) $ algoSetting x
+  maximum $ M.map (\a -> simChart a) $ algoSetting x
 
 setFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting -> FxTechnicalAnalysisSetting
 setFxTechnicalAnalysisSetting x =

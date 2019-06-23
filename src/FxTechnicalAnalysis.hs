@@ -255,8 +255,7 @@ setFxMovingAverageData :: Double ->
                           [Fad.FxTechnicalAnalysisData] ->
                           Fad.FxMovingAverageData
 setFxMovingAverageData short middle long tmin tmax ftms g pdl =
-  let n  = Fad.prevSetting ftms
-      fmadp = g $ head pdl
+  let fmadp = g $ head pdl
       fmad = Fad.FxMovingAverageData { Fad.short      = short
                                      , Fad.middle     = middle
                                      , Fad.long       = long

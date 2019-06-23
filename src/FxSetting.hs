@@ -83,12 +83,10 @@ createRandomFxAlMaSetting ix = do
   short  <- getRandomR (max 5 (Fad.shortSetting     ix - Gsd.taMargin Gsd.gsd), 5 + Fad.shortSetting     ix + Gsd.taMargin Gsd.gsd)
   middle <- getRandomR (max 5 (Fad.middleSetting    ix - Gsd.taMargin Gsd.gsd), 5 + Fad.middleSetting    ix + Gsd.taMargin Gsd.gsd)
   long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), 5 + Fad.longSetting      ix + Gsd.taMargin Gsd.gsd)
-  prev   <- getRandomR (max 3 (Fad.prevSetting      ix - Gsd.taMargin Gsd.gsd), 3 + Fad.prevSetting      ix + Gsd.taMargin Gsd.gsd)
   ts     <- getRandomR (0, Fad.thresholdSetting ix + fromIntegral (Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
             , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
-            , Fad.prevSetting       = prev
             , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) ts
             }
 
@@ -298,13 +296,11 @@ crossoverOrdFxAlMaSetting a b = do
   return ( a { Fad.shortSetting     = head a'
              , Fad.middleSetting    = a' !! 1
              , Fad.longSetting      = a' !! 2
-             , Fad.prevSetting      = choice1 die 0 (Fad.prevSetting a) (Fad.prevSetting b)
              , Fad.thresholdSetting = choice1 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
              }
          , b { Fad.shortSetting     = head b'
              , Fad.middleSetting    = b' !! 1
              , Fad.longSetting      = b' !! 2
-             , Fad.prevSetting      = choice2 die 0 (Fad.prevSetting a) (Fad.prevSetting b)
              , Fad.thresholdSetting = choice2 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
             }
          )
