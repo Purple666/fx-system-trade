@@ -1,6 +1,12 @@
 #!/bin/bash -x
 #https://www.forexite.com/free_forex_quotes/2016/04/260416.zip
 
+oc login -u andesm -p a
+oc scale deploymentconfig --replicas=0 fx-system-trade-backtest-latest
+oc scale deploymentconfig --replicas=0 fx-system-trade-backtest-retry
+oc scale deploymentconfig --replicas=0 fx-system-trade-backtest
+oc scale deploymentconfig --replicas=0 fx-system-trade-trade-practice
+
 function command_error() {
     exit 1
 }
@@ -33,6 +39,10 @@ cd ..
 
 ./store_db.sh
 
+oc scale deploymentconfig --replicas=1 fx-system-trade-backtest-latest
+oc scale deploymentconfig --replicas=1 fx-system-trade-backtest-retry
+oc scale deploymentconfig --replicas=1 fx-system-trade-backtest
+oc scale deploymentconfig --replicas=1 fx-system-trade-trade-practice
 
 
 

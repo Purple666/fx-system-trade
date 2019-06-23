@@ -49,12 +49,6 @@ data FxMovingAverageData = FxMovingAverageData
   { short      :: Double
   , middle     :: Double
   , long       :: Double
-  , slopeS     :: Double
-  , slopeL     :: Double
-  , slopeM     :: Double
-  , slopeSn    :: FxTradePosition
-  , slopeLn    :: FxTradePosition
-  , slopeMn    :: FxTradePosition
   , crossSL    :: FxTradePosition
   , crossSM    :: FxTradePosition
   , crossML    :: FxTradePosition
@@ -132,34 +126,6 @@ fxAlgorithmList =
   , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 22
   , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 23
   ]
-
-{-
-  , (isBuy (crossSL    . ema), isSell (crossSL    . ema)) -- 0
-  , (isBuy (crossSM    . ema), isSell (crossSM    . ema)) -- 1
-  , (isBuy (crossML    . ema), isSell (crossML    . ema)) -- 2
-  , (isBuy (crossSL    . wma), isSell (crossSL    . wma)) -- 6
-  , (isBuy (crossSM    . wma), isSell (crossSM    . wma)) -- 7
-  , (isBuy (crossML    . wma), isSell (crossML    . wma)) -- 8
-  , (isBuy (slopeSn    . rsi), isSell (slopeSn    . rsi)) -- 29
-  , (isBuy (slopeMn    . rsi), isSell (slopeMn    . rsi)) -- 30
-  , (isBuy (slopeLn    . rsi), isSell (slopeLn    . rsi)) -- 31
-  , (isBuy (slopeSn    .  st), isSell (slopeSn    .  st)) -- 32
-  , (isBuy (slopeMn    .  st), isSell (slopeMn    .  st)) -- 33
-  , (isBuy (slopeLn    .  st), isSell (slopeLn    .  st)) -- 34
-  , (isBuy (slopeSn    . rci), isSell (slopeSn    . rci)) -- 35
-  , (isBuy (slopeMn    . rci), isSell (slopeMn    . rci)) -- 36
-  , (isBuy (slopeLn    . rci), isSell (slopeLn    . rci)) -- 37
-  , (isBuy (slopeSn    . sma), isSell (slopeSn    . sma)) -- 38
-  , (isBuy (slopeMn    . sma), isSell (slopeMn    . sma)) -- 39
-  , (isBuy (slopeLn    . sma), isSell (slopeLn    . sma)) -- 40
-  , (isBuy (slopeSn    . ema), isSell (slopeSn    . ema)) -- 41
-  , (isBuy (slopeMn    . ema), isSell (slopeMn    . ema)) -- 42
-  , (isBuy (slopeLn    . ema), isSell (slopeLn    . ema)) -- 43
-  , (isBuy (slopeSn    . wma), isSell (slopeSn    . wma)) -- 44
-  , (isBuy (slopeMn    . wma), isSell (slopeMn    . wma)) -- 45
-  , (isBuy (slopeLn    . wma), isSell (slopeLn    . wma)) -- 46
--}
-
 
 isBuy :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
 isBuy f fxta =
@@ -244,12 +210,6 @@ initFxMovingAverageData =
   FxMovingAverageData { short      = 0
                       , middle     = 0
                       , long       = 0
-                      , slopeS     = 0
-                      , slopeM     = 0
-                      , slopeL     = 0
-                      , slopeSn    = None
-                      , slopeMn    = None
-                      , slopeLn    = None
                       , crossSL    = None
                       , crossSM    = None
                       , crossML    = None
@@ -270,7 +230,7 @@ getSimChartMax x =
                                , prevSetting $ rciSetting a
                                , prevSetting $ rsiSetting a
                                ]
-                         in {- prevSettingMax * -} simChart a) $ algoSetting x
+                         in prevSettingMax * simChart a) $ algoSetting x
 
 setFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting -> FxTechnicalAnalysisSetting
 setFxTechnicalAnalysisSetting x =

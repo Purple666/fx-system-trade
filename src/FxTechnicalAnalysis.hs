@@ -129,11 +129,6 @@ rci n x  =
       d = sum . map (\(a, b) -> (a - b) ^ (2 :: Int)) . zipWith (\a (_, b') -> (a, b')) r' . sort $ zip x r
   in (1 - (6.0 * fromIntegral d) / (fromIntegral n * (fromIntegral n ^ (2 :: Int) - 1))) * 100
 
-lsm :: Int -> [Double] -> Double
-lsm n y =
-  let x = reverse [1..fromIntegral n] :: [Double]
-  in (fromIntegral n * sum (zipWith (*) x y) - sum x * sum y) / (fromIntegral n * sum (map (^(2 :: Int)) x) - sum x ^ (2 :: Int))
-
 getRci :: Int -> [Fcd.FxChartData] -> Double
 getRci n x =
   let s = take n $ map Fcd.close x
@@ -240,16 +235,6 @@ setCross s l sp lp
   | lp < sp && s < l = Fad.Sell
   | otherwise = Fad.None
 
-lsmn :: [Double] -> Fad.FxTradePosition
-lsmn xs
-{- 
-  | fst $ foldl (\(f, p) x -> (f && p <= x, p)) (True, 0) xs = Fad.Buy
-  | fst $ foldl (\(f, p) x -> (f && x <= p, p)) (True, 0) xs = Fad.Sell
--}
-  | and $ map (\x -> 0 <= x) xs = Fad.Buy
-  | and $ map (\x -> x <= 0) xs = Fad.Sell
-  | otherwise = Fad.None
-
 setThreshold :: Double ->
                 Double ->
                 Double ->
@@ -275,12 +260,6 @@ setFxMovingAverageData short middle long tmin tmax ftms g pdl =
       fmad = Fad.FxMovingAverageData { Fad.short      = short
                                      , Fad.middle     = middle
                                      , Fad.long       = long
-                                     , Fad.slopeS     = lsm n (map (Fad.short  . g) $ take n pdl)
-                                     , Fad.slopeM     = lsm n (map (Fad.middle . g) $ take n pdl)
-                                     , Fad.slopeL     = lsm n (map (Fad.long   . g) $ take n pdl)
-                                     , Fad.slopeSn    = lsmn $ map (Fad.slopeS . g) (take n pdl) ++ [Fad.slopeS fmad]
-                                     , Fad.slopeMn    = lsmn $ map (Fad.slopeM . g) (take n pdl) ++ [Fad.slopeM fmad]
-                                     , Fad.slopeLn    = lsmn $ map (Fad.slopeL . g) (take n pdl) ++ [Fad.slopeL fmad]
                                      , Fad.crossSL    = setCross short  long   (Fad.short fmadp)  (Fad.long fmadp)  
                                      , Fad.crossSM    = setCross short  middle (Fad.short fmadp)  (Fad.middle fmadp)
                                      , Fad.crossML    = setCross middle long   (Fad.middle fmadp) (Fad.long fmadp)  
