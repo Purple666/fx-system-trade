@@ -33,7 +33,6 @@ instance Ga.Ga Fsd.FxSettingData where
   crossover         = crossoverFxSettingData
   createInitialData = createInitialGaData
   learningEvaluate  = Ft.gaLearningEvaluate
-  reset             = resetFxSettingData
   setHash           = setHashFxSettingData
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int

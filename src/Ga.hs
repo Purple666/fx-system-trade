@@ -30,7 +30,6 @@ class (Show a, Eq a, Ord a) => Ga a where
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   createInitialData :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
   learningEvaluate :: a -> (a, Rational)
-  reset :: MonadRandom m => LearningData a -> m (LearningData a)
   setHash :: LearningData a -> LearningData a
   getGaDataList :: LearningData a -> [a]
   maximumScore :: LearningData a -> Rational
@@ -70,8 +69,8 @@ selection2 x = do
 selectAlgorithm :: (Ga a, MonadRandom m) => m (LearningData a -> LearningData a -> m (LearningData a))
 selectAlgorithm = do
   die <- getRandomR (1, 100)
-  let x | 90 < (die :: Int) = copy
-        | die <= 10 = mutation
+  let x | 95 < (die :: Int) = copy
+        | die <= 5 = mutation
         | otherwise = crossover
   return x
 
