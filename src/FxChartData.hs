@@ -16,9 +16,6 @@ import Data.Hashable
 data FxChartData = FxChartData
   { no    :: Int
   , date  :: Int
-  , open  :: Double
-  , high  :: Double
-  , low   :: Double
   , close :: Double
   }
   deriving (Show, Read, Eq, Ord, Generic)
@@ -29,9 +26,6 @@ initFxChartData :: FxChartData
 initFxChartData =
   FxChartData { no    = 0
               , date  = 0
-              , open  = 0
-              , high  = 0
-              , low   = 0
               , close = 0
               }
 

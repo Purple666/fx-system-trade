@@ -42,9 +42,6 @@ getOneChart f = do
   close pipe
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                              , Fcd.date  = typed $ valueAt "time"  x
-                                             , Fcd.open  = typed $ valueAt "open"  x
-                                             , Fcd.high  = typed $ valueAt "high"  x
-                                             , Fcd.low   = typed $ valueAt "low"   x
                                              , Fcd.close = typed $ valueAt "close" x
                                              }
              ) r
@@ -57,9 +54,6 @@ getChartList s e = do
   close pipe
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
-                                       , Fcd.open  = typed $ valueAt "open"  x
-                                       , Fcd.high  = typed $ valueAt "high"  x
-                                       , Fcd.low   = typed $ valueAt "low"   x
                                        , Fcd.close = typed $ valueAt "close" x
                                        }
        ) r

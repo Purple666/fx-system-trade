@@ -13,8 +13,6 @@ module FxSettingData
   , getLearningTestTime
   , getLearningTestTimes
   , getTradeHoldTime
-  , getLossCutRate
-  , getProfitRate
   , setFxSettingData
   , getFxSettingLogResult
   , maxFxSettingFrolLog
@@ -68,10 +66,6 @@ data FxChart =
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
-                    , trSuccess          :: Int
-                    , trFail             :: Int
-                    , successProfit      :: Double
-                    , failProfit         :: Double
                     , trTrade            :: Integer
                     , trTradeDate        :: Integer
                     } deriving (Show, Read, Eq, Ord, Generic)
@@ -90,10 +84,6 @@ initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
             , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                  , trSuccess          = 0
-                                                  , trFail             = 0
-                                                  , successProfit      = 0 
-                                                  , failProfit         = 0
                                                   , trTrade            = 0
                                                   , trTradeDate        = 0
                                                   }
@@ -115,16 +105,6 @@ nextFxSettingData fc fsd =
   fsd { fxChart = fc
       }
 
-{-
-chartResetFxSettingData :: FxSettingData -> FxSettingData
-chartResetFxSettingData fsd =
-  fsd { fxChart = FxChart { chart       = 0
-                          , chartLength = []
-                          }
-        fxSettingLog = M.mapWithKey (\k (_, _) -> 
-      }
--}
-
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = (fxSetting fsd) {
@@ -133,20 +113,6 @@ plusLearningTestTimes fsd =
               }
           }
       }
-
-getLossCutRate :: FxSettingData -> Double
-getLossCutRate fsd =
-  let ls = learningSetting $ fxSetting fsd
-  in if failProfit ls == 0 || trFail ls == 0
-     then -Gsd.initalProperty Gsd.gsd
-     else -(failProfit ls / (fromIntegral $ trFail ls)) * getLearningTestTimes2 fsd
-
-getProfitRate :: FxSettingData -> Double
-getProfitRate fsd =
-  let ls = learningSetting $ fxSetting fsd
-  in if successProfit ls == 0 || trSuccess ls == 0
-     then Gsd.initalProperty Gsd.gsd
-     else (successProfit ls / (fromIntegral $ trSuccess ls)) * getLearningTestTimes2 fsd
 
 getLearningTestTime :: FxSettingData -> Int
 getLearningTestTime fsd =

@@ -55,8 +55,8 @@ unionFxSettingLog fsl fsl' =
                                                   else (a, b)) fsl fsl')
   . S.fromList . M.keys . M.filter (\(_, b) -> 1 < b) $ M.union (M.difference fsl fsl') (M.difference fsl' fsl)
   
-updateFxSettingLog :: Int -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog plsf profits fsd fsdf = 
+updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog profits fsd fsdf = 
   let fsl = Fsd.fxSettingLog fsd
       fs  = Fsd.fxSetting fsd
       fsl' = if M.member fs fsl
@@ -65,16 +65,11 @@ updateFxSettingLog plsf profits fsd fsdf =
              else if 0 < profits
                   then M.insert fs (profits, 1) fsl
                   else fsl
-      fsl'' = if (Gsd.fxSettingLogNum Gsd.gsd) < plsf
-              then M.withoutKeys fsl' . S.fromList . map (\(x, (_, _)) -> x) . take (plsf - Gsd.fxSettingLogNum Gsd.gsd) .
-                   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
-                   M.toList fsl'
-              else unionFxSettingLog fsl' (Fsd.fxSettingLog fsdf)
       fsd' = if length fsl' < length fsl && 0 < length fsl'
-             then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl''
+             then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl'
                       }
              else fsd
-  in fsd' { Fsd.fxSettingLog = fsl''
+  in fsd' { Fsd.fxSettingLog = unionFxSettingLog fsl' (Fsd.fxSettingLog fsdf)
           }
   
 choice1 :: [Bool] -> Int -> b -> b -> b
