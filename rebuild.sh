@@ -15,6 +15,11 @@ do
     sleep 5
     oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*Init:[0-9]|fx-system-trade.*build.*PodInitializing)'
 done
+oc get pods | egrep 'fx-system-trade.*build.*Error'
+if  [ $? = 0 ] ; then
+    exit
+fi
+
 sleep 10
 python3 get_rate_data/clear_fx-trade.py
 ./scaleup.sh
