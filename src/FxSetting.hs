@@ -170,7 +170,7 @@ resetFxSettingData :: MonadRandom m =>
                       Ga.LearningData Fsd.FxSettingData ->
                       m (Ga.LearningData  Fsd.FxSettingData)
 resetFxSettingData x =
-  createRandomGaData True $ Ga.getHeadGaData x
+  createRandomGaData False $ Ga.getHeadGaData x
 
 setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
