@@ -15,7 +15,6 @@ data GlobalSettingData = GlobalSettingData
   , tradeProductionBearer :: String
   , tradeProductionUrl    :: String
   , quantityRate          :: Double
-  , fxSettingLogNum       :: Int
   , initalProperty        :: Double
   , maxUnit               :: Int
   , dbHost                :: String
@@ -28,11 +27,10 @@ gsd =
                     , makeTreeCount         = 3
                     , algorithmRepeat       = 3
                     , learningTestCount     = 3
-                    , taOpenAndRate         = 1.2
-                    , taCloseProfitAndRate  = 0.8
-                    , taCloseLossAndRate    = 0.8
+                    , taOpenAndRate         = 1.3
+                    , taCloseProfitAndRate  = 0.7
+                    , taCloseLossAndRate    = 0.7
                     , countUpList           = 2
-                    , fxSettingLogNum       = 10
                     , quantityRate          = 5
                     , backtestLatestTime    = 24 * 60 * 20 * 12
                     , initalProperty        = 5000000
