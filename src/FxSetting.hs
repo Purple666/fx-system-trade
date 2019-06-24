@@ -40,12 +40,11 @@ updateFxSettingLog profits fsd fsdf =
                                               else (a, b)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
       fs   = Fsd.fxSetting fsd
       (_, _, ave) = Fsd.getFxSettingLogResult fsd
-      fsl' = M.filter(\(p, c) -> ave * 2 < p || (p <= ave * 2 && c < 3)) $ if M.member fs fsl
-                                                                           then let (p, c) = fsl M.! fs
-                                                                                in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
-                                                                           else if 0 < profits
-                                                                                then M.insert fs (profits, 1) fsl
-                                                                                else fsl
+      fsl' = M.filter(\(p, c) -> ave * 2 < p || (p <= ave * 2 && c < 3)) $
+             if M.member fs fsl
+             then let (p, c) = fsl M.! fs
+                  in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
+             else M.insert fs (profits, 1) fsl
       fsd' = if length fsl' < length fsl && 0 < length fsl'
              then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl'
                       }
