@@ -160,5 +160,7 @@ maxFxSettingFrolLog fsl =
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
   let (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) $ fxSettingLog fsd
-  in (p, c, p / fromIntegral c)
+  in if c == 0
+     then (0, 0, 0)
+     else (p, c, p / fromIntegral c)
 
