@@ -45,7 +45,7 @@ updateFxSettingLog profits fsd fsdf =
                                                                                 in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
                                                                            else if 0 < profits
                                                                                 then M.insert fs (profits, 1) fsl
-                  else fsl
+                                                                                else fsl
       fsd' = if length fsl' < length fsl && 0 < length fsl'
              then fsd { Fsd.fxSetting = Fsd.maxFxSettingFrolLog fsl'
                       }
