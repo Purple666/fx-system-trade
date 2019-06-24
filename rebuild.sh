@@ -3,7 +3,6 @@ git add . && git commit -m "Experiment" && git push
 oc login -u andesm -p a
 ./scaledown.sh
 oc start-build fx-system-trade
-sleep 10
 oc get pods | grep 'fx-system-trade.*Terminating'
 while [ $? = 0 ]
 do
