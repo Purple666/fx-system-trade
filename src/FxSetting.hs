@@ -100,7 +100,6 @@ createRandomFxAlgorithmSetting reset andRate ix = do
   sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
   ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
-  wma  <- createRandomFxAlMaSetting $ Fad.wmaSetting  ix
   macd <- createRandomFxAlMaSetting $ Fad.macdSetting ix
   rci  <- createRandomFxAlMaSetting $ Fad.rciSetting  ix
   st   <- createRandomFxAlMaSetting $ Fad.stSetting   ix
@@ -111,7 +110,6 @@ createRandomFxAlgorithmSetting reset andRate ix = do
               , Fad.rciSetting       = rci
               , Fad.smaSetting       = sma
               , Fad.emaSetting       = ema
-              , Fad.wmaSetting       = wma
               , Fad.macdSetting      = macd
               , Fad.stSetting        = st
               , Fad.rsiSetting       = rsi
@@ -241,7 +239,6 @@ crossoverFxAlgorithmSetting a b = do
   (smaa, smab)   <- crossoverOrdFxAlMaSetting (Fad.smaSetting a) (Fad.smaSetting b)
 
   (emaa, emab)   <- crossoverOrdFxAlMaSetting (Fad.emaSetting a) (Fad.emaSetting b)
-  (wmaa, wmab)   <- crossoverOrdFxAlMaSetting (Fad.wmaSetting a) (Fad.wmaSetting b)
   (macda, macdb) <- crossoverOrdFxAlMaSetting (Fad.macdSetting a) (Fad.macdSetting b)
   (rsia, rsib)   <- crossoverOrdFxAlMaSetting (Fad.rsiSetting a) (Fad.rsiSetting b)
   return ( a { Fad.algorithmTree    = ta
@@ -250,7 +247,6 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.rciSetting       = rcia
              , Fad.smaSetting       = smaa
              , Fad.emaSetting       = emaa
-             , Fad.wmaSetting       = wmaa
              , Fad.macdSetting      = macda
              , Fad.rsiSetting       = rsia
              , Fad.simChart         = choice1 die 3 (Fad.simChart  a) (Fad.simChart  b)
@@ -261,7 +257,6 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.rciSetting       = rcib
              , Fad.smaSetting       = smab
              , Fad.emaSetting       = emab
-             , Fad.wmaSetting       = wmab
              , Fad.macdSetting      = macdb
              , Fad.rsiSetting       = rsib
              , Fad.simChart         = choice2 die 3 (Fad.simChart  a) (Fad.simChart  b)

@@ -38,7 +38,6 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   , rci   :: FxMovingAverageData
   , sma   :: FxMovingAverageData
   , ema   :: FxMovingAverageData
-  , wma   :: FxMovingAverageData
   , macd  :: FxMovingAverageData
   , st    :: FxMovingAverageData
   , rsi   :: FxMovingAverageData
@@ -78,7 +77,6 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , algorithmOrRate    :: Int
   , smaSetting         :: FxAlMaSetting
   , emaSetting         :: FxAlMaSetting
-  , wmaSetting         :: FxAlMaSetting
   , macdSetting        :: FxAlMaSetting
   , stSetting          :: FxAlMaSetting
   , rciSetting         :: FxAlMaSetting
@@ -173,7 +171,6 @@ initFxAlgorithmSetting alc =
                      , rciSetting         = initFxAlMaSetting
                      , smaSetting         = initFxAlMaSetting
                      , emaSetting         = initFxAlMaSetting
-                     , wmaSetting         = initFxAlMaSetting
                      , macdSetting        = initFxAlMaSetting
                      , stSetting          = initFxAlMaSetting
                      , rsiSetting         = initFxAlMaSetting
@@ -196,7 +193,6 @@ initFxTechnicalAnalysisData =
                           , rci        = initFxMovingAverageData
                           , sma        = initFxMovingAverageData
                           , ema        = initFxMovingAverageData
-                          , wma        = initFxMovingAverageData
                           , macd       = initFxMovingAverageData
                           , st         = initFxMovingAverageData
                           , rsi        = initFxMovingAverageData

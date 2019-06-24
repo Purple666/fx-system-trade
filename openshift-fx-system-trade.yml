@@ -59,6 +59,7 @@ items:
     source:
       git:
         uri: https://github.com/andesm/fx-system-trade.git
+        ref: "opt"
       type: Git
     strategy:
       dockerStrategy:
@@ -621,6 +622,7 @@ items:
       contextDir: get_rate_data
       git:
         uri: https://github.com/andesm/fx-system-trade.git
+        ref: "opt"
       type: Git
     strategy:
       dockerStrategy:

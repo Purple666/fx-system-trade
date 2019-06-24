@@ -117,7 +117,6 @@ getPrepareTime x =
   maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
                                  , Fad.longSetting (Fad.smaSetting a)
                                  , Fad.longSetting (Fad.emaSetting a)
-                                 , Fad.longSetting (Fad.wmaSetting a)
                                  , Fad.longSetting (Fad.rsiSetting a)
                                  , Fad.longSetting (Fad.stSetting a) 
                                  ] * Fad.getSimChartMax x) $ Fad.algoSetting x
@@ -178,14 +177,6 @@ getEma n x =
   in if length s < n
      then 0
      else (sum s + h) / (fromIntegral n + 1)
-
-getWma :: Int -> [Fcd.FxChartData] -> Double
-getWma n x =
-  let s = take n $ map Fcd.close x
-      r = reverse [1..n]
-  in if length s < n
-     then 0
-     else (sum . map (\(a, b) -> a * fromIntegral b) $ zip s r) / fromIntegral (sum r)
 
 getMACD :: Double -> Double -> Int -> [Fad.FxTechnicalAnalysisData] -> (Double, Double)
 getMACD es el n x =
@@ -293,7 +284,6 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
       x = Fad.FxTechnicalAnalysisData { Fad.chart  = chart
                                       , Fad.sma    = makeFxMovingAverageData getSma 0 0 lr (Fad.smaSetting ftas) Fad.sma pdl
                                       , Fad.ema    = makeFxMovingAverageData getEma 0 0 lr (Fad.emaSetting ftas) Fad.ema pdl
-                                      , Fad.wma    = makeFxMovingAverageData getWma 0 0 lr (Fad.wmaSetting ftas) Fad.wma pdl
                                       , Fad.macd   = setFxMovingAverageData macd 0 macdSignal 0 0 (Fad.macdSetting ftas) Fad.macd pdl
                                       , Fad.rci    = makeFxMovingAverageData getRci (-100) 100 lr (Fad.rciSetting ftas) Fad.rci pdl
                                       , Fad.st     = setFxMovingAverageData k d sd  0 100 (Fad.stSetting ftas) Fad.st pdl
