@@ -9,12 +9,11 @@ do
     sleep 5
     oc get pods | grep 'fx-system-trade.*Terminating'
 done
-oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*Init:[0-9])'
+oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*Init:[0-9]|fx-system-trade.*build.*PodInitializing)'
 while [ $? = 0 ]
 do
     sleep 5
-    oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*Init:[0-9])'
-    
+    oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*Init:[0-9]|fx-system-trade.*build.*PodInitializing)'
 done
 sleep 10
 python3 get_rate_data/clear_fx-trade.py
