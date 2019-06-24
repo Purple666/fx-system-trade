@@ -1,11 +1,9 @@
 module FxSetting
-  ( getPrepareTimeAll
-  , createInitialGaData
+  ( createInitialGaData
   , copyFxSettingData
   , mutationFxSettingData
   , crossoverFxSettingData
   , resetFxSettingData
-  , emptyFxSettingLog
   , updateFxSettingLog
   , setHashFxSettingData
   ) where
@@ -34,18 +32,6 @@ instance Ga.Ga Fsd.FxSettingData where
   createInitialData = createInitialGaData
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
-
-getPrepareTimeAll :: Fsd.FxSettingData -> Int
-getPrepareTimeAll fsd =
-  maximum [ Ta.getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-          , Ta.getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-          , Ta.getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ] 
-
-emptyFxSettingLog :: Fsd.FxSettingData -> Fsd.FxSettingData
-emptyFxSettingLog fsd =
-  fsd { Fsd.fxSettingLog    = M.empty
-      }
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd fsdf = 

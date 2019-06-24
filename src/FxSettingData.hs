@@ -10,7 +10,6 @@ module FxSettingData
   , nextFxSettingData
   , plusLearningTestTimes
   , initFxSetting
-  , getLearningTestTime
   , getLearningTestTimes
   , getTradeHoldTime
   , setFxSettingData
@@ -113,22 +112,10 @@ plusLearningTestTimes fsd =
               }
           }
       }
-
-getLearningTestTime :: FxSettingData -> Int
-getLearningTestTime fsd =
-  let ls = learningSetting $ fxSetting fsd
-  in getLearningTestTimes fsd * Gsd.learningTestCount Gsd.gsd *
-     if trTrade ls == 0
-     then getTradeHoldTime fsd
-     else (getTradeHoldTime fsd) + (fromIntegral $ trTradeDate ls `div` trTrade ls)
                                                 
 getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
-
-getLearningTestTimes2 :: FxSettingData -> Double
-getLearningTestTimes2 fsd =
-  fromIntegral . learningTestTimes . learningSetting $ fxSetting fsd
 
 getTradeHoldTime :: FxSettingData -> Int
 getTradeHoldTime fsd =

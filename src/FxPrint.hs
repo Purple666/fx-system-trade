@@ -8,17 +8,18 @@ module FxPrint
 
 import Debug.Trace
 import           Control.Monad
-import qualified FxChartData   as Fcd
-import qualified FxSettingData as Fsd
-import qualified FxTime        as Ftm
-import qualified FxTradeData   as Ftd
-import qualified GlobalSettingData       as Gsd
+import qualified FxChartData              as Fcd
+import qualified FxSettingData            as Fsd
+import qualified FxTime                   as Ftm
+import qualified FxTradeData              as Ftd
+import qualified FxTechnicalAnalysis      as Ta
+import qualified GlobalSettingData        as Gsd
 import           Text.Printf
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
 printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
-  let ltt = Fsd.getLearningTestTime fsd
+  let ltt = Ta.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
   nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt

@@ -9,7 +9,7 @@ import           Control.Concurrent.Async
 import           Control.Monad.Random
 import           Control.DeepSeq
 import qualified Data.Map                 as M
-import qualified Data.List               as L
+import qualified Data.List                as L
 import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace
@@ -24,6 +24,7 @@ import qualified FxTradeData              as Ftd
 import qualified FxTweet                  as Ftw
 import qualified Ga
 import qualified GlobalSettingData        as Gsd
+import qualified FxTechnicalAnalysis      as Ta
 
 debug :: IO ()
 debug = do
@@ -36,8 +37,8 @@ backTest coName latest retry = do
   fsd <- Fm.readFxSettingData "backtest"
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
-      ltt = Fsd.getLearningTestTime fsd
-      p = Fs.getPrepareTimeAll fsd + ltt + Gsd.backtestLatestTime Gsd.gsd
+      ltt = Ta.getLearningTestTime fsd
+      p = Ta.getPrepareTimeAll fsd + ltt + Gsd.backtestLatestTime Gsd.gsd
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
@@ -91,9 +92,9 @@ learning n startN fsd = do
        M.fromList <$>
        (sequence $
          map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                ltt  = Fsd.getLearningTestTime fsd'
+                                ltt  = Ta.getLearningTestTime fsd'
                             fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
-                                                 cl <- Fm.getChartListBack n' (Fs.getPrepareTimeAll fsd' + ltt)
+                                                 cl <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd' + ltt)
                                                  return (Fsd.FxChart { Fsd.chart = cl
                                                                      , Fsd.chartLength = ltt
                                                                      }))
@@ -110,8 +111,8 @@ tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
   fsd <- Fm.readFxSettingData "backtest"
   e <- Fm.getOneChart Fm.getEndChartFromDB
-  let ltt = Fsd.getLearningTestTime fsd
-      s = Fs.getPrepareTimeAll fsd + ltt 
+  let ltt = Ta.getLearningTestTime fsd
+      s = Ta.getPrepareTimeAll fsd + ltt 
   (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) s fsd
   -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
   return (Fcd.no e, fsd')
@@ -128,10 +129,10 @@ backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || (retry && lf)
                              then learning n startN fsd
                              else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
-  let ltt = Fsd.getLearningTestTime fsd1
+  let ltt = Ta.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest ltt td fsd1
                  <$> ((++) <$>
-                       Fm.getChartListBack    n (Fs.getPrepareTimeAll fsd1) <*>
+                       Fm.getChartListBack    n (Ta.getPrepareTimeAll fsd1) <*>
                        Fm.getChartListForward n ltt)
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
@@ -201,14 +202,14 @@ tradeLoop :: Fcd.FxChartData ->
 tradeLoop p pl sleep td fsd coName = do
   t <- getCurrentTime
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
-  let ltt = Fsd.getLearningTestTime fsd
+  let ltt = Ta.getLearningTestTime fsd
   e <- Foa.getNowPrices td
   (pl', fsd1) <- if Ftd.side td == Ftd.None && ltt < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)
   (sleep', td2) <- if (Fcd.close e) /= (Fcd.close p)
                          then do td1 <- tradeEvaluate td fsd1 coName =<<
-                                        ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Fs.getPrepareTimeAll fsd1) <*> pure [e])
+                                        ((++) <$> Fm.getChartListBack (Fcd.no e - 1) (Ta.getPrepareTimeAll fsd1) <*> pure [e])
                                  -- Fp.printProgressFxTradeData td1 e                                 
                                  return (0, td1)
                    else return (sleep + 1, td)

@@ -6,15 +6,33 @@ module FxTechnicalAnalysis
   , getPrepareTime
   , updateAlgorithmListCount
   , checkAlgoSetting
+  , getLearningTestTime
+  , getPrepareTimeAll
   ) where
 
 import           Data.List
 import qualified Data.Map                as M
 import           Debug.Trace
+import qualified FxSettingData           as Fsd
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
+
+getLearningTestTime :: Fsd.FxSettingData -> Int
+getLearningTestTime fsd =
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
+  in Fsd.getLearningTestTimes fsd *
+     if Fsd.trTrade ls == 0
+     then Fsd.getTradeHoldTime fsd + getPrepareTimeAll fsd
+     else (Fsd.getTradeHoldTime fsd) + (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls) + getPrepareTimeAll fsd
+
+getPrepareTimeAll :: Fsd.FxSettingData -> Int
+getPrepareTimeAll fsd =
+  maximum [ getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+          , getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+          , getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+          ] 
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
