@@ -10,6 +10,7 @@ do
     sleep 5
     oc get pods | grep 'fx-system-trade.*Terminating'
 done
+sleep 10
 oc get pods | grep 'fx-system-trade.*build.*Running'
 while [ $? = 0 ]
 do
