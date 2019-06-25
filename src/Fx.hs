@@ -13,7 +13,7 @@ main = do
   hSetBuffering stdout NoBuffering
   (command:_) <- getArgs
   case command of
-    "debug"            -> GaFx.debug
+    "statistics"       -> GaFx.statistics
     "backtest"         -> GaFx.backTest "normal" False False
     "backtest-retry"   -> GaFx.backTest "retry"  False True
     "backtest-latest"  -> GaFx.backTest "latest" True False

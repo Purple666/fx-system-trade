@@ -1,7 +1,7 @@
 module GaFx
   ( backTest
   , trade
-  , debug
+  , statistics
   ) where
 
 import           Control.Concurrent
@@ -13,6 +13,7 @@ import qualified Data.List                as L
 import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace
+import           Text.Printf
 import qualified FxChartData              as Fcd
 import qualified FxMongodb                as Fm
 import qualified FxOandaAPI               as Foa
@@ -26,10 +27,13 @@ import qualified Ga
 import qualified GlobalSettingData        as Gsd
 import qualified FxTechnicalAnalysis      as Ta
 
-debug :: IO ()
-debug = do
+statistics :: IO ()
+statistics = do
   fsd <- Fm.readFxSettingData "backtest"
-  traceShow(M.elems $ Fsd.fxSettingLog fsd) $ return ()
+  mapM (\(p, c) -> do printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
+  let (p, c) = M.foldl (\(ac, bc) (a, _) -> (ac + a, bc + 1)) (0, 0) $ Fsd.fxSettingLog fsd
+      ave = p / fromIntegral c
+  printf "%f\n" ave
   return ()
 
 backTest :: String -> Bool -> Bool -> IO ()
