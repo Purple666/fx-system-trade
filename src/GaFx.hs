@@ -114,7 +114,7 @@ tradeLearning = do
   let ltt = Ta.getLearningTestTime fsd
       s = Ta.getPrepareTimeAll fsd + ltt 
   (plsf, lsf, tdlt, fsd') <- learning (Fcd.no e) s fsd
-  -- Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdl tdlt plsf lsf
+  Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdlt plsf lsf
   return (Fcd.no e, fsd')
 
 backTestLoop :: Bool ->
