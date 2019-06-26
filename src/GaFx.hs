@@ -34,6 +34,8 @@ statistics = do
   let (p, c) = M.foldl (\(ac, bc) (a, _) -> (ac + a, bc + 1)) (0, 0) $ Fsd.fxSettingLog fsd
       ave = p / fromIntegral c
   printf "%f\n" ave
+  let fsl = M.filter(\(p, c) -> ave < p || (0 < p && c < 3)) $ Fsd.fxSettingLog fsd
+  mapM (\(p, c) -> do printf "%f %d\n" p c) fsl
   return ()
 
 backTest :: String -> Bool -> Bool -> IO ()
