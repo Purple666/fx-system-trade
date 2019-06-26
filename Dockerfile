@@ -1,4 +1,4 @@
-From haskell
+FROM haskell
 USER root
 COPY stack /fx/stack
 WORKDIR /fx/stack
