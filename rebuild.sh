@@ -18,7 +18,7 @@ do
 done
 oc get pods | egrep 'fx-system-trade.*build.*Error'
 if  [ $? = 0 ] ; then
-    oc get pods | egrep 'fx-system-trade.*build.*Error' | xargs oc logs 
+    oc get pods | egrep 'fx-system-trade.*build.*Error' | awk '{print $1}' | xargs oc logs 
     exit
 fi
 sleep 10
