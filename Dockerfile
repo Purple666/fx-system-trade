@@ -7,7 +7,7 @@ FROM haskell
 #COPY src /fx/src
 #WORKDIR /fx/stack
 #RUN stack clean && stack build
-RUN cabel update && cabel install wreq mongoDB unix-time MonadRandom extra lens aeson async hashable
+RUN cabal new-update && cabal new-install wreq mongoDB unix-time MonadRandom extra lens aeson async hashable
 RUN ghc -O2 Fx.hs
         
         
