@@ -134,7 +134,7 @@ backTestLoop :: Bool ->
 backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
                              then learning n startN fsd
-                             else return (0, False, [Ftd.initFxTradeDataCommon], fsd)
+                             else return (0, True, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Ta.getLearningTestTime fsd1
   (fsd2, tdt) <- Ft.backTest ltt td fsd1
                  <$> ((++) <$>
