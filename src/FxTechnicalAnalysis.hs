@@ -23,7 +23,7 @@ getLearningTestTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in Fsd.getLearningTestTimes fsd * Gsd.learningTestCount Gsd.gsd *
      if Fsd.trTrade ls == 0
-     then getPrepareTimeAll fsd
+     then 1
      else (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls) -- + getPrepareTimeAll fsd
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
