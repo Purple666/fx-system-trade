@@ -44,7 +44,7 @@ backTest coName latest retry = do
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Ta.getLearningTestTime fsd
-      p = Ta.getPrepareTimeAll fsd + ltt + Gsd.backtestLatestTime Gsd.gsd
+      p = Ta.getPrepareTimeAll fsd + ltt
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
@@ -132,7 +132,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Bool, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
+  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || (retry && lf)
                              then learning n startN fsd
                              else return (0, True, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Ta.getLearningTestTime fsd1
