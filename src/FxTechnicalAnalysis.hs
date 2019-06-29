@@ -25,8 +25,8 @@ getLearningTestTime fsd =
            if Fsd.trTrade ls == 0
            then  getPrepareTimeAll fsd
            else (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls) + getPrepareTimeAll fsd
-  in if 24 * 60 * 5 * 4 < r
-     then 24 * 60 * 5 * 4
+  in if 24 * 60 * 5 < r
+     then 24 * 60 * 5
      else r
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
