@@ -41,7 +41,7 @@ updateFxSettingLog profits fsd fsdf =
       fs   = Fsd.fxSetting fsd
       (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) fsl
       ave = p / fromIntegral c
-      fsl' = M.filter(\(p, c) -> ave < p / (fromIntegral c) || (0 < p && c < 10)) $
+      fsl' = M.filter(\(p, c) -> ave / 2 < p / (fromIntegral c) || (0 < p && c < 10)) $
              if M.member fs fsl
              then let (p, c) = fsl M.! fs
                   in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
