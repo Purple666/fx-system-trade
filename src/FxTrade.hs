@@ -265,7 +265,7 @@ backTest l td fsd xcd =
       td4 = foldl (\td2 ctd -> let (_, _, td3) = evaluate ctd fsd getQuantityBacktest False td2
                                in td3)
             td1 ctdl
-  in {- printDebug ctdl $ -} checkAlgoSetting l fsd td4
+  in traceShow(l) $ {- printDebug ctdl $ -} checkAlgoSetting l fsd td4
 
 printDebug :: [Fad.FxChartTaData] -> (Fsd.FxSettingData, Ftd.FxTradeData) -> (Fsd.FxSettingData, Ftd.FxTradeData)
 printDebug ctdl r =
