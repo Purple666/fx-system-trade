@@ -11,7 +11,6 @@ module FxSettingData
   , plusLearningTestTimes
   , initFxSetting
   , getLearningTestTimes
-  , getTradeHoldTime
   , setFxSettingData
   , getFxSettingLogResult
   , maxFxSettingFrolLog
@@ -116,10 +115,6 @@ plusLearningTestTimes fsd =
 getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
-
-getTradeHoldTime :: FxSettingData -> Int
-getTradeHoldTime fsd =
-  getSimChartMax fsd * getLearningTestTimes fsd
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =

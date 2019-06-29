@@ -85,8 +85,7 @@ evaluate ctd fsd f1 forceSell td =
   let cd        = Fad.taChart ctd
       chart     = Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
-      tradeNo   = Fcd.no $ Ftd.tradeRate td
-      tradeDate = Fcd.no cd - tradeNo
+      tradeDate = Fcd.no cd - (Fcd.no $ Ftd.tradeRate td)
       ftado     = Fad.open        ctd
       ftadcp    = Fad.closeProfit ctd
       ftadcl    = Fad.closeLoss   ctd
@@ -137,7 +136,8 @@ evaluate ctd fsd f1 forceSell td =
                                        ctd alcCloseProfit $ Fsd.fxTaCloseProfit fs
                      fxTaCloseLoss   = Ta.updateAlgorithmListCount Fad.closeLoss
                                        ctd alcCloseLoss   $ Fsd.fxTaCloseLoss fs
-                 in fs { Fsd.learningSetting  = ls'
+                 in {- traceShow(tradeDate, Fcd.no cd, (Fcd.no $ Ftd.tradeRate td), Fsd.trTradeDate ls' `div` Fsd.trTrade ls', Fsd.trTradeDate ls', Fsd.trTrade ls') $ -}
+                    fs { Fsd.learningSetting  = ls'
                        , Fsd.fxTaOpen         = fxTaOpen       
                        , Fsd.fxTaCloseProfit  = fxTaCloseProfit
                        , Fsd.fxTaCloseLoss    = fxTaCloseLoss  
@@ -164,10 +164,6 @@ evaluate ctd fsd f1 forceSell td =
                                       else if close /= Ftd.None
                                            then Fcd.initFxChartData
                                            else Ftd.tradeRate td
-               , Ftd.tradeDateAve = if (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd) == 0
-                                    then 1.0
-                                    else (fromIntegral . Fsd.trTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd) /
-                                         (fromIntegral . Fsd.trTrade . Fsd.learningSetting $ Fsd.fxSetting fsd)
                , Ftd.side  = if open == Ftd.Buy
                              then Ftd.Buy
                              else if open == Ftd.Sell
