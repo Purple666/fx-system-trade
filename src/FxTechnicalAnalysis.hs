@@ -21,7 +21,7 @@ import qualified Tree                    as Tr
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-      r =  {- Fsd.getLearningTestTimes fsd * Gsd.learningTestCount Gsd.gsd * -}
+      r =  Fsd.getLearningTestTimes fsd *
            if Fsd.trTrade ls == 0
            then getPrepareTimeAll fsd
            else (fromIntegral $ Fsd.trTradeDate ls `div` Fsd.trTrade ls) + getPrepareTimeAll fsd
