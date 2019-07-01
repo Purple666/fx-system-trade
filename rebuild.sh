@@ -5,6 +5,7 @@ oc get pods | egrep '(fx-system-trade.*build.*Running|fx-system-trade.*build.*In
 ./scaledown.sh
 oc get pod | grep 'fx-system-trade-.*-build' | awk '{print $1}' | xargs oc delete pod
 oc start-build fx-system-trade
+sleep 10
 oc get pods | grep 'fx-system-trade.*Terminating'
 while [ $? = 0 ]
 do
