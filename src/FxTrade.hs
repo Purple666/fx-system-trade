@@ -23,9 +23,10 @@ evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
   (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
 
-
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
+                               else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = Ftd.realizedPL td
@@ -33,9 +34,8 @@ getQuantityLearning td chart = Ftd.realizedPL td
 {-
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
-                               else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+
 
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
