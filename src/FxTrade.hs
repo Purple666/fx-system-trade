@@ -28,7 +28,6 @@ getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) /
                                then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
-
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = Ftd.realizedPL td
 

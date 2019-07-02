@@ -93,7 +93,7 @@ learning n startN fsd = do
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
   r <- M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                         p'   = Ftd.getEvaluationValueList tdlt * (p / fromIntegral c)
+                                         p'   = Ftd.getEvaluationValueList tdlt * p
                                      in (p', Ft.evaluationOk tdlt, tdlt, fsd')) <$>
        M.fromList <$>
        (sequence $
