@@ -41,18 +41,17 @@ updateFxSettingLog profits fsd fsdf =
       fs   = Fsd.fxSetting fsd
       (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) fsl
       ave = p / fromIntegral c
-      fsl' = M.filter(\(p, c) -> 0 < p) $
-             if M.member fs fsl
+      fsl' = if M.member fs fsl
              then let (p, c) = fsl M.! fs
                   in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
              else M.insert fs (profits, 1) fsl
       fsl'' = if Gsd.fxSettingLogNum Gsd.gsd < length fsl'
               then M.delete (Fsd.minFxSettingFromLog fsl') fsl'
               else fsl'
-      fsd' = if length fsl' < length fsl && 0 < length fsl'
-             then fsd { Fsd.fxSetting = Fsd.maxFxSettingFromLog fsl'
+      fsd' = if M.member fs fsl''
+             then fsd 
+             else fsd { Fsd.fxSetting = Fsd.maxFxSettingFromLog fsl''
                       }
-             else fsd
   in fsd' { Fsd.fxSettingLog = fsl''
           }
   
