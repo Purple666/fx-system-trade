@@ -31,11 +31,6 @@ statistics :: IO ()
 statistics = do
   fsd <- Fm.readFxSettingData "backtest"
   mapM (\(p, c) -> do printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
-  let (p, c) = M.foldl (\(ac, bc) (a, _) -> (ac + a, bc + 1)) (0, 0) $ Fsd.fxSettingLog fsd
-      ave = p / fromIntegral c
-  printf "%f\n" ave
-  let fsl = M.filter(\(p, c) -> ave < p || (0 < p && c < 3)) $ Fsd.fxSettingLog fsd
-  mapM (\(p, c) -> do printf "%f %d\n" p c) fsl
   return ()
 
 backTest :: String -> Bool -> Bool -> IO ()
@@ -93,7 +88,7 @@ learning n startN fsd = do
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
   r <- M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                         p'   = Ftd.getEvaluationValueList tdlt * p
+                                         p'   = Ftd.getEvaluationValueList tdlt * (p + 1)
                                      in (p', Ft.evaluationOk tdlt, tdlt, fsd')) <$>
        M.fromList <$>
        (sequence $

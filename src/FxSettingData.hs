@@ -13,7 +13,8 @@ module FxSettingData
   , getLearningTestTimes
   , setFxSettingData
   , getFxSettingLogResult
-  , maxFxSettingFrolLog
+  , maxFxSettingFromLog
+  , minFxSettingFromLog
   ) where
 
 import Debug.Trace
@@ -140,16 +141,24 @@ setTreeFunction fs =
 setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData  fsl =
   setTreeFunction $ FxSettingData { fxChart = []
-                                  , fxSetting    = maxFxSettingFrolLog fsl
+                                  , fxSetting    = maxFxSettingFromLog fsl
                                   , fxSettingLog = fsl                                         
                                   }
 
-maxFxSettingFrolLog :: M.Map FxSetting (Double, Int) -> FxSetting
-maxFxSettingFrolLog fsl =
+maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
+maxFxSettingFromLog fsl =
   if null fsl == True
   then initFxSetting
   else head . map (\(x, (_, _)) -> x) . 
        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+       M.toList fsl
+
+minFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
+minFxSettingFromLog fsl =
+  if null fsl == True
+  then initFxSetting
+  else head . map (\(x, (_, _)) -> x) . 
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare a b) $
        M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
