@@ -136,7 +136,7 @@ backTestLoop retry lf n startN endN td fsd = do
                        Fm.getChartListBack    n (Ta.getPrepareTimeAll fsd1) <*>
                        Fm.getChartListForward n ltt)
   fsd3 <- Fm.writeFxSettingData "backtest"
-          <$> Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
+          <$> Fs.updateFxSettingLog (Ftd.realizedPL tdt - Ftd.realizedPL td) fsd2
           =<< Fm.readFxSettingData "backtest"
   if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && Ftd.realizedPL tdt < Ftd.realizedPL td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
