@@ -24,12 +24,12 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 5
-                    , makeTreeCount         = 5
-                    , algorithmRepeat       = 5
-                    , learningTestCount     = 5
-                    , taOpenAndRate         = 1.2
-                    , taCloseProfitAndRate  = 0.8
+  GlobalSettingData { taMargin              = 3
+                    , makeTreeCount         = 3
+                    , algorithmRepeat       = 3
+                    , learningTestCount     = 3
+                    , taOpenAndRate         = 1
+                    , taCloseProfitAndRate  = 1
                     , taCloseLossAndRate    = 1
                     , countUpList           = 2
                     , quantityRate          = 5
