@@ -99,8 +99,12 @@ evaluate ctd fsd f1 forceSell td =
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
         | otherwise = Ftd.realizedPL td
       (position, open)
-        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy)  && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | (Ftd.side td == Ftd.None ||
+           (Ftd.side td == Ftd.Sell && (0.01 <= tradeRate - chart || tradeRate - chart <= -0.01))) &&
+           evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | (Ftd.side td == Ftd.None ||
+           (Ftd.side td == Ftd.Buy && (0.01 <= chart - tradeRate || chart - tradeRate <= -0.01))) &&
+           evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 {-
         | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
@@ -112,12 +116,12 @@ evaluate ctd fsd f1 forceSell td =
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Sell)
         | Ftd.side td == Ftd.Buy &&
           (forceSell || lcd < tradeDate ||
-            (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
-            (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
+            (0.01 <= chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
+            (chart - tradeRate <= -0.01 && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell &&
           (forceSell || lcd < tradeDate ||
-            (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
-            (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
+            (0.01 <= tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
+            (tradeRate - chart <= -0.01 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
