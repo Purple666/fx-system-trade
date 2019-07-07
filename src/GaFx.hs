@@ -46,11 +46,11 @@ backTest coName latest retry = do
           then endN - p 
           else startN + p
   rn <- getRandomR(n, n + ltt * 2)
-  (fs, fsd') <- backTestLoop retry False rn startN endN td fsd
-  (s', f') <- if fs
-              then do Fp.printBackTestResult "=================================" (s + 1) f fsd'
+  (tdt, fsd') <- backTestLoop retry False rn startN endN td fsd
+  (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
+              then do Fp.printBackTestResult "=================================" (Ftd.realizedPL tdt) (s + 1) f fsd'
                       return (s + 1, f)
-              else do Fp.printBackTestResult "---------------------------------" s (f + 1) fsd'
+              else do Fp.printBackTestResult "---------------------------------" (Ftd.realizedPL tdt) s (f + 1) fsd'
                       return (s, f + 1)
   Fm.writeResult coName s' f'
   backTest coName latest retry
@@ -125,7 +125,7 @@ backTestLoop :: Bool ->
                 Int ->
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
-                IO (Bool, Fsd.FxSettingData)
+                IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
   (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
                              then learning n startN fsd
@@ -144,7 +144,7 @@ backTestLoop retry lf n startN endN td fsd = do
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-              then return (Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt, fsd3)
+              then return (tdt, fsd3)
               else backTestLoop retry (Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td) n' startN endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
