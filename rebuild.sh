@@ -23,6 +23,6 @@ if  [ $? = 0 ] ; then
     exit
 fi
 sleep 10
-#python3 get_rate_data/clear_fx-trade.py
+python3 get_rate_data/clear_fx-trade.py
 sleep 10
 ./scaleup.sh
