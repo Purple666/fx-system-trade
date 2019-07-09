@@ -14,7 +14,7 @@ module FxSettingData
   , setFxSettingData
   , getFxSettingLogResult
   , maxFxSettingFromLog
-  , minFxSettingFromLog
+  , minFxSettingDelete
   ) where
 
 import Debug.Trace
@@ -153,13 +153,11 @@ maxFxSettingFromLog fsl =
        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
        M.toList fsl
 
-minFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
-minFxSettingFromLog fsl =
-  if null fsl == True
-  then initFxSetting
-  else head . map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare a b) $
-       M.toList fsl
+minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
+minFxSettingDelete fsl =
+  M.fromList . take (Gsd.fxSettingLogNum Gsd.gsd) .
+  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+  M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
 getFxSettingLogResult fsd =
