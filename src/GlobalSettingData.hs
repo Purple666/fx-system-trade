@@ -24,18 +24,18 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 3
-                    , makeTreeCount         = 3
-                    , algorithmRepeat       = 3
-                    , learningTestCount     = 3
+  GlobalSettingData { taMargin              = 2
+                    , makeTreeCount         = 2
+                    , algorithmRepeat       = 2
+                    , learningTestCount     = 2
                     , taOpenAndRate         = 1.2
                     , taCloseProfitAndRate  = 0.8
                     , taCloseLossAndRate    = 1
                     , countUpList           = 2
                     , quantityRate          = 5
-                    , fxSettingLogNum       = 100
+                    , fxSettingLogNum       = 30
                     , backtestLatestTime    = 24 * 60 * 20 * 12
-                    , initalProperty        = 2000000
+                    , initalProperty        = 2500000
                     , maxUnit               = 500000
                     , spread                = 0.003
                     --, dbHost                = "openshift.flg.jp:30017"
