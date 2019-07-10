@@ -87,26 +87,26 @@ learning n startN fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
-  r <- M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                         p'   = Ftd.getEvaluationValueList tdlt * p
-                                     in (p', Ft.evaluationOk tdlt, tdlt, fsd')) <$>
-       M.fromList <$>
-       (sequence $
-         map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
-                                ltt  = Ta.getLearningTestTime fsd'
-                            fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
-                                                 cl <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd' + ltt)
-                                                 return (Fsd.FxChart { Fsd.chart = cl
-                                                                     , Fsd.chartLength = ltt
-                                                                     }))
-                                  [1 .. Gsd.learningTestCount Gsd.gsd]
-                            return (Fsd.nextFxSettingData fc fsd', a)) . M.toList $ M.filter (\(p, _) -> 0 < p) fsl)
-  let tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
+  fsdm' <- M.fromList <$>
+           (sequence $
+            map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
+                                   ltt  = Ta.getLearningTestTime fsd'
+                               fc <- mapM (\_ -> do n' <- getRandomR(startN, n)
+                                                    cl <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd' + ltt)
+                                                    return (Fsd.FxChart { Fsd.chart = cl
+                                                                        , Fsd.chartLength = ltt
+                                                                        }))
+                                     [1 .. Gsd.learningTestCount Gsd.gsd]
+                               return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
+  let r = M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
+                                            p'   = Ftd.getEvaluationValueList tdlt * p
+                                        in (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
+      tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
     then return (length tdlts, True, tdlt',  fsd'')
-    else if null r 
-         then learningLoop 0 0 fsl
+    else if null r
+         then learningLoop 0 0 . Ga.learningDataList . map Ga.learningData $ M.keys fsdm'
          else learningLoop 0 0 . Ga.learningDataList .
               map (\(_, _, _, fsd4) -> Ga.learningData fsd4) $ M.elems r
 
