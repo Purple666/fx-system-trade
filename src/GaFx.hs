@@ -88,7 +88,7 @@ learning n startN fsd = do
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
   r <- M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
-                                         p'   = Ftd.getEvaluationValueList tdlt * (p + 1)
+                                         p'   = Ftd.getEvaluationValueList tdlt * p
                                      in (p', Ft.evaluationOk tdlt, tdlt, fsd')) <$>
        M.fromList <$>
        (sequence $
@@ -105,8 +105,10 @@ learning n startN fsd = do
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
     then return (length tdlts, True, tdlt',  fsd'')
-    else learningLoop 0 0 . Ga.learningDataList .
-         map (\(_, _, _, fsd4) -> Ga.learningData fsd4) $ M.elems r
+    else if null r 
+         then learningLoop 0 0 fsl
+         else learningLoop 0 0 . Ga.learningDataList .
+              map (\(_, _, _, fsd4) -> Ga.learningData fsd4) $ M.elems r
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
