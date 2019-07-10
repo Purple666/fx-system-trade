@@ -100,7 +100,7 @@ learning n startN fsd = do
                                                                      , Fsd.chartLength = ltt
                                                                      }))
                                   [1 .. Gsd.learningTestCount Gsd.gsd]
-                            return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
+                            return (Fsd.nextFxSettingData fc fsd', a)) . M.toList $ M.filter (\(p, _) -> 0 < p) fsl)
   let tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
