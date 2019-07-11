@@ -39,14 +39,12 @@ backTest coName latest retry = do
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Ta.getLearningTestTime fsd
-      p = 60 * 24 * 20 * 12 * 2
+      startN = 60 * 24 * 20 * 12 * 2
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
-  startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
           then endN - Gsd.backtestLatestTime Gsd.gsd 
           else startN
-  rn <- getRandomR(n, n + ltt * 2)
-  (tdt, fsd') <- backTestLoop retry False rn endN td fsd
+  (tdt, fsd') <- backTestLoop retry False n endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
               then do Fp.printBackTestResult "=================================" (Ftd.realizedPL tdt) (s + 1) f fsd'
                       return (s + 1, f)
