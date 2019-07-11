@@ -95,7 +95,7 @@ evaluate ctd fsd f1 forceSell td =
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       fs        = Ftd.fxSetting td
-      lcd = Gsd.backtestLatestTime Gsd.gsd
+      lcd = 24 * 60 * 4
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chartLow * ((chartLow / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chartHigh * (1 - (chartHigh / tradeRate))
@@ -132,7 +132,7 @@ evaluate ctd fsd f1 forceSell td =
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
                      ls' = ls { Fsd.maxTradeDate = if Fsd.maxTradeDate ls < tradeDate
-                                                   then traceShow(tradeDate, lcd) $ tradeDate
+                                                   then tradeDate
                                                    else Fsd.maxTradeDate ls
                               }
                      alcOpen
