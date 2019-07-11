@@ -78,7 +78,7 @@ geneticOperators e x y = do
   (s1, s2) <- selection2 x
   af <- selectAlgorithm
   y' <- mappend y <$> af s1 s2
-  if e < length y'
+  if e <= length y'
     then return y'
     else geneticOperators e x y'
 
@@ -86,7 +86,7 @@ learningLoop :: (Ga a, MonadRandom m) =>
                 LearningData a -> m (LearningData a)
 learningLoop x = do
   x' <- evaluate <$> (geneticOperators (length x) x . learningData $ maximum x)
-  -- traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+  --traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else learningLoop x'
