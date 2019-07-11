@@ -90,7 +90,7 @@ learning n fsd = do
            (sequence $
             map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
                                    ltt  = Ta.getLearningTestTime fsd'
-                               fc <- mapM (\_ -> do n' <- getRandomR(n - ltt * (Gsd.learningTestCount Gsd.gsd + Fsd.getLearningTestTimes fsd') ^ 2, n)
+                               fc <- mapM (\_ -> do n' <- getRandomR(n - ltt * (Gsd.learningTestCount Gsd.gsd + Fsd.getLearningTestTimes fsd'), n)
                                                     cl <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd' + ltt)
                                                     return (Fsd.FxChart { Fsd.chart = cl
                                                                         , Fsd.chartLength = ltt
