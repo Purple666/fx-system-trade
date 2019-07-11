@@ -100,7 +100,7 @@ learning n startN fsd = do
                                return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
   let r = M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
                                             p'   = Ftd.getEvaluationValueList tdlt * (p + 1)
-                                        in {- traceShow(p, Ftd.getEvaluationValueList tdlt, p', Ft.evaluationOk tdlt) $ -} (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
+                                        in {- traceShow(Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -} (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
       tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
@@ -129,7 +129,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if lf
+  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
                              then learning n startN fsd
                              else return (0, True, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Ta.getLearningTestTime fsd1
