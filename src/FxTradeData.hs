@@ -8,7 +8,7 @@ module FxTradeData
   , getEvaluationValueList
   ) where
 
---import Debug.Trace
+import Debug.Trace
 import qualified Data.Map          as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad

@@ -39,7 +39,7 @@ backTest coName latest retry = do
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Ta.getLearningTestTime fsd
-      p = Ta.getPrepareTimeAll fsd + ltt * Gsd.backtestLatestTime Gsd.gsd
+      p = Ta.getPrepareTimeAll fsd + ltt + Gsd.backtestLatestTime Gsd.gsd
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
@@ -100,7 +100,7 @@ learning n startN fsd = do
                                return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
   let r = M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
                                             p'   = Ftd.getEvaluationValueList tdlt * (p + 1)
-                                        in traceShow(p, Ftd.getEvaluationValueList tdlt, p', Ft.evaluationOk tdlt) $ (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
+                                        in {- traceShow(p, Ftd.getEvaluationValueList tdlt, p', Ft.evaluationOk tdlt) $ -} (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
       tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
