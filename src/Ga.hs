@@ -48,7 +48,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
   evaluate (LearningData y) = LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
   learning x = do
-    let l = length x + 2
+    let l = (truncate . sqrt . fromIntegral $ length x) + 2
     setHash <$> (learningLoop =<< (LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData . evaluate . mappend x) <$> createInitialData l x)
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)

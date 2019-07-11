@@ -38,19 +38,15 @@ updateFxSettingLog profits fsd fsdf =
                                               then (a', b')
                                               else (a, b)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
       fs   = Fsd.fxSetting fsd
-      (p, c) = M.foldl (\(ac, bc) (a, b) -> (ac + a, bc + b)) (0, 0) fsl
-      ave = p / fromIntegral c
       fsl' = Fsd.minFxSettingDelete $
              if M.member fs fsl
              then let (p, c) = fsl M.! fs
                   in M.insert fs (p + profits, c + 1) $ M.delete fs fsl
-             else M.insert fs (profits, 1) fsl
-      fsd' = if M.member fs fsl'
-             then fsd 
-             else fsd { Fsd.fxSetting = Fsd.maxFxSettingFromLog fsl'
-                      }
-  in fsd' { Fsd.fxSettingLog = fsl'
-          }
+             else if 0 < profits
+                  then M.insert fs (profits, 1) fsl
+                  else fsl
+  in fsd { Fsd.fxSettingLog = fsl'
+         }
   
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
