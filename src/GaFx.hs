@@ -129,7 +129,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop retry lf n startN endN td fsd = do
-  (plsf, lok, tdlt, fsd1) <- if lf
+  (plsf, lok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
                              then learning n startN fsd
                              else return (0, True, [Ftd.initFxTradeDataCommon], fsd)
   let ltt = Ta.getLearningTestTime fsd1
