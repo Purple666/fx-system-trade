@@ -100,7 +100,7 @@ learning n startN fsd = do
                                return (Fsd.nextFxSettingData fc fsd', a)) $ M.toList fsl)
   let r = M.mapWithKey (\fsd' (p, c) -> let tdlt = Ft.learning fsd'
                                             p'   = Ftd.getEvaluationValueList tdlt * (p + 1)
-                                        in {- traceShow(p, Ftd.getEvaluationValueList tdlt, p', Ft.evaluationOk tdlt) $ -} (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
+                                        in traceShow(p, Ftd.getEvaluationValueList tdlt, p', Ft.evaluationOk tdlt) $ (p', Ft.evaluationOk tdlt, tdlt, fsd')) $ M.filter (\(p, _) -> 0 < p) fsdm'
       tdlts = M.elems $ M.filter (\(_, y, _, _) -> y) r
       (_, _, tdlt', fsd'') = maximum tdlts
   if (not $ null tdlts)
