@@ -64,8 +64,7 @@ data FxChart =
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
-                    , trTrade            :: Integer
-                    , trTradeDate        :: Integer
+                    , maxTradeDate       :: Int
                     } deriving (Show, Read, Eq, Ord, Generic)
 
 instance Hashable FxLearningSetting
@@ -82,8 +81,7 @@ initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
             , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                  , trTrade            = 0
-                                                  , trTradeDate        = 0
+                                                  , maxTradeDate       = 60
                                                   }
             , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
