@@ -39,7 +39,7 @@ backTest coName latest retry = do
   (s, f) <- Fm.readResult coName
   let td  = Ft.initFxTradeData Ftd.Backtest
       ltt = Ta.getLearningTestTime fsd
-      p = Ta.getPrepareTimeAll fsd + ltt + Gsd.backtestLatestTime Gsd.gsd
+      p = Ta.getPrepareTimeAll fsd + ltt * Gsd.learningTestCount Gsd.gsd ^ 2 + Gsd.backtestLatestTime Gsd.gsd
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
@@ -91,7 +91,7 @@ learning n startN fsd = do
            (sequence $
             map (\(x, a) -> do let fsd' = fsd { Fsd.fxSetting = x }
                                    ltt  = Ta.getLearningTestTime fsd'
-                               fc <- mapM (\_ -> do n' <- getRandomR(n - Gsd.backtestLatestTime Gsd.gsd, n)
+                               fc <- mapM (\_ -> do n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
                                                     cl <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd' + ltt)
                                                     return (Fsd.FxChart { Fsd.chart = cl
                                                                         , Fsd.chartLength = ltt
