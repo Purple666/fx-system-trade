@@ -21,7 +21,7 @@ import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
-  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
+  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
@@ -93,7 +93,7 @@ evaluate ctd fsd f1 forceSell td =
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       fs        = Ftd.fxSetting td
-      lcd = Ta.getLearningTestTime fsd
+      lcd = 60 * 24 * 5 * 4 -- Ta.getLearningTestTime fsd
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chart * ((chart / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
@@ -129,8 +129,10 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
-                     ls' = ls { Fsd.trTrade         = Fsd.trTrade ls + 1
-                              , Fsd.trTradeDate     = Fsd.trTradeDate ls + (fromIntegral $ tradeDate)
+                     ls' = ls { Fsd.trTrade         = 1 -- Fsd.trTrade ls + 1
+                              , Fsd.trTradeDate     = if Fsd.trTradeDate ls < (fromIntegral $ tradeDate)
+                                                      then (fromIntegral $ tradeDate)
+                                                      else Fsd.trTradeDate ls
                               }
                      alcOpen
                        | 0 < profits = Ta.calcFxalgorithmListCount profits $ Fsd.prevOpen fs
