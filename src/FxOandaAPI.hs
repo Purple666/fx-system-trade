@@ -121,6 +121,8 @@ getNowPrices td = do
        >>= asJSON
   e <- Fm.getOneChart Fm.getEndChartFromDB
   return $ e { Fcd.close = nbid . head . prices $ r ^. responseBody
+             , Fcd.high  = nbid . head . prices $ r ^. responseBody
+             , Fcd.low  = nbid . head . prices $ r ^. responseBody
              }
 
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
