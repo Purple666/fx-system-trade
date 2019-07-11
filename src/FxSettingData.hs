@@ -6,7 +6,6 @@ module FxSettingData
   , FxLearningSetting (..)
   , FxChart (..)
   , initFxSettingData
-  , resetFxSettingData
   , nextFxSettingData
   , plusLearningTestTimes
   , initFxSetting
@@ -90,14 +89,6 @@ initFxSetting =
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
             }
-
-resetFxSettingData :: FxSettingData -> FxSettingData
-resetFxSettingData fsd =
-  fsd { fxSetting = (fxSetting fsd) { fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
-                                    , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
-                                    , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
-                                    }
-      }
 
 nextFxSettingData :: [FxChart] -> FxSettingData -> FxSettingData
 nextFxSettingData fc fsd =

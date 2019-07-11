@@ -3,7 +3,6 @@ module FxSetting
   , copyFxSettingData
   , mutationFxSettingData
   , crossoverFxSettingData
-  , resetFxSettingData
   , updateFxSettingLog
   , setHashFxSettingData
   ) where
@@ -71,14 +70,12 @@ createRandomFxAlMaSetting ix = do
             , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) ts
             }
 
-createRandomFxAlgorithmSetting :: MonadRandom m => Bool -> Double -> Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
-createRandomFxAlgorithmSetting reset andRate ix = do
+createRandomFxAlgorithmSetting :: MonadRandom m => Double -> Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
+createRandomFxAlgorithmSetting andRate ix = do
   taAndR <- (\x -> truncate $ (andRate * fromIntegral x)) <$>
             getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
   taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
-  at <- if reset
-        then Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) Tr.Empty
-        else Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
+  at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
   sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
   ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
@@ -98,27 +95,25 @@ createRandomFxAlgorithmSetting reset andRate ix = do
               , Fad.simChart         = sc
               }
 
-createRandomFxTechnicalAnalysisSetting :: MonadRandom m => Bool -> Double ->
+createRandomFxTechnicalAnalysisSetting :: MonadRandom m => Double ->
                                           Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
-createRandomFxTechnicalAnalysisSetting reset andRate ix = do
+createRandomFxTechnicalAnalysisSetting andRate ix = do
   taAndR <- (\x -> truncate $ (andRate * fromIntegral x)) <$>
             getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd)
   taOrR  <- getRandomR(max 1 (Fad.treeAnaOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd)
-  tat <- if reset
-         then Tr.makeTree taAndR taOrR (Fad.techListCount ix) Tr.Empty
-         else Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
-  as' <- mapM (createRandomFxAlgorithmSetting reset andRate) $ Fad.algoSetting ix
+  tat <- Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
+  as' <- mapM (createRandomFxAlgorithmSetting andRate) $ Fad.algoSetting ix
   return $ ix { Fad.techAnaTree    = tat
               , Fad.algoSetting    = as'
               , Fad.treeAnaAndRate = taAndR
               , Fad.treeAnaOrRate  = taOrR
               }
 
-createRandomGaData :: MonadRandom m => Bool -> Fsd.FxSettingData -> m (Ga.LearningData Fsd.FxSettingData)
-createRandomGaData reset ix = do
-  faso  <- createRandomFxTechnicalAnalysisSetting reset (Gsd.taOpenAndRate        Gsd.gsd) . Fsd.fxTaOpen        $ Fsd.fxSetting ix
-  fascp <- createRandomFxTechnicalAnalysisSetting reset (Gsd.taCloseProfitAndRate Gsd.gsd) . Fsd.fxTaCloseProfit $ Fsd.fxSetting ix
-  fascl <- createRandomFxTechnicalAnalysisSetting reset (Gsd.taCloseLossAndRate   Gsd.gsd) . Fsd.fxTaCloseLoss   $ Fsd.fxSetting ix
+createRandomGaData :: MonadRandom m => Fsd.FxSettingData -> m (Ga.LearningData Fsd.FxSettingData)
+createRandomGaData ix = do
+  faso  <- createRandomFxTechnicalAnalysisSetting (Gsd.taOpenAndRate        Gsd.gsd) . Fsd.fxTaOpen        $ Fsd.fxSetting ix
+  fascp <- createRandomFxTechnicalAnalysisSetting (Gsd.taCloseProfitAndRate Gsd.gsd) . Fsd.fxTaCloseProfit $ Fsd.fxSetting ix
+  fascl <- createRandomFxTechnicalAnalysisSetting (Gsd.taCloseLossAndRate   Gsd.gsd) . Fsd.fxTaCloseLoss   $ Fsd.fxSetting ix
   let fsd = ix { Fsd.fxSetting = (Fsd.fxSetting ix) { Fsd.fxTaOpen        = faso
                                                     , Fsd.fxTaCloseProfit = fascp
                                                     , Fsd.fxTaCloseLoss   = fascl
@@ -133,7 +128,7 @@ createInitialGaData :: MonadRandom m =>
 createInitialGaData n x =
   Ga.learningDataList <$>
   concat <$>
-  mapM (\_ -> mapM (createRandomGaData False) $ Ga.getGaDataList x) [1..1]
+  mapM (\_ -> mapM createRandomGaData $ Ga.getGaDataList x) [1..n]
 
 copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
@@ -146,13 +141,7 @@ mutationFxSettingData :: MonadRandom m =>
                          Ga.LearningData Fsd.FxSettingData ->
                          m (Ga.LearningData Fsd.FxSettingData)
 mutationFxSettingData x _ =
-  resetFxSettingData x
-
-resetFxSettingData :: MonadRandom m =>
-                      Ga.LearningData Fsd.FxSettingData ->
-                      m (Ga.LearningData  Fsd.FxSettingData)
-resetFxSettingData x =
-  createRandomGaData False $ Ga.getHeadGaData x
+  createRandomGaData $ Ga.getHeadGaData x
 
 setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
