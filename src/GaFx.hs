@@ -43,8 +43,8 @@ backTest coName latest retry = do
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   startN <- (+) <$> pure p <*> (Fcd.no <$> Fm.getOneChart Fm.getStartChartFromDB)
   let n = if latest
-          then endN - p 
-          else startN + p
+          then endN - Gsd.backtestLatestTime Gsd.gsd 
+          else startN
   rn <- getRandomR(n, n + ltt * 2)
   (tdt, fsd') <- backTestLoop retry False rn endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
