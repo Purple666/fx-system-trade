@@ -147,7 +147,7 @@ backTestLoop retry lf n startN endN td fsd = do
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (tdt, fsd3)
-              else backTestLoop retry (Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td) n' startN endN tdt fsd3
+              else backTestLoop retry (Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && Ftd.realizedPL tdt < Ftd.realizedPL td) n' startN endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
