@@ -27,7 +27,7 @@ getPrepareTimeAll fsd =
   maximum [ getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ] 
+          ] * 2
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
