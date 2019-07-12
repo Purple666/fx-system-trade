@@ -133,7 +133,7 @@ backTestLoop retry lf n endN td fsd = do
           =<< Fm.readFxSettingData "backtest"
   if Ftd.profit tdt <= Ftd.profit td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
-            backTestLoop retry True n endN td fsd3
+            backTestLoop retry True n endN td $ Fsd.plusLearningTestTimes fsd3
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
