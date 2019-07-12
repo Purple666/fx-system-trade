@@ -66,7 +66,8 @@ data FxChart =
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
-                    , maxTradeDate       :: Int
+                    , totalTradeDate     :: Int
+                    , numTraderadeDate   :: Int
                     , logProfit          :: Double
                     , logCount           :: Int
                     } deriving (Show, Read, Eq, Ord, Generic)
@@ -85,7 +86,8 @@ initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
             , learningSetting = FxLearningSetting { learningTestTimes  = 1
-                                                  , maxTradeDate       = 60
+                                                  , totalTradeDate     = 0
+                                                  , numTraderadeDate   = 0
                                                   , logProfit          = 0
                                                   , logCount           = 0
                                                   }

@@ -130,9 +130,8 @@ evaluate ctd fsd f1 forceSell td =
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
-                     ls' = ls { Fsd.maxTradeDate = if Fsd.maxTradeDate ls < tradeDate
-                                                   then tradeDate
-                                                   else Fsd.maxTradeDate ls
+                     ls' = ls { Fsd.totalTradeDate     = Fsd.totalTradeDate ls + tradeDate
+                              , Fsd.numTraderadeDate   = Fsd.numTraderadeDate ls + 1
                               }
                      alcOpen
                        | 0 < profits = Ta.calcFxalgorithmListCount profits $ Fsd.prevOpen fs
