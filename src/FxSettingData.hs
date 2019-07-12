@@ -95,13 +95,17 @@ nextFxSettingData fc fsd =
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
-  fsd { fxSetting = (fxSetting fsd) {
-          learningSetting = (learningSetting . fxSetting $ fsd) {
-              learningTestTimes = (learningTestTimes . learningSetting . fxSetting $ fsd) + 1
-              }
-          }
+  fsd { fxSetting = plusLearningTestTimes2 $ fxSetting fsd
+      , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
       }
-                                                
+  
+plusLearningTestTimes2 :: FxSetting -> FxSetting
+plusLearningTestTimes2 fs =
+  fs { learningSetting = (learningSetting fs) {
+         learningTestTimes = (learningTestTimes $ learningSetting fs) + 1
+         }
+     }
+  
 getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
