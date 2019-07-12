@@ -5,6 +5,7 @@ module FxSetting
   , crossoverFxSettingData
   , updateFxSettingLog
   , setHashFxSettingData
+  , gaLearningDataFromLog
   ) where
 
 import           Control.Monad
@@ -31,6 +32,18 @@ instance Ga.Ga Fsd.FxSettingData where
   createInitialData = createInitialGaData
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
+
+gaLearningDataFromLog :: Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
+gaLearningDataFromLog fsd =
+  let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+            then Fsd.fxSettingLog fsd
+            else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
+  in Ga.learningDataList . map (\(fs, (p, c)) -> let fs = Fsd.fxSetting fsd
+                                                     fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
+                                                                                                               , Fsd.logCount  = c
+                                                                                                               }
+                                                              }
+                                                 in Ga.learningData fsd { Fsd.fxSetting = fs' }) $ M.toList fsl
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd fsdf = 

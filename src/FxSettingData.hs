@@ -10,6 +10,7 @@ module FxSettingData
   , plusLearningTestTimes
   , initFxSetting
   , getLearningTestTimes
+  , getLogProfit
   , setFxSettingData
   , getFxSettingLogResult
   , maxFxSettingFromLog
@@ -19,6 +20,7 @@ module FxSettingData
 import Debug.Trace
 import GHC.Generics (Generic)
 import Data.Hashable
+import qualified Ga
 import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
@@ -65,6 +67,8 @@ data FxChart =
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
                     , maxTradeDate       :: Int
+                    , logProfit          :: Double
+                    , logCount           :: Int
                     } deriving (Show, Read, Eq, Ord, Generic)
 
 instance Hashable FxLearningSetting
@@ -82,6 +86,8 @@ initFxSetting =
             , prevOpen            = ([], M.empty)
             , learningSetting = FxLearningSetting { learningTestTimes  = 1
                                                   , maxTradeDate       = 60
+                                                  , logProfit          = 0
+                                                  , logCount           = 0
                                                   }
             , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
@@ -96,7 +102,7 @@ nextFxSettingData fc fsd =
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = plusLearningTestTimes2 $ fxSetting fsd
-      , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
+      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
       }
   
 plusLearningTestTimes2 :: FxSetting -> FxSetting
@@ -109,6 +115,10 @@ plusLearningTestTimes2 fs =
 getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
+
+getLogProfit :: FxSettingData -> Double
+getLogProfit fsd =
+  logProfit . learningSetting $ fxSetting fsd
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =

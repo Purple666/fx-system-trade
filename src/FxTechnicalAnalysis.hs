@@ -20,7 +20,10 @@ import qualified Tree                    as Tr
 
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
-  Fsd.getLearningTestTimes fsd * (Fsd.maxTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd)
+  let t = Fsd.getLearningTestTimes fsd * (Fsd.maxTradeDate . Fsd.learningSetting $ Fsd.fxSetting fsd)
+  in if Gsd.maxTradeTime Gsd.gsd < t
+     then Gsd.maxTradeTime Gsd.gsd
+     else t
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd =
