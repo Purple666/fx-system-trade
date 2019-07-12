@@ -131,14 +131,14 @@ backTestLoop retry lf n endN td fsd = do
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
-  if Ftd.unrealizedPL tdt < Ftd.unrealizedPL td && Ftd.realizedPL tdt < Ftd.realizedPL td && retry
+  if Ftd.profit tdt < Ftd.profit td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok True
             backTestLoop retry True n endN td fsd3
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plsf lok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (tdt, fsd3)
-              else backTestLoop retry (Ftd.unrealizedPL tdt <= Ftd.unrealizedPL td && Ftd.realizedPL tdt <= Ftd.realizedPL td) n' endN tdt fsd3
+              else backTestLoop retry (Ftd.profit tdt < Ftd.profit td) n' endN tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
