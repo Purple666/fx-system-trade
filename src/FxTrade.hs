@@ -21,7 +21,7 @@ import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
-  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
+  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
 
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
@@ -95,7 +95,7 @@ evaluate ctd fsd f1 forceSell td =
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
       fs        = Ftd.fxSetting td
-      lcd = 24 * 60
+      lcd = 24 * 60 * 20 * 4 * 3
       unrealizedPL
         | Ftd.side td == Ftd.Buy  = Ftd.realizedPL td + 25 * f1 td chartLow * ((chartLow / tradeRate) - 1)
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chartHigh * (1 - (chartHigh / tradeRate))

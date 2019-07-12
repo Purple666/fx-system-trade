@@ -46,18 +46,12 @@ class (Show a, Eq a, Ord a) => Ga a where
   emptyLearningData = LearningData []
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-  evaluate (LearningData y) = LearningData . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
-  learning x = do
-    let l = length x + 2 -- (truncate . sqrt . fromIntegral $ length x) + 2
-    setHash <$> (learningLoop =<< (LearningData . take l . sortBy (\(_, a) (_, b) -> compare b a) . getLearningData . evaluate . mappend x) <$> createInitialData l x)
+  evaluate (LearningData y) = LearningData . filter(\(_, p) -> 0 < p) . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
+  learning x = do setHash <$> (learningLoop =<< createLoop (length x + 2) x emptyLearningData)
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
-  let mp = minimum . map snd $ getLearningData x
-  x' <- if mp <= 0
-        then fromList . map (\(f, p) -> (f, 1 + p + abs mp)) $ getLearningData x
-        else fromList $ getLearningData x
-  return $ learningData x'
+  learningData <$> (fromList $ getLearningData x)
 
 selection2 :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a, LearningData a)
 selection2 x = do
@@ -81,6 +75,14 @@ geneticOperators e x y = do
   if e <= length y'
     then return y'
     else geneticOperators e x y'
+
+createLoop :: (Ga a, MonadRandom m) => Int -> LearningData a -> LearningData a -> m (LearningData a)
+createLoop e x y = do
+  y' <- (mappend y . evaluate) <$> createInitialData e x
+  --traceShow("create", e, length y', length x, length y) $ return ()
+  if e <= length y'
+    then return . LearningData . take e . sortBy (\(_, a) (_, b) -> compare b a) $ getLearningData y'
+    else createLoop e (y' `mappend` y `mappend` x) y'
 
 learningLoop :: (Ga a, MonadRandom m) =>
                 LearningData a -> m (LearningData a)
