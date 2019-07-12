@@ -79,7 +79,7 @@ geneticOperators e x y = do
 createLoop :: (Ga a, MonadRandom m) => Int -> LearningData a -> LearningData a -> m (LearningData a)
 createLoop e x y = do
   y' <- (mappend y . evaluate) <$> createInitialData e x
-  -- traceShow("create", e, length y', length x, length y) $ return ()
+  traceShow("create", e, length y', length x, length y) $ return ()
   if e <= length y'
     then return . LearningData . take e . sortBy (\(_, a) (_, b) -> compare b a) $ getLearningData y'
     else createLoop e (y' `mappend` y `mappend` x) y'
@@ -88,7 +88,7 @@ learningLoop :: (Ga a, MonadRandom m) =>
                 LearningData a -> m (LearningData a)
 learningLoop x = do
   x' <- evaluate <$> (geneticOperators (length x) x . learningData $ maximum x)
-  -- traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+  traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else learningLoop x'

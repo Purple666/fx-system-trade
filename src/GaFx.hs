@@ -75,7 +75,7 @@ learningEvaluate n ld = do
                            return (Fsd.nextFxSettingData fc fsd)) $ Ga.getGaDataList ld)
   let r = map (\fsd -> let tdlt = Ft.learning fsd
                            p'   = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
-                       in {- traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
+                       in traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ 
                           (p', Ft.evaluationOk tdlt, tdlt, fsd)) fsdl
       r' = filter (\(_, y, _, _) -> y) r
       (pOk, _, tdltmOk, fsdOk) = maximum r'
