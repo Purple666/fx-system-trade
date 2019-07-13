@@ -82,7 +82,7 @@ createRandomFxAlMaSetting ix = do
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Double -> Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting andRate ix = do
-  taAndR <- (\x -> truncate $ (andRate * fromIntegral x)) <$>
+  taAndR <- (\x -> max 1 . truncate $ (andRate * fromIntegral x)) <$>
             getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
   taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
   at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
@@ -108,7 +108,7 @@ createRandomFxAlgorithmSetting andRate ix = do
 createRandomFxTechnicalAnalysisSetting :: MonadRandom m => Double ->
                                           Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
 createRandomFxTechnicalAnalysisSetting andRate ix = do
-  taAndR <- (\x -> truncate $ (andRate * fromIntegral x)) <$>
+  taAndR <- (\x -> max 1 . truncate $ (andRate * fromIntegral x)) <$>
             getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd)
   taOrR  <- getRandomR(max 1 (Fad.treeAnaOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd)
   tat <- Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
