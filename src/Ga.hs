@@ -83,7 +83,7 @@ createLoop e x y = do
   traceShow("create", e, length y', length x, length y) $ return ()
   if e <= length y'
     then return . LearningData . take e . sortBy (\(_, a) (_, b) -> compare b a) $ getLearningData y'
-    else createLoop e (y' `mappend` x' `mappend` x) y'
+    else createLoop e (x `mappend` x') y'
 
 gaLoop :: (Ga a, MonadRandom m) =>
                 Int -> LearningData a -> m (LearningData a)
