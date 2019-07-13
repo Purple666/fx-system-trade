@@ -29,7 +29,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   mutation :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   createInitialData :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
-  learningEvaluate :: a -> (a, Rational)
+  learningEvaluate :: Int -> (a, Rational) -> IO (a, Rational)
   setHash :: LearningData a -> LearningData a
   getGaDataList :: LearningData a -> [a]
   maximumScore :: LearningData a -> Rational
@@ -37,8 +37,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   emptyLearningData :: LearningData a
   learningData :: a -> LearningData a
   learningDataList :: [LearningData a] -> LearningData a
-  evaluate :: LearningData a -> LearningData a
-  learning :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
+  learning :: Int -> Int -> LearningData a -> IO (LearningData a)
   
   getGaDataList (LearningData x) = map fst x
   maximumScore (LearningData x) = fst . maximum $ map (\y -> (snd y, fst y)) x
@@ -46,16 +45,20 @@ class (Show a, Eq a, Ord a) => Ga a where
   emptyLearningData = LearningData []
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-  evaluate (LearningData y) = LearningData . filter(\(_, p) -> 0 < p) . map (learningEvaluate . fst) $ map (\x -> (fst x, 0 :: Rational)) y
-  learning m x = do
-    (ok, x') <- createLoop m 0 (length x + 2) x emptyLearningData
+
+  learning n m x = do
+    (ok, x') <- createLoop n (length x + 10) m 0 x emptyLearningData
     if ok
-      then setHash <$> gaLoop (length x + 2) x'
+      then gaLoop n (length x + 10) x'
       else return $ setHash x'
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
-  learningData <$> (fromList $ getLearningData x)
+  let mp = minimum . map snd $ getLearningData x
+  x' <- if mp <= 0
+        then fromList . map (\(f, p) -> (f, 1 + p + abs mp)) $ getLearningData x
+        else fromList $ getLearningData x
+  return $ learningData x'
 
 selection2 :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a, LearningData a)
 selection2 x = do
@@ -80,27 +83,36 @@ geneticOperators e x y = do
     then return y'
     else geneticOperators e x y'
 
-createLoop :: (Ga a, MonadRandom m) => Int -> Int -> Int -> LearningData a -> LearningData a -> m (Bool, LearningData a)
-createLoop e m c x y = do
+createLoop :: (Ga a) => Int -> Int -> Int -> Int -> LearningData a -> LearningData a -> IO (Bool, LearningData a)
+createLoop n e m c x y = do
   x' <- createInitialData e x
-  let y' = mappend y $ evaluate x'
-  traceShow("create", e, length y', length x, length y) $ return ()
+  y' <- mappend y <$> createEvaluate n x'
+  -- traceShow("create", e, m, c, length y', length x, length y) $ return ()
   if e <= length y'
     then return (True, y')
     else if m < c
-         then if 0 < length y'
+         then if 2 < length y'
               then return (True, y')
               else return (False, x)
-         else createLoop e m (c + 1) x' y'
+         else createLoop n e m (c + 1) x y'
 
-gaLoop :: (Ga a, MonadRandom m) =>
-          Int -> LearningData a -> m (LearningData a)
-gaLoop e x = do
-  x' <- evaluate <$> (geneticOperators e x . learningData $ maximum x)
-  traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
+gaLoop n e x = do
+  x' <- gaEvaluate n =<< (geneticOperators e x $ LearningData [(maximum x, maximumScore x)])
+  -- traceShow("ga", length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
-    else gaLoop e x'
+    else gaLoop n e $ mappend x' x
+
+createEvaluate :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
+createEvaluate n (LearningData y) = do
+  LearningData <$> (mapM (learningEvaluate n) $ map (\x -> (fst x, 0 :: Rational)) y)
+
+gaEvaluate :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
+gaEvaluate n (LearningData y) = do
+  LearningData <$> mapM (learningEvaluate n) y
+    
+              
 
     
 

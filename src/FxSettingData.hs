@@ -4,9 +4,7 @@ module FxSettingData
   ( FxSettingData (..)
   , FxSetting (..)
   , FxLearningSetting (..)
-  , FxChart (..)
   , initFxSettingData
-  , nextFxSettingData
   , plusLearningTestTimes
   , initFxSetting
   , getLearningTestTimes
@@ -30,8 +28,7 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { fxChart           :: [FxChart]
-                , fxSetting         :: FxSetting
+  FxSettingData { fxSetting         :: FxSetting
                 , fxSettingLog      :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
@@ -59,11 +56,6 @@ instance Ord FxSetting where
 
 instance Hashable FxSetting
 
-data FxChart =
-  FxChart { chart       :: [Fcd.FxChartData]
-          , chartLength :: Int
-          } deriving (Show, Ord, Eq)
-
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
                     , totalTradeDate     :: Int
@@ -76,8 +68,7 @@ instance Hashable FxLearningSetting
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { fxChart = []
-                , fxSetting = initFxSetting
+  FxSettingData { fxSetting = initFxSetting
                 , fxSettingLog = M.empty
                 }
 
@@ -95,11 +86,6 @@ initFxSetting =
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
             }
-
-nextFxSettingData :: [FxChart] -> FxSettingData -> FxSettingData
-nextFxSettingData fc fsd =
-  fsd { fxChart = fc
-      }
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
@@ -145,8 +131,7 @@ setTreeFunction fs =
 
 setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData  fsl =
-  setTreeFunction $ FxSettingData { fxChart = []
-                                  , fxSetting    = maxFxSettingFromLog fsl
+  setTreeFunction $ FxSettingData { fxSetting    = maxFxSettingFromLog fsl
                                   , fxSettingLog = fsl                                         
                                   }
 
