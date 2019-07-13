@@ -90,7 +90,7 @@ learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 IO (Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n fsd ld = do
-  ld' <- Ga.learning ld
+  ld' <- Ga.learning (Fsd.getLearningTestTimes fsd) ld
   (ok, plok, tdltm, fsd', ld'') <- learningEvaluate n ld'
   if ok
     then return (True, plok, tdltm, fsd)
