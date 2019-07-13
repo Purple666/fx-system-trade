@@ -78,7 +78,7 @@ geneticOperators e x y = do
 
 createLoop :: (Ga a, MonadRandom m) => Int -> LearningData a -> LearningData a -> m (LearningData a)
 createLoop e x y = do
-  x' <- createInitialData e $ y `mappend` x
+  x' <- createInitialData e x
   let y' = mappend y $ evaluate x'
   traceShow("create", e, length y', length x, length y) $ return ()
   if e <= length y'
