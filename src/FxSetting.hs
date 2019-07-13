@@ -38,8 +38,7 @@ gaLearningDataFromLog fsd =
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
-  in Ga.learningDataList . map (\(fs, (p, c)) -> let fs = Fsd.fxSetting fsd
-                                                     fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
+  in Ga.learningDataList . map (\(fs, (p, c)) -> let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
                                                                                                                , Fsd.logCount  = c
                                                                                                                }
                                                               }
