@@ -99,22 +99,16 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  let xs' = if (fst $ minimum xs) < 0
-            then M.map (\(x, y) -> (x + (abs . fst $ minimum xs) + 1, y)) xs
-            else xs
-  in if (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
-     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < x) xs'
-          in (LeafDataMap a, LeafDataMap b)
-     else (LeafDataMap M.empty, LeafDataMap xs)
+  if (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs)
+  then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs
+       in (LeafDataMap a, LeafDataMap b)
+  else (LeafDataMap M.empty, LeafDataMap xs)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
-    else do let mx = fst . minimum . map snd $ M.toList xs
-                xs' = if mx <= 0
-                      then M.map (\(x, _) -> toRational (x + abs mx + 1)) xs
-                      else M.map (toRational . fst) xs
+    else do let xs' = M.map (toRational . fst) xs
             foldl (\acc _ -> do l <- R.fromList $ M.toList xs'
                                 insertTree andRate orRate (Leaf l) =<< acc
                   ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
@@ -217,11 +211,11 @@ evaluateTrueLeafDataList f s (Leaf x) =
 evaluateTrueLeafDataList f s (Node x l r) =
   let l' = evaluateTrueLeafDataList f s l
       r' = evaluateTrueLeafDataList f s r
-  in l' ++ r'
+  in case fst $ getNodeData x of
+       0 -> if null l' || null r'
+            then []
+            else l' ++ r'
+       _ -> l' ++ r'
 {-
-    case fst $ getNodeData x of
-    0 -> if null l' || null r'
-         then []
-         else l' ++ r'
-    _ -> l' ++ r'
+  in l' ++ r'
 -}
