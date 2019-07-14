@@ -49,7 +49,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learning n m x = do
     (ok, x') <- createLoop n (length x + 10) m 0 x emptyLearningData
     if ok
-      then gaLoop n (length x + 10) x'
+      then setHash <$> gaLoop n (length x + 10) x'
       else return $ setHash x'
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
