@@ -87,7 +87,7 @@ createLoop :: (Ga a) => Int -> Int -> Int -> Int -> LearningData a -> LearningDa
 createLoop n e m c x y = do
   x' <- createInitialData e x
   y' <- mappend y <$> createEvaluate n x'
-  traceShow("create", e, m, c, length y', length x, length y) $ return ()
+  --traceShow("create", e, m, c, length y', length x, length y) $ return ()
   if e <= length y'
     then return (True, y')
     else if m < c
@@ -99,7 +99,7 @@ createLoop n e m c x y = do
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop n e x = do
   x' <- gaEvaluate n =<< (geneticOperators e x $ LearningData [(maximum x, maximumScore x)])
-  traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+  --traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else gaLoop n e $ mappend x' x
