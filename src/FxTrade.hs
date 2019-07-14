@@ -309,7 +309,7 @@ learning :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learning n fsd =
   mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
                      ltt = Ta.getLearningTestTime fsd
-                 n' <- getRandomR(n - ltt * (Gsd.learningTestCount Gsd.gsd + Fsd.getLearningTestTimes fsd), n)
+                 n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
                  fc <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd + ltt)
                  traceShow(ltt, n, n', length fc) $ return ()
                  let ctdl = makeChart fsd ltt fc
