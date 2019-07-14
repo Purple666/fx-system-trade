@@ -22,6 +22,6 @@ if  [ $? = 0 ] ; then
     oc get pods | egrep 'fx-system-trade.*build.*Error' | awk '{print $1}' | xargs oc logs 
     exit
 fi
-python3 get_rate_data/clear_fx-trade.py
+#python3 get_rate_data/clear_fx-trade.py
 sleep 10
 ./scaleup.sh
