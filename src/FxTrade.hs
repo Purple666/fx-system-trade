@@ -86,8 +86,8 @@ evaluate :: Fad.FxChartTaData ->
 evaluate ctd fsd f1 forceSell td =
   let cd        = Fad.taChart ctd
       chart     = Fcd.close cd
-      chartHigh = Fcd.high cd
-      chartLow  = Fcd.low cd
+      chartHigh = Fcd.close cd -- Fcd.high cd
+      chartLow  = Fcd.close cd -- Fcd.low cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeDate = Fcd.no cd - (Fcd.no $ Ftd.tradeRate td)
       ftado     = Fad.open        ctd
