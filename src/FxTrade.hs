@@ -311,7 +311,7 @@ learning n fsd =
                      ltt = Ta.getLearningTestTime fsd
                  n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
                  fc <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd + ltt)
-                 traceShow(ltt, n, n', length fc) $ return ()
+                 -- traceShow(ltt, n, n', length fc) $ return ()
                  let ctdl = makeChart fsd ltt fc
                      (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td') (Ftd.None, Ftd.None, td) $ init ctdl
                      (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
