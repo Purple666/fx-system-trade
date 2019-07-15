@@ -65,7 +65,7 @@ learningEvaluate :: Int ->
 learningEvaluate n ld = do
   r <- mapM (\fsd -> do tdlt <- Ft.learning n fsd
                         let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
-                        return $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ 
+                        return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
                           (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
   let r' = filter (\(_, y, _, _) -> y) r
       (pOk, _, tdltmOk, fsdOk) = maximum r'
