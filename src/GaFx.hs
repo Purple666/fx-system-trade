@@ -71,7 +71,7 @@ learningEvaluate n ld = do
       (pOk, _, tdltmOk, fsdOk) = maximum r'
       (pNg, _, tdltmNg, fsdNg) = maximum r
   return $ if null r'
-           then (False, 0,         tdltmNg, Fsd.plusLearningTestTimes fsdNg)
+           then (False, 0,         tdltmNg, fsdNg)
            else (True,  length r', tdltmOk, fsdOk)
 
 learningLoop :: Int ->
