@@ -21,7 +21,7 @@ import qualified Tree                    as Tr
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   let fs = Fsd.learningSetting $ Fsd.fxSetting fsd
-      t = Gsd.learningTestCount Gsd.Gsd * Fsd.getLearningTestTimes fsd ^ 2 * if Fsd.numTraderadeDate fs == 0
+      t = Gsd.learningTestCount Gsd.gsd * Fsd.getLearningTestTimes fsd ^ 2 * if Fsd.numTraderadeDate fs == 0
                                                                              then 60 
                                                                              else (Fsd.totalTradeDate fs `div` Fsd.numTraderadeDate fs)
   in if Gsd.maxTradeTime Gsd.gsd < t
