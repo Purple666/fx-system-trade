@@ -120,8 +120,12 @@ getNowPrices td = do
   r <- retry 100 $ getWith opts "https://api-fxpractice.oanda.com/v1/prices"
        >>= asJSON
   e <- Fm.getOneChart Fm.getEndChartFromDB
-  return $ e { Fcd.close = nbid . head . prices $ r ^. responseBody
-             , Fcd.high  = nbid . head . prices $ r ^. responseBody
+  return $ e { Fcd.close = if Ftd.side td == Ftd.Buy
+                           then nask . head . prices $ r ^. responseBody
+                           else if Ftd.side td == Ftd.Sell
+                                then nbid . head . prices $ r ^. responseBody
+                                else ((nask . head . prices $ r ^. responseBody) + (nbid . head . prices $ r ^. responseBody)) / 2
+             , Fcd.high  = nask . head . prices $ r ^. responseBody
              , Fcd.low  = nbid . head . prices $ r ^. responseBody
              }
 
