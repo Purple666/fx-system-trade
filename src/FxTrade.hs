@@ -22,7 +22,8 @@ import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
-  (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
+  (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
+  -- (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && 
   --0 < Ftd.getEvaluationValueList tdlt
   
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
