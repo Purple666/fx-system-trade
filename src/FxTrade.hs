@@ -279,7 +279,7 @@ backTest :: Int ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n fc td fsd =
   let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
-      fc' = V.toList $ V.slice (n -1 - Ta.getPrepareTimeAll fsd) (n - 1) fc V.++ V.slice n ltt fc
+      fc' = V.toList $ V.slice (n - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) fc V.++ V.slice n ltt fc
       ctdl = makeChart fsd ltt fc'
       td1 = td { Ftd.fxSetting = Fsd.fxSetting fsd
                }
@@ -315,7 +315,7 @@ learning n fsd =
                        ltt = Ta.getLearningTestTime fsd
                        fc = Fsd.chart fsd
                    n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
-                   let fc' = V.toList $ V.slice (n - (Ta.getPrepareTimeAll fsd) + ltt) n fc
+                   let fc' = V.toList $ V.slice (n' - (Ta.getPrepareTimeAll fsd + ltt)) ltt fc
                    -- traceShow(ltt, n, n', length fc) $ return ()
                        ctdl = makeChart fsd ltt fc'
                        (_, _, td'') = L.foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td') (Ftd.None, Ftd.None, td) $ L.init ctdl
