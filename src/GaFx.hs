@@ -210,6 +210,6 @@ tradeLoop p pl sleep td fsd coName = do
                                  return (0, td1)
                    else return (sleep + 1, td) -- 
   if 240 < sleep'
-    then do return td2
+    then return td2
     else tradeLoop e pl' sleep' td2 fsd1 coName
 
