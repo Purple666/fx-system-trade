@@ -112,7 +112,7 @@ evaluate ctd fsd f1 forceSell td =
           evaluateProfitInc fto ftado = (chartHigh, Ftd.Buy)
         | (Ftd.side td == Ftd.None ||
            (Ftd.side td == Ftd.Buy && (0 < chartLow - tradeRate ||
-                                       chartLow - tradeRate <= 0))) &&
+                                       chartLow - tradeRate < 0))) &&
           evaluateProfitDec fto ftado = (chartLow, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 {-
