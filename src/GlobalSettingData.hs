@@ -25,10 +25,10 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 5
-                    , makeTreeCount         = 1
+  GlobalSettingData { taMargin              = 3
+                    , makeTreeCount         = 3
                     , algorithmRepeat       = 3
-                    , learningTestCount     = 5
+                    , learningTestCount     = 3
                     , taOpenAndRate         = 1.2
                     , taCloseProfitAndRate  = 0.8
                     , taCloseLossAndRate    = 1
@@ -47,6 +47,7 @@ gsd =
                     , tradeProductionBearer = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
                     , tradeProductionUrl    = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
                     }
+
 
 
 
