@@ -52,7 +52,8 @@ backTest coName latest retry = do
   let n = if latest
           then endN - Gsd.backtestLatestTime Gsd.gsd 
           else startN
-  (tdt, fsd') <- backTestLoop retry False n endN td fsd
+  fc <- V.fromList <$> Fm.getChartListAll
+  (tdt, fsd') <- backTestLoop retry False n endN fc td fsd 
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
               then do Fp.printBackTestResult "=================================" (Ftd.realizedPL tdt) (s + 1) f fsd'
                       return (s + 1, f)
@@ -98,10 +99,11 @@ learningLoop c n fsd ld = do
          else learningLoop (c + 1) n fsd' ld'
 
 learning :: Int ->
+            V.Vector Fcd.FxChartData ->
             Fsd.FxSettingData ->
             IO (Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
-learning n fsd = do
-  let ld = Fs.gaLearningDataFromLog fsd                 
+learning n fc fsd = do
+  let ld = Fs.gaLearningDataFromLog fc fsd                 
   (ok, plok, tdltm, fsd) <- learningEvaluate n ld
   if ok
     then return (True, plok, tdltm, fsd)
@@ -111,33 +113,35 @@ tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
   fsd <- Fm.readFxSettingData "backtest"
   e <- Fm.getOneChart Fm.getEndChartFromDB
-  (ok, plok, tdlt, fsd') <- learning (Fcd.no e) fsd
+  fc <- V.fromList <$> Fm.getChartListAll
+  (ok, plok, tdlt, fsd') <- learning (Fcd.no e) fc fsd
   Fp.printLearningFxTradeData 0 (Fcd.no e) fsd' tdlt plok ok
   return (Fcd.no e, fsd')
 
 backTestLoop :: Bool ->
                 Bool ->
                 Int ->
-                Int ->
+                Int -> 
+                V.Vector Fcd.FxChartData ->
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
-backTestLoop retry lf n endN td fsd = do
+backTestLoop retry lf n endN fc td fsd = do
   (ok, plok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
-                               then learning n fsd
+                               then learning n fc fsd
                                else return (True, 0, [Ftd.initFxTradeDataCommon], fsd)
-  (fsd2, tdt) <- Ft.backTest n td fsd1
+  let (fsd2, tdt) = Ft.backTest n fc td fsd1
   fsd3 <- Fm.writeFxSettingData "backtest"
           <$> Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
           =<< Fm.readFxSettingData "backtest"
   if Ftd.profit tdt <= Ftd.profit td && retry
     then do Fp.printTestProgress fsd1 fsd td tdt tdlt plok ok True
-            backTestLoop retry True n endN td fsd3
+            backTestLoop retry True n endN fc td fsd3
     else do Fp.printTestProgress fsd1 fsd td tdt tdlt plok ok False
             let n' = Fcd.no (Ftd.chart tdt) + 1
             if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
               then return (tdt, fsd3)
-              else backTestLoop retry (Ftd.profit tdt <= Ftd.profit td) n' endN tdt fsd3
+              else backTestLoop retry (Ftd.profit tdt <= Ftd.profit td) n' endN fc tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->

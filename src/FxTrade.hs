@@ -8,8 +8,10 @@ module FxTrade ( initFxTradeData
 
 import           Control.Monad
 import qualified Data.Map                as M
+import qualified Data.List               as L
+import           Data.Vector             as V
 import           Debug.Trace
-import           Control.Monad.Random
+import           Control.Monad.Random    as R
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm
 import qualified FxPrint                 as Fp
@@ -22,7 +24,7 @@ import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
-  (and $ map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
+  (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
   -- (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && 
   --0 < Ftd.getEvaluationValueList tdlt
   
@@ -219,19 +221,19 @@ makeChartTa :: [Fcd.FxChartData] ->
                [Fad.FxChartTaData]
 makeChartTa [] _ _ _ ctdl = ctdl
 makeChartTa (x:xcd) ftado ftadcp ftadcl ctdl =
-  let ftado'  = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftado
-      ftadcp' = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcp
-      ftadcl' = M.map (dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcl
+  let ftado'  = M.map (L.dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftado
+      ftadcp' = M.map (L.dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcp
+      ftadcl' = M.map (L.dropWhile (\b -> Fcd.no x < Fcd.no (Fad.chart b))) ftadcl
       ctd = Fad.FxChartTaData { Fad.taChart     = x
-                              , Fad.open        = M.map (\y -> if null y
+                              , Fad.open        = M.map (\y -> if L.null y
                                                                then Fad.initFxTechnicalAnalysisData
-                                                               else head y) ftado'
-                              , Fad.closeProfit = M.map (\y -> if null y
+                                                               else L.head y) ftado'
+                              , Fad.closeProfit = M.map (\y -> if L.null y
                                                                then Fad.initFxTechnicalAnalysisData
-                                                               else head y) ftadcp'
-                              , Fad.closeLoss   = M.map (\y -> if null y
+                                                               else L.head y) ftadcp'
+                              , Fad.closeLoss   = M.map (\y -> if L.null y
                                                                then Fad.initFxTechnicalAnalysisData
-                                                               else head y) ftadcl'
+                                                               else L.head y) ftadcl'
                               }
   in makeChartTa xcd ftado' ftadcp' ftadcl' (ctd:ctdl)
 
@@ -246,11 +248,11 @@ Prelude> break (\x -> x `mod` 5 == 0 ) [1..10]
 makeSimChart :: Int -> [Fcd.FxChartData] -> [Fcd.FxChartData]
 makeSimChart _ [] = []
 makeSimChart c xs =
-  let (chart, xs') = break (\x -> Fcd.no x `mod` c == 0) xs
-  in if null xs'
-     then let fcd  = head chart
+  let (chart, xs') = L.break (\x -> Fcd.no x `mod` c == 0) xs
+  in if L.null xs'
+     then let fcd  = L.head chart
           in [fcd]
-     else head xs' : makeSimChart c (tail xs')
+     else L.head xs' : makeSimChart c (L.tail xs')
 
 {-
 xcd [old .. new]
@@ -267,27 +269,28 @@ makeChart fsd chartLength xcd  =
                . Fad.algoSetting $ Fsd.fxTaCloseProfit fs
       ftadcl = M.map (\x -> Ta.makeFxTechnicalAnalysisDataList x [] (makeSimChart (Fad.simChart x) xcd) [])
                . Fad.algoSetting $ Fsd.fxTaCloseLoss fs
-  in makeChartTa (take chartLength $ reverse xcd) ftado ftadcp ftadcl []
+  in makeChartTa (L.take chartLength $ L.reverse xcd) ftado ftadcp ftadcl []
 
 
 backTest :: Int ->
+            V.Vector Fcd.FxChartData ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
-            IO (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest n td fsd = do
+            (Fsd.FxSettingData, Ftd.FxTradeData)
+backTest n fc td fsd =
   let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
-  fc <- (++) <$> Fm.getChartListBack n (Ta.getPrepareTimeAll fsd) <*> Fm.getChartListForward n ltt
-  let ctdl = makeChart fsd ltt fc
+      fc' = V.toList $ V.slice (n -1 - Ta.getPrepareTimeAll fsd) (n - 1) fc V.++ V.slice n ltt fc
+      ctdl = makeChart fsd ltt fc'
       td1 = td { Ftd.fxSetting = Fsd.fxSetting fsd
                }
-      td4 = foldl (\td2 ctd -> let (_, _, td3) = evaluate ctd fsd getQuantityBacktest False td2
-                               in td3)
+      td4 = L.foldl (\td2 ctd -> let (_, _, td3) = evaluate ctd fsd getQuantityBacktest False td2
+                                 in td3)
             td1 ctdl
-  return $ checkAlgoSetting ltt fsd td4
+  in checkAlgoSetting ltt fsd td4
 
 printDebug :: [Fad.FxChartTaData] -> (Fsd.FxSettingData, Ftd.FxTradeData) -> (Fsd.FxSettingData, Ftd.FxTradeData)
 printDebug ctdl r =
-  let a = map (\ctd -> (Fcd.no . Fad.chart $ (Fad.open ctd M.! 0), Fad.short . Fad.rci $ (Fad.open ctd M.! 0))) ctdl
+  let a = L.map (\ctd -> (Fcd.no . Fad.chart $ (Fad.open ctd M.! 0), Fad.short . Fad.rci $ (Fad.open ctd M.! 0))) ctdl
   in traceShow(a) $ r
 
 checkAlgoSetting :: Int ->
@@ -308,24 +311,25 @@ checkAlgoSetting l fsd td =
   
 learning :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learning n fsd =
-  mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
-                     ltt = Ta.getLearningTestTime fsd
-                 n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
-                 fc <- Fm.getChartListBack n' (Ta.getPrepareTimeAll fsd + ltt)
-                 -- traceShow(ltt, n, n', length fc) $ return ()
-                 let ctdl = makeChart fsd ltt fc
-                     (_, _, td'') = foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td') (Ftd.None, Ftd.None, td) $ init ctdl
-                     (_, _, td''') = evaluate (last ctdl) fsd getQuantityLearning True td''
-                 return (td''' { Ftd.chartLength = ltt })) [1 .. Gsd.learningTestCount Gsd.gsd]
+  R.mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
+                       ltt = Ta.getLearningTestTime fsd
+                       fc = Fsd.chart fsd
+                   n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
+                   let fc' = V.toList $ V.slice (n - (Ta.getPrepareTimeAll fsd) + ltt) n fc
+                   -- traceShow(ltt, n, n', length fc) $ return ()
+                       ctdl = makeChart fsd ltt fc'
+                       (_, _, td'') = L.foldl (\(_, _, td') ctd -> evaluate ctd fsd getQuantityLearning False td') (Ftd.None, Ftd.None, td) $ L.init ctdl
+                       (_, _, td''') = evaluate (L.last ctdl) fsd getQuantityLearning True td''
+                   return (td''' { Ftd.chartLength = ltt })) [1 .. Gsd.learningTestCount Gsd.gsd]
 
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          Fcd.FxChartData ->
          IO (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 trade td fsd e = do
-  fc <- (++) <$> Fm.getChartListBack (Fcd.no e - 1) (Ta.getPrepareTimeAll fsd) <*> pure [e]
+  fc <- (L.++) <$> Fm.getChartListBack (Fcd.no e - 1) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
-  return $ evaluate (last ctdl) fsd getQuantityBacktest False td
+  return $ evaluate (L.last ctdl) fsd getQuantityBacktest False td
 
 gaLearningEvaluate :: Int -> (Fsd.FxSettingData, Rational) -> IO (Fsd.FxSettingData, Rational)
 gaLearningEvaluate n (fsd, p) = do

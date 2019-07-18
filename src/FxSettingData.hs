@@ -19,6 +19,7 @@ import Debug.Trace
 import GHC.Generics (Generic)
 import Data.Hashable
 import qualified Ga
+import           Data.Vector             as V
 import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
@@ -28,8 +29,9 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { fxSetting         :: FxSetting
-                , fxSettingLog      :: M.Map FxSetting (Double, Int)
+  FxSettingData { chart         :: V.Vector Fcd.FxChartData
+                , fxSetting     :: FxSetting
+                , fxSettingLog  :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
@@ -68,7 +70,8 @@ instance Hashable FxLearningSetting
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { fxSetting = initFxSetting
+  FxSettingData { chart        = V.empty
+                , fxSetting    = initFxSetting
                 , fxSettingLog = M.empty
                 }
 
@@ -110,10 +113,10 @@ getLogProfit fsd =
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
-  maximum [ Fad.getSimChartMax . fxTaOpen        $ fxSetting fsd
-          , Fad.getSimChartMax . fxTaCloseProfit $ fxSetting fsd
-          , Fad.getSimChartMax . fxTaCloseLoss   $ fxSetting fsd
-          ]
+  L.maximum [ Fad.getSimChartMax . fxTaOpen        $ fxSetting fsd
+            , Fad.getSimChartMax . fxTaCloseProfit $ fxSetting fsd
+            , Fad.getSimChartMax . fxTaCloseLoss   $ fxSetting fsd
+            ]
 
 setFxSetting :: FxSetting -> FxSetting
 setFxSetting fts =
@@ -137,15 +140,15 @@ setFxSettingData  fsl =
 
 maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
 maxFxSettingFromLog fsl =
-  if null fsl == True
+  if L.null fsl == True
   then initFxSetting
-  else head . map (\(x, (_, _)) -> x) . 
+  else L.head . L.map (\(x, (_, _)) -> x) . 
        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
        M.toList fsl
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
 minFxSettingDelete fsl =
-  M.fromList . take (Gsd.fxSettingLogNum Gsd.gsd) .
+  M.fromList . L.take (Gsd.fxSettingLogNum Gsd.gsd) .
   L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
   M.toList fsl
 

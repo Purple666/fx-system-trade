@@ -9,8 +9,9 @@ module FxSetting
   ) where
 
 import           Control.Monad
-import           Control.Monad.Random
+import           Control.Monad.Random    as R
 import           Data.Hashable
+import           Data.Vector             as V
 import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified Data.Set                as S
@@ -33,16 +34,17 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
-gaLearningDataFromLog fsd =
+gaLearningDataFromLog :: V.Vector Fcd.FxChartData -> Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
+gaLearningDataFromLog fc fsd =
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
-  in Ga.learningDataList . map (\(fs, (p, c)) -> let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
-                                                                                                               , Fsd.logCount  = c
-                                                                                                               }
-                                                              }
-                                                 in Ga.learningData fsd { Fsd.fxSetting = fs' }) $ M.toList fsl
+  in Ga.learningDataList . L.map (\(fs, (p, c)) -> let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
+                                                                                                                 , Fsd.logCount  = c
+                                                                                                                 }
+                                                                }
+                                                   in Ga.learningData fsd { Fsd.chart = fc
+                                                                          , Fsd.fxSetting = fs' }) $ M.toList fsl
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd fsdf = 
@@ -112,7 +114,7 @@ createRandomFxTechnicalAnalysisSetting andRate ix = do
             getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd)
   taOrR  <- getRandomR(max 1 (Fad.treeAnaOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd)
   tat <- Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
-  as' <- mapM (createRandomFxAlgorithmSetting andRate) $ Fad.algoSetting ix
+  as' <- R.mapM (createRandomFxAlgorithmSetting andRate) $ Fad.algoSetting ix
   return $ ix { Fad.techAnaTree    = tat
               , Fad.algoSetting    = as'
               , Fad.treeAnaAndRate = taAndR
@@ -137,8 +139,8 @@ createInitialGaData :: MonadRandom m =>
                        m (Ga.LearningData Fsd.FxSettingData)
 createInitialGaData n x =
   Ga.learningDataList <$>
-  concat <$>
-  mapM (\_ -> mapM createRandomGaData $ Ga.getGaDataList x) [1 .. 1]
+  L.concat <$>
+  R.mapM (\_ -> R.mapM createRandomGaData $ Ga.getGaDataList x) [1 .. 1]
 
 copyFxSettingData :: MonadRandom m =>
                      Ga.LearningData Fsd.FxSettingData ->
@@ -156,10 +158,10 @@ mutationFxSettingData x _ =
 setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
 setHashFxSettingData x =
-  Ga.LearningData . map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                             { Fsd.settingHash = hash (Fsd.fxSetting fsd)
-                                             }
-                                           }, p)) $ Ga.getLearningData x
+  Ga.LearningData . L.map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                               { Fsd.settingHash = hash (Fsd.fxSetting fsd)
+                                               }
+                                             }, p)) $ Ga.getLearningData x
 
 crossoverFxSettingData :: MonadRandom m =>
                           Ga.LearningData Fsd.FxSettingData ->
@@ -190,21 +192,21 @@ crossoverFxTechnicalAnalysisSetting :: MonadRandom m =>
                                        Fad.FxTechnicalAnalysisSetting ->
                                        m (Fad.FxTechnicalAnalysisSetting, Fad.FxTechnicalAnalysisSetting)
 crossoverFxTechnicalAnalysisSetting a b = do
-  die      <- replicateM 2 $ getRandomR (True, False)
+  die      <- R.replicateM 2 $ R.getRandomR (True, False)
   (ta, tb) <- Tr.crossoverTree (Fad.treeAnaAndRate a) (Fad.treeAnaOrRate a)
               (Fad.techAnaTree a) (Fad.techListCount a) (Fad.techAnaTree b) (Fad.techListCount b)
   let mk = min (fst . M.findMax $ Fad.algoSetting a) (fst . M.findMax $ Fad.algoSetting b)
-  oxs      <- mapM (\k -> do (a', b') <- crossoverFxAlgorithmSetting (Fad.algoSetting a M.! k) (Fad.algoSetting b M.! k)
-                             return ((k, a'), (k, b'))) [0..mk]
+  oxs      <- R.mapM (\k -> do (a', b') <- crossoverFxAlgorithmSetting (Fad.algoSetting a M.! k) (Fad.algoSetting b M.! k)
+                               return ((k, a'), (k, b'))) [0..mk]
   return ( a { Fad.techAnaTree    = ta
              , Fad.treeAnaAndRate = choice1 die 0 (Fad.treeAnaAndRate a) (Fad.treeAnaAndRate b)
              , Fad.treeAnaOrRate  = choice1 die 1 (Fad.treeAnaOrRate  a) (Fad.treeAnaOrRate  b)
-             , Fad.algoSetting    = M.union (M.fromList $ map fst oxs) (Fad.algoSetting a)
+             , Fad.algoSetting    = M.union (M.fromList $ L.map fst oxs) (Fad.algoSetting a)
              }
          , b { Fad.techAnaTree    = tb
              , Fad.treeAnaAndRate = choice2 die 0 (Fad.treeAnaAndRate a) (Fad.treeAnaAndRate b)
              , Fad.treeAnaOrRate  = choice2 die 1 (Fad.treeAnaOrRate  a) (Fad.treeAnaOrRate  b)
-             , Fad.algoSetting    = M.union (M.fromList $ map snd oxs) (Fad.algoSetting b)
+             , Fad.algoSetting    = M.union (M.fromList $ L.map snd oxs) (Fad.algoSetting b)
              }
          )
 
@@ -213,7 +215,7 @@ crossoverFxAlgorithmSetting :: MonadRandom m =>
                                Fad.FxAlgorithmSetting ->
                                m (Fad.FxAlgorithmSetting, Fad.FxAlgorithmSetting)
 crossoverFxAlgorithmSetting a b = do
-  die <- replicateM 4 $ getRandomR (True, False)
+  die <- R.replicateM 4 $ R.getRandomR (True, False)
   (ta, tb)       <- Tr.crossoverTree (Fad.algorithmAndRate a) (Fad.algorithmOrRate a)
                     (Fad.algorithmTree a) (Fad.algorithmListCount a) (Fad.algorithmTree b) (Fad.algorithmListCount b)
   (rcia, rcib)   <- crossoverOrdFxAlMaSetting (Fad.rciSetting a) (Fad.rciSetting b)
@@ -248,32 +250,32 @@ crossoverOrdCalc :: (MonadRandom m, Num a, Ord a) => a -> Int -> [a] -> [a] -> m
 crossoverOrdCalc margin n x y = do
   die <- getRandomR (True, False)
   let (x' , y') = if die && (x !! n) + margin <= y !! (n + 1) && (y !! n) + margin <= x !! (n + 1)
-                  then (take (n + 1) y ++ drop (n + 1) x , take (n + 1) x ++ drop (n + 1) y)
+                  then (L.take (n + 1) y L.++ L.drop (n + 1) x , L.take (n + 1) x L.++ L.drop (n + 1) y)
                   else (x , y)
-  if length x - 1 == n
+  if L.length x - 1 == n
     then return (x , y)
     else crossoverOrdCalc margin (n + 1) x' y'
 
 crossoverOrd :: (MonadRandom m, Num a, Ord a) => a -> [a] -> [a] -> m ([a], [a])
 crossoverOrd mrg x y = do
-  let n = length x
-      x' = x ++ [maximum (x ++ y) + mrg + 1]
-      y' = y ++ [maximum (x ++ y) + mrg + 1]
+  let n = L.length x
+      x' = x L.++ [L.maximum (x L.++ y) + mrg + 1]
+      y' = y L.++ [L.maximum (x L.++ y) + mrg + 1]
   r <- crossoverOrdCalc mrg 0 x' y'
-  return (take n (fst r), take n (snd r))
+  return (L.take n (fst r), L.take n (snd r))
 
 crossoverOrdFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> Fad.FxAlMaSetting -> m (Fad.FxAlMaSetting, Fad.FxAlMaSetting)
 crossoverOrdFxAlMaSetting a b = do
-  die <- replicateM 2 $ getRandomR (True, False)
+  die <- R.replicateM 2 $ R.getRandomR (True, False)
   (a', b') <- crossoverOrd 1
               [Fad.shortSetting a, Fad.middleSetting a, Fad.longSetting a]
               [Fad.shortSetting b, Fad.middleSetting b, Fad.longSetting b]
-  return ( a { Fad.shortSetting     = head a'
+  return ( a { Fad.shortSetting     = L.head a'
              , Fad.middleSetting    = a' !! 1
              , Fad.longSetting      = a' !! 2
              , Fad.thresholdSetting = choice1 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
              }
-         , b { Fad.shortSetting     = head b'
+         , b { Fad.shortSetting     = L.head b'
              , Fad.middleSetting    = b' !! 1
              , Fad.longSetting      = b' !! 2
              , Fad.thresholdSetting = choice2 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
