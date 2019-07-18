@@ -14,6 +14,7 @@ main = do
   (command:_) <- getArgs
   case command of
     "statistics"       -> GaFx.statistics
+    "test"             -> GaFx.test
     "backtest"         -> GaFx.backTest "normal" False False
     "backtest-retry"   -> GaFx.backTest "retry"  False True
     "backtest-latest"  -> GaFx.backTest "latest" True False

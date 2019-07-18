@@ -14,6 +14,7 @@ module FxMongodb
   , checkFxSettingData
   , readResult
   , writeResult
+  , getChartListAll
   ) where
 
 import           Control.Monad.Trans.Reader
@@ -26,6 +27,11 @@ import qualified FxChartData                as Fcd
 import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
+
+getChartListAll :: IO [Fcd.FxChartData]
+getChartListAll = do
+  e <- Fcd.no <$> getOneChart getEndChartFromDB
+  getChartList 0 e
 
 getChartListBack :: Int -> Int -> IO [Fcd.FxChartData]
 getChartListBack s l = do

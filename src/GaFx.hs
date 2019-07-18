@@ -2,6 +2,7 @@ module GaFx
   ( backTest
   , trade
   , statistics
+  , test
   ) where
 
 import           Control.Concurrent
@@ -13,6 +14,7 @@ import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace
 import           Text.Printf
+import           Data.Vector              as V
 import qualified FxChartData              as Fcd
 import qualified FxMongodb                as Fm
 import qualified FxOandaAPI               as Foa
@@ -29,9 +31,16 @@ import qualified FxTechnicalAnalysis      as Ta
 statistics :: IO ()
 statistics = do
   fsd <- Fm.readFxSettingData "backtest"
-  mapM (\(p, c) -> do printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
+  Prelude.mapM (\(p, c) -> do printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
   return ()
 
+test :: IO ()
+test = do
+  fc <- Fm.getChartListAll
+  let cv = V.fromList fc
+      s = L.sum . L.map Fcd.close . V.toList $ V.slice 50000 100000 cv
+  print s
+  
 backTest :: String -> Bool -> Bool -> IO ()
 backTest coName latest retry = do
   fsd <- Fm.readFxSettingData "backtest"
@@ -63,16 +72,16 @@ learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     IO (Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningEvaluate n ld = do
-  r <- mapM (\fsd -> do tdlt <- Ft.learning n fsd
-                        let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
-                        return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
-                          (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
-  let r' = filter (\(_, y, _, _) -> y) r
-      (pOk, _, tdltmOk, fsdOk) = maximum r'
-      (pNg, _, tdltmNg, fsdNg) = maximum r
-  return $ if null r'
-           then (False, 0,         tdltmNg, fsdNg)
-           else (True,  length r', tdltmOk, fsdOk)
+  r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learning n fsd
+                                let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
+                                return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
+                                  (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
+  let r' = L.filter (\(_, y, _, _) -> y) r
+      (pOk, _, tdltmOk, fsdOk) = L.maximum r'
+      (pNg, _, tdltmNg, fsdNg) = L.maximum r
+  return $ if L.null r'
+           then (False, 0,          tdltmNg, fsdNg)
+           else (True,  L.length r', tdltmOk, fsdOk)
 
 learningLoop :: Int ->
                 Int ->
@@ -171,9 +180,9 @@ tradeWeeklyLoop td coName = do
   (pl, fsd') <- tradeLearning
   e <- Foa.getNowPrices td
   td' <- tradeLoop e pl 0 td fsd' coName
-  tdw <- Fm.updateFxTradeData (coName ++ "_weekly") td
+  tdw <- Fm.updateFxTradeData (coName L.++ "_weekly") td
   -- Ftw.tweetTWeek tdw td'
-  Fm.setFxTradeData (coName ++ "_weekly") td'
+  Fm.setFxTradeData (coName L.++ "_weekly") td'
   tradeWeeklyLoop td' coName
 
 tradeLoop :: Fcd.FxChartData ->
@@ -195,7 +204,7 @@ tradeLoop p pl sleep td fsd coName = do
                          then do td1 <- tradeEvaluate td fsd1 coName e 
                                  -- Fp.printProgressFxTradeData td1 e                                 
                                  return (0, td1)
-                   else return (sleep + 1, td)
+                   else return (sleep + 1, td) -- 
   if 240 < sleep'
     then do return td2
     else tradeLoop e pl' sleep' td2 fsd1 coName
