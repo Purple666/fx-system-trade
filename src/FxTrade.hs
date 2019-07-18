@@ -106,6 +106,10 @@ evaluate ctd fsd f1 forceSell td =
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chartHigh * (1 - (chartHigh / tradeRate))
         | otherwise = Ftd.realizedPL td
       (position, open)
+        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | otherwise = (0, Ftd.None)
+{-
         | (Ftd.side td == Ftd.None ||
            (Ftd.side td == Ftd.Sell && (0 < tradeRate - chartHigh ||
                                         tradeRate - chartHigh < 0))) &&
@@ -114,10 +118,6 @@ evaluate ctd fsd f1 forceSell td =
            (Ftd.side td == Ftd.Buy && (0 < chartLow - tradeRate ||
                                        chartLow - tradeRate <= 0))) &&
           evaluateProfitDec fto ftado = (chartLow, Ftd.Sell)
-        | otherwise = (0, Ftd.None)
-{-
-        | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | Ftd.side td == Ftd.None && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 -}        
       (profits, close)
