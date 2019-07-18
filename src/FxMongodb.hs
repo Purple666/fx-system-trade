@@ -49,8 +49,6 @@ getOneChart f = do
   r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                              , Fcd.date  = typed $ valueAt "time"  x
                                              , Fcd.close = typed $ valueAt "close" x
-                                             , Fcd.high  = (typed $ valueAt "close" x) -- + Gsd.spread Gsd.gsd / 2
-                                             , Fcd.low   = (typed $ valueAt "close" x) -- - Gsd.spread Gsd.gsd / 2
                                              }
              ) r
   return $ head r'
@@ -63,8 +61,6 @@ getChartList s e = do
   mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
                                        , Fcd.date  = typed $ valueAt "time"  x
                                        , Fcd.close = typed $ valueAt "close" x
-                                       , Fcd.high  = (typed $ valueAt "close" x) --  + Gsd.spread Gsd.gsd / 2
-                                       , Fcd.low   = (typed $ valueAt "close" x) -- - Gsd.spread Gsd.gsd / 2
                                        }
        ) r
 

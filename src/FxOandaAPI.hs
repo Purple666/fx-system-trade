@@ -125,8 +125,6 @@ getNowPrices td = do
                            else if Ftd.side td == Ftd.Sell
                                 then nbid . head . prices $ r ^. responseBody
                                 else ((nask . head . prices $ r ^. responseBody) + (nbid . head . prices $ r ^. responseBody)) / 2
-             , Fcd.high  = nask . head . prices $ r ^. responseBody
-             , Fcd.low  = nbid . head . prices $ r ^. responseBody
              }
 
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData

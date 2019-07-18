@@ -17,8 +17,6 @@ data FxChartData = FxChartData
   { no    :: Int
   , date  :: Int
   , close :: Double
-  , high  :: Double
-  , low   :: Double
   }
   deriving (Show, Read, Eq, Ord, Generic)
 
@@ -29,8 +27,6 @@ initFxChartData =
   FxChartData { no    = 0
               , date  = 0
               , close = 0
-              , high = 0
-              , low = 0
               }
 
 getDate :: Int -> IO String

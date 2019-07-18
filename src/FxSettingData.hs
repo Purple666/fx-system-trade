@@ -133,8 +133,9 @@ setTreeFunction fs =
 
 
 setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
-setFxSettingData  fsl =
-  setTreeFunction $ FxSettingData { fxSetting    = maxFxSettingFromLog fsl
+setFxSettingData fsl =
+  setTreeFunction $ FxSettingData { chart        = V.empty
+                                  , fxSetting    = maxFxSettingFromLog fsl
                                   , fxSettingLog = fsl                                         
                                   }
 
