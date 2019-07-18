@@ -25,9 +25,9 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 3
+  GlobalSettingData { taMargin              = 10
                     , makeTreeCount         = 1
-                    , algorithmRepeat       = 2
+                    , algorithmRepeat       = 3
                     , learningTestCount     = 5
                     , taOpenAndRate         = 1.2
                     , taCloseProfitAndRate  = 0.8
@@ -38,7 +38,7 @@ gsd =
                     , backtestLatestTime    = 24 * 60 * 5 * 4 * 12
                     , maxTradeTime          = 24 * 60 * 5 * 4 
                     , initalProperty        = 2500000
-                    , maxUnit               = 500000
+                    , maxUnit               = 3000000
                     , spread                = 0.004
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
