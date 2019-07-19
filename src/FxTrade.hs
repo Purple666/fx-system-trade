@@ -279,7 +279,7 @@ backTest :: Int ->
             (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n fc td fsd =
   let ltt = Ta.getLearningTestTime fsd
-      fc' = V.toList $ V.slice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) fc V.++ V.slice n ltt fc
+      fc' = V.toList $ V.slice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt) fc
       ctdl = makeChart fsd ltt fc'
       td1 = td { Ftd.fxSetting = Fsd.fxSetting fsd
                }
