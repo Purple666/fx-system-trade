@@ -46,22 +46,19 @@ gaLearningDataFromLog fc fsd =
                                                    in Ga.learningData fsd { Fsd.chart = fc
                                                                           , Fsd.fxSetting = fs' }) $ M.toList fsl
 
-updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog profits fsd fsdf = 
-  let fsl  = M.unionWith (\(a, b) (a', b') -> if b < b'
-                                              then (a', b')
-                                              else (a, b)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdf)
+updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog profits fsd = 
+  let fsl  = Fsd.fxSettingLog fsd
       fs   = Fsd.fxSetting fsd
-      fsl' = Fsd.minFxSettingDelete $
-             if M.member fs fsl
-             then let (p, c) = fsl M.! fs
-                  in if 0 < p + profits
-                     then M.insert fs (p + profits, c + 1) $ M.delete fs fsl
-                     else M.delete fs fsl
-             else if 0 < profits
-                  then M.insert fs (profits, 1) fsl
-                  else fsl
-  in fsd { Fsd.fxSettingLog = fsl'
+  in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
+                              if M.member fs fsl
+                              then let (p, c) = fsl M.! fs
+                                   in if 0 < p + profits
+                                      then M.insert fs (p + profits, c + 1) $ M.delete fs fsl
+                                      else M.delete fs fsl
+                              else if 0 < profits
+                                   then M.insert fs (profits, 1) fsl
+                                   else fsl
          }
   
 choice1 :: [Bool] -> Int -> b -> b -> b

@@ -22,6 +22,28 @@ import           GHC.Generics            (Generic)
 import           Network.Wreq
 import           Text.Printf
 
+data Pricing = Pricing
+  { pi_prices     :: [Price]
+  } deriving (Show, Generic)
+
+data Price = Price
+  { pr_bids :: [PriceBucket]
+  , pr_asks :: [PriceBucket]
+  } deriving (Show, Generic)
+
+data PriceBucket = PriceBucket
+  { pb_price :: String
+  } deriving (Show, Generic)
+
+instance FromJSON Pricing where 
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
+instance FromJSON Price where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
+instance FromJSON PriceBucket where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
 data Positions = Positions
   { pinstrument :: String
   , punits      :: Int
@@ -33,7 +55,6 @@ data PositionsBody = PositionsBody
   { positions    :: [Positions]
   } deriving (Show, Generic, Eq)
 
-
 data TradeOpened = TradeOpened
   { oid           :: Maybe Int
   , ounits        :: Maybe Int
@@ -41,7 +62,7 @@ data TradeOpened = TradeOpened
   , otakeProfit   :: Maybe Int
   , ostopLoss     :: Maybe Int
   , otrailingStop :: Maybe Int
-  }  deriving (Show, Generic)
+  } deriving (Show, Generic)
 
 data TradesClosed = TradeClosed
   { cid    :: Int
@@ -64,17 +85,6 @@ data OrdersBody = OrdersBody
   , tradeReduced :: TradeReduced
   } deriving (Show, Generic)
 
-data Prices = Prices
-  { ninstrument :: String
-  , ntime       :: String
-  , nbid        :: Double
-  , nask        :: Double
-  } deriving (Show, Generic)
-
-data PricesBody = PricesBody
-  { prices :: [Prices]
-  } deriving (Show, Generic)
-
 data AccountsBody = AccountsBody
   { accountId       :: Int
   , accountName     :: String
@@ -88,6 +98,7 @@ data AccountsBody = AccountsBody
   , marginRate      :: Double
   , accountCurrency :: String
   } deriving (Show, Generic)
+
 
 instance FromJSON OrdersBody
 
@@ -105,11 +116,6 @@ instance FromJSON PositionsBody
 instance FromJSON Positions where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
-instance FromJSON PricesBody
-
-instance FromJSON Prices where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
-
 instance FromJSON AccountsBody
 
 getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
@@ -117,14 +123,17 @@ getNowPrices td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td] &
              param "instruments" .~ ["USD_JPY"]
-  r <- retry 100 $ getWith opts "https://api-fxpractice.oanda.com/v1/prices"
+  r <- getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
+  traceShow(r) $ return ()
   e <- Fm.getOneChart Fm.getEndChartFromDB
+  let ask = read . pb_price . head . pr_asks . head . pi_prices $ r ^. responseBody
+      bid = read . pb_price . head . pr_bids . head . pi_prices $ r ^. responseBody
   return $ e { Fcd.close = if Ftd.side td == Ftd.Buy
-                           then nask . head . prices $ r ^. responseBody
+                           then ask
                            else if Ftd.side td == Ftd.Sell
-                                then nbid . head . prices $ r ^. responseBody
-                                else ((nask . head . prices $ r ^. responseBody) + (nbid . head . prices $ r ^. responseBody)) / 2
+                                then bid
+                                else (ask + bid) / 2
              }
 
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData

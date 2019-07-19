@@ -299,13 +299,13 @@ checkAlgoSetting :: Int ->
                     (Fsd.FxSettingData, Ftd.FxTradeData)
 checkAlgoSetting l fsd td =
   let td' = td { Ftd.chartLength = l
-               , Ftd.fxSetting = (Ftd.fxSetting td)
-                                 { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Ftd.fxSetting td
-                                 , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Ftd.fxSetting td
-                                 , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Ftd.fxSetting td
-                                 }
+               , Ftd.fxSetting = Fsd.initFxSetting
                }
-      fsd' = fsd { Fsd.fxSetting = Ftd.fxSetting td'
+      fsd' = fsd { Fsd.fxSetting = (Ftd.fxSetting td) 
+                                   { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Ftd.fxSetting td
+                                   , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Ftd.fxSetting td
+                                   , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Ftd.fxSetting td
+                                   }
                  }
   in (fsd', td')
   
@@ -314,7 +314,7 @@ learning n fsd =
   R.mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
                        ltt = Ta.getLearningTestTime fsd
                        fc = Fsd.chart fsd
-                   n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd, n)
+                   n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
                    let fc' = V.toList $ V.slice (n' - (Ta.getPrepareTimeAll fsd + ltt)) (Ta.getPrepareTimeAll fsd + ltt) fc
                    -- traceShow(ltt, n, n', length fc) $ return ()
                        ctdl = makeChart fsd ltt fc'

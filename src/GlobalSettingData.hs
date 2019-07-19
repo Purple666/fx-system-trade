@@ -34,12 +34,12 @@ gsd =
                     , initalProperty        = 2500000
                     , maxUnit               = 3000000
                     , spread                = 0.004
-                    --, dbHost                = "openshift.flg.jp:30017"
-                    , dbHost                = "mongo:27017"
-                    , tradePracticeBearer   = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
-                    , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
-                    , tradeProductionBearer = "Bearer b8831e8a4c0974fc5207eb9c4d844845-96edf86dff693710db11e5a333c18117"
-                    , tradeProductionUrl    = "https://api-fxpractice.oanda.com/v1/accounts/6716490"
+                    , dbHost                = "openshift.flg.jp:30017"
+                    --, dbHost                = "mongo:27017"
+                    , tradePracticeBearer   = "Bearer 041fff2f1e9950579315d9a8d629ef9f-5b7c44123e8fc34c65951f4d3332b96b"
+                    , tradePracticeUrl      = "https://api-fxpractice.oanda.com/v3/accounts/101-009-11751301-001"
+                    , tradeProductionBearer = "Bearer 041fff2f1e9950579315d9a8d629ef9f-5b7c44123e8fc34c65951f4d3332b96b"
+                    , tradeProductionUrl    = "https://api-fxpractice.oanda.com/v3/accounts/101-009-11751301-001"
                     }
 
 

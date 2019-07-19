@@ -36,10 +36,9 @@ statistics = do
 
 test :: IO ()
 test = do
-  fc <- Fm.getChartListAll
-  let cv = V.fromList fc
-      s = L.sum . L.map Fcd.close . V.toList $ V.slice 50000 100000 cv
-  print s
+  let td = Ft.initFxTradeData Ftd.Practice
+  e <- Foa.getNowPrices td
+  print e
   
 backTest :: IO ()
 backTest = do
@@ -126,14 +125,12 @@ backTestLoop lf n endN fc td fsd = do
                                then learning n fc fsd
                                else return (True, 0, [Ftd.initFxTradeDataCommon], fsd)
   let (fsd2, tdt) = Ft.backTest n fc td fsd1
-  fsd3 <- Fm.writeFxSettingData "backtest"
-          <$> Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
-          =<< Fm.readFxSettingData "backtest"
+  fsd3 <- Fm.writeFxSettingData "backtest" $ Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fp.printTestProgress fsd1 fsd td tdt tdlt plok ok False
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
-    else backTestLoop (Ftd.profit tdt <= Ftd.profit td) n' endN fc tdt fsd3
+    else backTestLoop (Ftd.profit tdt < Ftd.profit td) n' endN fc tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
