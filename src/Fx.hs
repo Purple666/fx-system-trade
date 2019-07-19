@@ -15,9 +15,7 @@ main = do
   case command of
     "statistics"       -> GaFx.statistics
     "test"             -> GaFx.test
-    "backtest"         -> GaFx.backTest "normal" False False
-    "backtest-retry"   -> GaFx.backTest "retry"  False True
-    "backtest-latest"  -> GaFx.backTest "latest" True False
+    "backtest"         -> GaFx.backTest
     "trade-practice"   -> GaFx.trade Ftd.Practice "trade_practice"
     "trade-production" -> GaFx.trade Ftd.Production "trade_production"
 

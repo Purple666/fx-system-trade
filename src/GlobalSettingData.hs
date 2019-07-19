@@ -6,9 +6,6 @@ data GlobalSettingData = GlobalSettingData
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
   , countUpList           :: Double
-  , taOpenAndRate         :: Double
-  , taCloseProfitAndRate  :: Double
-  , taCloseLossAndRate    :: Double
   , backtestLatestTime    :: Int
   , maxTradeTime          :: Int
   , fxSettingLogNum       :: Int
@@ -29,9 +26,6 @@ gsd =
                     , makeTreeCount         = 2
                     , algorithmRepeat       = 2
                     , learningTestCount     = 2
-                    , taOpenAndRate         = 1
-                    , taCloseProfitAndRate  = 1
-                    , taCloseLossAndRate    = 1
                     , countUpList           = 2
                     , quantityRate          = 5
                     , fxSettingLogNum       = 20

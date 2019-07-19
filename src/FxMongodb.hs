@@ -121,10 +121,10 @@ writeFxSettingData coName fsd = do
   close pipe
   return fsd
 
-readResult :: String -> IO (Int, Int)
-readResult coName = do
+readResult :: IO (Int, Int)
+readResult = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "result_" ++ coName)
+  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "result_backtest")
   close pipe
   if null r
     then return (0, 0)
@@ -132,10 +132,10 @@ readResult coName = do
             f <- head <$> mapM (\x -> return (read . typed $ valueAt "fail"    x)) r
             return (s , f)
 
-writeResult :: String -> Int -> Int -> IO ()
-writeResult coName s f = do
+writeResult :: Int -> Int -> IO ()
+writeResult s f = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setResultToDB (T.pack $ "result_" ++ coName) s f 
+  _ <- access pipe master "fx" $ setResultToDB (T.pack $ "result_backtest") s f 
   close pipe
   return ()
 
