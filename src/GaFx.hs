@@ -45,7 +45,7 @@ backTest = do
   fsd <- Fm.readFxSettingData "backtest"
   (s, f) <- Fm.readResult
   let td  = Ft.initFxTradeData Ftd.Backtest
-      startN = Ta.getPrepareTimeAll fsd * Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+      startN = Ta.getPrepareTimeAll fsd * Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd ^ 2
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   fc <- V.fromList <$> Fm.getChartListAll
   (tdt, fsd') <- backTestLoop False startN endN fc td fsd
