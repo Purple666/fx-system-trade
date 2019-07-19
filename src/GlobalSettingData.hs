@@ -21,15 +21,15 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 2
-                    , makeTreeCount         = 2
-                    , algorithmRepeat       = 2
-                    , learningTestCount     = 2
+  GlobalSettingData { taMargin              = 5
+                    , makeTreeCount         = 5
+                    , algorithmRepeat       = 5
+                    , learningTestCount     = 5
                     , countUpList           = 2
                     , quantityRate          = 5
                     , fxSettingLogNum       = 10
                     , maxTradeTime          = 24 * 60 * 5 * 4 
-                    , initalProperty        = 2500000
+                    , initalProperty        = 3000000
                     , maxUnit               = 3000000
                     , spread                = 0.004
                     --, dbHost                = "openshift.flg.jp:30017"
