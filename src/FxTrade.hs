@@ -307,7 +307,7 @@ checkAlgoSetting l fsd td =
                                    , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Ftd.fxSetting td
                                    }
                  }
-  in (fsd, td')
+  in (fsd, td)
   
 learning :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learning n fsd =
