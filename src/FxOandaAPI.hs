@@ -44,79 +44,35 @@ instance FromJSON Price where
 instance FromJSON PriceBucket where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
 
-data Positions = Positions
-  { pinstrument :: String
-  , punits      :: Int
-  , pside       :: String
-  , pavgPrice   :: Double
-  } deriving (Show, Generic, Eq)
+data AccountBody = AccountBody
+  { account :: Account
+  } deriving (Show, Generic)
+    
+data Account = Account
+  { balance         :: String
+  , unrealizedPL    :: String
+  } deriving (Show, Generic)
+
+instance FromJSON AccountBody
+instance FromJSON Account
 
 data PositionsBody = PositionsBody
-  { positions    :: [Positions]
-  } deriving (Show, Generic, Eq)
-
-data TradeOpened = TradeOpened
-  { oid           :: Maybe Int
-  , ounits        :: Maybe Int
-  , oside         :: Maybe String
-  , otakeProfit   :: Maybe Int
-  , ostopLoss     :: Maybe Int
-  , otrailingStop :: Maybe Int
+  { positions    :: [Position]
   } deriving (Show, Generic)
 
-data TradesClosed = TradeClosed
-  { cid    :: Int
-  , cunits :: Int
-  , cside  :: String
-  }  deriving (Show, Generic)
-
-data TradeReduced = TradeReduced
-  { rid    :: Maybe Int
-  , runits :: Maybe Int
-  , rside  :: Maybe String
-  }  deriving (Show, Generic)
-
-data OrdersBody = OrdersBody
-  { instrument   :: String
-  , time         :: String
-  , price        :: Double
-  , tradeOpened  :: TradeOpened
-  , tradesClosed :: [TradesClosed]
-  , tradeReduced :: TradeReduced
+data Position = Position
+  { long  :: PositionSide
+  , short :: PositionSide
   } deriving (Show, Generic)
 
-data AccountsBody = AccountsBody
-  { accountId       :: Int
-  , accountName     :: String
-  , balance         :: Double
-  , unrealizedPl    :: Double
-  , realizedPl      :: Double
-  , marginUsed      :: Double
-  , marginAvail     :: Double
-  , openTrades      :: Int
-  , openOrders      :: Int
-  , marginRate      :: Double
-  , accountCurrency :: String
+data PositionSide = PositionSide
+  { units        :: String
+  , averagePrice ::  String
   } deriving (Show, Generic)
-
-
-instance FromJSON OrdersBody
-
-instance FromJSON TradeOpened where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON TradesClosed where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON TradeReduced where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
 
 instance FromJSON PositionsBody
-
-instance FromJSON Positions where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 1 }
-
-instance FromJSON AccountsBody
+instance FromJSON Position
+instance FromJSON PositionSide
 
 getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
 getNowPrices td = do
@@ -138,18 +94,19 @@ getNowPrices td = do
 
 close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 close td = do
-  (s, u, _) <- getOandaPosition td
+  (s, u, _) <- getPosition td
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
-  updateFxTradeData =<< if s == Ftd.Buy
-                        then setOandaOrders td "sell" u
-                        else if s == Ftd.Sell
-                             then setOandaOrders td "buy" u
-                             else return td
+  if s == Ftd.Buy
+    then setOrders td (-u)
+    else if s == Ftd.Sell
+         then setOrders td u
+         else return ()
+  updateFxTradeData td
 
 open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
 open td side = do
-  (b, _) <- getOandaBalance td
+  (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
       u' = if Gsd.maxUnit Gsd.gsd < u
@@ -157,17 +114,18 @@ open td side = do
            else u
   printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
-  td'' <- updateFxTradeData =<< if side == Ftd.Buy
-                                then setOandaOrders td "buy" u'
-                                else if side == Ftd.Sell
-                                     then setOandaOrders td "sell" u'
-                                     else return td
-  return (u', td'')
+  if side == Ftd.Buy
+    then setOrders td u'
+    else if side == Ftd.Sell
+         then setOrders td (-u')
+         else return()  
+  td' <- updateFxTradeData td
+  return (u', td')
 
 updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do
-  (s, _, r) <- getOandaPosition td
-  (b, upl) <- getOandaBalance td
+  (s, _, r) <- getPosition td
+  (b, upl) <- getBalance td
   return $ td { Ftd.tradeRate    = (Ftd.tradeRate td) { Fcd.close = r
                                                       }
               , Ftd.side         = s
@@ -175,47 +133,42 @@ updateFxTradeData td = do
               , Ftd.unrealizedPL = b + upl
               }
 
-getOandaBalance :: Ftd.FxTradeData -> IO (Double, Double)
-getOandaBalance td = do
+getBalance :: Ftd.FxTradeData -> IO (Double, Double)
+getBalance td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- retry 100 $ getWith opts (Ftd.url td)
+  r <- getWith opts (Ftd.url td)
        >>= asJSON
-  let b =  balance $ r ^. responseBody
-      upl = unrealizedPl $ r ^. responseBody
+  let b =  read . balance $ r ^. responseBody
+      upl = read . unrealizedPL $ r ^. responseBody
   return (b, upl)
 
-setOandaOrders :: Ftd.FxTradeData -> String -> Int -> IO Ftd.FxTradeData
-setOandaOrders td s u = do
+setOrders :: Ftd.FxTradeData -> Int -> IO ()
+setOrders td u = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- retry 100 $ postWith opts (Ftd.url td ++ "/orders")
-       ["instrument" := ("USD_JPY" :: String), "units" := u, "side" := s, "type" := ("market" :: String)]
-       >>= asJSON
-  return $ td { Ftd.chart = (Ftd.chart td) { Fcd.close = price $ r ^. responseBody
-                                           }
-              }
+  postWith opts (Ftd.url td ++ "/orders")
+    [ "type" := ("MARKET" :: String)
+    , "instrument" := ("USD_JPY" :: String)
+    , "units" := u
+    , "timeInForce" :=  ("FOK" :: String)
+    , "positionFill" :=  ("DEFAULT" :: String)
+    ]
+  return ()
 
-getOandaPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
-getOandaPosition td = do
+getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
+getPosition td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- retry 100 $ getWith opts (Ftd.url td ++ "/positions")
+  r <- retry 100 $ getWith opts (Ftd.url td ++ "/OpenPositions")
        >>= asJSON
   let ps = positions $ r ^. responseBody
-      s = if null ps
-          then Ftd.None
-          else let st = pside $ head ps
-               in if st == "buy"
-                  then Ftd.Buy
-                  else if st == "sell"
-                       then Ftd.Sell
-                       else Ftd.None
-      u = if null ps
-          then 0
-          else punits $ head ps
-      p = if null ps
-          then 0
-          else pavgPrice $ head ps
-  return (s, u, p)
-
+  return $ if null ps
+           then (Ftd.None, 0, 0)
+           else let lu = read . units . long  $ head ps
+                    su = read . units . short $ head ps
+                in if lu /= 0
+                   then (Ftd.Buy, lu, read . averagePrice . long  $ head ps)
+                   else if su /= 0 
+                        then (Ftd.Sell, su, read . averagePrice . short $ head ps)
+                        else (Ftd.None, 0, 0)
