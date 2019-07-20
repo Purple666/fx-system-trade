@@ -128,7 +128,8 @@ backTestLoop lf n endN fc td fsd = do
                                else return (True, 0, [Ftd.initFxTradeDataCommon], fsd)
   (fsd2, tdt) <- Ft.backTest n fc td fsd1
   let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
-  Fp.printTestProgress fsd1 fsd td tdt tdlt plok ok False
+  Fm.writeFxSettingData "backtest" fsd3
+  Fp.printTestProgress fsd3 fsd td tdt tdlt plok ok False
   let n' = Fcd.no (Ftd.chart tdt) + 1
       ltt = Ta.getLearningTestTime fsd3 * Gsd.learningTestCount Gsd.gsd
   if endN <= n' + ltt || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
