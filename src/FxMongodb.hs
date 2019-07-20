@@ -2,8 +2,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 
 module FxMongodb
-  ( getChartListBack
-  , getChartListForward
+  ( getChartListSlice
   , getOneChart
   , getStartChartFromDB
   , getEndChartFromDB
@@ -33,12 +32,8 @@ getChartListAll = do
   e <- Fcd.no <$> getOneChart getEndChartFromDB
   getChartList 0 e
 
-getChartListBack :: Int -> Int -> IO [Fcd.FxChartData]
-getChartListBack s l = do
-  getChartList (s - l) s
-
-getChartListForward :: Int -> Int -> IO [Fcd.FxChartData]
-getChartListForward s l = do
+getChartListSlice :: Int -> Int -> IO [Fcd.FxChartData]
+getChartListSlice s l = do
   getChartList s (s + l)
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
