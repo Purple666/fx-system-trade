@@ -301,13 +301,13 @@ checkAlgoSetting l fsd td =
   let td' = td { Ftd.chartLength = l
                , Ftd.fxSetting = Fsd.initFxSetting
                }
-      fsd' = fsd { Fsd.fxSetting = (Ftd.fxSetting fsd) 
+      fsd' = fsd { Fsd.fxSetting = (Ftd.fxSetting td) 
                                    { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Ftd.fxSetting td
                                    , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Ftd.fxSetting td
                                    , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Ftd.fxSetting td
                                    }
                  }
-  in (fsd', td')
+  in (fsd, td')
   
 learning :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learning n fsd =
