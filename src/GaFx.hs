@@ -45,7 +45,7 @@ backTest = do
   fsd <- Fm.readFxSettingData "backtest"
   (s, f) <- Fm.readResult
   let td  = Ft.initFxTradeData Ftd.Backtest
-      startN = Ta.getPrepareTimeAll fsd * Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd ^ 2 + Gsd.maxTradeTime Gsd.gsd
+      startN = Ta.getPrepareTimeAll fsd + Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd ^ 2 + Gsd.maxTradeTime Gsd.gsd
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   fc <- V.fromList <$> Fm.getChartListAll
   (tdt, fsd') <- backTestLoop False startN endN fc td fsd
@@ -122,7 +122,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop lf n endN fc td fsd = do
-  (ok, plok, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
+  (ok, plok, tdlt, fsd1) <- if Ftd.side td == Ftd.None -- || lf
                                then learning n fc fsd
                                else return (True, 0, [Ftd.initFxTradeDataCommon], fsd)
   let (fsd2, tdt) = Ft.backTest n fc td fsd1
@@ -131,7 +131,7 @@ backTestLoop lf n endN fc td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
-    else backTestLoop (Ftd.profit tdt < Ftd.profit td) n' endN fc tdt fsd3
+    else backTestLoop (Ftd.profit tdt <= Ftd.profit td) n' endN fc tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
