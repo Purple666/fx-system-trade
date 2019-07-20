@@ -301,7 +301,7 @@ checkAlgoSetting l fsd td =
   let td' = td { Ftd.chartLength = l
                , Ftd.fxSetting = Fsd.initFxSetting
                }
-      fsd' = fsd { Fsd.fxSetting = (Ftd.fxSetting td) 
+      fsd' = fsd { Fsd.fxSetting = (Ftd.fxSetting fsd) 
                                    { Fsd.fxTaOpen        = Ta.checkAlgoSetting . Fsd.fxTaOpen        $ Ftd.fxSetting td
                                    , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting . Fsd.fxTaCloseProfit $ Ftd.fxSetting td
                                    , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting . Fsd.fxTaCloseLoss   $ Ftd.fxSetting td
