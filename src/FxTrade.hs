@@ -314,6 +314,7 @@ learning n fsd =
                    n' <- getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
                    -- let fc' = V.toList $ V.slice (n' - (Ta.getPrepareTimeAll fsd + ltt)) (Ta.getPrepareTimeAll fsd + ltt) fc
                    fc' <- Fm.getChartListSlice (n' - (Ta.getPrepareTimeAll fsd + ltt)) (Ta.getPrepareTimeAll fsd + ltt)
+                   -- traceShow(n' - (Ta.getPrepareTimeAll fsd + ltt), (Ta.getPrepareTimeAll fsd + ltt), L.length fc') $ return ()
                    let ctdl = makeChart fsd ltt fc'
                        (_, _, td'', _) = L.foldl (\(_, _, td', _) ctd -> evaluate ctd fsd getQuantityLearning False td' Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
                        (_, _, td''', _) = evaluate (L.last ctdl) fsd getQuantityLearning True td'' Fsd.initFxSetting
