@@ -7,6 +7,6 @@ db = client.fx
 db.fsd_backtest.drop()
 db.trade_practice.drop()
 db.trade_practice_weekly.drop()
-db.result_normal.drop()
-db.result_latest.drop()
+db.result_backtest.drop()
+
     
