@@ -129,8 +129,7 @@ backTestLoop lf n endN fc td fsd = do
       fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fp.printTestProgress fsd1 fsd td tdt tdlt plok ok False
   let n' = Fcd.no (Ftd.chart tdt) + 1
-      ltt = Ta.getLearningTestTime fsd3 * Gsd.learningTestCount Gsd.gsd
-  if endN <= (n' + Ta.getPrepareTimeAll fsd3 + ltt) || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+  if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
     else backTestLoop (Ftd.profit tdt <= Ftd.profit td) n' endN fc tdt fsd3
 
