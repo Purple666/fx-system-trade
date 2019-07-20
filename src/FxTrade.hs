@@ -170,7 +170,7 @@ evaluate ctd fsd f1 forceSell td =
                       }
               else fs'
       td' = td { Ftd.chart     = cd
-               -- , Ftd.fxSetting = fs''
+               , Ftd.fxSetting = fs''
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
                                                           , Fcd.close = position
