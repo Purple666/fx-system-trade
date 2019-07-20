@@ -140,7 +140,7 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  Fcd.FxChartData ->
                  IO (Ftd.FxTradeData)
 tradeEvaluate td fsd coName e = do
-  (open, close, td1) <- Ft.trade td fsd e
+  (open, close, td1, _) <- Ft.trade td fsd e
   td3 <- if close /= Ftd.None
          then do td2 <- Foa.close td1
                  Fm.setFxTradeData coName td2

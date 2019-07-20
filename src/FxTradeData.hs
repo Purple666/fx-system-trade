@@ -13,12 +13,10 @@ import qualified Data.Map          as M
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
-import qualified FxSettingData           as Fsd
 
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
-              , fxSetting          :: Fsd.FxSetting
               , side               :: FxSide
               , trSuccess          :: Int
               , trFail             :: Int
@@ -67,7 +65,6 @@ initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
   FxTradeData { chart               = Fcd.initFxChartData
               , tradeRate           = Fcd.initFxChartData
-              , fxSetting           = Fsd.initFxSetting
               , side                = None
               , profit              = 0
               , trSuccess           = 0
