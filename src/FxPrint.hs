@@ -19,14 +19,11 @@ import           Text.Printf
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
+printTestProgress fsd fsdo td tdt tdlt oknum lok ok = do
   let ltt = Ta.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
   nd' <-  Fcd.getDate . Fcd.date $ Ftd.chart tdt
-  if retry
-    then printf " "
-    else return ()
   printf "%s : " =<< Ftm.getLogTime
   printf "%s-%s : %6d %6.2f %4s "
     nd
@@ -36,15 +33,15 @@ printTestProgress fsd fsdo td tdt tdlt plsf lok retry = do
     (show (Ftd.side tdt))
   printFxTradeData tdt
   printFxTradeData $ sum tdlt
-  printf "| %3d %c %3d %3d\n" plsf (head $ show lok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
+  printf "| %3d %c %c %3d %3d\n" oknum (head $ show lok) (head $ show ok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
-printLearningFxTradeData :: Double -> Int -> Fsd.FxSettingData -> [Ftd.FxTradeData] -> Int -> Bool -> IO ()
-printLearningFxTradeData p n fsd tdlt plsf le = do
-  printf "%s " =<< Ftm.getLogTime
-  printf "%10.3f " p
-  printf "| %8d  " n 
+printLearningFxTradeData :: Fsd.FxSettingData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData fsd tdlt oknum lok ok = do
+  let ltt = Ta.getLearningTestTime fsd
+      ls = Fsd.learningSetting $ Fsd.fxSetting fsd
+  printf "%s : " =<< Ftm.getLogTime
   printFxTradeData $ sum tdlt
-  printf "| %3d %c %3d\n" plsf (head $ show le) (length $ Fsd.fxSettingLog fsd)
+  printf "%6d %3d %c %c %3d %3d\n" ltt oknum (head $ show lok) (head $ show ok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
