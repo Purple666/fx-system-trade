@@ -70,7 +70,7 @@ learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     IO (Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningEvaluate n ld = do
-  r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learning n fsd
+  r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learningEvaluate n (Gsd.learningTestCount Gsd.gsd) fsd
                                 let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
                                 return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
                                   (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
@@ -87,7 +87,7 @@ learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n fsd ld = do
-  ld' <- Ga.learning n (Fsd.getLearningTestTimes fsd) ld
+  ld' <- Ga.learning n ld
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
   if ok
     then return (False, True, plok, tdltm, fsd)
@@ -131,8 +131,7 @@ backTestLoop lf n endN fc td fsd = do
   Fm.writeFxSettingData "backtest" fsd3
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   let n' = Fcd.no (Ftd.chart tdt) + 1
-      ltt = Ta.getLearningTestTime fsd3 * Gsd.learningTestCount Gsd.gsd
-  if endN <= n' + ltt || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+  if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
     else backTestLoop (Ftd.profit tdt <= Ftd.profit td) n' endN fc tdt fsd3
 

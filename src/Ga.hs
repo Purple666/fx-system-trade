@@ -29,7 +29,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   mutation :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   crossover :: MonadRandom m => LearningData a -> LearningData a -> m (LearningData a)
   createInitialData :: MonadRandom m => Int -> LearningData a -> m (LearningData a)
-  learningEvaluate :: Int -> (a, Rational) -> IO (a, Rational)
+  learningEvaluate :: Int -> LearningData a -> IO (LearningData a)
   setHash :: LearningData a -> LearningData a
   getGaDataList :: LearningData a -> [a]
   maximumScore :: LearningData a -> Rational
@@ -37,7 +37,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   emptyLearningData :: LearningData a
   learningData :: a -> LearningData a
   learningDataList :: [LearningData a] -> LearningData a
-  learning :: Int -> Int -> LearningData a -> IO (LearningData a)
+  learning :: Int -> LearningData a -> IO (LearningData a)
   
   getGaDataList (LearningData x) = map fst x
   maximumScore (LearningData x) = fst . maximum $ map (\y -> (snd y, fst y)) x
@@ -45,12 +45,8 @@ class (Show a, Eq a, Ord a) => Ga a where
   emptyLearningData = LearningData []
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-
-  learning n m x = do
-    (ok, x') <- createLoop n (length x + 2) m 0 x emptyLearningData
-    if ok
-      then setHash <$> gaLoop n (length x + 2) x'
-      else return $ setHash x'
+  learning n x = do
+    setHash <$> (gaLoop n (length x + 2) =<< createInitialData (length x + 2) x)
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
@@ -83,34 +79,14 @@ geneticOperators e x y = do
     then return y'
     else geneticOperators e x y'
 
-createLoop :: (Ga a) => Int -> Int -> Int -> Int -> LearningData a -> LearningData a -> IO (Bool, LearningData a)
-createLoop n e m c x y = do
-  x' <- createInitialData e x
-  y' <- mappend y <$> createEvaluate n x'
-  -- traceShow("create", e, m, c, length y', length x, length y) $ return ()
-  if e <= length y'
-    then return (True, y')
-    else if m < c
-         then if 2 < length y'
-              then return (True, y')
-              else return (False, x)
-         else createLoop n e m (c + 1) x y'
-
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop n e x = do
-  x' <- gaEvaluate n =<< (geneticOperators e x $ LearningData [(maximum x, maximumScore x)])
+  x' <- learningEvaluate n =<< (geneticOperators e x $ LearningData [(maximum x, maximumScore x)])
   -- traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else gaLoop n e $ mappend x' x
 
-createEvaluate :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
-createEvaluate n (LearningData y) = do
-  LearningData <$> (mapM (learningEvaluate n) $ map (\x -> (fst x, 0 :: Rational)) y)
-
-gaEvaluate :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
-gaEvaluate n (LearningData y) = do
-  LearningData <$> mapM (learningEvaluate n) y
     
               
 

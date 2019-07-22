@@ -67,8 +67,6 @@ data FxLearningSetting =
                     , logCount           :: Int
                     } deriving (Show, Read, Eq, Ord, Generic)
 
-instance Hashable FxLearningSetting
-
 initFxSettingData :: FxSettingData
 initFxSettingData =
   FxSettingData { chart        = V.empty
