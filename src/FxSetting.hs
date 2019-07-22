@@ -157,9 +157,10 @@ mutationFxSettingData x _ =
 setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
 setHashFxSettingData x =
-  Ga.LearningData . L.map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                               { Fsd.settingHash = hash (Fsd.fxSetting fsd)
-                                               }
+  Ga.LearningData . L.map (\(fsd, p) -> (fsd { Fsd.fxSettingChart = Fsd.initFxSettingChart
+                                             , Fsd.fxSetting = (Fsd.fxSetting fsd)
+                                                               { Fsd.settingHash = hash (Fsd.fxSetting fsd)
+                                                               }
                                              }, p)) $ Ga.getLearningData x
 
 crossoverFxSettingData :: MonadRandom m =>

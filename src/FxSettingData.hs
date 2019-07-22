@@ -8,6 +8,7 @@ module FxSettingData
   , initFxSettingData
   , plusLearningTestTimes
   , initFxSetting
+  , initFxSettingChart
   , getLearningTestTimes
   , getLogProfit
   , setFxSettingData
