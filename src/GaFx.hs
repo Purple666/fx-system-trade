@@ -88,7 +88,7 @@ learningLoop c n fsd ld = do
   ld' <- Ga.learning ld
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
   if ok
-    then return (False, True, plok, tdltm, fsd)
+    then return (False, True, plok, tdltm, fsd')
     else if Fsd.getLearningTestTimes fsd' < fromIntegral c || fsd == fsd'
          then return (False, False, plok, tdltm, Fsd.plusLearningTestTimes fsd')
          else learningLoop (c + 1) n fsd' ld'
