@@ -59,7 +59,7 @@ items:
     source:
       git:
         uri: https://github.com/andesm/fx-system-trade.git
-        ref: "vec"
+        #ref: "vec"
       type: Git
     strategy:
       dockerStrategy:

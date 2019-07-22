@@ -325,7 +325,7 @@ getChart n fsd = do
 learningEvaluate :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learningEvaluate n fsd =
   R.mapM (\_ -> do (ltt, fc) <- getChart n fsd
-                   return $ evaluate fsd ltt fc) [1 ..  (Gsd.learningTestCount Gsd.gsd) ]
+                   return $ evaluate fsd ltt fc) [1 ..  (Gsd.learningTestCount Gsd.gsd)]
 
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
