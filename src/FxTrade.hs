@@ -312,8 +312,8 @@ learningEvaluate n c fsd =
                        ltt = Ta.getLearningTestTime fsd
                        fc = Fsd.chart fsd
                    n' <- if c == 1
-                         then getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
-                         else return n
+                         then return n
+                         else getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
                    fc' <- Fm.getChartListSlice (n' - (Ta.getPrepareTimeAll fsd + ltt)) (Ta.getPrepareTimeAll fsd + ltt)
                    -- traceShow(n' - (Ta.getPrepareTimeAll fsd + ltt), (Ta.getPrepareTimeAll fsd + ltt), L.length fc') $ return ()
                    let ctdl = makeChart fsd ltt fc'
