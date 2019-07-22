@@ -312,7 +312,7 @@ learningEvaluate n c fsd =
                    n' <- if c == 1
                          then return (n - ltt)
                          else getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n - ltt)
-                   fc' <- Fm.getChartListSlice (n' - ltt) ltt
+                   fc' <- Fm.getChartListSlice n' ltt
                    -- traceShow(n' - (Ta.getPrepareTimeAll fsd + ltt), (Ta.getPrepareTimeAll fsd + ltt), L.length fc') $ return ()
                    let ctdl = makeChart fsd ltt fc'
                        (_, _, td'', _) = L.foldl (\(_, _, td', _) ctd -> evaluate ctd fsd getQuantityLearning False td' Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
