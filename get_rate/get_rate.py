@@ -7,7 +7,6 @@ import dateutil.parser
 if __name__ == "__main__":
 
     JST = timezone(timedelta(hours=+9), 'JST')
-    client_oanda = requests.session()
     
     #client = pymongo.MongoClient('mongo', 27017)
     client_mongo = pymongo.MongoClient('openshift.flg.jp', 30017)
@@ -18,10 +17,10 @@ if __name__ == "__main__":
     same = 0
     
     while True:
-        response = client_oanda.get('https://api-fxpractice.oanda.com/v3/accounts/101-009-11751301-001/pricing',
-                                    params={'instruments': 'USD_JPY'},
-                                    headers={'content-type': 'application/json',
-                                             'Authorization': 'Bearer 041fff2f1e9950579315d9a8d629ef9f-5b7c44123e8fc34c65951f4d3332b96b'})
+        response = requests.get('https://api-fxpractice.oanda.com/v3/accounts/101-009-11751301-001/pricing',
+                                params={'instruments': 'USD_JPY'},
+                                headers={'content-type': 'application/json',
+                                         'Authorization': 'Bearer 041fff2f1e9950579315d9a8d629ef9f-5b7c44123e8fc34c65951f4d3332b96b'})
         json = response.json()
 
         price = json['prices'][0]
