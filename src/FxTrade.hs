@@ -308,11 +308,12 @@ checkAlgoSetting l fsd td fs =
 learningEvaluate :: Int -> Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learningEvaluate n c fsd =
   R.mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
-                       ltt = Ta.getPrepareTimeAll fsd + Ta.getLearningTestTime fsd
+                       ltt = Ta.getLearningTestTime fsd
+                       lttp = Ta.getPrepareTimeAll fsd + lttp
                    n' <- if c == 1
-                         then return (n - ltt)
-                         else getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n - ltt)
-                   fc' <- Fm.getChartListSlice n' ltt
+                         then return (n - lttp)
+                         else getRandomR(n - lttp * Gsd.learningTestCount Gsd.gsd ^ 2, n - lttp)
+                   fc' <- Fm.getChartListSlice n' lttp
                    -- traceShow(n' - (Ta.getPrepareTimeAll fsd + ltt), (Ta.getPrepareTimeAll fsd + ltt), L.length fc') $ return ()
                    let ctdl = makeChart fsd ltt fc'
                        (_, _, td'', _) = L.foldl (\(_, _, td', _) ctd -> evaluate ctd fsd getQuantityLearning False td' Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
