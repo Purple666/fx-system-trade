@@ -56,7 +56,8 @@ instance Eq FxSetting where
 instance Ord FxSetting where
   compare a b = compare (settingHash a) (settingHash b) 
 
-instance Hashable FxSetting
+instance Hashable FxSetting where
+  hashWithSalt s (FxSetting _ _ c d e f) = s `hashWithSalt` c `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
   FxLearningSetting { learningTestTimes  :: Int
