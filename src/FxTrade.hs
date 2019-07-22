@@ -271,14 +271,13 @@ makeChart fsd chartLength xcd  =
 
 
 backTest :: Int ->
-            V.Vector Fcd.FxChartData ->
             Ftd.FxTradeData ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
-backTest n fc td fsd = do
+backTest n td fsd = do
   let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
-  fc' <- Fm.getChartListSlice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
-  let ctdl = makeChart fsd ltt fc'
+  fc <- Fm.getChartListSlice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
+  let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
       (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluate ctd fsd getQuantityBacktest False td2 fs2
                                                in (td3, fs3))
@@ -309,12 +308,11 @@ checkAlgoSetting l fsd td fs =
 learningEvaluate :: Int -> Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learningEvaluate n c fsd =
   R.mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
-                       ltt = Ta.getLearningTestTime fsd
-                       fc = Fsd.chart fsd
+                       ltt = Ta.getPrepareTimeAll fsd + Ta.getLearningTestTime fsd
                    n' <- if c == 1
-                         then return n
-                         else getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n)
-                   fc' <- Fm.getChartListSlice (n' - (Ta.getPrepareTimeAll fsd + ltt)) (Ta.getPrepareTimeAll fsd + ltt)
+                         then return (n - ltt)
+                         else getRandomR(n - ltt * Gsd.learningTestCount Gsd.gsd ^ 2, n - ltt)
+                   fc' <- Fm.getChartListSlice (n' - ltt) ltt
                    -- traceShow(n' - (Ta.getPrepareTimeAll fsd + ltt), (Ta.getPrepareTimeAll fsd + ltt), L.length fc') $ return ()
                    let ctdl = makeChart fsd ltt fc'
                        (_, _, td'', _) = L.foldl (\(_, _, td', _) ctd -> evaluate ctd fsd getQuantityLearning False td' Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl

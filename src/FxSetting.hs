@@ -34,8 +34,8 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: V.Vector Fcd.FxChartData -> Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
-gaLearningDataFromLog fc fsd =
+gaLearningDataFromLog :: Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
+gaLearningDataFromLog fsd =
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
@@ -43,8 +43,7 @@ gaLearningDataFromLog fc fsd =
                                                                                                                  , Fsd.logCount  = c
                                                                                                                  }
                                                                 }
-                                                   in Ga.learningData fsd { Fsd.chart = fc
-                                                                          , Fsd.fxSetting = fs' }) $ M.toList fsl
+                                                   in Ga.learningData fsd { Fsd.fxSetting = fs' }) $ M.toList fsl
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd = 

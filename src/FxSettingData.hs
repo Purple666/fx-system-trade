@@ -29,8 +29,7 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { chart         :: V.Vector Fcd.FxChartData
-                , fxSetting     :: FxSetting
+  FxSettingData { fxSetting     :: FxSetting
                 , fxSettingLog  :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
@@ -69,8 +68,7 @@ data FxLearningSetting =
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { chart        = V.empty
-                , fxSetting    = initFxSetting
+  FxSettingData { fxSetting    = initFxSetting
                 , fxSettingLog = M.empty
                 }
 
@@ -133,8 +131,7 @@ setTreeFunction fs =
 
 setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData fsl =
-  setTreeFunction $ FxSettingData { chart        = V.empty
-                                  , fxSetting    = maxFxSettingFromLog fsl
+  setTreeFunction $ FxSettingData { fxSetting    = maxFxSettingFromLog fsl
                                   , fxSettingLog = fsl                                         
                                   }
 
