@@ -17,7 +17,8 @@ chart = []
 no = 0
 for r in df.itertuples():
     t = int(datetime.strptime(r[2] + r[3], "%Y%m%d%H%M%S").timestamp() / 60)
-    chart.append({'no': no, 'time': t, 'open': r[4], 'high': r[5], 'low': r[6], 'close': r[7] })
+    chart.append({'no': no, 'time': t, 'close': r[7] })
+    #chart.append({'no': no, 'time': t, 'open': r[4], 'high': r[5], 'low': r[6], 'close': r[7] })
     #co.insert_one({'no': no, 'time': t, 'open': r[4], 'high': r[5], 'low': r[6], 'close': r[7] })
     #print('no:', no, 'time:', t, 'open:', r[4], 'high:', r[5], 'low:', r[6], 'close:', r[7])
     no = no + 1
