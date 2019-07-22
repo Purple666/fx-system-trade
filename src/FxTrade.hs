@@ -309,7 +309,7 @@ learningEvaluate :: Int -> Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
 learningEvaluate n c fsd =
   R.mapM (\_ -> do let td = initFxTradeData Ftd.Backtest
                        ltt = Ta.getLearningTestTime fsd
-                       lttp = Ta.getPrepareTimeAll fsd + lttp
+                       lttp = Ta.getPrepareTimeAll fsd + ltt
                    n' <- if c == 1
                          then return (n - lttp)
                          else getRandomR(n - lttp * Gsd.learningTestCount Gsd.gsd ^ 2, n - lttp)
