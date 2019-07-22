@@ -4,6 +4,7 @@ module FxSettingData
   ( FxSettingData (..)
   , FxSetting (..)
   , FxLearningSetting (..)
+  , FxSettingChart(..)
   , initFxSettingData
   , plusLearningTestTimes
   , initFxSetting
@@ -19,7 +20,6 @@ import Debug.Trace
 import GHC.Generics (Generic)
 import Data.Hashable
 import qualified Ga
-import           Data.Vector             as V
 import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified FxChartData             as Fcd
@@ -29,8 +29,9 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { fxSetting     :: FxSetting
-                , fxSettingLog  :: M.Map FxSetting (Double, Int)
+  FxSettingData { fxSettingChart :: FxSettingChart
+                , fxSetting      :: FxSetting
+                , fxSettingLog   :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
@@ -42,6 +43,11 @@ data FxSetting =
             , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Generic)
+
+data FxSettingChart =
+  FxSettingChart { chart            :: [Fcd.FxChartData]
+                 , learningTestTime :: Int
+                 } deriving (Show)
 
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
@@ -68,9 +74,11 @@ data FxLearningSetting =
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { fxSetting    = initFxSetting
-                , fxSettingLog = M.empty
+  FxSettingData { fxSettingChart = initFxSettingChart
+                , fxSetting      = initFxSetting
+                , fxSettingLog   = M.empty
                 }
+
 
 initFxSetting :: FxSetting
 initFxSetting =
@@ -86,6 +94,12 @@ initFxSetting =
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
             }
+
+initFxSettingChart :: FxSettingChart
+initFxSettingChart =
+  FxSettingChart { chart            = []
+                 , learningTestTime = 0
+                 }
 
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
@@ -128,11 +142,11 @@ setTreeFunction fs =
      , fxSettingLog  = M.mapKeys setFxSetting $ fxSettingLog fs
      }
 
-
 setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData fsl =
-  setTreeFunction $ FxSettingData { fxSetting    = maxFxSettingFromLog fsl
-                                  , fxSettingLog = fsl                                         
+  setTreeFunction $ FxSettingData { fxSettingChart = initFxSettingChart
+                                  , fxSetting      = maxFxSettingFromLog fsl
+                                  , fxSettingLog   = fsl                                         
                                   }
 
 maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting

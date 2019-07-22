@@ -11,7 +11,6 @@ module FxSetting
 import           Control.Monad
 import           Control.Monad.Random    as R
 import           Data.Hashable
-import           Data.Vector             as V
 import qualified Data.List               as L
 import qualified Data.Map                as M
 import qualified Data.Set                as S
@@ -34,16 +33,22 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
-gaLearningDataFromLog fsd =
+gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData)
+gaLearningDataFromLog n fsd = do 
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
-  in Ga.learningDataList . L.map (\(fs, (p, c)) -> let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
-                                                                                                                 , Fsd.logCount  = c
-                                                                                                                 }
-                                                                }
-                                                   in Ga.learningData fsd { Fsd.fxSetting = fs' }) $ M.toList fsl
+  Ga.learningDataList <$> (mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n fsd { Fsd.fxSetting = fs }
+                                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
+                                                                                                                   , Fsd.logCount  = c
+                                                                                                                   }
+                                                                  }
+                                                         fsd' = fsd { Fsd.fxSetting = fs'
+                                                                    , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart            = fc
+                                                                                                              , Fsd.learningTestTime = ltt
+                                                                                                              }
+                                                                    }
+                                                     return $ Ga.learningData fsd') $ M.toList fsl)
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd = 

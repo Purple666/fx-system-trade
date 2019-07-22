@@ -68,7 +68,7 @@ learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     IO (Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningEvaluate n ld = do
-  r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learningEvaluate n (Gsd.learningTestCount Gsd.gsd) fsd
+  r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learningEvaluate n fsd
                                 let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
                                 return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
                                   (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
@@ -85,7 +85,7 @@ learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n fsd ld = do
-  ld' <- Ga.learning n ld
+  ld' <- Ga.learning ld
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
   if ok
     then return (False, True, plok, tdltm, fsd)
@@ -97,7 +97,7 @@ learning :: Int ->
             Fsd.FxSettingData ->
             IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n fsd = do
-  let ld = Fs.gaLearningDataFromLog fsd                 
+  ld <- Fs.gaLearningDataFromLog n fsd
   (ok, plok, tdltm, fsd) <- learningEvaluate n ld
   if ok
     then return (True, True, plok, tdltm, fsd)
