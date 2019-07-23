@@ -76,6 +76,10 @@ instance FromJSON Position
 instance FromJSON PositionSide
 
 data Order = Order
+  { order :: OrderRequest
+  } deriving (Show, Generic)
+
+data OrderRequest = OrderRequest
   { or_type         :: String
   , or_instrument   :: String
   , or_units        :: Int
@@ -84,6 +88,7 @@ data Order = Order
   } deriving (Show, Generic)
 
 instance ToJSON Order where
+instance ToJSON OrderRequest where
   toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 3 }
 
 getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
@@ -161,11 +166,12 @@ setOrders td u = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  postWith opts (Ftd.url td ++ "/orders") (toJSON Order { or_type         = "MARKET" 
-                                                        , or_instrument   = "USD_JPY"
-                                                        , or_units        = u
-                                                        , or_timeInForce  = "FOK"
-                                                        , or_positionFill =  "DEFAULT"
+  postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
+                                                                               , or_instrument   = "USD_JPY"
+                                                                               , or_units        = u
+                                                                               , or_timeInForce  = "FOK"
+                                                                               , or_positionFill = "DEFAULT"
+                                                                               }
                                                         })
   return ()
 
