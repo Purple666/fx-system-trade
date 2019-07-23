@@ -81,7 +81,6 @@ getNowPrices td = do
              param "instruments" .~ ["USD_JPY"]
   r <- getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
-  traceShow(r) $ return ()
   e <- Fm.getOneChart Fm.getEndChartFromDB
   let ask = read . pb_price . head . pr_asks . head . pi_prices $ r ^. responseBody
       bid = read . pb_price . head . pr_bids . head . pi_prices $ r ^. responseBody
