@@ -139,8 +139,8 @@ getBalance td = do
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- getWith opts (Ftd.url td)
        >>= asJSON
-  let b =  read . balance $ r ^. responseBody
-      upl = read . unrealizedPL $ r ^. responseBody
+  let b =  read . account. balance $ r ^. responseBody
+      upl = read . account . unrealizedPL $ r ^. responseBody
   return (b, upl)
 
 setOrders :: Ftd.FxTradeData -> Int -> IO ()
