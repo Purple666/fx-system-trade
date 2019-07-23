@@ -167,13 +167,14 @@ setOrders td u = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
-                                                                               , or_instrument   = "USD_JPY"
-                                                                               , or_units        = u
-                                                                               , or_timeInForce  = "FOK"
-                                                                               , or_positionFill = "DEFAULT"
-                                                                               }
-                                                        })
+  r <- postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
+                                                                                    , or_instrument   = "USD_JPY"
+                                                                                    , or_units        = u
+                                                                                    , or_timeInForce  = "FOK"
+                                                                                    , or_positionFill = "DEFAULT"
+                                                                                    }
+                                                             })
+  traceShow(r) $ return ()
   return ()
 
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
