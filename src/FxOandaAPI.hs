@@ -78,6 +78,7 @@ getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
 getNowPrices td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td] &
+             header "content-type" .~  ["application/json"] &
              param "instruments" .~ ["USD_JPY"]
   r <- getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
@@ -135,6 +136,7 @@ updateFxTradeData td = do
 getBalance :: Ftd.FxTradeData -> IO (Double, Double)
 getBalance td = do
   let opts = defaults &
+             header "content-type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- getWith opts (Ftd.url td)
        >>= asJSON
@@ -145,6 +147,7 @@ getBalance td = do
 setOrders :: Ftd.FxTradeData -> Int -> IO ()
 setOrders td u = do
   let opts = defaults &
+             header "content-type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   postWith opts (Ftd.url td ++ "/orders")
     [ "type" := ("MARKET" :: String)
@@ -158,6 +161,7 @@ setOrders td u = do
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getPosition td = do
   let opts = defaults &
+             header "content-type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- getWith opts (Ftd.url td ++ "/openPositions")
        >>= asJSON
