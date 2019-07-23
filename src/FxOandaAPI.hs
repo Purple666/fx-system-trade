@@ -22,6 +22,7 @@ import qualified Data.ByteString.Char8   as B
 import           GHC.Generics            (Generic)
 import           Network.Wreq
 import           Text.Printf
+import           Data.Maybe
 
 data Pricing = Pricing
   { pi_prices     :: [Price]
@@ -68,7 +69,7 @@ data Position = Position
 
 data PositionSide = PositionSide
   { units        :: String
-  , averagePrice ::  String
+  , averagePrice :: Maybe String
   } deriving (Show, Generic)
 
 instance FromJSON PositionsBody
@@ -188,7 +189,7 @@ getPosition td = do
            else let lu = read . units . long  $ head ps
                     su = read . units . short $ head ps
                 in if lu /= 0
-                   then (Ftd.Buy, lu, read . averagePrice . long  $ head ps)
+                   then (Ftd.Buy, lu, read . fromJust . averagePrice . long  $ head ps)
                    else if su /= 0 
-                        then (Ftd.Sell, su, read . averagePrice . short $ head ps)
+                        then (Ftd.Sell, su, read . fromJust . averagePrice . short $ head ps)
                         else (Ftd.None, 0, 0)
