@@ -1,7 +1,7 @@
 import requests
 import pymongo
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 import dateutil.parser
 
 if __name__ == "__main__":
@@ -40,7 +40,7 @@ if __name__ == "__main__":
             elif document['time'] != db_price['time']:
                 db_price['no'] = document['no'] + 1
                 co.update_one({"no": db_price['no']}, {"$set": db_price}, upsert = True)
-                print("rate : %s %d %d %6.3f" % (loc.astimezone(), db_price['no'], db_price['time'], db_price['close']))
+                print("rate : %s %d %d %6.3f" % (loc.astimezone(tzinfo=JST), db_price['no'], db_price['time'], db_price['close']))
                 same = 0
         except Exception as e:
             print(e)

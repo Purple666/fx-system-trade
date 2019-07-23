@@ -156,7 +156,7 @@ getBalance td = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- getWith opts (Ftd.url td)
+  r <- retry 100 $ getWith opts (Ftd.url td)
        >>= asJSON
   let b =  read . balance . account $ r ^. responseBody
       upl = read . unrealizedPL . account $ r ^. responseBody
@@ -167,13 +167,13 @@ setOrders td u = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
-                                                                                    , or_instrument   = "USD_JPY"
-                                                                                    , or_units        = u
-                                                                                    , or_timeInForce  = "FOK"
-                                                                                    , or_positionFill = "DEFAULT"
-                                                                                    }
-                                                             })
+  r <- retry 100 $ postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
+                                                                                                , or_instrument   = "USD_JPY"
+                                                                                                , or_units        = u
+                                                                                                , or_timeInForce  = "FOK"
+                                                                                                , or_positionFill = "DEFAULT"
+                                                                                                }
+                                                                         })
   -- traceShow(r) $ return ()
   return ()
 
@@ -182,7 +182,7 @@ getPosition td = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- getWith opts (Ftd.url td ++ "/openPositions")
+  r <- retry 100 $ getWith opts (Ftd.url td ++ "/openPositions")
        >>= asJSON
   let ps = positions $ r ^. responseBody
   return $ if null ps
