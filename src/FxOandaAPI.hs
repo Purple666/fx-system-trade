@@ -17,6 +17,7 @@ import Debug.Trace
 import           Control.Exception.Extra
 import           Control.Lens
 import           Data.Aeson
+import           Data.Aeson.Types
 import qualified Data.ByteString.Char8   as B
 import           GHC.Generics            (Generic)
 import           Network.Wreq
@@ -74,11 +75,22 @@ instance FromJSON PositionsBody
 instance FromJSON Position
 instance FromJSON PositionSide
 
+data Order = Order
+  { or_type         :: String
+  , or_instrument   :: String
+  , or_units        :: Int
+  , or_timeInForce  :: String
+  , or_positionFill :: String
+  } deriving (Show, Generic)
+
+instance ToJSON Order where
+  toJSON = genericToJSON defaultOptions { fieldLabelModifier = drop 3 }
+
 getNowPrices :: Ftd.FxTradeData -> IO Fcd.FxChartData
 getNowPrices td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td] &
-             header "content-type" .~  ["application/json"] &
+             header "Content-Type" .~  ["application/json"] &
              param "instruments" .~ ["USD_JPY"]
   r <- getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
@@ -136,7 +148,7 @@ updateFxTradeData td = do
 getBalance :: Ftd.FxTradeData -> IO (Double, Double)
 getBalance td = do
   let opts = defaults &
-             header "content-type" .~  ["application/json"] &
+             header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- getWith opts (Ftd.url td)
        >>= asJSON
@@ -147,21 +159,20 @@ getBalance td = do
 setOrders :: Ftd.FxTradeData -> Int -> IO ()
 setOrders td u = do
   let opts = defaults &
-             header "content-type" .~  ["application/json"] &
+             header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  postWith opts (Ftd.url td ++ "/orders")
-    [ "type" := ("MARKET" :: String)
-    , "instrument" := ("USD_JPY" :: String)
-    , "units" := u
-    , "timeInForce" :=  ("FOK" :: String)
-    , "positionFill" :=  ("DEFAULT" :: String)
-    ]
+  postWith opts (Ftd.url td ++ "/orders") (toJSON Order { or_type         = "MARKET" 
+                                                        , or_instrument   = "USD_JPY"
+                                                        , or_units        = u
+                                                        , or_timeInForce  = "FOK"
+                                                        , or_positionFill =  "DEFAULT"
+                                                        })
   return ()
 
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getPosition td = do
   let opts = defaults &
-             header "content-type" .~  ["application/json"] &
+             header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
   r <- getWith opts (Ftd.url td ++ "/openPositions")
        >>= asJSON
