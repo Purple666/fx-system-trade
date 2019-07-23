@@ -116,9 +116,9 @@ close td = do
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
   if s == Ftd.Buy
-    then setOrders td (-u)
+    then setOrders td u
     else if s == Ftd.Sell
-         then setOrders td u
+         then setOrders td (-u)
          else return ()
   updateFxTradeData td
 
