@@ -98,7 +98,7 @@ getNowPrices td = do
              header "Authorization" .~ [B.pack $ Ftd.bearer td] &
              header "Content-Type" .~  ["application/json"] &
              param "instruments" .~ ["USD_JPY"]
-  r <- getWith opts (Ftd.url td ++ "/pricing")
+  r <- retry 100 $ getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
   e <- Fm.getOneChart Fm.getEndChartFromDB
   let ask = read . pb_price . head . pr_asks . head . pi_prices $ r ^. responseBody

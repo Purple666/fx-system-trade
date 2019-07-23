@@ -11,9 +11,8 @@ import qualified Ga
 import           Control.Monad
 import qualified Data.Map                as M
 import qualified Data.List               as L
-import           Data.Vector             as V
 import           Debug.Trace
-import           Control.Monad.Random    as R
+import qualified Control.Monad.Random    as R
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm
 import qualified FxPrint                 as Fp
@@ -318,7 +317,7 @@ getChart :: Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
 getChart n fsd = do
   let ltt = Ta.getLearningTestTime fsd
       lttp = Ta.getPrepareTimeAll fsd + ltt
-  n' <- getRandomR(n - lttp * Gsd.learningTestCount Gsd.gsd ^ 2, n - lttp)
+  n' <- R.getRandomR(n - lttp * Gsd.learningTestCount Gsd.gsd ^ 2, n - lttp)
   fc <- Fm.getChartListSlice n' lttp
   return (ltt, fc)
   

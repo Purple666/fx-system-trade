@@ -216,6 +216,3 @@ evaluateTrueLeafDataList f s (Node x l r) =
             then []
             else l' ++ r'
        _ -> l' ++ r'
-{-
-  in l' ++ r'
--}

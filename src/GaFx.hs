@@ -70,8 +70,7 @@ learningEvaluate :: Int ->
 learningEvaluate n ld = do
   r <- Prelude.mapM (\fsd -> do tdlt <- Ft.learningEvaluate n fsd
                                 let  p' = Ftd.getEvaluationValueList tdlt * (Fsd.getLogProfit fsd + 1)
-                                return {- $ traceShow(Fsd.learningSetting $ Fsd.fxSetting fsd ,p' , Ftd.getEvaluationValueList tdlt, Ft.evaluationOk tdlt) $ -}
-                                  (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
+                                return (p', Ft.evaluationOk tdlt, tdlt, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
       (pOk, _, tdltmOk, fsdOk) = L.maximum r'
       (pNg, _, tdltmNg, fsdNg) = L.maximum r
@@ -188,15 +187,15 @@ tradeLoop p pl sleep td fsd coName = do
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   let ltt = Ta.getLearningTestTime fsd
   e <- Foa.getNowPrices td
-  (pl', fsd1) <- if Ftd.side td == Ftd.None && ltt < Fcd.no e - pl
+  (pl', fsd') <- if Ftd.side td == Ftd.None && ltt < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)
-  (sleep', td2) <- if (Fcd.close e) /= (Fcd.close p)
-                         then do td1 <- tradeEvaluate td fsd1 coName e 
+  (sleep', td'') <- if (Fcd.close e) /= (Fcd.close p)
+                         then do td' <- tradeEvaluate td fsd' coName e 
                                  -- Fp.printProgressFxTradeData td1 e                                 
-                                 return (0, td1)
+                                 return (0, td')
                    else return (sleep + 1, td) -- 
   if 240 < sleep'
-    then return td2
-    else tradeLoop e pl' sleep' td2 fsd1 coName
+    then return td''
+    else tradeLoop e pl' sleep' td'' fsd' coName
 
