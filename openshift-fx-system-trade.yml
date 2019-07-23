@@ -353,13 +353,13 @@ items:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: python:latest
+        openshift.io/imported-from: python:3.7.3
       from:
         kind: DockerImage
-        name: python:latest
+        name: python:3.7.3
       generation: null
       importPolicy: {}
-      name: "latest"
+      name: "3.7.3"
       referencePolicy:
         type: ""
   status:
@@ -405,7 +405,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:latest
+          name: python:3.7.3
       type: Docker
     triggers:
     - github:
@@ -512,7 +512,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:latest
+          name: python:3.7.3
           namespace: flg
       type: Docker
     triggers:

@@ -160,7 +160,7 @@ getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getPosition td = do
   let opts = defaults &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- retry 100 $ getWith opts (Ftd.url td ++ "/OpenPositions")
+  r <- getWith opts (Ftd.url td ++ "/OpenPositions")
        >>= asJSON
   let ps = positions $ r ^. responseBody
   return $ if null ps

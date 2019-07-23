@@ -1,4 +1,4 @@
-FROM python:3.7
+FROM python
 ENV PYTHONUNBUFFERED 1
 WORKDIR /python
 COPY . /python
