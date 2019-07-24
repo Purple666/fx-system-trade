@@ -4,11 +4,13 @@
 module FxOandaAPI
   ( close
   , open
+  , closeOpen
   , updateFxTradeData
   , getNowPrices
   ) where
 
 import qualified FxChartData             as Fcd
+import qualified FxPrint                 as Fp
 import qualified FxMongodb               as Fm
 import qualified FxTime                  as Ftm
 import qualified FxTradeData             as Ftd
@@ -110,35 +112,63 @@ getNowPrices td = do
                                 else (ask + bid) / 2
              }
 
-close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
-close td = do
-  (s, u, _) <- getPosition td
+closeOpen :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+closeOpen coName td = do
+  (s, cu, _) <- getPosition td
+  (b, _) <- getBalance td
+  p <- getNowPrices td
+  let ou = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
+      ou' = if Gsd.maxUnit Gsd.gsd < ou
+            then Gsd.maxUnit Gsd.gsd
+            else ou
+  (open, close) <- if s == Ftd.Buy
+                   then do setOrders td (-(cu + ou'))
+                           return (Ftd.Sell, Ftd.Buy)
+                   else if s == Ftd.Sell
+                        then do setOrders td (-cu + ou')
+                                return (Ftd.Buy, Ftd.Sell)
+                        else return (Ftd.None, Ftd.None)
+  td' <- updateFxTradeData td
+  Fm.setFxTradeData coName td'
   printf "%s : " =<< Ftm.getLogTime
-  printf "Close - %d\n" u
+  printf "closeOpen - %f %d %d %3.6f\n" b cu ou' (Fcd.close p)
+  Fp.printTradeResult open close td td' ou'
+  return td'
+
+close :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+close coName td = do
+  (s, u, _) <- getPosition td
   if s == Ftd.Buy
-    then setOrders td u
+    then setOrders td (-u)
     else if s == Ftd.Sell
          then setOrders td (-u)
          else return ()
-  updateFxTradeData td
-
-open :: Ftd.FxTradeData -> Ftd.FxSide -> IO (Int, Ftd.FxTradeData)
-open td side = do
+  td' <- updateFxTradeData td
+  Fm.setFxTradeData coName td'
+  printf "%s : " =<< Ftm.getLogTime
+  printf "Close - %d\n" u
+  Fp.printTradeResult Ftd.None s td td' 0
+  return td'
+  
+open :: String -> Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
+open coName td side = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
       u' = if Gsd.maxUnit Gsd.gsd < u
            then Gsd.maxUnit Gsd.gsd
            else u
-  printf "%s : " =<< Ftm.getLogTime
-  printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
   if side == Ftd.Buy
     then setOrders td u'
     else if side == Ftd.Sell
          then setOrders td (-u')
          else return()  
   td' <- updateFxTradeData td
-  return (u', td')
+  Fm.setFxTradeData coName td'
+  printf "%s : " =<< Ftm.getLogTime
+  printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
+  Fp.printTradeResult side Ftd.None td td' u'
+  return td'
 
 updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do

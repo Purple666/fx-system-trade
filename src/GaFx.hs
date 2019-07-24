@@ -136,19 +136,13 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  IO (Ftd.FxTradeData)
 tradeEvaluate td fsd coName e = do
   (open, close, td1, _) <- Ft.trade td fsd e
-  td3 <- if close /= Ftd.None
-         then do td2 <- Foa.close td1
-                 Fm.setFxTradeData coName td2
-                 Fp.printTradeResult open close td td2 0
-                 return td2
-         else return td1
-  td5 <- if open /= Ftd.None
-         then do (units, td4) <- Foa.open td3 open
-                 Fm.setFxTradeData coName td4
-                 Fp.printTradeResult open close td td4 units
-                 return td4
-         else return td3
-  return td5
+  if open /= Ftd.None && close /= Ftd.None
+    then Foa.closeOpen coName td1
+    else if close /= Ftd.None
+         then Foa.close coName td1
+         else if open /= Ftd.None
+              then Foa.open coName td1 open
+              else return td1
 
 waitTrade :: IO ()
 waitTrade =
