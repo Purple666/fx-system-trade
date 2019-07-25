@@ -176,7 +176,7 @@ tradeLoop p pl sleep td fsd = do
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   let ltt = Ta.getLearningTestTime fsd
   e <- Foa.getNowPrices td
-  (pl', fsd') <- if Ftd.side td == Ftd.None && ltt < Fcd.no e - pl
+  (pl', fsd') <- if ltt < Fcd.no e - pl
                  then tradeLearning
                  else return (pl, fsd)
   (sleep', td'') <- if (Fcd.close e) /= (Fcd.close p)
