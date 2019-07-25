@@ -26,8 +26,6 @@ import qualified Tree                    as Tr
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
   (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
-  -- (and $ map (\x -> 0 < Ftd.getEvaluationValue x) tdlt) -- && 
-  --0 < Ftd.getEvaluationValueList tdlt
   
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
@@ -36,25 +34,6 @@ getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) /
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
 getQuantityLearning td chart = Ftd.realizedPL td
-
-{-
-
-getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-
-
-
-getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = Ftd.realizedPL td
-
-
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning  _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
-
-
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning _ _ = Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
--}
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -153,8 +132,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                        ctd alcCloseProfit $ Fsd.fxTaCloseProfit fs
                      fxTaCloseLoss   = Ta.updateAlgorithmListCount Fad.closeLoss
                                        ctd alcCloseLoss   $ Fsd.fxTaCloseLoss fs
-                 in {- traceShow(tradeDate, Fcd.no cd, (Fcd.no $ Ftd.tradeRate td), Fsd.trTradeDate ls' `div` Fsd.trTrade ls', Fsd.trTradeDate ls', Fsd.trTrade ls') $ -}
-                    fs { Fsd.learningSetting  = ls'
+                 in fs { Fsd.learningSetting  = ls'
                        , Fsd.fxTaOpen         = fxTaOpen       
                        , Fsd.fxTaCloseProfit  = fxTaCloseProfit
                        , Fsd.fxTaCloseLoss    = fxTaCloseLoss  
@@ -283,11 +261,6 @@ backTest n td fsd = do
                                                in (td3, fs3))
                              (td, fs) ctdl
   return $ checkAlgoSetting ltt fsd td4 fs4
-
-printDebug :: [Fad.FxChartTaData] -> (Fsd.FxSettingData, Ftd.FxTradeData) -> (Fsd.FxSettingData, Ftd.FxTradeData)
-printDebug ctdl r =
-  let a = L.map (\ctd -> (Fcd.no . Fad.chart $ (Fad.open ctd M.! 0), Fad.short . Fad.rci $ (Fad.open ctd M.! 0))) ctdl
-  in traceShow(a) $ r
 
 checkAlgoSetting :: Int ->
                     Fsd.FxSettingData ->

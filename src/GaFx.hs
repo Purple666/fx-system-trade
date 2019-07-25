@@ -2,19 +2,16 @@ module GaFx
   ( backTest
   , trade
   , statistics
-  , test
+  , debug
   ) where
 
 import           Control.Concurrent
-import           Control.Concurrent.Async
-import           Control.DeepSeq
 import qualified Data.Map                 as M
 import qualified Data.List                as L
 import           Data.Time
 import           Data.Time.Clock.POSIX
 import           Debug.Trace
 import           Text.Printf
-import           Data.Vector              as V
 import qualified FxChartData              as Fcd
 import qualified FxMongodb                as Fm
 import qualified FxOandaAPI               as Foa
@@ -34,11 +31,11 @@ statistics = do
   Prelude.mapM (\(p, c) -> do printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
   return ()
 
-test :: IO ()
-test = do
+debug :: IO ()
+debug = do
   let td = Ft.initFxTradeData Ftd.Practice
-  e <- Foa.getNowPrices td
-  print e
+  Foa.closeOpen "debug" td 
+  return ()
   
 backTest :: IO ()
 backTest = do
@@ -186,9 +183,8 @@ tradeLoop p pl sleep td fsd coName = do
                  else return (pl, fsd)
   (sleep', td'') <- if (Fcd.close e) /= (Fcd.close p)
                          then do td' <- tradeEvaluate td fsd' coName e 
-                                 -- Fp.printProgressFxTradeData td1 e                                 
                                  return (0, td')
-                   else return (sleep + 1, td) -- 
+                   else return (sleep + 1, td)
   if 240 < sleep'
     then return td''
     else tradeLoop e pl' sleep' td'' fsd' coName

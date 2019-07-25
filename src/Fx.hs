@@ -14,7 +14,7 @@ main = do
   (command:_) <- getArgs
   case command of
     "statistics"       -> GaFx.statistics
-    "test"             -> GaFx.test
+    "debug"            -> GaFx.debug
     "backtest"         -> GaFx.backTest
     "trade-practice"   -> GaFx.trade Ftd.Practice "trade_practice"
     "trade-production" -> GaFx.trade Ftd.Production "trade_production"
