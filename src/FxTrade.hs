@@ -28,8 +28,8 @@ evaluationOk tdlt =
   (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
   
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd `div` 2) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Gsd.maxUnit Gsd.gsd `div` 2) * chart) / 25
+getQuantityBacktest td chart = if (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+                               then (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
@@ -45,19 +45,25 @@ evaluateProfitDec fts ftad =
 
 initFxTradeData :: Ftd.FxEnvironment -> Ftd.FxTradeData
 initFxTradeData Ftd.Backtest =
-  Ftd.initFxTradeDataCommon { Ftd.environment      = Ftd.Backtest
-                            , Ftd.bearer           = ""
-                            , Ftd.url              = ""
+  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
+                            , Ftd.coName      = "backtest"
+                            , Ftd.environment = Ftd.Backtest
+                            , Ftd.bearer      = ""
+                            , Ftd.url         = ""
                         }
 initFxTradeData Ftd.Practice =
-  Ftd.initFxTradeDataCommon { Ftd.environment      = Ftd.Practice
-                            , Ftd.bearer           = Gsd.tradePracticeBearer Gsd.gsd
-                            , Ftd.url              = Gsd.tradePracticeUrl  Gsd.gsd
+  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.practiceMaxUnit Gsd.gsd
+                            , Ftd.coName      = "trade_practice"
+                            , Ftd.environment = Ftd.Practice
+                            , Ftd.bearer      = Gsd.tradePracticeBearer Gsd.gsd
+                            , Ftd.url         = Gsd.tradePracticeUrl Gsd.gsd
                         }
 initFxTradeData Ftd.Production =
-  Ftd.initFxTradeDataCommon { Ftd.environment      = Ftd.Production
-                            , Ftd.bearer           = Gsd.tradeProductionBearer Gsd.gsd
-                            , Ftd.url              = Gsd.tradeProductionUrl  Gsd.gsd
+  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
+                            , Ftd.coName      = "trade_production"
+                            , Ftd.environment = Ftd.Production
+                            , Ftd.bearer      = Gsd.tradeProductionBearer Gsd.gsd
+                            , Ftd.url         = Gsd.tradeProductionUrl Gsd.gsd
                             }
 
 evaluateOne :: Fad.FxChartTaData ->
@@ -149,11 +155,11 @@ evaluateOne ctd fsd f1 forceSell td fs =
       td' = td { Ftd.chart     = cd
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position
+                                                          , Fcd.close = position + Gsd.spread Gsd.gsd
                                                           }
                                  else if open == Ftd.Sell
                                       then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                               , Fcd.close = position
+                                                               , Fcd.close = position - Gsd.spread Gsd.gsd
                                                                }
                                       else if close /= Ftd.None
                                            then Fcd.initFxChartData

@@ -11,8 +11,8 @@ module FxMongodb
   , writeFxSettingData
   , readFxSettingData
   , checkFxSettingData
-  , readResult
-  , writeResult
+  , readBacktestResult
+  , writeBacktestResult
   , getChartListAll
   ) where
 
@@ -90,36 +90,36 @@ updateFxTradeData coName td = do
                                           , Ftd.trFail        = read . typed $ valueAt "trFail"        x
                                           , Ftd.profit        = read . typed $ valueAt "profit"        x}) r
 
-readFxSettingData :: String -> IO Fsd.FxSettingData
-readFxSettingData coName = do
+readFxSettingData :: IO Fsd.FxSettingData
+readFxSettingData = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
+  r <- access pipe master "fx" $ getDataFromDB  "fxsetting_log"
   close pipe
   if null r
     then return $ Fsd.initFxSettingData
     else do fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fsd.setFxSettingData fsl
 
-checkFxSettingData :: String -> IO Bool
-checkFxSettingData coName = do
+checkFxSettingData :: IO Bool
+checkFxSettingData = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "fsd_" ++ coName)
+  r <- access pipe master "fx" $ getDataFromDB "fxsetting_log"
   close pipe
   if null r
     then return True
     else return False
 
-writeFxSettingData :: String -> Fsd.FxSettingData -> IO (Fsd.FxSettingData)
-writeFxSettingData coName fsd = do
+writeFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+writeFxSettingData fsd = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingToDB (T.pack $ "fsd_" ++ coName) (Fsd.fxSettingLog fsd)
+  _ <- access pipe master "fx" $ setFxSettingLogToDB (Fsd.fxSettingLog fsd)
   close pipe
   return fsd
 
-readResult :: IO (Int, Int)
-readResult = do
+readBacktestResult :: IO (Int, Int)
+readBacktestResult = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB (T.pack $ "result_backtest")
+  r <- access pipe master "fx" $ getDataFromDB "result_backtest"
   close pipe
   if null r
     then return (0, 0)
@@ -127,10 +127,10 @@ readResult = do
             f <- head <$> mapM (\x -> return (read . typed $ valueAt "fail"    x)) r
             return (s , f)
 
-writeResult :: Int -> Int -> IO ()
-writeResult s f = do
+writeBacktestResult :: Int -> Int -> IO ()
+writeBacktestResult s f = do
   pipe <- connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setResultToDB (T.pack $ "result_backtest") s f 
+  _ <- access pipe master "fx" $ setBacktestResultToDB s f 
   close pipe
   return ()
 
@@ -147,15 +147,15 @@ setFxTradeDataToDB coName td =
                             , "profit"         =: (show $ Ftd.profit        td)       
                             ]
 
-setFxSettingToDB :: T.Text -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
-setFxSettingToDB coName fsl =
-  upsert (select [] coName ) [ "fsl" =: show fsl
-                             ]
+setFxSettingLogToDB :: M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
+setFxSettingLogToDB fsl =
+  upsert (select [] "fxsetting_log" ) [ "fsl" =: show fsl
+                                     ]
 
-setResultToDB :: T.Text -> Int -> Int -> Action IO ()
-setResultToDB coName s f = 
-  upsert (select [] coName ) [ "success" =: show s
-                             , "fail"    =: show f
-                             ]
+setBacktestResultToDB :: Int -> Int -> Action IO ()
+setBacktestResultToDB s f = 
+  upsert (select [] "result_backtest" ) [ "success" =: show s
+                                        , "fail"    =: show f
+                                        ]
   
 

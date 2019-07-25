@@ -24,6 +24,8 @@ data FxTradeData =
               , unrealizedPL       :: Double
               , realizedPL         :: Double
               , chartLength        :: Int
+              , maxUnit            :: Int
+              , coName             :: String
               , environment        :: FxEnvironment
               , bearer             :: String
               , url                :: String
@@ -31,7 +33,7 @@ data FxTradeData =
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 
-data FxEnvironment = Backtest | Practice | Production deriving (Show, Read)
+data FxEnvironment = Backtest | Practice | Production deriving (Show, Read, Eq)
 
 instance Num FxTradeData where
   x - y = x { trSuccess          = trSuccess          x - trSuccess          y
@@ -72,6 +74,8 @@ initFxTradeDataCommon =
               , realizedPL          = Gsd.initalProperty Gsd.gsd
               , unrealizedPL        = Gsd.initalProperty Gsd.gsd
               , chartLength         = 0
+              , maxUnit             = 0
+              , coName              = ""
               , environment         = Backtest
               , bearer              = ""
               , url                 = ""

@@ -112,14 +112,14 @@ getNowPrices td = do
                                 else (ask + bid) / 2
              }
 
-closeOpen :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
-closeOpen coName td = do
+closeOpen :: Ftd.FxTradeData -> IO Ftd.FxTradeData
+closeOpen td = do
   (s, cu, _) <- getPosition td
   (b, _) <- getBalance td
   p <- getNowPrices td
   let ou = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
-      ou' = if Gsd.maxUnit Gsd.gsd `div` 2 < ou
-            then Gsd.maxUnit Gsd.gsd `div` 2
+      ou' = if Ftd.maxUnit td `div` 2 < ou
+            then Ftd.maxUnit td `div` 2
             else ou
   (open, close) <- if s == Ftd.Buy
                    then do setOrders td (-(cu + ou'))
@@ -129,14 +129,14 @@ closeOpen coName td = do
                                 return (Ftd.Buy, Ftd.Sell)
                         else return (Ftd.None, Ftd.None)
   td' <- updateFxTradeData td
-  Fm.setFxTradeData coName td'
+  Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "closeOpen - %f %d %d %3.6f\n" b cu ou' (Fcd.close p)
   Fp.printTradeResult open close td td' ou'
   return td'
 
-close :: String -> Ftd.FxTradeData -> IO Ftd.FxTradeData
-close coName td = do
+close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
+close td = do
   (s, u, _) <- getPosition td
   if s == Ftd.Buy
     then setOrders td (-u)
@@ -144,19 +144,19 @@ close coName td = do
          then setOrders td (-u)
          else return ()
   td' <- updateFxTradeData td
-  Fm.setFxTradeData coName td'
+  Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
   Fp.printTradeResult Ftd.None s td td' 0
   return td'
   
-open :: String -> Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
-open coName td side = do
+open :: Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
+open td side = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
-      u' = if Gsd.maxUnit Gsd.gsd `div` 2 < u
-           then Gsd.maxUnit Gsd.gsd `div` 2
+      u' = if Ftd.maxUnit td `div` 2 < u
+           then Ftd.maxUnit td `div` 2
            else u
   if side == Ftd.Buy
     then setOrders td u'
@@ -164,7 +164,7 @@ open coName td side = do
          then setOrders td (-u')
          else return()  
   td' <- updateFxTradeData td
-  Fm.setFxTradeData coName td'
+  Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
   Fp.printTradeResult side Ftd.None td td' u'
