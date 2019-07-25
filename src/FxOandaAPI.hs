@@ -118,8 +118,8 @@ closeOpen coName td = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let ou = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
-      ou' = if Gsd.maxUnit Gsd.gsd < ou
-            then Gsd.maxUnit Gsd.gsd
+      ou' = if Gsd.maxUnit Gsd.gsd `div` 2 < ou
+            then Gsd.maxUnit Gsd.gsd `div` 2
             else ou
   (open, close) <- if s == Ftd.Buy
                    then do setOrders td (-(cu + ou'))
@@ -155,8 +155,8 @@ open coName td side = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
-      u' = if Gsd.maxUnit Gsd.gsd < u
-           then Gsd.maxUnit Gsd.gsd
+      u' = if Gsd.maxUnit Gsd.gsd `div` 2 < u
+           then Gsd.maxUnit Gsd.gsd `div` 2
            else u
   if side == Ftd.Buy
     then setOrders td u'

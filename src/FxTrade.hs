@@ -28,8 +28,8 @@ evaluationOk tdlt =
   (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
   
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Gsd.maxUnit Gsd.gsd) * chart) / 25
+getQuantityBacktest td chart = if (fromIntegral (Gsd.maxUnit Gsd.gsd `div` 2) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+                               then (fromIntegral (Gsd.maxUnit Gsd.gsd `div` 2) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
 
 getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
