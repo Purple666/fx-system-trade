@@ -99,16 +99,16 @@ evaluateOne ctd fsd f1 forceSell td fs =
         | otherwise = (0, Ftd.None)
 -}        
       (profits, close)
-        | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Buy)
-        | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Sell)
+        | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate - Gsd.spread Gsd.gsd, Ftd.Buy)
+        | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart - Gsd.spread Gsd.gsd, Ftd.Sell)
         | Ftd.side td == Ftd.Buy &&
           (forceSell || lcd < tradeDate ||
            (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
-           (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
+           (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate - Gsd.spread Gsd.gsd, Ftd.Buy)
         | Ftd.side td == Ftd.Sell &&
           (forceSell || lcd < tradeDate ||
             (0 < tradeRate - chart && evaluateProfitInc ftcp ftadcp) ||
-            (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart, Ftd.Sell)
+            (tradeRate - chart < 0 && evaluateProfitInc ftcl ftadcl)) = (tradeRate - chart - Gsd.spread Gsd.gsd, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
             then let ls  = Fsd.learningSetting fs
@@ -149,11 +149,11 @@ evaluateOne ctd fsd f1 forceSell td fs =
       td' = td { Ftd.chart     = cd
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                          , Fcd.close = position
                                                           }
                                  else if open == Ftd.Sell
                                       then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                               , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                               , Fcd.close = position
                                                                }
                                       else if close /= Ftd.None
                                            then Fcd.initFxChartData
