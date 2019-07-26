@@ -182,7 +182,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                            then Ftd.realizedPL td' + 25 * f1 td' chart * (1 - (chart / (Fcd.close $ Ftd.tradeRate td')))
                                            else Ftd.realizedPL td'
                  }
-  in (open, close, td'', fs'')
+  in traceShow(profits, chart, tradeRate) $ (open, close, td'', fs'')
 
 {-
 (x:xcd), ftado, ftadcp, ftadcl [new .. old]
