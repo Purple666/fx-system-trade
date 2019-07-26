@@ -17,6 +17,7 @@ import qualified GlobalSettingData       as Gsd
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
+              , unit               :: Int
               , side               :: FxSide
               , trSuccess          :: Int
               , trFail             :: Int
@@ -67,6 +68,7 @@ initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
   FxTradeData { chart               = Fcd.initFxChartData
               , tradeRate           = Fcd.initFxChartData
+              , unit                = 0
               , side                = None
               , profit              = 0
               , trSuccess           = 0
@@ -83,12 +85,11 @@ initFxTradeDataCommon =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  profit x
---  
-{-  
   if profit x < 0 && unrealizedPL x < Gsd.initalProperty Gsd.gsd
   then - (profit x * (unrealizedPL x - Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
   else   (profit x * (unrealizedPL x - Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
+--  
+{-  
   profit x
   unrealizedPL x
   if profit x < 0 && unrealizedPL x < Gsd.initalProperty Gsd.gsd
