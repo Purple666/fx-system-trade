@@ -96,7 +96,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
 -}        
       (profits, close)
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate - Gsd.spread Gsd.gsd, Ftd.Buy)
-        | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart - Gsd.spred Gsd.gsd, Ftd.Sell)
+        | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart - Gsd.spread Gsd.gsd, Ftd.Sell)
         | Ftd.side td == Ftd.Buy &&
           (forceSell || lcd < tradeDate ||
            (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
