@@ -90,14 +90,8 @@ evaluateOne ctd fsd f1 forceSell td fs =
         | Ftd.side td == Ftd.Sell = Ftd.realizedPL td + 25 * f1 td chart * (1 - (chart / tradeRate))
         | otherwise = Ftd.realizedPL td
       (position, open)
-        | (Ftd.side td == Ftd.None ||
-           (Ftd.side td == Ftd.Sell && (0 < tradeRate - chart ||
-                                        tradeRate - chart < 0))) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
-        | (Ftd.side td == Ftd.None ||
-           (Ftd.side td == Ftd.Buy && (0 < chart - tradeRate ||
-                                       chart - tradeRate < 0))) &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Sell) && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+        | (Ftd.side td == Ftd.None || Ftd.side td == Ftd.Buy)  && evaluateProfitDec fto ftado = (chart, Ftd.Sell)
         | otherwise = (0, Ftd.None)
 {-
         | Ftd.side td == Ftd.None && evaluateProfitInc fto ftado = (chart, Ftd.Buy)
@@ -109,7 +103,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chart, Ftd.Sell)
         | Ftd.side td == Ftd.Buy &&
           (forceSell || lcd < tradeDate ||
-           (0 < chart - tradeRate  && evaluateProfitDec ftcp ftadcp) ||
+           (0 < chart - tradeRate && evaluateProfitDec ftcp ftadcp) ||
            (chart - tradeRate < 0 && evaluateProfitDec ftcl ftadcl)) = (chart - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell &&
           (forceSell || lcd < tradeDate ||

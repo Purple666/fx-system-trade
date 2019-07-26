@@ -8,6 +8,7 @@ data GlobalSettingData = GlobalSettingData
   , countUpList           :: Double
   , maxTradeTime          :: Int
   , fxSettingLogNum       :: Int
+  , gaNum                 :: Int
   , tradePracticeBearer   :: String
   , tradePracticeUrl      :: String
   , tradeProductionBearer :: String
@@ -28,7 +29,8 @@ gsd =
                     , learningTestCount     = 2
                     , countUpList           = 5
                     , quantityRate          = 5
-                    , fxSettingLogNum       = 100
+                    , fxSettingLogNum       = 1000
+                    , gaNum                 = 100
                     , maxTradeTime          = 24 * 60 * 5 * 4 
                     , initalProperty        = 3000000
                     , productionMaxUnit     = 3000000
