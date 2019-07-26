@@ -170,11 +170,6 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits / 25
                                   else Ftd.realizedPL td
-               , Ftd.unrealizedPL = if Ftd.side td == Ftd.Buy
-                                    then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * (chart - tradeRate) / 25
-                                    else if Ftd.side td == Ftd.Sell
-                                         then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * (tradeRate - chart) / 25
-                                         else Ftd.realizedPL td
                }
   in (open, close, td', fs'')
 

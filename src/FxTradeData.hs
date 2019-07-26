@@ -22,7 +22,6 @@ data FxTradeData =
               , trSuccess          :: Int
               , trFail             :: Int
               , profit             :: Double
-              , unrealizedPL       :: Double
               , realizedPL         :: Double
               , chartLength        :: Int
               , maxUnit            :: Int
@@ -41,17 +40,14 @@ instance Num FxTradeData where
             , trFail             = trFail             x - trFail             y
             , profit             = profit             x - profit             y
             , realizedPL         = realizedPL         x - realizedPL         y
-            , unrealizedPL       = unrealizedPL       x - unrealizedPL       y
             }
   x + y = x { trSuccess          = trSuccess          x + trSuccess          y
             , trFail             = trFail             x + trFail             y
             , profit             = profit             x + profit             y
             , realizedPL         = realizedPL         x + realizedPL         y
-            , unrealizedPL       = unrealizedPL       x + unrealizedPL       y
             }
 
   fromInteger _ = initFxTradeDataCommon { realizedPL       = 0
-                                        , unrealizedPL     = 0
                                         }
 
 instance Eq FxTradeData where
@@ -74,7 +70,6 @@ initFxTradeDataCommon =
               , trSuccess           = 0
               , trFail              = 0
               , realizedPL          = Gsd.initalProperty Gsd.gsd
-              , unrealizedPL        = Gsd.initalProperty Gsd.gsd
               , chartLength         = 0
               , maxUnit             = 0
               , coName              = ""
@@ -85,9 +80,7 @@ initFxTradeDataCommon =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  if profit x < 0 && realizedPL x < Gsd.initalProperty Gsd.gsd
-  then - (profit x * (realizedPL x - Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
-  else   (profit x * (realizedPL x - Gsd.initalProperty Gsd.gsd) * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
+  (profit x * realizedPL x * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
 --  
 {-  
   profit x

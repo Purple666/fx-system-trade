@@ -178,7 +178,6 @@ updateFxTradeData td = do
                                                       }
               , Ftd.side         = s
               , Ftd.realizedPL   = b
-              , Ftd.unrealizedPL = b + upl
               }
 
 getBalance :: Ftd.FxTradeData -> IO (Double, Double)
