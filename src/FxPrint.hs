@@ -74,8 +74,7 @@ printTradeResult open close td td' units = do
 
 printFxTradeData :: Ftd.FxTradeData -> IO ()
 printFxTradeData td =
-  printf "| %8d %8.3f  %10.0f : %4d %4d %3.0f "
-  (Ftd.unit td)
+  printf "| %8.3f  %10.0f : %4d %4d %3.0f "
   (Ftd.profit td)
   (Ftd.realizedPL td)
   (Ftd.trSuccess td)

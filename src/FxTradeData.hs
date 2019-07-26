@@ -36,15 +36,17 @@ data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 data FxEnvironment = Backtest | Practice | Production deriving (Show, Read, Eq)
 
 instance Num FxTradeData where
-  x - y = x { trSuccess          = trSuccess          x - trSuccess          y
-            , trFail             = trFail             x - trFail             y
-            , profit             = profit             x - profit             y
-            , realizedPL         = realizedPL         x - realizedPL         y
+  x - y = x { unit       = unit       x - unit        y
+            , trSuccess  = trSuccess  x - trSuccess   y
+            , trFail     = trFail     x - trFail      y
+            , profit     = profit     x - profit      y
+            , realizedPL = realizedPL x - realizedPL  y
             }
-  x + y = x { trSuccess          = trSuccess          x + trSuccess          y
-            , trFail             = trFail             x + trFail             y
-            , profit             = profit             x + profit             y
-            , realizedPL         = realizedPL         x + realizedPL         y
+  x + y = x { unit       = unit       x + unit        y
+            , trSuccess  = trSuccess  x + trSuccess   y
+            , trFail     = trFail     x + trFail      y
+            , profit     = profit     x + profit      y
+            , realizedPL = realizedPL x + realizedPL  y
             }
 
   fromInteger _ = initFxTradeDataCommon { realizedPL       = 0
