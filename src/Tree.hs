@@ -16,7 +16,6 @@ module Tree
   , addLeafDataMap
   , checkLeafDataMap
   , emptyLeafDataMap
-  , initLeafDataMap
   ) where
 
 import qualified Control.Monad.Random as R
@@ -85,9 +84,6 @@ defaultFunction _ = True
 emptyLeafDataMap :: LeafDataMap a
 emptyLeafDataMap = LeafDataMap M.empty
 
-initLeafDataMap :: LeafData a -> LeafDataMap a
-initLeafDataMap k = LeafDataMap $ M.singleton k (0, 0)
-
 setFunctionToLeafDataMap :: [LeafData a] -> LeafDataMap a -> LeafDataMap a
 setFunctionToLeafDataMap ix (LeafDataMap xs) =
   LeafDataMap . M.fromList . map (\(LeafData k, (x, y)) -> (ix !! fst k, (x, y))) $ M.toList xs
@@ -99,10 +95,14 @@ setFunctionToTree ix (Node x l r) = Node x (setFunctionToTree ix l) (setFunction
 
 checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
-  if (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs)
-  then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs
-       in (LeafDataMap a, LeafDataMap b)
-  else (LeafDataMap M.empty, LeafDataMap xs)
+  let mx = fst $ minimum xs
+      xs' = if mx <= 0
+            then M.map (\(p, c) -> (p + mx + 1, c)) xs
+            else xs
+  in if (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
+     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs'
+          in (LeafDataMap a, LeafDataMap b)
+     else (LeafDataMap M.empty, LeafDataMap xs')
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =
