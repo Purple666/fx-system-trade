@@ -121,7 +121,7 @@ getLearningTestTimes fsd =
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
-  logProfit . learningSetting $ fxSetting fsd
+  (logProfit . learningSetting $ fxSetting fsd) * (fromIntegral . logCount . learningSetting $ fxSetting fsd)
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
