@@ -291,7 +291,9 @@ evaluate fsd ltt fc =
       ctdl = makeChart fsd ltt fc
       (_, _, td'', _) = L.foldl (\(_, _, td', _) ctd -> evaluateOne ctd fsd getUnitLearning False td' Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
       (_, _, td''', _) = evaluateOne (L.last ctdl) fsd getUnitLearning True td'' Fsd.initFxSetting
-  in (td''' { Ftd.chartLength = ltt })
+  in if null ctdl
+     then td
+     else (td''' { Ftd.chartLength = ltt })
 
 getChart :: Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
 getChart n fsd = do
