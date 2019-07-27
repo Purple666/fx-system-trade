@@ -168,7 +168,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                   else Ftd.trFail td
                , Ftd.profit     = Ftd.profit td + profits
                , Ftd.realizedPL = if close /= Ftd.None
-                                  then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits / 25
+                                  then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits
                                   else Ftd.realizedPL td
                }
   in (open, close, td', fs'')
