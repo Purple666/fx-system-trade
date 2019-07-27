@@ -26,14 +26,22 @@ import qualified Tree                    as Tr
 evaluationOk :: [Ftd.FxTradeData] -> Bool
 evaluationOk tdlt =
   (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
-  
+
+{-  
 getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
 getQuantityBacktest td chart = if (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
                                then (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25
                                else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
+-}
 
-getQuantityLearning :: Ftd.FxTradeData -> Double -> Double
-getQuantityLearning td chart = Ftd.realizedPL td
+getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
+getUnitBacktest td chart = truncate $ (25 * if Ftd.realizedPL td < Gsd.initalProperty Gsd.gsd
+                                            then Ftd.realizedPL td / chart
+                                            else Gsd.initalProperty Gsd.gsd / chart)
+
+getUnitLearning :: Ftd.FxTradeData -> Double -> Int
+getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+    
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
