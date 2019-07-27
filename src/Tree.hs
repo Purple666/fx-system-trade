@@ -97,7 +97,7 @@ checkLeafDataMap :: LeafDataMap a -> (LeafDataMap a, LeafDataMap a)
 checkLeafDataMap (LeafDataMap xs) =
   let mx = fst $ minimum xs
       xs' = if mx <= 0
-            then M.map (\(p, c) -> (p + mx + 1, c)) xs
+            then M.map (\(p, c) -> (p + abs mx + 1, c)) xs
             else xs
   in if (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
      then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs'
