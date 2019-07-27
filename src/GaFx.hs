@@ -126,7 +126,7 @@ backTestLoop lf n endN td fsd = do
   Fm.writeFxSettingData fsd3
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   let n' = Fcd.no (Ftd.chart tdt) + 1
-  if endN <= n' || Ftd.realizedPL tdt < 0 -- Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
+  if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
     else backTestLoop (Ftd.profit tdt <= Ftd.profit td) n' endN tdt fsd3
 
