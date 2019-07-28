@@ -99,10 +99,10 @@ checkLeafDataMap (LeafDataMap xs) =
       xs' = if mx <= 0
             then M.map (\(p, c) -> (p + abs mx + 1, c)) xs
             else xs
-  in if (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
+  in if (not $ M.null xs) && (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
      then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs'
           in (LeafDataMap a, LeafDataMap b)
-     else (LeafDataMap M.empty, LeafDataMap xs')
+     else (LeafDataMap M.empty, LeafDataMap xs)
 
 makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (TreeData a)
 makeTree andRate orRate (LeafDataMap xs) t =
