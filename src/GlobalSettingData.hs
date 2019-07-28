@@ -24,12 +24,12 @@ data GlobalSettingData = GlobalSettingData
 gsd :: GlobalSettingData
 gsd =
   GlobalSettingData { taMargin              = 2
-                    , makeTreeCount         = 1
+                    , makeTreeCount         = 2
                     , algorithmRepeat       = 2
                     , learningTestCount     = 2
-                    , countUpList           = 1.2
+                    , countUpList           = 2
                     , quantityRate          = 5
-                    , fxSettingLogNum       = 10
+                    , fxSettingLogNum       = 30
                     , gaNum                 = 100
                     , maxTradeTime          = 24 * 60 * 5 * 4 
                     , initalProperty        = 3000000
