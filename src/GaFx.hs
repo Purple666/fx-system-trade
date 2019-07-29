@@ -115,7 +115,7 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop lf n endN td fsd = do
-  (lok, ok, oknum, tdlt, fsd1) <- if Ftd.side td == Ftd.None -- || lf
+  (lok, ok, oknum, tdlt, fsd1) <- if Ftd.side td == Ftd.None || lf
                                   then learning n fsd
                                   else return (True, True, 0, [Ftd.initFxTradeDataCommon], fsd)
 {-
