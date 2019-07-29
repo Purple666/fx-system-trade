@@ -49,8 +49,8 @@ gaLearningDataFromLog n fsd = do
                                                                                                               }
                                                                     }
                                                      return $ Ga.learningData fsd') .
-                           L.take Gsd.gaNum Gsd.gsd .
-                           L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / from Integral b') (a / fromIntegral a')) $
+                           L.take (Gsd.gaNum Gsd.gsd) .
+                           L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
                            M.toList fsl)
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
