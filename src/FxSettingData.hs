@@ -155,7 +155,7 @@ maxFxSettingFromLog fsl =
   if L.null fsl == True
   then initFxSetting
   else L.head . L.map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / from Integral b') (a / fromIntegral a') $
        M.toList fsl
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
