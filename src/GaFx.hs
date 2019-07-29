@@ -94,11 +94,11 @@ learning :: Int ->
             Fsd.FxSettingData ->
             IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n fsd = do
-  ld <- Fs.gaLearningDataFromLog n fsd
+  (ld, ld') <- Fs.gaLearningDataFromLog n fsd
   (ok, plok, tdltm, fsd) <- learningEvaluate n ld
   if ok
     then return (True, True, plok, tdltm, fsd)
-    else learningLoop 0 n fsd ld
+    else learningLoop 0 n fsd ld'
     
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do

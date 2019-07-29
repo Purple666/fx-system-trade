@@ -33,25 +33,23 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData)
+gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData, Ga.LearningData Fsd.FxSettingData)
 gaLearningDataFromLog n fsd = do 
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
-  Ga.learningDataList <$> (mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n fsd { Fsd.fxSetting = fs }
-                                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
-                                                                                                                   , Fsd.logCount  = c
-                                                                                                                   }
-                                                                  }
-                                                         fsd' = fsd { Fsd.fxSetting = fs'
-                                                                    , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart            = fc
-                                                                                                              , Fsd.learningTestTime = ltt
-                                                                                                              }
-                                                                    }
-                                                     return $ Ga.learningData fsd') .
-                           L.take (Gsd.gaNum Gsd.gsd) .
-                           L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
-                           M.toList fsl)
+  fsl' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n fsd { Fsd.fxSetting = fs }
+                                    let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
+                                                                                                  , Fsd.logCount  = c
+                                                                                                  }
+                                                 }
+                                        fsd' = fsd { Fsd.fxSetting = fs'
+                                                   , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart            = fc
+                                                                                             , Fsd.learningTestTime = ltt
+                                                                                             }
+                                                   }
+                                    return $ Ga.learningData fsd') $ M.toList fsl
+  return (Ga.learningDataList fsl', Ga.learningDataList $ take (Gsd.gaNum Gsd.gsd) fsl')
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd = 
