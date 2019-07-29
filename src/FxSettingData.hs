@@ -161,7 +161,7 @@ maxFxSettingFromLog fsl =
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
 minFxSettingDelete fsl =
   M.fromList . L.take (Gsd.fxSettingLogNum Gsd.gsd) .
-  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
   M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
