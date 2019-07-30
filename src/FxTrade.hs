@@ -28,28 +28,24 @@ evaluationOk tdlt =
   (L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt)
 
 {-  
-getQuantityBacktest :: Ftd.FxTradeData -> Double -> Double
-getQuantityBacktest td chart = if (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25 < Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-                               then (fromIntegral (Ftd.maxUnit td `div` 2) * chart) / 25
-                               else Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd
-
-getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
-getUnitBacktest td chart = let u = truncate $ (25 * if Ftd.realizedPL td < Gsd.initalProperty Gsd.gsd
-                                                    then Ftd.realizedPL td / chart
-                                                    else Gsd.initalProperty Gsd.gd / chart)
-                           in if Ftd.maxUnit td `div` 2 < u
-                              then Ftd.maxUnit td `div` 2
-                              else u
--}
-
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate $ (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
                            in if Ftd.maxUnit td `div` 2 < u
                               then Ftd.maxUnit td `div` 2
                               else u
-
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
 getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+-}
+
+getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
+getUnitBacktest td chart = let u = truncate $ (25 * (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd) / chart)
+                           in if Ftd.maxUnit td `div` 2 < u
+                              then Ftd.maxUnit td `div` 2
+                              else u
+
+getUnitLearning :: Ftd.FxTradeData -> Double -> Int
+getUnitLearning td chart = getUnitBacktest td chart
+
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
