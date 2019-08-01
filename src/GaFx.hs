@@ -122,7 +122,7 @@ backTestLoop lf n endN td fsd = do
   (lok, ok, oknum, tdlt, fsd1) <- learning n fsd
 -}
   (fsd2, tdt) <- Ft.backTest n td fsd1
-  let fsd3 = Fs.updateFxSettingLog (Ftd.realizedPL tdt - Ftd.realizedPL td) fsd2
+  let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fm.writeFxSettingData fsd3
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   let n' = Fcd.no (Ftd.chart tdt) + 1
