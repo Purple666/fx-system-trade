@@ -47,9 +47,9 @@ backTest = do
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   (tdt, fsd') <- backTestLoop False startN endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
-              then do Fp.printBackTestResult "=================================" (Ftd.realizedPL tdt) (s + 1) f fsd'
+              then do Fp.printBackTestResult "=================================" tdt (s + 1) f fsd'
                       return (s + 1, f)
-              else do Fp.printBackTestResult "---------------------------------" (Ftd.realizedPL tdt) s (f + 1) fsd'
+              else do Fp.printBackTestResult "---------------------------------" tdt s (f + 1) fsd'
                       return (s, f + 1)
   Fm.writeBacktestResult s' f'
   backTest

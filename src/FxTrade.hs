@@ -34,7 +34,7 @@ getUnitBacktest td chart = let u = truncate $ (25 * (Gsd.initalProperty Gsd.gsd 
                               else u
                                    
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+getUnitLearning td chart = getUnitBacktest td chart
 
 {-  
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
@@ -42,9 +42,9 @@ getUnitBacktest td chart = let u = truncate $ (25 * (Gsd.initalProperty Gsd.gsd 
                            in if Ftd.maxUnit td `div` 2 < u
                               then Ftd.maxUnit td `div` 2
                               else u
-
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = getUnitBacktest td chart
+getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+
 -}
 
 

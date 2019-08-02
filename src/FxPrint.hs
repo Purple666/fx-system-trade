@@ -81,8 +81,8 @@ printFxTradeData td =
   (Ftd.trFail td)
   (Ftd.getWinRate td)
 
-printBackTestResult :: String -> Double -> Int -> Int -> Fsd.FxSettingData ->  IO ()
-printBackTestResult bar rpl s f fsd = do
+printBackTestResult :: String -> Ftd.FxTradeData -> Int -> Int -> Fsd.FxSettingData ->  IO ()
+printBackTestResult bar tdt s f fsd = do
   let (p, c, a) = Fsd.getFxSettingLogResult fsd
-  printf (bar ++ " %10.0f %d - %d : %6.2f %6d %6.2f\n") rpl s f p c a
+  printf (bar ++ " %8.3f %10.0f %d - %d : %6.2f %6d %6.2f\n") (Ftd.profit tdt) (Ftd.realizedPL tdt) s f p c a
 
