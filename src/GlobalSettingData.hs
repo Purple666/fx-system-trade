@@ -25,12 +25,12 @@ gsd :: GlobalSettingData
 gsd =
   GlobalSettingData { taMargin              = 10
                     , makeTreeCount         = 1
-                    , algorithmRepeat       = 2
+                    , algorithmRepeat       = 3
                     , learningTestCount     = 2
                     , countUpList           = 1.5
                     , quantityRate          = 5
                     , fxSettingLogNum       = 1000
-                    , gaNum                 = 10
+                    , gaNum                 = 20
                     , maxTradeTime          = 24 * 60 * 5 * 4 
                     , initalProperty        = 3000000
                     , productionMaxUnit     = 3000000
