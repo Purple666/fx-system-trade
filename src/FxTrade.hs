@@ -58,7 +58,7 @@ evaluateProfitDec fts ftad =
 
 initFxTradeData :: Ftd.FxEnvironment -> Ftd.FxTradeData
 initFxTradeData Ftd.Backtest =
-  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.practiceMaxUnit Gsd.gsd -- Gsd.productionMaxUnit Gsd.gsd
+  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
                             , Ftd.coName      = "backtest"
                             , Ftd.environment = Ftd.Backtest
                             , Ftd.bearer      = ""
