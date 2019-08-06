@@ -135,7 +135,8 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  Fcd.FxChartData ->
                  IO (Ftd.FxTradeData)
 tradeEvaluate td fsd e = do
-  (open, close, td1, _) <- Ft.trade td fsd e
+  (open, close, td1, fs) <- Ft.trade td fsd e
+  traceShow(Ftd.prevOpen fs) $ return () 
   if open /= Ftd.None && close /= Ftd.None
     then Foa.closeOpen td1
     else if close /= Ftd.None
