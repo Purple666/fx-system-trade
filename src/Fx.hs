@@ -17,7 +17,6 @@ main = do
     "debug"          -> GaFx.debug
     "backtest"       -> GaFx.backTest
     "trade-practice" -> GaFx.trade Ftd.Practice
-    "trade-practice" -> GaFx.trade Ftd.Practice
     "trade-sim"      -> GaFx.tradeSim
 
 

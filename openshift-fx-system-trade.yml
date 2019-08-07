@@ -227,7 +227,7 @@ items:
         - image: fx-system-trade
           name: fx-system-trade
           #command: ["./Fx", "trade-sim"]
-          command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
+          command: ["stack", "exec", "--", "fx-exe", "trade-sim"]
           resources: {}
           volumeMounts:
           - name: localtime
