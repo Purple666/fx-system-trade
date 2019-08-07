@@ -1,5 +1,6 @@
 module FxPrint
-  ( printProgressFxTradeData
+  ( printTradeSimProgress
+  , printProgressFxTradeData
   , printTradeResult
   , printTestProgress
   , printLearningFxTradeData
@@ -16,6 +17,18 @@ import qualified FxTradeData             as Ftd
 import qualified FxTechnicalAnalysis     as Ta
 import qualified GlobalSettingData       as Gsd
 import           Text.Printf
+
+
+printTradeSimProgress :: Ftd.FxSide -> Ftd.FxSide -> Ftd.FxTradeData -> IO ()
+printTradeSimProgress open close td = do
+  nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
+  printf "%s : " =<< Ftm.getLogTime
+  printf "%s : %6.2f %4s "
+    nd
+    (Fcd.close $ Ftd.chart td)
+    (show (Ftd.side td))
+  printFxTradeData td
+  printf "| %s %s \n" (head $ show open) (head $ show close) 
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()

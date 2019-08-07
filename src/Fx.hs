@@ -13,10 +13,11 @@ main = do
   hSetBuffering stdout NoBuffering
   (command:_) <- getArgs
   case command of
-    "statistics"       -> GaFx.statistics
-    "debug"            -> GaFx.debug
-    "backtest"         -> GaFx.backTest
-    "trade-practice"   -> GaFx.trade Ftd.Practice
-    "trade-production" -> GaFx.trade Ftd.Production
+    "statistics"     -> GaFx.statistics
+    "debug"          -> GaFx.debug
+    "backtest"       -> GaFx.backTest
+    "trade-practice" -> GaFx.trade Ftd.Practice
+    "trade-practice" -> GaFx.trade Ftd.Practice
+    "trade-sim"      -> GaFx.tradeSim
 
 
