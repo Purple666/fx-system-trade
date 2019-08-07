@@ -231,11 +231,15 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n endN pl td fsd = do
   let ltt = Ta.getLearningTestTime fsd
+  traceShow("1") $ return ()
   e <- Fm.getOneChart $ Fm.getChartListFromDB n (n + 1)
+  traceShow("2") $ return ()
   (pl', fsd') <- if ltt < Fcd.no e - pl
                  then tradeSimLearning n
                  else return (pl, fsd)
+  traceShow("3") $ return ()
   td' <- tradeSimEvaluate td fsd' e 
+  traceShow("4") $ return ()
   if endN <= n 
     then return td'
     else tradeSimLoop (n + 1) endN pl' td' fsd' 
