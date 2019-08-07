@@ -218,7 +218,7 @@ tradeSimEvaluate td fsd e = do
 tradeSimLearning :: Int -> IO (Int, Fsd.FxSettingData)
 tradeSimLearning n = do
   fsd <- Fm.readFxSettingData
-  e <- Fm.getOneChart $ Fm.getChartListFromDB n n
+  e <- Fm.getOneChart $ Fm.getChartListFromDB n (n + 1)
   (lok, ok, oknum, tdlt, fsd') <- learning (Fcd.no e) fsd
   Fp.printLearningFxTradeData fsd' tdlt oknum lok ok 
   return (Fcd.no e, fsd')
@@ -231,7 +231,7 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n endN pl td fsd = do
   let ltt = Ta.getLearningTestTime fsd
-  e <- Fm.getOneChart $ Fm.getChartListFromDB n n
+  e <- Fm.getOneChart $ Fm.getChartListFromDB n (n + 1)
   (pl', fsd') <- if ltt < Fcd.no e - pl
                  then tradeSimLearning n
                  else return (pl, fsd)
