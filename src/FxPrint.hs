@@ -28,7 +28,7 @@ printTradeSimProgress open close td = do
     (Fcd.close $ Ftd.chart td)
     (show (Ftd.side td))
   printFxTradeData td
-  printf "| %s %s \n" (head $ show open) (head $ show close) 
+  printf "| %c %c \n" (head $ show open) (head $ show close) 
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
