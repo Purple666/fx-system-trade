@@ -44,7 +44,7 @@ backTest = do
   let td  = Ft.initFxTradeData Ftd.Backtest
       startN = Gsd.maxTradeTime Gsd.gsd * 12
   fsd <- Fm.readFxSettingData
-  (s, f) <- Fm.readBacktestResult
+  (s, f) <- Fm.readBacktestResult "backtest"
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   (tdt, fsd') <- backTestLoop True startN endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
@@ -52,7 +52,7 @@ backTest = do
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" tdt s (f + 1) fsd'
                       return (s, f + 1)
-  Fm.writeBacktestResult s' f'
+  Fm.writeBacktestResult "backtest" s' f'
   backTest
 
 trade :: Ftd.FxEnvironment -> IO ()
@@ -69,8 +69,15 @@ tradeSim = do
   endN <- (-) <$> (Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB) <*> pure (-1)
   let startN = endN - Gsd.maxTradeTime Gsd.gsd * 4
   (pl, fsd) <- tradeSimLearning startN
-  tradeSimLoop startN endN pl td fsd
-  return ()
+  (s, f) <- Fm.readBacktestResult "trade-sim"
+  td' <- tradeSimLoop startN endN pl td fsd
+  (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td'
+              then do Fp.printBackTestResult "=================================" td (s + 1) f fsd
+                      return (s + 1, f)
+              else do Fp.printBackTestResult "---------------------------------" td s (f + 1) fsd
+                      return (s, f + 1)
+  Fm.writeBacktestResult "backtest" s' f'
+  tradeSim
 
 learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->

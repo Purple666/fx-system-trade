@@ -111,10 +111,10 @@ writeFxSettingData fsd = do
   close pipe
   return fsd
 
-readBacktestResult :: IO (Int, Int)
-readBacktestResult = do
+readBacktestResult :: String -> IO (Int, Int)
+readBacktestResult name = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getDataFromDB "result_backtest"
+  r <- access pipe master "fx" . getDataFromDB $ T.pack ("result_" ++ name )
   close pipe
   if null r
     then return (0, 0)
@@ -122,10 +122,10 @@ readBacktestResult = do
             f <- head <$> mapM (\x -> return (read . typed $ valueAt "fail"    x)) r
             return (s , f)
 
-writeBacktestResult :: Int -> Int -> IO ()
-writeBacktestResult s f = do
+writeBacktestResult :: String -> Int -> Int -> IO ()
+writeBacktestResult name s f = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setBacktestResultToDB s f 
+  _ <- access pipe master "fx" $ setBacktestResultToDB ("result_" ++ name ) s f 
   close pipe
   return ()
 
@@ -147,10 +147,10 @@ setFxSettingLogToDB fsl =
   upsert (select [] "fxsetting_log" ) [ "fsl" =: show fsl
                                      ]
 
-setBacktestResultToDB :: Int -> Int -> Action IO ()
-setBacktestResultToDB s f = 
-  upsert (select [] "result_backtest" ) [ "success" =: show s
-                                        , "fail"    =: show f
-                                        ]
+setBacktestResultToDB :: String -> Int -> Int -> Action IO ()
+setBacktestResultToDB name s f = 
+  upsert (select [] (T.pack name)) [ "success" =: show s
+                                   , "fail"    =: show f
+                                   ]
   
 
