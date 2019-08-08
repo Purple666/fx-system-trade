@@ -242,7 +242,7 @@ tradeSimLoop n endN pl td fsd = do
                  then tradeSimLearning n
                  else return (pl, fsd)
   td' <- tradeSimEvaluate td fsd' e 
-  if endN <= n 
+  if endN <= n ||  Ftd.realizedPL td' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return td'
     else tradeSimLoop (n + 1) endN pl' td' fsd' 
 
