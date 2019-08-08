@@ -67,7 +67,8 @@ tradeSim :: IO ()
 tradeSim = do
   let td  = Ft.initFxTradeData Ftd.Backtest
   endN <- (-) <$> (Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB) <*> pure (-1)
-  let startN = endN - Gsd.maxTradeTime Gsd.gsd * 4
+  let -- startN = endN - Gsd.maxTradeTime Gsd.gsd * 4
+      startN = Gsd.maxTradeTime Gsd.gsd * 12
   (pl, fsd) <- tradeSimLearning startN
   (s, f) <- Fm.readBacktestResult "trade-sim"
   td' <- tradeSimLoop startN endN pl td fsd
