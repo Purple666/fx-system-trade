@@ -214,12 +214,11 @@ tradeSimEvaluate :: Ftd.FxTradeData ->
                  Fcd.FxChartData ->
                  IO (Ftd.FxTradeData)
 tradeSimEvaluate td fsd e = do
-  (open, close, td1, _) <- Ft.trade td fsd e
+  (open, close, td', _) <- Ft.trade td fsd e
   if open /= Ftd.None || close /= Ftd.None
-    then Fp.printTradeSimProgress open close td1
+    then Fp.printTradeSimProgress open close td'
     else return ()
-  -- Fp.printTradeSimProgress open close td1
-  return td1
+  return td'
 
 tradeSimLearning :: Int -> IO (Int, Fsd.FxSettingData)
 tradeSimLearning n = do

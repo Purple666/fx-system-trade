@@ -21,6 +21,7 @@ import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad
 import qualified FxTradeData             as Ftd
 import qualified GlobalSettingData       as Gsd
+import qualified SecretData              as Sd
 import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
@@ -68,15 +69,15 @@ initFxTradeData Ftd.Practice =
   Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.practiceMaxUnit Gsd.gsd
                             , Ftd.coName      = "trade_practice"
                             , Ftd.environment = Ftd.Practice
-                            , Ftd.bearer      = Gsd.tradePracticeBearer Gsd.gsd
-                            , Ftd.url         = Gsd.tradePracticeUrl Gsd.gsd
+                            , Ftd.bearer      = Sd.tradePracticeBearer Sd.sd
+                            , Ftd.url         = Sd.tradePracticeUrl Sd.sd
                         }
 initFxTradeData Ftd.Production =
   Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
                             , Ftd.coName      = "trade_production"
                             , Ftd.environment = Ftd.Production
-                            , Ftd.bearer      = Gsd.tradeProductionBearer Gsd.gsd
-                            , Ftd.url         = Gsd.tradeProductionUrl Gsd.gsd
+                            , Ftd.bearer      = Sd.tradeProductionBearer Sd.sd
+                            , Ftd.url         = Sd.tradeProductionUrl Sd.sd
                             }
 
 evaluateOne :: Fad.FxChartTaData ->
