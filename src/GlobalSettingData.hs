@@ -9,10 +9,6 @@ data GlobalSettingData = GlobalSettingData
   , maxTradeTime          :: Int
   , fxSettingLogNum       :: Int
   , gaNum                 :: Int
-  , tradePracticeBearer   :: String
-  , tradePracticeUrl      :: String
-  , tradeProductionBearer :: String
-  , tradeProductionUrl    :: String
   , quantityRate          :: Double
   , initalProperty        :: Double
   , productionMaxUnit     :: Int

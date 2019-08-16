@@ -1,1 +1,1 @@
-../.secret.hs
+.secret.hs
