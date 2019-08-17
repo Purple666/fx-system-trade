@@ -8,6 +8,8 @@ module FxTechnicalAnalysis
   , getLearningTestTime
   , getPrepareTimeAll
   , getHoldTime
+  , createRandomFxAlMaSetting
+  , createRandomFxAlgorithmSetting
   ) where
 
 import           Control.Monad
@@ -52,6 +54,42 @@ getPrepareTime x =
                                  , Fad.longSetting (Fad.stSetting a) 
                                  ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
+createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
+createRandomFxAlMaSetting ix = do
+  short  <- getRandomR (max 5 (Fad.shortSetting     ix - Gsd.taMargin Gsd.gsd), 5 + Fad.shortSetting     ix + Gsd.taMargin Gsd.gsd)
+  middle <- getRandomR (max 5 (Fad.middleSetting    ix - Gsd.taMargin Gsd.gsd), 5 + Fad.middleSetting    ix + Gsd.taMargin Gsd.gsd)
+  long   <- getRandomR (max 5 (Fad.longSetting      ix - Gsd.taMargin Gsd.gsd), 5 + Fad.longSetting      ix + Gsd.taMargin Gsd.gsd)
+  ts     <- getRandomR (0, Fad.thresholdSetting ix + fromIntegral (Gsd.taMargin Gsd.gsd))
+  return ix { Fad.shortSetting      = short
+            , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
+            , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
+            , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) ts
+            }
+
+createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
+createRandomFxAlgorithmSetting ix = do
+  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
+  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
+  at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
+  sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
+  sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
+  ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
+  macd <- createRandomFxAlMaSetting $ Fad.macdSetting ix
+  rci  <- createRandomFxAlMaSetting $ Fad.rciSetting  ix
+  st   <- createRandomFxAlMaSetting $ Fad.stSetting   ix
+  rsi  <- createRandomFxAlMaSetting $ Fad.rsiSetting  ix
+  return $ ix { Fad.algorithmTree    = at
+              , Fad.algorithmAndRate = taAndR
+              , Fad.algorithmOrRate  = taOrR
+              , Fad.rciSetting       = rci
+              , Fad.smaSetting       = sma
+              , Fad.emaSetting       = ema
+              , Fad.macdSetting      = macd
+              , Fad.stSetting        = st
+              , Fad.rsiSetting       = rsi
+              , Fad.simChart         = sc
+              }
+
 checkAlgoSetting :: R.MonadRandom m => Fad.FxTechnicalAnalysisSetting -> m (Fad.FxTechnicalAnalysisSetting)
 checkAlgoSetting fts = do
   let as  = Fad.algoSetting fts
@@ -69,13 +107,14 @@ checkAlgoSetting fts = do
                                     let x'' = x { Fad.algorithmTree = t' }
                                     return (M.insert k x'' as', a)) (pure (as, Tr.emptyLeafDataMap))
                 . sort $ M.keys as
-  let (as''', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
-                       then let nk = fst (M.findMax as) + 1
-                                tlcl = Tr.getLeafDataMap tlc
-                                ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
-                            in (M.insert nk (Fad.initFxAlgorithmSetting pr) as'',
-                                Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
-                      else (as'', tlc)
+  (as''', tlc') <- if not . M.null $ Tr.getLeafDataMap pr
+                   then do let nk = fst (M.findMax as) + 1
+                               tlcl = Tr.getLeafDataMap tlc
+                               ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
+                           x <- createRandomFxAlgorithmSetting $ Fad.initFxAlgorithmSetting pr
+                           return (M.insert nk x as'',
+                                   Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
+                   else return (as'', tlc)
   return $ fts { Fad.techListCount = tlc'
                , Fad.algoSetting   = as'''
                }
