@@ -41,9 +41,9 @@ debug = do
   
 backTest :: IO ()
 backTest = do
+  fsd <- Fm.readFxSettingData
   let td  = Ft.initFxTradeData Ftd.Backtest
       startN = Gsd.maxTradeTime Gsd.gsd * 2
-  fsd <- Fm.readFxSettingData
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
   (tdt, fsd') <- backTestLoop True startN endN td fsd
@@ -68,7 +68,7 @@ tradeSim = do
   let td  = Ft.initFxTradeData Ftd.Backtest
   endN <- (-) <$> (Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB) <*> pure (-1)
   let -- startN = endN - Gsd.maxTradeTime Gsd.gsd * 4
-      startN = Gsd.maxTradeTime Gsd.gsd * 12
+      startN = Gsd.maxTradeTime Gsd.gsd * 2
   (pl, fsd) <- tradeSimLearning startN
   (s, f) <- Fm.readBacktestResult "trade-sim"
   td' <- tradeSimLoop startN endN pl td fsd

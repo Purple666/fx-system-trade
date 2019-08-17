@@ -7,6 +7,7 @@ module FxTechnicalAnalysis
   , checkAlgoSetting
   , getLearningTestTime
   , getPrepareTimeAll
+  , getHoldTime
   ) where
 
 import           Data.List
@@ -28,12 +29,26 @@ getLearningTestTime fsd =
      then Gsd.maxTradeTime Gsd.gsd
      else t
 
+
+getHoldTime :: Fsd.FxSettingData -> Int
+getHoldTime fsd = 
+  getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd =
   maximum [ getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
           ] 
+
+getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
+getPrepareTime x =
+  maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
+                                 , Fad.longSetting (Fad.smaSetting a)
+                                 , Fad.longSetting (Fad.emaSetting a)
+                                 , Fad.longSetting (Fad.rsiSetting a)
+                                 , Fad.longSetting (Fad.stSetting a) 
+                                 ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
 checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts =
@@ -130,15 +145,6 @@ updateThreshold f ctd =
                             { Fad.thresholdMaxSetting = getThreshold 50 50 k ctd Fad.rsi f . Fad.thresholdMaxSetting $ Fad.rsiSetting x
                             }
                           })
-
-getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
-getPrepareTime x =
-  maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
-                                 , Fad.longSetting (Fad.smaSetting a)
-                                 , Fad.longSetting (Fad.emaSetting a)
-                                 , Fad.longSetting (Fad.rsiSetting a)
-                                 , Fad.longSetting (Fad.stSetting a) 
-                                 ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
 rci :: Int -> [Double] -> Double
 rci n x  =
