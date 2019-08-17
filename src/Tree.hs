@@ -123,7 +123,15 @@ adjustTree (LeafDataMap dm) (Leaf x) =
   if M.member x dm
   then Leaf x
   else Empty
-adjustTree e (Node x l r) = Node x (adjustTree e l) (adjustTree e r)
+adjustTree e (Node x l r) = let l' = adjustTree e l
+                                r' = adjustTree e r
+                            in if l' == Empty && r' == Empty
+                               then Empty
+                               else if l' == Empty && r' /= Empty
+                                    then r'
+                                    else if l' /= Empty && r' == Empty
+                                         then l'
+                                         else Node x l' r'
 
 insertTree :: R.MonadRandom m => Int -> Int -> TreeData a -> TreeData a -> m (TreeData a)
 insertTree _ _ e Empty = return e
