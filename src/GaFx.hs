@@ -42,7 +42,7 @@ debug = do
 backTest :: IO ()
 backTest = do
   let td  = Ft.initFxTradeData Ftd.Backtest
-      startN = Gsd.maxTradeTime Gsd.gsd * 12
+      startN = Gsd.maxTradeTime Gsd.gsd * 2
   fsd <- Fm.readFxSettingData
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
