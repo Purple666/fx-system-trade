@@ -111,7 +111,7 @@ checkAlgoSetting fts = do
                    then do let nk = fst (M.findMax as) + 1
                                tlcl = Tr.getLeafDataMap tlc
                                ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
-                           x <- createRandomFxAlgorithmSetting $ Fad.initFxAlgorithmSetting pr
+                           x <- createRandomFxAlgorithmSetting . snd $ M.findMax as
                            return (M.insert nk x as'',
                                    Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
                    else return (as'', tlc)
