@@ -19,9 +19,9 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 4
+  GlobalSettingData { taMargin              = 1
                     , makeTreeCount         = 1
-                    , algorithmRepeat       = 4
+                    , algorithmRepeat       = 2
                     , learningTestCount     = 4
                     , countUpList           = 2
                     , quantityRate          = 5
