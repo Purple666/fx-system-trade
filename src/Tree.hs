@@ -187,7 +187,7 @@ divideTree (Node x l r) = do
 
 evaluateTree :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> Bool
 evaluateTree f s (Leaf x) = (f . snd $ getLeafData x) s
-evaluateTree _ _ Empty = False
+evaluateTree _ _ Empty = True
 evaluateTree f s (Node _ l Empty) = evaluateTree f s l
 evaluateTree f s (Node _ Empty r) = evaluateTree f s r
 evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (evaluateTree f s r)
