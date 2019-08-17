@@ -10,6 +10,8 @@ module FxTechnicalAnalysis
   , getHoldTime
   ) where
 
+import           Control.Monad
+import           Control.Monad.Random    as R
 import           Data.List
 import qualified Data.Map                as M
 import           Debug.Trace
@@ -50,27 +52,33 @@ getPrepareTime x =
                                  , Fad.longSetting (Fad.stSetting a) 
                                  ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
-checkAlgoSetting :: Fad.FxTechnicalAnalysisSetting -> Fad.FxTechnicalAnalysisSetting
-checkAlgoSetting fts =
+checkAlgoSetting :: R.MonadRandom m => Fad.FxTechnicalAnalysisSetting -> m (Fad.FxTechnicalAnalysisSetting)
+checkAlgoSetting fts = do
   let as  = Fad.algoSetting fts
       tlc = Fad.techListCount fts
-      (as', pr) = foldl (\(acc, p) k -> let x = as M.! k
-                                            (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
-                                            x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p
-                                                   , Fad.algorithmTree = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
-                                                   }
-                                        in (M.insert k x' acc, a)) (as, Tr.emptyLeafDataMap)
-                  . sort $ M.keys as
-      (as'', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
-                      then let nk = fst (M.findMax as) + 1
-                               tlcl = Tr.getLeafDataMap tlc
-                               ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
-                           in (M.insert nk (Fad.initFxAlgorithmSetting pr) as',
-                               Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
-                      else (as', tlc)
-  in fts { Fad.techListCount = tlc'
-         , Fad.algoSetting   = as''
-         }
+  (as'', pr) <- foldl (\acc k -> do (as', p) <- acc
+                                    let x = as M.! k
+                                        (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
+                                        x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
+                                        t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
+                                    t' <- if t == Tr.Empty
+                                          then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmAndRate x' + Gsd.taMargin Gsd.gsd)
+                                                  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  x' - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmOrRate  x' + Gsd.taMargin Gsd.gsd)
+                                                  Tr.makeTree taAndR taOrR (Fad.algorithmListCount x') Tr.Empty
+                                          else return t
+                                    let x'' = x { Fad.algorithmTree = t' }
+                                    return (M.insert k x'' as', a)) (pure (as, Tr.emptyLeafDataMap))
+                . sort $ M.keys as
+  let (as''', tlc') =  if not . M.null $ Tr.getLeafDataMap pr
+                       then let nk = fst (M.findMax as) + 1
+                                tlcl = Tr.getLeafDataMap tlc
+                                ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
+                            in (M.insert nk (Fad.initFxAlgorithmSetting pr) as'',
+                                Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
+                      else (as'', tlc)
+  return $ fts { Fad.techListCount = tlc'
+               , Fad.algoSetting   = as'''
+               }
 
 updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnalysisData) ->
                             Fad.FxChartTaData ->

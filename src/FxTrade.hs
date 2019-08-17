@@ -265,23 +265,27 @@ backTest n td fsd = do
       (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
                                                in (td3, fs3))
                              (td, fs) ctdl
-  return $ checkAlgoSetting ltt fsd td4 fs4
+  checkAlgoSetting ltt fsd td4 fs4
 
-checkAlgoSetting :: Int ->
+checkAlgoSetting :: R.MonadRandom m =>
+                    Int ->
                     Fsd.FxSettingData ->
                     Ftd.FxTradeData ->
                     Fsd.FxSetting ->
-                    (Fsd.FxSettingData, Ftd.FxTradeData)
-checkAlgoSetting l fsd td fs =
+                    m (Fsd.FxSettingData, Ftd.FxTradeData)
+checkAlgoSetting l fsd td fs = do
   let td' = td { Ftd.chartLength = l
                }
-      fsd' = fsd { Fsd.fxSetting = fs
-                                   { Fsd.fxTaOpen        = Ta.checkAlgoSetting $ Fsd.fxTaOpen        fs
-                                   , Fsd.fxTaCloseProfit = Ta.checkAlgoSetting $ Fsd.fxTaCloseProfit fs
-                                   , Fsd.fxTaCloseLoss   = Ta.checkAlgoSetting $ Fsd.fxTaCloseLoss   fs
+  tao  <- Ta.checkAlgoSetting $ Fsd.fxTaOpen        fs
+  tacp <- Ta.checkAlgoSetting $ Fsd.fxTaCloseProfit fs
+  tacl <- Ta.checkAlgoSetting $ Fsd.fxTaCloseLoss   fs            
+  let fsd' = fsd { Fsd.fxSetting = fs
+                                   { Fsd.fxTaOpen        = tao
+                                   , Fsd.fxTaCloseProfit = tacp
+                                   , Fsd.fxTaCloseLoss   = tacl
                                    }
                  }
-  in (fsd', td')
+  return (fsd', td')
 
 evaluate :: Fsd.FxSettingData -> Int -> [Fcd.FxChartData] -> Ftd.FxTradeData
 evaluate fsd ltt fc =
