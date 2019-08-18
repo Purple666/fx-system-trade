@@ -5,6 +5,8 @@ data GlobalSettingData = GlobalSettingData
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
+  , treeAndRate           :: Int
+  , treeOrRate            :: Int
   , countUpList           :: Double
   , maxTradeTime          :: Int
   , fxSettingLogNum       :: Int
@@ -25,6 +27,8 @@ gsd =
                     , learningTestCount     = 5
                     , countUpList           = 2
                     , quantityRate          = 5
+                    , treeAndRate           = 2
+                    , treeOrRate            = 3
                     , fxSettingLogNum       = 1000
                     , gaNum                 = 20
                     , maxTradeTime          = 24 * 60 * 5 * 4 * 3

@@ -75,8 +75,8 @@ choice2 die n a b = if die !! n then a else b
 createRandomFxTechnicalAnalysisSetting :: MonadRandom m => 
                                           Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
 createRandomFxTechnicalAnalysisSetting ix = do
-  taAndR <- getRandomR(1, 1 + Fad.treeAnaAndRate ix + Gsd.taMargin Gsd.gsd)
-  taOrR  <- getRandomR(1, 1 + Fad.treeAnaOrRate  ix + Gsd.taMargin Gsd.gsd * 2)
+  taAndR <- getRandomR(1, 1 + Fad.treeAnaAndRate ix + Gsd.treeAndRate Gsd.gsd)
+  taOrR  <- getRandomR(1, 1 + Fad.treeAnaOrRate  ix + Gsd.treeOrRate  Gsd.gsd)
   tat <- Tr.makeTree taAndR taOrR (Fad.techListCount ix) (Fad.techAnaTree ix)
   as' <- R.mapM Ta.createRandomFxAlgorithmSetting $ Fad.algoSetting ix
   return $ ix { Fad.techAnaTree    = tat
