@@ -61,8 +61,8 @@ createRandomFxAlMaSetting ix = do
   ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - (fromIntegral $ Gsd.taMargin Gsd.gsd)),
                         Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
-            , Fad.middleSetting     = short + middle
-            , Fad.longSetting       = middle + long
+            , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
+            , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
             , Fad.thresholdSetting  = min ts (Fad.thresholdMaxSetting ix)
             }
 
