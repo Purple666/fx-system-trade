@@ -68,7 +68,7 @@ createRandomFxAlMaSetting ix = do
 createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting ix = do
   taAndR <- getRandomR(1, 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
-  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
+  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd * 2)
   at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
   sc <- getRandomR (1, 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
@@ -100,7 +100,7 @@ checkAlgoSetting fts = do
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(1, 1 + Fad.algorithmAndRate x' + Gsd.taMargin Gsd.gsd)
-                                                  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  x' + Gsd.taMargin Gsd.gsd)
+                                                  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  x' + Gsd.taMargin Gsd.gsd * 2)
                                                   Tr.makeTree taAndR taOrR (Fad.algorithmListCount x') Tr.Empty
                                           else return t
                                     let x'' = x { Fad.algorithmTree = t' }
