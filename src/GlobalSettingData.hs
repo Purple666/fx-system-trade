@@ -19,11 +19,11 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 10
+  GlobalSettingData { taMargin              = 5
                     , makeTreeCount         = 1
-                    , algorithmRepeat       = 2
+                    , algorithmRepeat       = 5
                     , learningTestCount     = 2
-                    , countUpList           = 2
+                    , countUpList           = 3
                     , quantityRate          = 5
                     , fxSettingLogNum       = 1000
                     , gaNum                 = 20
