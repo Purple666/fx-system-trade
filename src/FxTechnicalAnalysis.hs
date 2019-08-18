@@ -55,11 +55,10 @@ getPrepareTime x =
 
 createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
 createRandomFxAlMaSetting ix = do
-  short  <- getRandomR (5  5 + Fad.shortSetting  ix + Gsd.taMargin Gsd.gsd)
+  short  <- getRandomR (5, 5 + Fad.shortSetting  ix + Gsd.taMargin Gsd.gsd)
   middle <- getRandomR (5, 5 + Fad.middleSetting ix + Gsd.taMargin Gsd.gsd)
   long   <- getRandomR (5, 5 + Fad.longSetting   ix + Gsd.taMargin Gsd.gsd)
-  ts     <- getRandomR (max 0 (Fad.thresholdSetting ix - (fromIntegral $ Gsd.taMargin Gsd.gsd)),
-                        Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
+  ts     <- getRandomR (0, Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
             , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
@@ -68,10 +67,10 @@ createRandomFxAlMaSetting ix = do
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting ix = do
-  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
-  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.taMargin Gsd.gsd), 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
+  taAndR <- getRandomR(1, 1 + Fad.algorithmAndRate ix + Gsd.taMargin Gsd.gsd)
+  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  ix + Gsd.taMargin Gsd.gsd)
   at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
-  sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
+  sc <- getRandomR (1, 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
   ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
   macd <- createRandomFxAlMaSetting $ Fad.macdSetting ix
