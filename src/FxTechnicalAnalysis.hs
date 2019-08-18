@@ -55,14 +55,14 @@ getPrepareTime x =
 
 createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
 createRandomFxAlMaSetting ix = do
-  short  <- getRandomR (5      , 5      + Fad.shortSetting  ix + Gsd.taMargin Gsd.gsd)
-  middle <- getRandomR (short  , short  + Fad.middleSetting ix + Gsd.taMargin Gsd.gsd)
-  long   <- getRandomR (middle , middle + Fad.longSetting   ix + Gsd.taMargin Gsd.gsd)
+  short  <- getRandomR (5                             , 5      + Fad.shortSetting  ix + Gsd.taMargin Gsd.gsd)
+  middle <- getRandomR (short   + Gsd.taMargin Gsd.gsd, short  + Fad.middleSetting ix + Gsd.taMargin Gsd.gsd)
+  long   <- getRandomR (middle  + Gsd.taMargin Gsd.gsd, middle + Fad.longSetting   ix + Gsd.taMargin Gsd.gsd)
   ts     <- getRandomR (0, Fad.thresholdSetting ix + fromIntegral (Gsd.taMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
-            , Fad.middleSetting     = max (short  + Gsd.taMargin Gsd.gsd) middle
-            , Fad.longSetting       = max (middle + Gsd.taMargin Gsd.gsd) long
-            , Fad.thresholdSetting  = min (Fad.thresholdMaxSetting ix) ts
+            , Fad.middleSetting     = middle
+            , Fad.longSetting       = long
+            , Fad.thresholdSetting  = ts
             }
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
