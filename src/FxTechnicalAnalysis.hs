@@ -27,14 +27,14 @@ getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   let fs = Fsd.learningSetting $ Fsd.fxSetting fsd
   in Fsd.getLearningTestTimes fsd * if Fsd.numTraderadeDate fs == 0
-                                    then 60
-                                    else (Fsd.totalTradeDate fs `div` Fsd.numTraderadeDate fs)
+                                    then getHoldTime fsd 
+                                    else getHoldTime fsd + (Fsd.totalTradeDate fs `div` Fsd.numTraderadeDate fs)
 
 getHoldTime :: Fsd.FxSettingData -> Int
 getHoldTime fsd = 
-  maximum [ getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
-          , getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
-          , getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
+  maximum [ Fad.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
+          , Fad.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
+          , Fad.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
           ] 
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
@@ -46,7 +46,7 @@ getPrepareTimeAll fsd =
 
 getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
 getPrepareTime x =
-  maximum $ M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
+  maximum . M.map (\a -> maximum [ Fad.longSetting (Fad.rciSetting a)
                                  , Fad.longSetting (Fad.smaSetting a)
                                  , Fad.longSetting (Fad.emaSetting a)
                                  , Fad.longSetting (Fad.rsiSetting a)
