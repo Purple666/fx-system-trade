@@ -21,7 +21,7 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 30
+  GlobalSettingData { taMargin              = 1
                     , makeTreeCount         = 2
                     , algorithmRepeat       = 2
                     , learningTestCount     = 2
