@@ -21,13 +21,13 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 4
-                    , makeTreeCount         = 4
-                    , algorithmRepeat       = 4
-                    , learningTestCount     = 4
-                    , countUpList           = 4
+  GlobalSettingData { taMargin              = 3
+                    , makeTreeCount         = 3
+                    , algorithmRepeat       = 3
+                    , learningTestCount     = 3
+                    , countUpList           = 3
                     , quantityRate          = 5
-                    , treeAndRate           = 1
+                    , treeAndRate           = 3
                     , treeOrRate            = 1
                     , fxSettingLogNum       = 1000
                     , gaNum                 = 20
@@ -35,7 +35,7 @@ gsd =
                     , initalProperty        = 3000000
                     , productionMaxUnit     = 3000000
                     , practiceMaxUnit       = 250000
-                    , spread                = 0.004
+                    , spread                = 0.000
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
