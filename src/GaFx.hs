@@ -36,7 +36,7 @@ statistics = do
 debug :: IO ()
 debug = do
   let td = Ft.initFxTradeData Ftd.Practice
-  Foa.closeOpen td 
+  Foa.closeOpen td td 
   return ()
   
 backTest :: IO ()
@@ -153,14 +153,14 @@ tradeEvaluate :: Ftd.FxTradeData ->
                  Fcd.FxChartData ->
                  IO (Ftd.FxTradeData)
 tradeEvaluate td fsd e = do
-  (open, close, td1, _) <- Ft.trade td fsd e
+  (open, close, td', _) <- Ft.trade td fsd e
   if open /= Ftd.None && close /= Ftd.None
-    then Foa.closeOpen td1
+    then Foa.closeOpen td td'
     else if close /= Ftd.None
-         then Foa.close td1
+         then Foa.close td td'
          else if open /= Ftd.None
-              then Foa.open td1 open
-              else return td1
+              then Foa.open td td' open
+              else return td'
 
 waitTrade :: IO ()
 waitTrade =
