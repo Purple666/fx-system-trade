@@ -231,7 +231,7 @@ crossoverOrd mrg x y = do
 crossoverOrdFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> Fad.FxAlMaSetting -> m (Fad.FxAlMaSetting, Fad.FxAlMaSetting)
 crossoverOrdFxAlMaSetting a b = do
   die <- R.replicateM 2 $ R.getRandomR (True, False)
-  (a', b') <- crossoverOrd (Gsd.taMargin Gsd.gsd)
+  (a', b') <- crossoverOrd 1 -- (Gsd.taMargin Gsd.gsd)
               [Fad.shortSetting a, Fad.middleSetting a, Fad.longSetting a]
               [Fad.shortSetting b, Fad.middleSetting b, Fad.longSetting b]
   return ( a { Fad.shortSetting     = L.head a'
