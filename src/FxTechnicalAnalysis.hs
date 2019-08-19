@@ -102,12 +102,12 @@ checkAlgoSetting fts = do
                                     let x = as M.! k
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
-                                        t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
+                                        t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
                                     t' <- if t == Tr.Empty
-                                          then do  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.treeAndRate Gsd.gsd),
-                                                                        max 1 (Fad.algorithmAndRate ix + Gsd.treeAndRate Gsd.gsd))
-                                                   taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.treeOrRate  Gsd.gsd),
-                                                                        max 1 (Fad.algorithmOrRate  ix + Gsd.treeOrRate  Gsd.gsd))
+                                          then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
+                                                                       max 1 (Fad.algorithmAndRate x' + Gsd.treeAndRate Gsd.gsd))
+                                                  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  x' - Gsd.treeOrRate  Gsd.gsd),
+                                                                       max 1 (Fad.algorithmOrRate  x' + Gsd.treeOrRate  Gsd.gsd))
                                                   Tr.makeTree taAndR taOrR (Fad.algorithmListCount x') Tr.Empty
                                           else return t
                                     let x'' = x { Fad.algorithmTree = t' }
