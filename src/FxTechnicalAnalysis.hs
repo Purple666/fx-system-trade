@@ -57,8 +57,8 @@ createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaS
 createRandomFxAlMaSetting ix = do
   short  <- getRandomR (max 5            (Fad.shortSetting  ix - Gsd.taMargin Gsd.gsd),
                         max 5            (Fad.shortSetting  ix + Gsd.taMargin Gsd.gsd))
-  middle <- getRandomR (max (short + 5)  (Fad.middleSetting ix - Gsd.taMargin Gsd.gsd),
-                        max (short + 5)  (Fad.middleSetting ix + Gsd.taMargin Gsd.gsd))
+  middle <- getRandomR (max (short  + 5) (Fad.middleSetting ix - Gsd.taMargin Gsd.gsd),
+                        max (short  + 5) (Fad.middleSetting ix + Gsd.taMargin Gsd.gsd))
   long   <- getRandomR (max (middle + 5) (Fad.longSetting   ix - Gsd.taMargin Gsd.gsd),
                         max (middle + 5) (Fad.longSetting   ix + Gsd.taMargin Gsd.gsd))
   ts     <- getRandomR (0, Fad.thresholdSetting ix + (fromIntegral $ Gsd.taMargin Gsd.gsd))
@@ -70,10 +70,12 @@ createRandomFxAlMaSetting ix = do
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
 createRandomFxAlgorithmSetting ix = do
-  taAndR <- getRandomR(1, 1 + Fad.algorithmAndRate ix + Gsd.treeAndRate Gsd.gsd)
-  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  ix + Gsd.treeOrRate  Gsd.gsd)
+  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.treeAndRate Gsd.gsd),
+                       max 1 (Fad.algorithmAndRate ix + Gsd.treeAndRate Gsd.gsd))
+  taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.treeOrRate  Gsd.gsd),
+                       max 1 (Fad.algorithmOrRate  ix + Gsd.treeOrRate  Gsd.gsd))
   at <- Tr.makeTree taAndR taOrR (Fad.algorithmListCount ix) (Fad.algorithmTree ix)
-  sc <- getRandomR (1, 1 + Fad.simChart ix + Gsd.taMargin Gsd.gsd)
+  sc <- getRandomR (max 1 (Fad.simChart ix - Gsd.taMargin Gsd.gsd), max 1 (Fad.simChart ix + Gsd.taMargin Gsd.gsd))
   sma  <- createRandomFxAlMaSetting $ Fad.smaSetting  ix
   ema  <- createRandomFxAlMaSetting $ Fad.emaSetting  ix
   macd <- createRandomFxAlMaSetting $ Fad.macdSetting ix
@@ -102,8 +104,10 @@ checkAlgoSetting fts = do
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x)
                                     t' <- if t == Tr.Empty
-                                          then do taAndR <- getRandomR(1, 1 + Fad.algorithmAndRate x' + Gsd.treeAndRate Gsd.gsd)
-                                                  taOrR  <- getRandomR(1, 1 + Fad.algorithmOrRate  x' + Gsd.treeOrRate  Gsd.gsd)
+                                          then do  taAndR <- getRandomR(max 1 (Fad.algorithmAndRate ix - Gsd.treeAndRate Gsd.gsd),
+                                                                        max 1 (Fad.algorithmAndRate ix + Gsd.treeAndRate Gsd.gsd))
+                                                   taOrR  <- getRandomR(max 1 (Fad.algorithmOrRate  ix - Gsd.treeOrRate  Gsd.gsd),
+                                                                        max 1 (Fad.algorithmOrRate  ix + Gsd.treeOrRate  Gsd.gsd))
                                                   Tr.makeTree taAndR taOrR (Fad.algorithmListCount x') Tr.Empty
                                           else return t
                                     let x'' = x { Fad.algorithmTree = t' }
