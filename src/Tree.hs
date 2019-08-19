@@ -136,8 +136,10 @@ adjustTree e (Node x l r) = let l' = adjustTree e l
 insertTree :: R.MonadRandom m => Int -> Int -> TreeData a -> TreeData a -> m (TreeData a)
 insertTree _ _ e Empty = return e
 insertTree andRate orRate e (Leaf x) = do
-  die <- R.fromList [(NodeData (0, (&&)), toRational andRate), (NodeData (1, (||)), toRational orRate)]
-  return (Node die e (Leaf x))
+  if e == Leaf x
+    then return (Leaf x)
+    else do die <- R.fromList [(NodeData (0, (&&)), toRational andRate), (NodeData (1, (||)), toRational orRate)]
+            return (Node die e (Leaf x))
 insertTree _ _ e (Node x l Empty) =
   if e == l
   then return (Node x l Empty)
