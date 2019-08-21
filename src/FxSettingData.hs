@@ -119,10 +119,6 @@ getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
 
-getLogProfit :: FxSettingData -> Double
-getLogProfit fsd =
-  (logProfit . learningSetting $ fxSetting fsd) * (fromIntegral . logCount . learningSetting $ fxSetting fsd)
-
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
   L.maximum [ Fad.getSimChartMax . fxTaOpen        $ fxSetting fsd
@@ -150,18 +146,22 @@ setFxSettingData fsl =
                                   , fxSettingLog   = fsl                                         
                                   }
 
+getLogProfit :: FxSettingData -> Double
+getLogProfit fsd =
+  (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
+
 maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
 maxFxSettingFromLog fsl =
   if L.null fsl == True
   then initFxSetting
   else L.head . L.map (\(x, (_, _)) -> x) . 
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a')) $
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
        M.toList fsl
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
 minFxSettingDelete fsl =
   M.fromList . L.take (Gsd.fxSettingLogNum Gsd.gsd) .
-  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b * fromIntegral b') (a * fromIntegral a')) $
+  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
   M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
