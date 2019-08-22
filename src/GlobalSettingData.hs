@@ -1,7 +1,8 @@
 module GlobalSettingData where
 
 data GlobalSettingData = GlobalSettingData
-  { taMargin              :: Int
+  { taRandomMargin        :: Int
+  , taMiddleLongMargin    :: Int
   , makeTreeCount         :: Int
   , algorithmRepeat       :: Int
   , learningTestCount     :: Int
@@ -21,16 +22,17 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taMargin              = 10
+  GlobalSettingData { taRandomMargin        = 1
+                    , taMiddleLongMargin    = 5
                     , makeTreeCount         = 1
                     , algorithmRepeat       = 2
                     , learningTestCount     = 2
                     , countUpList           = 3
                     , quantityRate          = 5
-                    , treeAndRate           = 1
-                    , treeOrRate            = 1
+                    , treeAndRate           = 3
+                    , treeOrRate            = 2
                     , fxSettingLogNum       = 50
-                    , gaNum                 = 50
+                    , gaNum                 = 20
                     , maxTradeTime          = 24 * 60 * 5 * 4 * 3
                     , initalProperty        = 3000000
                     , productionMaxUnit     = 3000000

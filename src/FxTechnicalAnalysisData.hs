@@ -179,9 +179,11 @@ initFxAlgorithmSetting alc =
 
 initFxAlMaSetting :: FxAlMaSetting
 initFxAlMaSetting =
-  FxAlMaSetting { shortSetting        = 5 + Gsd.taMargin Gsd.gsd
-                , middleSetting       = 5 + Gsd.taMargin Gsd.gsd * 2
-                , longSetting         = 5 + Gsd.taMargin Gsd.gsd * 3
+  FxAlMaSetting { shortSetting        = 5                                              + Gsd.taRandomMargin Gsd.gsd
+                , middleSetting       = 5                                              + Gsd.taRandomMargin Gsd.gsd +
+                                        Gsd.taMiddleLongMargin Gsd.gsd + Gsd.taRandomMargin Gsd.gsd
+                , longSetting         = 5                                              + Gsd.taRandomMargin Gsd.gsd + 
+                                        (Gsd.taMiddleLongMargin Gsd.gsd + Gsd.taRandomMargin Gsd.gsd) * 2
                 , thresholdSetting    = 30
                 , thresholdMaxSetting = 30
                 }

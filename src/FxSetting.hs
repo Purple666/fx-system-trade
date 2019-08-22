@@ -48,7 +48,9 @@ gaLearningDataFromLog n fsd = do
                                                                                              , Fsd.learningTestTime = ltt
                                                                                              }
                                                    }
-                                    return $ Ga.learningData fsd') $ M.toList fsl
+                                    return $ Ga.learningData fsd') .
+          L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
+          M.toList fsl
   return (Ga.learningDataList fsl', Ga.learningDataList $ take (Gsd.gaNum Gsd.gsd) fsl')
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
@@ -233,7 +235,7 @@ crossoverOrd mrg x y = do
 crossoverOrdFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> Fad.FxAlMaSetting -> m (Fad.FxAlMaSetting, Fad.FxAlMaSetting)
 crossoverOrdFxAlMaSetting a b = do
   die <- R.replicateM 2 $ R.getRandomR (True, False)
-  (a', b') <- crossoverOrd (Gsd.taMargin Gsd.gsd)
+  (a', b') <- crossoverOrd (Gsd.taMiddleLongMargin Gsd.gsd)
               [Fad.shortSetting a, Fad.middleSetting a, Fad.longSetting a]
               [Fad.shortSetting b, Fad.middleSetting b, Fad.longSetting b]
   return ( a { Fad.shortSetting     = L.head a'

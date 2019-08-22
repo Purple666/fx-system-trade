@@ -13,7 +13,6 @@ module FxSettingData
   , getLogProfit
   , setFxSettingData
   , getFxSettingLogResult
-  , maxFxSettingFromLog
   , minFxSettingDelete
   ) where
 
