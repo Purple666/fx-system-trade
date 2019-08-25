@@ -170,7 +170,11 @@ crossoverTree andRate orRate x xdm y ydm = do
 
 divideTree :: R.MonadRandom m => TreeData a -> m (TreeData a, TreeData a)
 divideTree Empty = return (Empty, Empty)
-divideTree (Leaf x) = return (Leaf x, Leaf x)
+divideTree (Leaf x) = do
+  die1 <- R.getRandomR (True, False)
+  if die1
+    then return (Leaf x, Empty)
+    else return (Empty, Leaf x)
 divideTree (Node x l r) = do
   die2 <- R.getRandomR (True, False)
   if die2

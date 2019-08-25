@@ -120,7 +120,7 @@ checkAlgoSetting fts = do
                                ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
                            x <- createRandomFxAlgorithmSetting . snd $ M.findMax as
                            return (M.insert nk x as'',
-                                   Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (ave, 0) tlcl)
+                                   Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (1, 0) tlcl)
                    else return (as'', tlc)
   return $ fts { Fad.techListCount = tlc'
                , Fad.algoSetting   = as'''
