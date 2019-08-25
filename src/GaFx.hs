@@ -52,6 +52,7 @@ backTest = do
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" tdt s (f + 1) fsd'
                       return (s, f + 1)
+  Fm.writeFxSettingData fsd'
   Fm.writeBacktestResult "backtest" s' f'
   backTest
 
@@ -141,7 +142,6 @@ backTestLoop lf n endN td fsd = do
 -}
   (fsd2, tdt) <- Ft.backTest n td fsd1
   let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
-  Fm.writeFxSettingData fsd3
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
