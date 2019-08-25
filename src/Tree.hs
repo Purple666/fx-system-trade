@@ -144,11 +144,11 @@ insertTree andRate orRate e (Leaf x) = do
             return (Node die e (Leaf x))
 insertTree _ _ e (Node x l Empty) =
   if e == l
-  then return (Node x l Empty)
+  then return l
   else return (Node x l e)
 insertTree _ _ e (Node x Empty r) =
   if e == r
-  then return (Node x Empty r)
+  then return r
   else return (Node x e r)
 insertTree andRate orRate e (Node x l r) =
   if e == l || e == r
