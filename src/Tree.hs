@@ -108,11 +108,11 @@ makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (T
 makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
-    else do let mx = fst . minimum . map snd $ M.toList xs
+{-     else do let mx = fst . minimum . map snd $ M.toList xs
                 xs' = if mx <= 0
-                      then M.map (\(p, c) -> toRational ((p + abs mx + 1) / fromIntegral (c + 1))) xs
-                      else M.map (\(p, c) -> toRational (p / fromIntegral (c + 1))) xs
-    -- else do let xs' = M.map (toRational . fst) xs
+                      then M.map (\(p, c) -> toRational (p + abs mx + 1)) xs
+                      else M.map (\(p, c) -> toRational p) xs -}
+    else do let xs' = M.map (toRational . fst) xs
             foldl (\acc _ -> do l <- R.fromList $ M.toList xs'
                                 insertTree andRate orRate (Leaf l) =<< acc
                   ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
