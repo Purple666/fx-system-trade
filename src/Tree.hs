@@ -131,7 +131,9 @@ adjustTree e (Node x l r) = let l' = adjustTree e l
                                     then r'
                                     else if l' /= Empty && r' == Empty
                                          then l'
-                                         else Node x l' r'
+                                         else if l' == r'
+                                              then l'
+                                              else Node x l' r'
 
 insertTree :: R.MonadRandom m => Int -> Int -> TreeData a -> TreeData a -> m (TreeData a)
 insertTree _ _ e Empty = return e
