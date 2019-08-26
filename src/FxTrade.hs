@@ -167,6 +167,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                       }
               else fs'
       td' = td { Ftd.chart     = cd
+{-               
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
                                                           , Fcd.close = position + Gsd.spread Gsd.gsd
@@ -198,6 +199,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits
                                   else Ftd.realizedPL td
+-}
                }
   in (open, close, td', fs'')
 
@@ -277,7 +279,7 @@ backTest n td fsd = do
       (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
                                                in (td3, fs3))
                              (td, fs) ctdl
-  return (fsd, td)
+  return (fsd, td4)
   --checkAlgoSetting ltt fsd td4 fs4
 
 checkAlgoSetting :: R.MonadRandom m =>
