@@ -277,7 +277,8 @@ backTest n td fsd = do
       (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
                                                in (td3, fs3))
                              (td, fs) ctdl
-  checkAlgoSetting ltt fsd td4 fs4
+  return (fsd td4)
+  --checkAlgoSetting ltt fsd td4 fs4
 
 checkAlgoSetting :: R.MonadRandom m =>
                     Int ->
