@@ -176,6 +176,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                                                , Fcd.close = position - Gsd.spread Gsd.gsd
                                                                }
                                       else Ftd.tradeRate td
+{-               
                , Ftd.unit  = if open /= Ftd.None
                              then f1 td position
                              else if close /= Ftd.None
@@ -194,7 +195,6 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.trFail     = if close /= Ftd.None && profits <= 0
                                   then Ftd.trFail td + 1
                                   else Ftd.trFail td
-{-               
                , Ftd.profit     = Ftd.profit td + profits
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits
