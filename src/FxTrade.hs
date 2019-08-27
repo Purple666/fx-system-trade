@@ -276,9 +276,9 @@ backTest n td fsd = do
   fc <- Fm.getChartListSlice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
-      (td', fs) `seq` (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
+      (td4, fs4) = (td, fs) `seq` L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
                                                in (td3, fs3))
-                             (td, fs) ctdl
+                   (td, fs) ctdl
   return (fsd, td4)
   --checkAlgoSetting ltt fsd td4 fs4
 
