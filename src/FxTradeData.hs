@@ -82,11 +82,11 @@ initFxTradeDataCommon =
 
 getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
-  (profit x * realizedPL x * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
+  profit x
 --  
 {-
+  (profit x * realizedPL x * getWinRatePure x ^ 4) / (fromIntegral $ chartLength x)
 (fromIntegral $ trSuccess x) * 
-  profit x
   (profit x * realizedPL x) / (fromIntegral $ chartLength x)
   unrealizedPL x
   if profit x < 0 && unrealizedPL x < Gsd.initalProperty Gsd.gsd
