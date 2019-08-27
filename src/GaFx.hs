@@ -134,15 +134,14 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop lf n endN td fsd = do
-  (lok, ok, oknum, tdlt, fsd1) <- if False -- lf
+  (lok, ok, oknum, tdlt, fsd1) <- if lf
                                   then learning n fsd
                                   else return (True, True, 0, [Ftd.initFxTradeDataCommon], fsd)
 {-
   (lok, ok, oknum, tdlt, fsd1) <- learning n fsd
 -}
   (fsd2, tdt) <- Ft.backTest n td fsd1
-  --let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
-  let fsd3 = fsd2
+  let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
