@@ -166,7 +166,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                             else ([], M.empty)
                       }
               else fs'
-      td' = td { Ftd.chart     = cd
+      td' = td { Ftd.chart = cd
                , Ftd.unit  = if open /= Ftd.None
                              then f1 td position
                              else if close /= Ftd.None
