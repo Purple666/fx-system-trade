@@ -17,13 +17,13 @@ import qualified GlobalSettingData       as Gsd
 data FxTradeData =
   FxTradeData { chart              :: Fcd.FxChartData
               , tradeRate          :: Fcd.FxChartData
-              , unit               :: !Int
-              , side               :: !FxSide
+              , unit               :: Int
+              , side               :: FxSide
               , trSuccess          :: !Int
               , trFail             :: !Int
               , profit             :: !Double
               , realizedPL         :: !Double
-              , chartLength        :: !Int
+              , chartLength        :: Int
               , maxUnit            :: Int
               , coName             :: String
               , environment        :: FxEnvironment
