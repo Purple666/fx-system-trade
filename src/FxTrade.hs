@@ -172,7 +172,6 @@ evaluateOne ctd fsd f1 forceSell td fs =
                              else if close /= Ftd.None
                                   then 0
                                   else Ftd.unit td
-{-               
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
                                                           , Fcd.close = position + Gsd.spread Gsd.gsd
@@ -199,7 +198,6 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + (fromIntegral $ Ftd.unit td) * profits
                                   else Ftd.realizedPL td
--}
                }
   in (open, close, td', fs'')
 
