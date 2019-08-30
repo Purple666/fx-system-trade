@@ -115,7 +115,7 @@ makeTree andRate orRate (LeafDataMap xs) t =
     else do let xs' = M.map (toRational . fst) xs
             foldl (\acc _ -> do l <- R.fromList $ M.toList xs'
                                 insertTree andRate orRate (Leaf l) =<< acc
-                  ) (pure t) [0..Gsd.makeTreeCount Gsd.gsd]
+                  ) (pure t) [1..Gsd.makeTreeCount Gsd.gsd]
 
 adjustTree :: LeafDataMap a -> TreeData a -> TreeData a
 adjustTree _ Empty = Empty
