@@ -30,18 +30,18 @@ import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxSettingChart :: FxSettingChart
-                , fxSetting      :: FxSetting
+                , fxSetting      :: !FxSetting
                 , fxSettingLog   :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
-  FxSetting { settingHash     :: Int
+  FxSetting { settingHash     :: !Int
             , prevOpen        :: ([Tr.LeafData (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData)],
                                    M.Map Int [Tr.LeafData Fad.FxTechnicalAnalysisData])
-            , learningSetting :: FxLearningSetting
-            , fxTaOpen        :: Fad.FxTechnicalAnalysisSetting
-            , fxTaCloseProfit :: Fad.FxTechnicalAnalysisSetting
-            , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
+            , learningSetting :: !FxLearningSetting
+            , fxTaOpen        :: !Fad.FxTechnicalAnalysisSetting
+            , fxTaCloseProfit :: !Fad.FxTechnicalAnalysisSetting
+            , fxTaCloseLoss   :: !Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Generic)
 
 data FxSettingChart =

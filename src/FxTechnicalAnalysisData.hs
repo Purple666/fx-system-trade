@@ -65,31 +65,31 @@ instance Hashable FxTradePosition
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
                              , techListCount  :: Tr.LeafDataMap (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
-                             , treeAnaAndRate :: Int
-                             , treeAnaOrRate  :: Int
+                             , treeAnaAndRate :: !Int
+                             , treeAnaOrRate  :: !Int
                              , algoSetting    :: M.Map Int FxAlgorithmSetting
                              } deriving (Show, Read, Ord, Eq, Generic)
 
 data FxAlgorithmSetting = FxAlgorithmSetting
   { algorithmTree      :: Tr.TreeData FxTechnicalAnalysisData
   , algorithmListCount :: Tr.LeafDataMap FxTechnicalAnalysisData
-  , algorithmAndRate   :: Int
-  , algorithmOrRate    :: Int
-  , smaSetting         :: FxAlMaSetting
-  , emaSetting         :: FxAlMaSetting
-  , macdSetting        :: FxAlMaSetting
-  , stSetting          :: FxAlMaSetting
-  , rciSetting         :: FxAlMaSetting
-  , rsiSetting         :: FxAlMaSetting
-  , simChart           :: Int
+  , algorithmAndRate   :: !Int
+  , algorithmOrRate    :: !Int
+  , smaSetting         :: !FxAlMaSetting
+  , emaSetting         :: !FxAlMaSetting
+  , macdSetting        :: !FxAlMaSetting
+  , stSetting          :: !FxAlMaSetting
+  , rciSetting         :: !FxAlMaSetting
+  , rsiSetting         :: !FxAlMaSetting
+  , simChart           :: !Int
   } deriving (Show, Read, Ord, Eq, Generic)
 
 data FxAlMaSetting = FxAlMaSetting
-  { shortSetting        :: Int
-  , middleSetting       :: Int
-  , longSetting         :: Int
-  , thresholdSetting    :: Double
-  , thresholdMaxSetting :: Double
+  { shortSetting        :: !Int
+  , middleSetting       :: !Int
+  , longSetting         :: !Int
+  , thresholdSetting    :: !Double
+  , thresholdMaxSetting :: !Double
   }  deriving (Show, Read, Eq, Ord, Generic)
 
 instance Hashable FxTechnicalAnalysisSetting
