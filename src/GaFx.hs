@@ -148,7 +148,7 @@ backTestLoop lf n endN ptd td fsd = do
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
-    else backTestLoop (Ftd.profit tdt <= Ftd.profit ptd) n' endN ptd tdt fsd3
+    else backTestLoop (Ftd.profit tdt <= Ftd.profit ptd') n' endN ptd' tdt fsd3
 
 tradeEvaluate :: Ftd.FxTradeData ->
                  Fsd.FxSettingData ->
