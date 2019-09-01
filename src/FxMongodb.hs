@@ -92,8 +92,9 @@ readFxSettingData = do
   close pipe
   if null r
     then return $ Fsd.initFxSettingData
-    else do fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fsd.setFxSettingData fsl
+    else do fs  <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
+            fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
+            return $ Fsd.setFxSettingData fs fsl
 
 checkFxSettingData :: IO Bool
 checkFxSettingData = do
@@ -107,7 +108,7 @@ checkFxSettingData = do
 writeFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
 writeFxSettingData fsd = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setFxSettingLogToDB (Fsd.fxSettingLog fsd)
+  _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
   close pipe
   return fsd
 
@@ -142,10 +143,11 @@ setFxTradeDataToDB coName td =
                             , "profit"         =: (show $ Ftd.profit        td)       
                             ]
 
-setFxSettingLogToDB :: M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
-setFxSettingLogToDB fsl =
-  upsert (select [] "fxsetting_log" ) [ "fsl" =: show fsl
-                                     ]
+setFxSettingToDB :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
+setFxSettingToDB fs fsl =
+  upsert (select [] "fxsetting_log" ) [ "fs"  =: show fs
+                                      , "fsl" =: show fsl
+                                      ]
 
 setBacktestResultToDB :: String -> Int -> Int -> Action IO ()
 setBacktestResultToDB name s f = 

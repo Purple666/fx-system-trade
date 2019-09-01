@@ -30,7 +30,7 @@ import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
   FxSettingData { fxSettingChart :: FxSettingChart
-                , fxSetting      :: !FxSetting
+                , fxSetting      :: FxSetting
                 , fxSettingLog   :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
@@ -138,10 +138,10 @@ setTreeFunction fs =
      , fxSettingLog  = M.mapKeys setFxSetting $ fxSettingLog fs
      }
 
-setFxSettingData :: M.Map FxSetting (Double, Int) -> FxSettingData
-setFxSettingData fsl =
+setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
+setFxSettingData fs fsl =
   setTreeFunction $ FxSettingData { fxSettingChart = initFxSettingChart
-                                  , fxSetting      = maxFxSettingFromLog fsl
+                                  , fxSetting      = fs
                                   , fxSettingLog   = fsl                                         
                                   }
 
