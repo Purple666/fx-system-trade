@@ -46,7 +46,7 @@ backTest = do
       startN = Gsd.maxTradeTime Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
-  (tdt, fsd') <- backTestLoop True startN endN td fsd
+  (tdt, fsd') <- backTestLoop True startN endN td td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
               then do Fp.printBackTestResult "=================================" tdt (s + 1) f fsd'
                       return (s + 1, f)
@@ -134,10 +134,10 @@ backTestLoop :: Bool ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop lf n endN ptd td fsd = do
-  (ptd', lok, ok, oknum, tdlt, fsd1) <- if lf
+  (ptd', (lok, ok, oknum, tdlt, fsd1)) <- if lf
                                   then do r <- learning n fsd
                                           return (td, r)
-                                  else return (ptd, True, True, 0, [Ftd.initFxTradeDataCommon], fsd)
+                                  else return (ptd, (True, True, 0, [Ftd.initFxTradeDataCommon], fsd))
 {-
   (lok, ok, oknum, tdlt, fsd1) <- learning n fsd
 -}
