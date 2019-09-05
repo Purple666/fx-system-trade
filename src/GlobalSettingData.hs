@@ -30,14 +30,14 @@ gsd =
                     , countUpList           = 2
                     , quantityRate          = 5
                     , treeAndRate           = 1
-                    , treeOrRate            = 2
+                    , treeOrRate            = 1
                     , fxSettingLogNum       = 50
                     , gaNum                 = 20
                     , maxTradeTime          = 24 * 60 * 5 * 4 * 3
                     , initalProperty        = 3000000
                     , productionMaxUnit     = 3000000
                     , practiceMaxUnit       = 250000
-                    , spread                = 0.004
+                    , spread                = 0.000
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
