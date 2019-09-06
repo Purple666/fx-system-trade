@@ -100,7 +100,7 @@ checkLeafDataMap (LeafDataMap xs) =
             then M.map (\(p, c) -> (p + abs mx + 1, c)) xs
             else xs
   in if (not $ M.null xs) && (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
-     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs) * (Gsd.countUpList $ Gsd.gsd) < x) xs'
+     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < x) xs'
           in (LeafDataMap a, LeafDataMap b)
      else (LeafDataMap M.empty, LeafDataMap xs)
 

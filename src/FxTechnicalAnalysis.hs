@@ -112,7 +112,7 @@ checkAlgoSetting fts = do
                                                                        max 1 (Fad.algorithmOrRate  x' + Gsd.treeOrRate  Gsd.gsd))
                                                   Tr.makeTree taAndR taOrR (Fad.algorithmListCount x') Tr.Empty
                                           else return t
-                                    let x'' = x { Fad.algorithmTree = t' }
+                                    let x'' = x' { Fad.algorithmTree = t' }
                                     return (M.insert k x'' as', a)) (pure (as, Tr.emptyLeafDataMap))
                 . sort $ M.keys as
   (as''', tlc') <- if not . M.null $ Tr.getLeafDataMap pr
