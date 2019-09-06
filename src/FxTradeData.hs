@@ -24,11 +24,11 @@ data FxTradeData =
               , profit             :: !Double
               , realizedPL         :: !Double
               , chartLength        :: !Int
-              , maxUnit            :: Int
-              , coName             :: String
-              , environment        :: FxEnvironment
-              , bearer             :: String
-              , url                :: String
+              , maxUnit            :: !Int
+              , coName             :: !String
+              , environment        :: !FxEnvironment
+              , bearer             :: !String
+              , url                :: !String
               } deriving (Show, Read)
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
