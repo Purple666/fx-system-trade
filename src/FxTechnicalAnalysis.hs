@@ -103,7 +103,7 @@ checkAlgoSetting fts = do
   (as'', pr) <- foldl (\acc k -> do (as', p) <- acc
                                     let x = as' M.! k
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
-                                        x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
+                                        x' = x { Fad.algorithmListCount = Tr.unionLeafDataMap p b }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
@@ -134,11 +134,11 @@ updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnaly
                             Fad.FxTechnicalAnalysisSetting ->
                             Fad.FxTechnicalAnalysisSetting
 updateAlgorithmListCount f ctd (ldlt, ldla) fts =
-  let tlc = Tr.addLeafDataMap (Fad.techListCount fts) ldlt
+  let tlc = Tr.addLeafDataMap ldlt (Fad.techListCount fts) 
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in traceShow(x, "------" , Fad.algorithmListCount y) $ M.insert k y' acc)
+                                        in M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
   in fts { Fad.techListCount = tlc
          , Fad.algoSetting   = as

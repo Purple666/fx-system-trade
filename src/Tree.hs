@@ -13,6 +13,7 @@ module Tree
   , setFunctionToTree
   , makeValidLeafDataList
   , calcValidLeafDataList
+  , unionLeafDataMap
   , addLeafDataMap
   , checkLeafDataMap
   , emptyLeafDataMap
@@ -204,15 +205,22 @@ evaluateTree f s (Node _ l Empty) = evaluateTree f s l
 evaluateTree f s (Node _ Empty r) = evaluateTree f s r
 evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (evaluateTree f s r)
 
-addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
-addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
+unionLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
+unionLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
                                                  then (1, y + y')
                                                  else (x + x', y + y')) a b
 
+addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
+addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
+  let b' = foldl (\acc k -> M.delete k acc) b $ Mkeys.M.diffrence a b
+  in LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
+                                                    then (1, y + y')
+                                                    else (x + x', y + y')) a b'
+
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
 calcValidLeafDataList p lds =
-  foldl (\acc k -> addLeafDataMap (LeafDataMap $ M.singleton k (p, 1)) acc) emptyLeafDataMap lds
+  foldl (\acc k -> unionLeafDataMap (LeafDataMap $ M.singleton k (p, 1)) acc) emptyLeafDataMap lds
 
 makeValidLeafDataList :: ((a -> Bool, a -> Bool) -> (a -> Bool)) -> a -> TreeData a -> [LeafData a]
 makeValidLeafDataList f s tl =
