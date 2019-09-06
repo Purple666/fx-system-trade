@@ -94,7 +94,7 @@ readFxSettingData = do
     then return $ Fsd.initFxSettingData
     else do fs  <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fsd.setFxSettingData fs M.empty fsl
+            return $ Fsd.setFxSettingData fs fsl
 
 checkFxSettingData :: IO Bool
 checkFxSettingData = do
