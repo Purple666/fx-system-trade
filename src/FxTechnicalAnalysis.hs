@@ -101,7 +101,7 @@ checkAlgoSetting fts = do
   let as  = Fad.algoSetting fts
       tlc = Fad.techListCount fts
   (as'', pr) <- foldl (\acc k -> do (as', p) <- acc
-                                    let x = as M.! k
+                                    let x = as' M.! k
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
