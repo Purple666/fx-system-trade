@@ -14,9 +14,9 @@ import GHC.Generics (Generic)
 import Data.Hashable
 
 data FxChartData = FxChartData
-  { no    :: !Int
-  , date  :: !Int
-  , close :: !Double
+  { no    :: Int
+  , date  :: Int
+  , close :: Double
   }
   deriving (Show, Read, Eq, Ord, Generic)
 

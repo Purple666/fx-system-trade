@@ -15,20 +15,20 @@ import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 
 data FxTradeData =
-  FxTradeData { chart              :: !Fcd.FxChartData
-              , tradeRate          :: !Fcd.FxChartData
-              , unit               :: !Int
-              , side               :: !FxSide
-              , trSuccess          :: !Int
-              , trFail             :: !Int
-              , profit             :: !Double
-              , realizedPL         :: !Double
-              , chartLength        :: !Int
-              , maxUnit            :: !Int
-              , coName             :: !String
-              , environment        :: !FxEnvironment
-              , bearer             :: !String
-              , url                :: !String
+  FxTradeData { chart              :: Fcd.FxChartData
+              , tradeRate          :: Fcd.FxChartData
+              , unit               :: Int
+              , side               :: FxSide
+              , trSuccess          :: Int
+              , trFail             :: Int
+              , profit             :: Double
+              , realizedPL         :: Double
+              , chartLength        :: Int
+              , maxUnit            :: Int
+              , coName             :: String
+              , environment        :: FxEnvironment
+              , bearer             :: String
+              , url                :: String
               } deriving (Show, Read)
 
 data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)

@@ -93,8 +93,8 @@ readFxSettingData = do
   if null r
     then return $ Fsd.initFxSettingData
     else do fs  <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
-            -- fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fsd.setFxSettingData fs M.empty -- fsl
+            fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
+            return $ Fsd.setFxSettingData fs M.empty fsl
 
 checkFxSettingData :: IO Bool
 checkFxSettingData = do
@@ -146,7 +146,7 @@ setFxTradeDataToDB coName td =
 setFxSettingToDB :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
 setFxSettingToDB fs fsl =
   upsert (select [] "fxsetting_log" ) [ "fs"  =: show fs
-                                      -- , "fsl" =: show fsl
+                                      , "fsl" =: show fsl
                                       ]
 
 setBacktestResultToDB :: String -> Int -> Int -> Action IO ()

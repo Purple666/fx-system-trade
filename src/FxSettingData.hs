@@ -29,7 +29,7 @@ import qualified GlobalSettingData       as Gsd
 import qualified FxTechnicalAnalysisData as Fad
 
 data FxSettingData =
-  FxSettingData { fxSettingChart :: !FxSettingChart
+  FxSettingData { fxSettingChart :: FxSettingChart
                 , fxSetting      :: FxSetting
                 , fxSettingLog   :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
@@ -45,8 +45,8 @@ data FxSetting =
             } deriving (Show, Read, Generic)
 
 data FxSettingChart =
-  FxSettingChart { chart            :: ![Fcd.FxChartData]
-                 , learningTestTime :: !Int
+  FxSettingChart { chart            :: [Fcd.FxChartData]
+                 , learningTestTime :: Int
                  } deriving (Show)
 
 instance Eq FxSettingData where
