@@ -105,6 +105,7 @@ checkAlgoSetting fts = do
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
+                                    traceShow(a) $ return ()
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
                                                                        max 1 (Fad.algorithmAndRate x' + Gsd.treeAndRate Gsd.gsd))
@@ -116,7 +117,7 @@ checkAlgoSetting fts = do
                                     return (M.insert k x'' as', a)) (pure (as, Tr.emptyLeafDataMap))
                 . sort $ M.keys as
   (as''', tlc') <- if not . M.null $ Tr.getLeafDataMap pr
-                   then do let nk = fst (M.findMax as) + 1
+                   then do let nk = fst (M.findMax as'') + 1
                                tlcl = Tr.getLeafDataMap tlc
                                ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
                            x <- createRandomFxAlgorithmSetting $ Fad.initFxAlgorithmSetting pr
