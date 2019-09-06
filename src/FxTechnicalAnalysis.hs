@@ -138,7 +138,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in traceShow(x, '------' , Fad.algorithmListCount y) $ M.insert k y' acc)
+                                        in traceShow(x, "------" , Fad.algorithmListCount y) $ M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
   in fts { Fad.techListCount = tlc
          , Fad.algoSetting   = as
