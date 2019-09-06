@@ -105,7 +105,6 @@ checkAlgoSetting fts = do
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
-                                    traceShow(a,"-------" ,b) $ return ()
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
                                                                        max 1 (Fad.algorithmAndRate x' + Gsd.treeAndRate Gsd.gsd))
@@ -139,7 +138,7 @@ updateAlgorithmListCount f ctd (ldlt, ldla) fts =
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
-                                        in M.insert k y' acc)
+                                        in traceShow(x, '------' , Fad.algorithmListCount y) $ M.insert k y' acc)
             (updateThreshold f ctd $ Fad.algoSetting fts) ldla
   in fts { Fad.techListCount = tlc
          , Fad.algoSetting   = as
