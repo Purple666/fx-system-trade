@@ -105,6 +105,7 @@ checkAlgoSetting fts = do
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
                                         x' = x { Fad.algorithmListCount = Tr.addLeafDataMap b p }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
+                                    traceShow(a,b) $ return ()
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
                                                                        max 1 (Fad.algorithmAndRate x' + Gsd.treeAndRate Gsd.gsd))
