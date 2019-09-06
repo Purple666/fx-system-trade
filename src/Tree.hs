@@ -213,10 +213,10 @@ unionLeafDataMap (LeafDataMap a) (LeafDataMap b) =
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  let b' = foldl (\acc k -> M.delete k acc) b $ Mkeys.M.diffrence a b
+  let a' = foldl (\acc k -> M.delete k acc) a $ Mkeys.M.diffrence a b
   in LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
                                                     then (1, y + y')
-                                                    else (x + x', y + y')) a b'
+                                                    else (x + x', y + y')) a' b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
 calcValidLeafDataList p lds =
