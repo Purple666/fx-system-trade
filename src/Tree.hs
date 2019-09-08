@@ -20,12 +20,12 @@ module Tree
   ) where
 
 import qualified Control.Monad.Random as R
+import           Data.Hashable
 import           Data.List
 import qualified Data.Map             as M
+import           Debug.Trace
+import           GHC.Generics         (Generic)
 import qualified GlobalSettingData    as Gsd
-import GHC.Generics (Generic)
-import Data.Hashable
-import Debug.Trace
 
 newtype LeafData a = LeafData { getLeafData :: (Int, (a -> Bool, a -> Bool)) } deriving(Generic)
 
@@ -64,7 +64,7 @@ instance Show NodeData where
 instance Eq (LeafData a) where
   a == b = fst (getLeafData a) == fst (getLeafData b)
 
-instance Eq NodeData where  
+instance Eq NodeData where
   a == b = fst (getNodeData a) == fst (getNodeData b)
 
 instance Ord (LeafData a) where
@@ -100,8 +100,8 @@ checkLeafDataMap (LeafDataMap xs) =
       xs' = if mx <= 0
             then M.map (\(p, c) -> (p + abs mx + 1, c)) xs
             else xs
-  in if (not $ M.null xs) && (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < (fst $ maximum xs')
-     then let (a, b) = M.partition (\(x, _) -> (fst $ minimum xs') * (Gsd.countUpList $ Gsd.gsd) < x) xs'
+  in if not (M.null xs) && fst (minimum xs') * (Gsd.countUpList Gsd.gsd) < fst (maximum xs')
+     then let (a, b) = M.partition (\(x, _) -> fst (minimum xs') * (Gsd.countUpList Gsd.gsd) < x) xs'
           in (LeafDataMap a, LeafDataMap b)
      else (LeafDataMap M.empty, LeafDataMap xs)
 
@@ -130,15 +130,11 @@ adjustTree e (Node x l r) = let l' = adjustTree e l
                                then Empty
                                else if l' == Empty && r' /= Empty
                                     then r'
-                                    else if l' /= Empty && r' == Empty
-                                         then l'
-                                         else if l' == r'
-                                              then l'
-                                              else Node x l' r'
+                                    else if l' /= Empty && r' == Empty || l' == r' then l' else Node x l' r'
 
 insertTree :: R.MonadRandom m => Int -> Int -> TreeData a -> TreeData a -> m (TreeData a)
 insertTree _ _ e Empty = return e
-insertTree andRate orRate e (Leaf x) = do
+insertTree andRate orRate e (Leaf x) =
   if e == Leaf x
     then return (Leaf x)
     else do die <- R.fromList [(NodeData (0, (&&)), toRational andRate), (NodeData (1, (||)), toRational orRate)]
@@ -213,7 +209,7 @@ unionLeafDataMap (LeafDataMap a) (LeafDataMap b) =
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
-  let a' = foldl (\acc k -> M.delete k acc) a . M.keys $ M.difference a b
+  let a' = foldl (flip M.delete) a . M.keys $ M.difference a b
   in LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
                                                     then (1, y + y')
                                                     else (x + x', y + y')) a' b
@@ -251,6 +247,6 @@ exsistTreeCount x (Node _ l r) =
   let l' = exsistTreeCount x l
       r' = exsistTreeCount x r
   in l' + r'
-  
+
 
 

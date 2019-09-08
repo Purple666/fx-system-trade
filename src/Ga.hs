@@ -38,14 +38,14 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningData :: a -> LearningData a
   learningDataList :: [LearningData a] -> LearningData a
   learning :: LearningData a -> IO (LearningData a)
-  
+
   getGaDataList (LearningData x) = map fst x
   maximumScore (LearningData x) = fst . maximum $ map (\y -> (snd y, fst y)) x
   getHeadGaData (LearningData x) = fst $ head x
   emptyLearningData = LearningData []
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
-  learning x = do
+  learning x =
     setHash <$> (gaLoop (length x + 2) =<< (learningEvaluate <$> createInitialData (length x + 2) x))
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
@@ -81,16 +81,16 @@ geneticOperators e x y = do
 
 gaLoop :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
 gaLoop e x = do
-  x' <- learningEvaluate <$> (geneticOperators e x $ LearningData [(maximum x, maximumScore x)])
+  x' <- learningEvaluate <$> geneticOperators e x (LearningData [(maximum x, maximumScore x)])
   -- traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
     else gaLoop e $ mappend x' x
 
-    
-              
 
-    
+
+
+
 
 
 

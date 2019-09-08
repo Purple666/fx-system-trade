@@ -1,23 +1,23 @@
 module GlobalSettingData where
 
 data GlobalSettingData = GlobalSettingData
-  { taRandomMargin        :: Int
-  , taMiddleLongMargin    :: Int
-  , makeTreeCount         :: Int
-  , algorithmRepeat       :: Int
-  , learningTestCount     :: Int
-  , treeAndRate           :: Int
-  , treeOrRate            :: Int
-  , countUpList           :: Double
-  , maxTradeTime          :: Int
-  , fxSettingLogNum       :: Int
-  , gaNum                 :: Int
-  , quantityRate          :: Double
-  , initalProperty        :: Double
-  , productionMaxUnit     :: Int
-  , practiceMaxUnit       :: Int
-  , dbHost                :: String
-  , spread                :: Double
+  { taRandomMargin     :: Int
+  , taMiddleLongMargin :: Int
+  , makeTreeCount      :: Int
+  , algorithmRepeat    :: Int
+  , learningTestCount  :: Int
+  , treeAndRate        :: Int
+  , treeOrRate         :: Int
+  , countUpList        :: Double
+  , maxTradeTime       :: Int
+  , fxSettingLogNum    :: Int
+  , gaNum              :: Int
+  , quantityRate       :: Double
+  , initalProperty     :: Double
+  , productionMaxUnit  :: Int
+  , practiceMaxUnit    :: Int
+  , dbHost             :: String
+  , spread             :: Double
   }
 
 gsd :: GlobalSettingData

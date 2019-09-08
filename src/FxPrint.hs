@@ -7,15 +7,15 @@ module FxPrint
   , printBackTestResult
   ) where
 
-import Debug.Trace
 import           Control.Monad
-import qualified Data.Map                as M
-import qualified FxChartData             as Fcd
-import qualified FxSettingData           as Fsd
-import qualified FxTime                  as Ftm
-import qualified FxTradeData             as Ftd
-import qualified FxTechnicalAnalysis     as Ta
-import qualified GlobalSettingData       as Gsd
+import qualified Data.Map            as M
+import           Debug.Trace
+import qualified FxChartData         as Fcd
+import qualified FxSettingData       as Fsd
+import qualified FxTechnicalAnalysis as Ta
+import qualified FxTime              as Ftm
+import qualified FxTradeData         as Ftd
+import qualified GlobalSettingData   as Gsd
 import           Text.Printf
 
 
@@ -28,7 +28,7 @@ printTradeSimProgress open close td = do
     (Fcd.close $ Ftd.chart td)
     (show (Ftd.side td))
   printFxTradeData td
-  printf "| %c %c \n" (head $ show open) (head $ show close) 
+  printf "| %c %c \n" (head $ show open) (head $ show close)
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
                      Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
@@ -59,7 +59,7 @@ printLearningFxTradeData fsd tdlt oknum lok ok = do
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
   printf "%s " =<< Ftm.getLogTime
-  printf "%7.3f %7.3f %8.3f " (Fcd.close e) (Fcd.close $ Ftd.tradeRate td) ((Fcd.close $ Ftd.tradeRate td) - (Fcd.close e))
+  printf "%7.3f %7.3f %8.3f " (Fcd.close e) (Fcd.close $ Ftd.tradeRate td) (Fcd.close (Ftd.tradeRate td) - Fcd.close e)
   printFxTradeData td
   printf "\n"
 
@@ -72,7 +72,7 @@ printTradeResult open close td td' units = do
   nd <- Fcd.getDate . Fcd.date $ Ftd.chart td'
   printf "%s %8d | "
     nd
-    ((Fcd.no $ Ftd.chart td') - (Fcd.no $ Ftd.tradeRate td))
+    (Fcd.no (Ftd.chart td') - Fcd.no (Ftd.tradeRate td))
   printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     (Ftd.profit $ td' - td)

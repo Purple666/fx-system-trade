@@ -9,22 +9,22 @@ module FxOandaAPI
   , getNowPrices
   ) where
 
-import qualified FxChartData             as Fcd
-import qualified FxPrint                 as Fp
-import qualified FxMongodb               as Fm
-import qualified FxTime                  as Ftm
-import qualified FxTradeData             as Ftd
-import qualified GlobalSettingData       as Gsd
-import Debug.Trace
 import           Control.Exception.Extra
 import           Control.Lens
 import           Data.Aeson
 import           Data.Aeson.Types
 import qualified Data.ByteString.Char8   as B
+import           Data.Maybe
+import           Debug.Trace
+import qualified FxChartData             as Fcd
+import qualified FxMongodb               as Fm
+import qualified FxPrint                 as Fp
+import qualified FxTime                  as Ftm
+import qualified FxTradeData             as Ftd
 import           GHC.Generics            (Generic)
+import qualified GlobalSettingData       as Gsd
 import           Network.Wreq
 import           Text.Printf
-import           Data.Maybe
 
 data Pricing = Pricing
   { pi_prices     :: [Price]
@@ -39,7 +39,7 @@ data PriceBucket = PriceBucket
   { pb_price :: String
   } deriving (Show, Generic)
 
-instance FromJSON Pricing where 
+instance FromJSON Pricing where
   parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
 
 instance FromJSON Price where
@@ -51,10 +51,10 @@ instance FromJSON PriceBucket where
 data AccountBody = AccountBody
   { account :: Account
   } deriving (Show, Generic)
-    
+
 data Account = Account
-  { balance         :: String
-  , unrealizedPL    :: String
+  { balance      :: String
+  , unrealizedPL :: String
   } deriving (Show, Generic)
 
 instance FromJSON AccountBody
@@ -138,18 +138,16 @@ closeOpen tdo td = do
 close :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 close tdo td = do
   (s, u, _) <- getPosition td
-  if s == Ftd.Buy
+  if s == Ftd.Buy || s == Ftd.Sell
     then setOrders td (-u)
-    else if s == Ftd.Sell
-         then setOrders td (-u)
-         else return ()
+    else return ()
   td' <- updateFxTradeData td
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
   Fp.printTradeResult Ftd.None s tdo td' 0
   return td'
-  
+
 open :: Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
 open tdo td side = do
   (b, _) <- getBalance td
@@ -162,7 +160,7 @@ open tdo td side = do
     then setOrders td u'
     else if side == Ftd.Sell
          then setOrders td (-u')
-         else return()  
+         else return ()
   td' <- updateFxTradeData td
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
@@ -196,7 +194,7 @@ setOrders td u = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
              header "Authorization" .~ [B.pack $ Ftd.bearer td]
-  r <- retry 100 $ postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET" 
+  r <- retry 100 $ postWith opts (Ftd.url td ++ "/orders") (toJSON Order { order = OrderRequest { or_type         = "MARKET"
                                                                                                 , or_instrument   = "USD_JPY"
                                                                                                 , or_units        = u
                                                                                                 , or_timeInForce  = "FOK"
@@ -220,6 +218,6 @@ getPosition td = do
                     su = read . units . short $ head ps
                 in if lu /= 0
                    then (Ftd.Buy, lu, read . fromJust . averagePrice . long  $ head ps)
-                   else if su /= 0 
+                   else if su /= 0
                         then (Ftd.Sell, su, read . fromJust . averagePrice . short $ head ps)
                         else (Ftd.None, 0, 0)
