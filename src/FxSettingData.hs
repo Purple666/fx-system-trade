@@ -16,17 +16,16 @@ module FxSettingData
   , minFxSettingDelete
   ) where
 
-import Debug.Trace
-import GHC.Generics (Generic)
-import Data.Hashable
-import qualified Ga
+import           Data.Hashable
 import qualified Data.List               as L
 import qualified Data.Map                as M
+import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxTechnicalAnalysisData as Fad
-import qualified Tree                    as Tr
+import qualified Ga
+import           GHC.Generics            (Generic)
 import qualified GlobalSettingData       as Gsd
-import qualified FxTechnicalAnalysisData as Fad
+import qualified Tree                    as Tr
 
 data FxSettingData =
   FxSettingData { fxSettingChart :: FxSettingChart
@@ -53,23 +52,23 @@ instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
 
 instance Ord FxSettingData where
-  compare a b = compare (fxSetting a) (fxSetting b) 
+  compare a b = compare (fxSetting a) (fxSetting b)
 
 instance Eq FxSetting where
   a == b = settingHash a == settingHash b
 
 instance Ord FxSetting where
-  compare a b = compare (settingHash a) (settingHash b) 
+  compare a b = compare (settingHash a) (settingHash b)
 
 instance Hashable FxSetting where
   hashWithSalt s (FxSetting _ _ _ d e f) = s `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
-  FxLearningSetting { learningTestTimes  :: Int
-                    , totalTradeDate     :: Int
-                    , numTraderadeDate   :: Int
-                    , logProfit          :: Double
-                    , logCount           :: Int
+  FxLearningSetting { learningTestTimes :: Int
+                    , totalTradeDate    :: Int
+                    , numTraderadeDate  :: Int
+                    , logProfit         :: Double
+                    , logCount          :: Int
                     } deriving (Show, Read, Eq, Ord, Generic)
 
 initFxSettingData :: FxSettingData
@@ -106,14 +105,14 @@ plusLearningTestTimes fsd =
   fsd { fxSetting = plusLearningTestTimes2 $ fxSetting fsd
       -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
       }
-  
+
 plusLearningTestTimes2 :: FxSetting -> FxSetting
 plusLearningTestTimes2 fs =
   fs { learningSetting = (learningSetting fs) {
-         learningTestTimes = (learningTestTimes $ learningSetting fs) + 1
+         learningTestTimes = learningTestTimes (learningSetting fs) + 1
          }
      }
-  
+
 getLearningTestTimes :: FxSettingData -> Int
 getLearningTestTimes fsd =
   learningTestTimes . learningSetting $ fxSetting fsd
@@ -142,18 +141,18 @@ setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData fs fsl =
   setTreeFunction $ FxSettingData { fxSettingChart = initFxSettingChart
                                   , fxSetting      = fs
-                                  , fxSettingLog   = fsl                                         
+                                  , fxSettingLog   = fsl
                                   }
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
-  (logProfit . learningSetting $ fxSetting fsd)
+  logProfit . learningSetting $ fxSetting fsd
 
 maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
 maxFxSettingFromLog fsl =
-  if L.null fsl == True
+  if L.null fsl
   then initFxSetting
-  else L.head . L.map (\(x, (_, _)) -> x) . 
+  else L.head . L.map (\(x, (_, _)) -> x) .
        L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
        M.toList fsl
 

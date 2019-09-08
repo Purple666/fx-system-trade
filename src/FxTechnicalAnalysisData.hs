@@ -18,13 +18,13 @@ module FxTechnicalAnalysisData
   , setFxTechnicalAnalysisSetting
   ) where
 
+import           Data.Hashable
 import qualified Data.Map          as M
 import           Debug.Trace
 import qualified FxChartData       as Fcd
+import           GHC.Generics      (Generic)
 import qualified GlobalSettingData as Gsd
 import qualified Tree              as Tr
-import GHC.Generics (Generic)
-import Data.Hashable
 
 data FxChartTaData = FxChartTaData
   { taChart     :: Fcd.FxChartData
@@ -142,15 +142,11 @@ initTechAnaLeafData x =
 
 isProfitInc :: Int -> (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData) -> Bool
 isProfitInc n (fts, ftad) =
-  if M.member n ftad && M.member n fts
-  then Tr.evaluateTree fst (ftad M.! n) $ algorithmTree (fts M.! n)
-  else False
+  M.member n ftad && M.member n fts && (Tr.evaluateTree fst (ftad M.! n) $ algorithmTree (fts M.! n))
 
 isProfitDec :: Int -> (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData) -> Bool
 isProfitDec n (fts, ftad) =
-  if M.member n ftad && M.member n fts
-  then Tr.evaluateTree snd (ftad M.! n) $ algorithmTree (fts M.! n)
-  else False
+  M.member n ftad && M.member n fts && (Tr.evaluateTree snd (ftad M.! n) $ algorithmTree (fts M.! n))
 
 initFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting
 initFxTechnicalAnalysisSetting =
@@ -182,7 +178,7 @@ initFxAlMaSetting =
   FxAlMaSetting { shortSetting        = 5                                              + Gsd.taRandomMargin Gsd.gsd
                 , middleSetting       = 5                                              + Gsd.taRandomMargin Gsd.gsd +
                                         Gsd.taMiddleLongMargin Gsd.gsd + Gsd.taRandomMargin Gsd.gsd
-                , longSetting         = 5                                              + Gsd.taRandomMargin Gsd.gsd + 
+                , longSetting         = 5                                              + Gsd.taRandomMargin Gsd.gsd +
                                         (Gsd.taMiddleLongMargin Gsd.gsd + Gsd.taRandomMargin Gsd.gsd) * 2
                 , thresholdSetting    = 30
                 , thresholdMaxSetting = 30
@@ -217,7 +213,7 @@ initFxMovingAverageData =
 
 getSimChartMax :: FxTechnicalAnalysisSetting -> Int
 getSimChartMax x =
-  maximum $ M.map (\a -> simChart a) $ algoSetting x
+  maximum $ M.map (simChart) $ algoSetting x
 
 setFxTechnicalAnalysisSetting :: FxTechnicalAnalysisSetting -> FxTechnicalAnalysisSetting
 setFxTechnicalAnalysisSetting x =

@@ -17,8 +17,8 @@ import           Control.Monad.Random    as R
 import           Data.List
 import qualified Data.Map                as M
 import           Debug.Trace
-import qualified FxSettingData           as Fsd
 import qualified FxChartData             as Fcd
+import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
@@ -29,21 +29,21 @@ getLearningTestTime fsd =
   in Gsd.learningTestCount Gsd.gsd * Fsd.getLearningTestTimes fsd *
      if Fsd.numTraderadeDate fs == 0
      then 60
-     else (Fsd.totalTradeDate fs `div` Fsd.numTraderadeDate fs)
+     else Fsd.totalTradeDate fs `div` Fsd.numTraderadeDate fs
 
 getHoldTime :: Fsd.FxSettingData -> Int
-getHoldTime fsd = 
+getHoldTime fsd =
   maximum [ Fad.getSimChartMax . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , Fad.getSimChartMax . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , Fad.getSimChartMax . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ] 
+          ]
 
 getPrepareTimeAll :: Fsd.FxSettingData -> Int
 getPrepareTimeAll fsd =
   maximum [ getPrepareTime . Fsd.fxTaOpen        $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
           , getPrepareTime . Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-          ] 
+          ]
 
 getPrepareTime :: Fad.FxTechnicalAnalysisSetting -> Int
 getPrepareTime x =
@@ -51,7 +51,7 @@ getPrepareTime x =
                                  , Fad.longSetting (Fad.smaSetting a)
                                  , Fad.longSetting (Fad.emaSetting a)
                                  , Fad.longSetting (Fad.rsiSetting a)
-                                 , Fad.longSetting (Fad.stSetting a) 
+                                 , Fad.longSetting (Fad.stSetting a)
                                  ] * Fad.getSimChartMax x) $ Fad.algoSetting x
 
 createRandomFxAlMaSetting :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
@@ -62,12 +62,12 @@ createRandomFxAlMaSetting ix = do
                         max (short  + Gsd.taMiddleLongMargin Gsd.gsd) (Fad.middleSetting ix + Gsd.taRandomMargin Gsd.gsd))
   long   <- getRandomR (max (middle + Gsd.taMiddleLongMargin Gsd.gsd) (Fad.longSetting   ix - Gsd.taRandomMargin Gsd.gsd),
                         max (middle + Gsd.taMiddleLongMargin Gsd.gsd) (Fad.longSetting   ix + Gsd.taRandomMargin Gsd.gsd))
-  ts     <- getRandomR (max 0                            (Fad.thresholdSetting ix - (fromIntegral $ Gsd.taRandomMargin Gsd.gsd)),
-                        min (Fad.thresholdMaxSetting ix) (Fad.thresholdSetting ix + (fromIntegral $ Gsd.taRandomMargin Gsd.gsd)))
+  ts     <- getRandomR (max 0                            (Fad.thresholdSetting ix - fromIntegral (Gsd.taRandomMargin Gsd.gsd)),
+                        min (Fad.thresholdMaxSetting ix) (Fad.thresholdSetting ix + fromIntegral (Gsd.taRandomMargin Gsd.gsd)))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = middle
             , Fad.longSetting       = long
-            , Fad.thresholdSetting  = ts 
+            , Fad.thresholdSetting  = ts
             }
 
 createRandomFxAlgorithmSetting :: MonadRandom m => Fad.FxAlgorithmSetting -> m Fad.FxAlgorithmSetting
@@ -96,7 +96,7 @@ createRandomFxAlgorithmSetting ix = do
               , Fad.simChart         = sc
               }
 
-checkAlgoSetting :: R.MonadRandom m => Fad.FxTechnicalAnalysisSetting -> m (Fad.FxTechnicalAnalysisSetting)
+checkAlgoSetting :: R.MonadRandom m => Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
 checkAlgoSetting fts = do
   let as  = Fad.algoSetting fts
       tlc = Fad.techListCount fts
@@ -118,7 +118,7 @@ checkAlgoSetting fts = do
   (as''', tlc') <- if not . M.null $ Tr.getLeafDataMap pr
                    then do let nk = fst (M.findMax as'') + 1
                                tlcl = Tr.getLeafDataMap tlc
-                               ave = (foldr (\(acc, _) a -> acc + a) 0 tlcl) / (fromIntegral $ length tlcl)
+                               ave = foldr (\(acc, _) a -> acc + a) 0 tlcl / fromIntegral (length tlcl)
                            x <- createRandomFxAlgorithmSetting $ Fad.initFxAlgorithmSetting pr
                            return (M.insert nk x as'',
                                    Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (1, 0) tlcl)
@@ -134,7 +134,7 @@ updateAlgorithmListCount :: (Fad.FxChartTaData -> M.Map Int Fad.FxTechnicalAnaly
                             Fad.FxTechnicalAnalysisSetting ->
                             Fad.FxTechnicalAnalysisSetting
 updateAlgorithmListCount f ctd (ldlt, ldla) fts =
-  let tlc = Tr.addLeafDataMap ldlt (Fad.techListCount fts) 
+  let tlc = Tr.addLeafDataMap ldlt (Fad.techListCount fts)
       as  = M.foldrWithKey (\k x acc -> let y = acc M.! k
                                             y' = y { Fad.algorithmListCount =
                                                      Tr.addLeafDataMap x (Fad.algorithmListCount y) }
@@ -168,10 +168,10 @@ calcFxalgorithmListCount :: Double ->
                            (Tr.LeafDataMap (M.Map Int Fad.FxAlgorithmSetting, M.Map Int Fad.FxTechnicalAnalysisData),
                             M.Map Int (Tr.LeafDataMap Fad.FxTechnicalAnalysisData))
 calcFxalgorithmListCount p (ptat, pat) =
-  (Tr.calcValidLeafDataList p ptat, M.map (\x -> Tr.calcValidLeafDataList p x) pat)
+  (Tr.calcValidLeafDataList p ptat, M.map (Tr.calcValidLeafDataList p) pat)
 
 getThreshold :: Double ->
-                Double -> 
+                Double ->
                 Int ->
                 Fad.FxChartTaData ->
                 (Fad.FxTechnicalAnalysisData -> Fad.FxMovingAverageData) ->
@@ -273,7 +273,7 @@ getBB :: Int -> Double -> [Fcd.FxChartData] -> Fad.FxMovingAverageData
 getBB n ma x =
   let chart = head x
       s = take n $ map Fcd.close x
-      sd = sqrt $ (fromIntegral n * foldl (\acc b -> (b ^ (2 :: Int) + acc)) 0 s - sum s ^ (2 :: Int)) / fromIntegral (n * (n - 1))
+      sd = sqrt $ (fromIntegral n * foldl (\acc b -> b ^ (2 :: Int) + acc) 0 s - sum s ^ (2 :: Int)) / fromIntegral (n * (n - 1))
   in if length s < n || ma == 0
      then Fad.initFxMovingAverageData
      else Fad.initFxMovingAverageData { Fad.thresholdS = if Fcd.close chart < ma - sd * 3 ||
@@ -330,9 +330,9 @@ setFxMovingAverageData short middle long tmin tmax ftms g pdl =
       fmad = Fad.FxMovingAverageData { Fad.short      = short
                                      , Fad.middle     = middle
                                      , Fad.long       = long
-                                     , Fad.crossSL    = setCross short  long   (Fad.short fmadp)  (Fad.long fmadp)  
+                                     , Fad.crossSL    = setCross short  long   (Fad.short fmadp)  (Fad.long fmadp)
                                      , Fad.crossSM    = setCross short  middle (Fad.short fmadp)  (Fad.middle fmadp)
-                                     , Fad.crossML    = setCross middle long   (Fad.middle fmadp) (Fad.long fmadp)  
+                                     , Fad.crossML    = setCross middle long   (Fad.middle fmadp) (Fad.long fmadp)
                                      , Fad.thresholdS = setThreshold short  tmin tmax ftms
                                      , Fad.thresholdL = setThreshold middle tmin tmax ftms
                                      , Fad.thresholdM = setThreshold long   tmin tmax ftms

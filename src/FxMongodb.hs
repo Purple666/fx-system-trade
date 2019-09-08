@@ -16,19 +16,19 @@ module FxMongodb
   , writeBacktestResult
   ) where
 
-import           Control.Monad.Trans.Reader
-import           Database.MongoDB
 import           Control.Exception.Extra
-import Debug.Trace
+import           Control.Monad.Trans.Reader
 import qualified Data.Map                   as M
 import qualified Data.Text                  as T
+import           Database.MongoDB
+import           Debug.Trace
 import qualified FxChartData                as Fcd
 import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
 
 getChartListSlice :: Int -> Int -> IO [Fcd.FxChartData]
-getChartListSlice s l = do
+getChartListSlice s l =
   getChartList s (s + l)
 
 getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
@@ -91,7 +91,7 @@ readFxSettingData = do
   r <- access pipe master "fx" $ getDataFromDB  "fxsetting_log"
   close pipe
   if null r
-    then return $ Fsd.initFxSettingData
+    then return Fsd.initFxSettingData
     else do fs  <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fsd.setFxSettingData fs fsl
@@ -105,7 +105,7 @@ checkFxSettingData = do
     then return True
     else return False
 
-writeFxSettingData :: Fsd.FxSettingData -> IO (Fsd.FxSettingData)
+writeFxSettingData :: Fsd.FxSettingData -> IO Fsd.FxSettingData
 writeFxSettingData fsd = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
   _ <- access pipe master "fx" $ setFxSettingToDB (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
@@ -126,7 +126,7 @@ readBacktestResult name = do
 writeBacktestResult :: String -> Int -> Int -> IO ()
 writeBacktestResult name s f = do
   pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  _ <- access pipe master "fx" $ setBacktestResultToDB ("result_" ++ name ) s f 
+  _ <- access pipe master "fx" $ setBacktestResultToDB ("result_" ++ name ) s f
   close pipe
   return ()
 
@@ -136,11 +136,11 @@ getDataFromDB coName =
 
 setFxTradeDataToDB :: T.Text -> Ftd.FxTradeData -> Action IO ()
 setFxTradeDataToDB coName td =
-  upsert (select [] coName) [ "chart"          =: (show $ Ftd.chart         td)    
-                            , "tradeRate"      =: (show $ Ftd.tradeRate     td)    
-                            , "trSuccess"      =: (show $ Ftd.trSuccess     td)       
-                            , "trFail"         =: (show $ Ftd.trFail        td)       
-                            , "profit"         =: (show $ Ftd.profit        td)       
+  upsert (select [] coName) [ "chart"          =: show (Ftd.chart         td)
+                            , "tradeRate"      =: show (Ftd.tradeRate     td)
+                            , "trSuccess"      =: show (Ftd.trSuccess     td)
+                            , "trFail"         =: show (Ftd.trFail        td)
+                            , "profit"         =: show (Ftd.profit        td)
                             ]
 
 setFxSettingToDB :: Fsd.FxSetting -> M.Map Fsd.FxSetting (Double, Int) -> Action IO ()
@@ -150,9 +150,9 @@ setFxSettingToDB fs fsl =
                                       ]
 
 setBacktestResultToDB :: String -> Int -> Int -> Action IO ()
-setBacktestResultToDB name s f = 
+setBacktestResultToDB name s f =
   upsert (select [] (T.pack name)) [ "success" =: show s
                                    , "fail"    =: show f
                                    ]
-  
+
 

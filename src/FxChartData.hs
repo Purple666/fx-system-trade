@@ -9,9 +9,9 @@ module FxChartData
   ) where
 
 import qualified Data.ByteString.Char8 as LC (pack, unpack)
+import           Data.Hashable
 import           Data.UnixTime
-import GHC.Generics (Generic)
-import Data.Hashable
+import           GHC.Generics          (Generic)
 
 data FxChartData = FxChartData
   { no    :: Int
@@ -37,4 +37,4 @@ getYear c = read . LC.unpack . formatUnixTimeGMT (LC.pack "%Y%m%d") $ UnixTime (
 
 getChartListBack :: Int -> Int -> [FxChartData] -> [FxChartData]
 getChartListBack s l x =  reverse . take l . drop s $ reverse x
-   
+

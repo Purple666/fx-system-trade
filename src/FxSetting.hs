@@ -19,11 +19,11 @@ import qualified FxChartData             as Fcd
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
 import qualified FxTechnicalAnalysisData as Fad
+import qualified FxTrade                 as Ft
 import qualified FxTradeData             as Ftd
 import qualified Ga
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
-import qualified FxTrade                 as Ft
 
 instance Ga.Ga Fsd.FxSettingData where
   copy              = copyFxSettingData
@@ -34,7 +34,7 @@ instance Ga.Ga Fsd.FxSettingData where
   setHash           = setHashFxSettingData
 
 gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData, Ga.LearningData Fsd.FxSettingData)
-gaLearningDataFromLog n fsd = do 
+gaLearningDataFromLog n fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (0, 0) $ Fsd.fxSettingLog fsd
@@ -54,7 +54,7 @@ gaLearningDataFromLog n fsd = do
   return (Ga.learningDataList fsl', Ga.learningDataList $ take (Gsd.gaNum Gsd.gsd) fsl')
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog profits fsd = 
+updateFxSettingLog profits fsd =
   let fsl  = Fsd.fxSettingLog fsd
       fs   = Fsd.fxSetting fsd
   in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
@@ -67,14 +67,14 @@ updateFxSettingLog profits fsd =
                                    then M.insert fs (profits, 1) fsl
                                    else fsl
          }
-  
+
 choice1 :: [Bool] -> Int -> b -> b -> b
 choice1 die n a b = if die !! n then b else a
 
 choice2 :: [Bool] -> Int -> b -> b -> b
 choice2 die n a b = if die !! n then a else b
 
-createRandomFxTechnicalAnalysisSetting :: MonadRandom m => 
+createRandomFxTechnicalAnalysisSetting :: MonadRandom m =>
                                           Fad.FxTechnicalAnalysisSetting -> m Fad.FxTechnicalAnalysisSetting
 createRandomFxTechnicalAnalysisSetting ix = do
   taAndR <- getRandomR(max 1 (Fad.treeAnaAndRate ix - Gsd.treeAndRate Gsd.gsd),
@@ -106,7 +106,7 @@ createInitialGaData :: MonadRandom m =>
                        Ga.LearningData Fsd.FxSettingData ->
                        m (Ga.LearningData Fsd.FxSettingData)
 createInitialGaData n x =
-  Ga.learningDataList <$>
+  Ga.learningDataList .
   L.concat <$>
   R.mapM (\_ -> R.mapM createRandomGaData $ Ga.getGaDataList x) [1 .. 1]
 
