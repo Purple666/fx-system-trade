@@ -73,9 +73,9 @@ tradeSim = do
   (s, f) <- Fm.readBacktestResult "trade-sim"
   td' <- tradeSimLoop startN endN pl td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td'
-              then do Fp.printBackTestResult "=================================" td (s + 1) f fsd
+              then do Fp.printBackTestResult "=================================" td' (s + 1) f fsd
                       return (s + 1, f)
-              else do Fp.printBackTestResult "---------------------------------" td s (f + 1) fsd
+              else do Fp.printBackTestResult "---------------------------------" td' s (f + 1) fsd
                       return (s, f + 1)
   Fm.writeBacktestResult "backtest" s' f'
   tradeSim
@@ -91,7 +91,7 @@ learningEvaluate n ld = do
       (pOk, _, tdltmOk, fsdOk) = L.maximum r'
       (pNg, _, tdltmNg, fsdNg) = L.maximum r
   return $ if L.null r'
-           then (False, 0,          tdltmNg, fsdNg)
+           then (False, 0,           tdltmNg, fsdNg)
            else (True,  L.length r', tdltmOk, fsdOk)
 
 learningLoop :: Int ->
