@@ -112,8 +112,8 @@ getNowPrices td = do
                                 else (ask + bid) / 2
              }
 
-closeOpen :: Ftd.FxTradeData -> IO Ftd.FxTradeData
-closeOpen td = do
+closeOpen :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+closeOpen tdo td = do
   (s, cu, r) <- getPosition td
   (b, _) <- getBalance td
   p <- getNowPrices td
@@ -128,28 +128,28 @@ closeOpen td = do
                         then do setOrders td (-cu + ou')
                                 return (Ftd.Buy, Ftd.Sell)
                         else return (Ftd.None, Ftd.None)
-  td' <- updateFxTradeData s r td
+  td' <- updateFxTradeData s r tdo td
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "closeOpen - %f %d %d %3.6f\n" b cu ou' (Fcd.close p)
-  Fp.printTradeResult open close td td' ou'
+  Fp.printTradeResult open close tdo td' ou'
   return td'
 
-close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
-close td = do
+close :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+close tdo td = do
   (s, u, r) <- getPosition td
   if s == Ftd.Buy || s == Ftd.Sell
     then setOrders td (-u)
     else return ()
-  td' <- updateFxTradeData s r td 
+  td' <- updateFxTradeData s r tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
-  Fp.printTradeResult Ftd.None s td td' 0
+  Fp.printTradeResult Ftd.None s tdo td' 0
   return td'
 
-open :: Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
-open td side = do
+open :: Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
+open tdo td side = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
@@ -161,31 +161,31 @@ open td side = do
     else if side == Ftd.Sell
          then setOrders td (-u')
          else return ()
-  td' <- updateFxTradeData Ftd.None 0 td 
+  td' <- updateFxTradeData Ftd.None 0 tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
-  Fp.printTradeResult side Ftd.None td td' u'
+  Fp.printTradeResult side Ftd.None tdo td' u'
   return td'
 
-updateFxTradeData :: Ftd.FxSide -> Double -> Ftd.FxTradeData -> IO Ftd.FxTradeData
-updateFxTradeData side rate td = do
+updateFxTradeData :: Ftd.FxSide -> Double -> Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+updateFxTradeData side rate tdo td = do
   (s, _, r) <- getPosition td
   (b, upl) <- getBalance td
   return $ td { Ftd.tradeRate  = (Ftd.tradeRate td) { Fcd.close = r
                                                     }
               , Ftd.side       = s
-              , Ftd.trSuccess  = if side /= Ftd.None && Ftd.realizedPL td < b
-                                 then Ftd.trSuccess td + 1
-                                 else Ftd.trSuccess td
-              , Ftd.trFail     = if side /= Ftd.None && b < Ftd.realizedPL td
-                                 then Ftd.trFail td + 1
-                                 else Ftd.trFail td
+              , Ftd.trSuccess  = if side /= Ftd.None && Ftd.realizedPL tdo < b
+                                 then Ftd.trSuccess tdo + 1
+                                 else Ftd.trSuccess tdo
+              , Ftd.trFail     = if side /= Ftd.None && b < Ftd.realizedPL tdo
+                                 then Ftd.trFail tdo + 1
+                                 else Ftd.trFail tdo
               , Ftd.profit     = if side == Ftd.Buy
-                                 then Ftd.profit td + rate - (Fcd.close $ Ftd.tradeRate td)
+                                 then Ftd.profit tdo + rate - (Fcd.close $ Ftd.tradeRate tdo)
                                  else if side == Ftd.Sell
-                                      then Ftd.profit td + (Fcd.close $ Ftd.tradeRate td) - rate
-                                      else Ftd.profit td
+                                      then Ftd.profit tdo + (Fcd.close $ Ftd.tradeRate tdo) - rate
+                                      else Ftd.profit tdo
               , Ftd.realizedPL = b
               }
 
