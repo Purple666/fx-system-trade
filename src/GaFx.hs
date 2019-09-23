@@ -59,7 +59,7 @@ trade :: Ftd.FxEnvironment -> IO ()
 trade environment = do
   let td = Ft.initFxTradeData environment
   c <- Fm.getOneChart Fm.getEndChartFromDB
-  td <- Foa.updateFxTradeData =<< Fm.updateFxTradeData (Ftd.coName td) td { Ftd.chart = c }
+  td <- Foa.updateFxTradeData Ftd.None 0 =<< Fm.updateFxTradeData (Ftd.coName td) td { Ftd.chart = c }
   Fp.printProgressFxTradeData td c
   tradeWeeklyLoop td
 
