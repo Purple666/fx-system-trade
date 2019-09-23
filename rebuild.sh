@@ -1,5 +1,5 @@
 #!/bin/bash -x
-git add . && git commit -m "Experiment" && git push
+git add . && git commit && git push
 oc login -u andesm -p a
 ./scaledown.sh
 oc get pod | grep 'fx-system-trade-.*-build' | awk '{print $1}' | xargs oc delete pod

@@ -112,8 +112,8 @@ getNowPrices td = do
                                 else (ask + bid) / 2
              }
 
-closeOpen :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
-closeOpen tdo td = do
+closeOpen :: Ftd.FxTradeData -> IO Ftd.FxTradeData
+closeOpen td = do
   (s, cu, _) <- getPosition td
   (b, _) <- getBalance td
   p <- getNowPrices td
@@ -132,11 +132,11 @@ closeOpen tdo td = do
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "closeOpen - %f %d %d %3.6f\n" b cu ou' (Fcd.close p)
-  Fp.printTradeResult open close tdo td' ou'
+  Fp.printTradeResult open close td td' ou'
   return td'
 
-close :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
-close tdo td = do
+close :: Ftd.FxTradeData -> IO Ftd.FxTradeData
+close td = do
   (s, u, _) <- getPosition td
   if s == Ftd.Buy || s == Ftd.Sell
     then setOrders td (-u)
@@ -145,11 +145,11 @@ close tdo td = do
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Close - %d\n" u
-  Fp.printTradeResult Ftd.None s tdo td' 0
+  Fp.printTradeResult Ftd.None s td td' 0
   return td'
 
-open :: Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
-open tdo td side = do
+open :: Ftd.FxTradeData -> Ftd.FxSide -> IO Ftd.FxTradeData
+open td side = do
   (b, _) <- getBalance td
   p <- getNowPrices td
   let u = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
@@ -165,17 +165,26 @@ open tdo td side = do
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "Open - %s %f %d %3.6f\n" (show side) b u' (Fcd.close p)
-  Fp.printTradeResult side Ftd.None tdo td' u'
+  Fp.printTradeResult side Ftd.None td td' u'
   return td'
 
 updateFxTradeData :: Ftd.FxTradeData -> IO Ftd.FxTradeData
 updateFxTradeData td = do
   (s, _, r) <- getPosition td
   (b, upl) <- getBalance td
-  return $ td { Ftd.tradeRate    = (Ftd.tradeRate td) { Fcd.close = r
-                                                      }
-              , Ftd.side         = s
-              , Ftd.realizedPL   = b
+  return $ td { Ftd.tradeRate  = (Ftd.tradeRate td) { Fcd.close = r
+                                                    }
+              , Ftd.side       = s
+              , Ftd.trSuccess  = if Ftd.realizedPL td < b
+                                 then Ftd.trSuccess td + 1
+                                 else Ftd.trSuccess td
+              , Ftd.trFail     = if b < Ftd.realizedPL td
+                                 then Ftd.trFail td + 1
+                                 else Ftd.trFail td
+              , Ftd.profit     = if Ftd.realizedPL td /= b
+                                 then Ftd.profit td + r - (Fcd.close $ Ftd.tradeRate td)
+                                 else Ftd.profit td
+              , Ftd.realizedPL = b
               }
 
 getBalance :: Ftd.FxTradeData -> IO (Double, Double)
