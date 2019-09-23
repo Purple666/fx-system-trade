@@ -212,7 +212,7 @@ setOrders td u = do
                                                                                                 , or_positionFill = "DEFAULT"
                                                                                                 }
                                                                          })
-  -- traceShow(r) $ return ()
+  traceShow(r) $ return ()
   return ()
 
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
