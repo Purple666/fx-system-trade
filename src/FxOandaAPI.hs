@@ -225,7 +225,7 @@ setOrders td u = do
                                                                                                 }
                                                                          })
        >>= asJSON
-  let p = read . price . head . fromJust. tradesClosed . orderFillTransaction $ r ^. responseBody
+  let p = read . price . head . fromMaybe [TradeReduce { price = "0"}] . tradesClosed . orderFillTransaction $ r ^. responseBody
   return (p)
 
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
