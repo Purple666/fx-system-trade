@@ -26,8 +26,8 @@ import qualified GlobalSettingData       as Gsd
 import           Network.Wreq
 import           Text.Printf
 
-data Pricing = Pricing
-  { pi_prices     :: [Price]
+data PriceBucket = PriceBucket
+  { pb_price :: String
   } deriving (Show, Generic)
 
 data Price = Price
@@ -35,18 +35,9 @@ data Price = Price
   , pr_asks :: [PriceBucket]
   } deriving (Show, Generic)
 
-data PriceBucket = PriceBucket
-  { pb_price :: String
+data Pricing = Pricing
+  { pi_prices     :: [Price]
   } deriving (Show, Generic)
-
-instance FromJSON Pricing where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
-
-instance FromJSON Price where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
-
-instance FromJSON PriceBucket where
-  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
 
 data AccountBody = AccountBody
   { account :: Account
@@ -56,9 +47,6 @@ data Account = Account
   { balance      :: String
   , unrealizedPL :: String
   } deriving (Show, Generic)
-
-instance FromJSON AccountBody
-instance FromJSON Account
 
 data PositionsBody = PositionsBody
   { positions    :: [Position]
@@ -74,9 +62,35 @@ data PositionSide = PositionSide
   , averagePrice :: Maybe String
   } deriving (Show, Generic)
 
+data OrderBody = OrderBody
+  { orderFillTransaction :: OrderFillTransaction
+  } deriving (Show, Generic)
+
+data OrderFillTransaction = OrderFillTransaction
+  { tradesClosed :: Maybe [TradeReduce]
+  }  deriving (Show, Generic)
+
+data TradeReduce = TradeReduce
+  { price :: String
+  }  deriving (Show, Generic)
+
+instance FromJSON Pricing where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
+instance FromJSON Price where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
+instance FromJSON PriceBucket where
+  parseJSON = genericParseJSON defaultOptions { fieldLabelModifier = drop 3 }
+
+instance FromJSON AccountBody
+instance FromJSON Account
 instance FromJSON PositionsBody
 instance FromJSON Position
 instance FromJSON PositionSide
+instance FromJSON OrderBody
+instance FromJSON OrderFillTransaction
+instance FromJSON TradeReduce
 
 data Order = Order
   { order :: OrderRequest
@@ -114,21 +128,21 @@ getNowPrices td = do
 
 closeOpen :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 closeOpen tdo td = do
-  (s, cu, r) <- getPosition td
+  (s, cu, _) <- getPosition td
   (b, _) <- getBalance td
   p <- getNowPrices td
   let ou = truncate $ ((b / Gsd.quantityRate Gsd.gsd) * 25) / Fcd.close p
       ou' = if Ftd.maxUnit td `div` 2 < ou
             then Ftd.maxUnit td `div` 2
             else ou
-  (open, close) <- if s == Ftd.Buy
-                   then do setOrders td (-(cu + ou'))
-                           return (Ftd.Sell, Ftd.Buy)
-                   else if s == Ftd.Sell
-                        then do setOrders td (-cu + ou')
-                                return (Ftd.Buy, Ftd.Sell)
-                        else return (Ftd.None, Ftd.None)
-  td' <- updateFxTradeData s r tdo td
+  (open, close, r') <- if s == Ftd.Buy
+                       then do r <- setOrders td (-(cu + ou'))
+                               return (Ftd.Sell, Ftd.Buy, r)
+                       else if s == Ftd.Sell
+                            then do r <- setOrders td (-cu + ou')
+                                    return (Ftd.Buy, Ftd.Sell, r)
+                            else return (Ftd.None, Ftd.None, 0)
+  td' <- updateFxTradeData s r' tdo td
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
   printf "closeOpen - %f %d %d %3.6f\n" b cu ou' (Fcd.close p)
@@ -137,10 +151,8 @@ closeOpen tdo td = do
 
 close :: Ftd.FxTradeData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 close tdo td = do
-  (s, u, r) <- getPosition td
-  if s == Ftd.Buy || s == Ftd.Sell
-    then setOrders td (-u)
-    else return ()
+  (s, u, _) <- getPosition td
+  r <- setOrders td (-u)
   td' <- updateFxTradeData s r tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
@@ -160,7 +172,7 @@ open tdo td side = do
     then setOrders td u'
     else if side == Ftd.Sell
          then setOrders td (-u')
-         else return ()
+         else return (0)
   td' <- updateFxTradeData Ftd.None 0 tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
@@ -200,7 +212,7 @@ getBalance td = do
       upl = read . unrealizedPL . account $ r ^. responseBody
   return (b, upl)
 
-setOrders :: Ftd.FxTradeData -> Int -> IO ()
+setOrders :: Ftd.FxTradeData -> Int -> IO (Double)
 setOrders td u = do
   let opts = defaults &
              header "Content-Type" .~  ["application/json"] &
@@ -212,8 +224,9 @@ setOrders td u = do
                                                                                                 , or_positionFill = "DEFAULT"
                                                                                                 }
                                                                          })
-  traceShow(r) $ return ()
-  return ()
+       >>= asJSON
+  let p = read . price . head . fromJust. tradesClosed . orderFillTransaction $ r ^. responseBody
+  return (p)
 
 getPosition :: Ftd.FxTradeData -> IO (Ftd.FxSide, Int, Double)
 getPosition td = do
