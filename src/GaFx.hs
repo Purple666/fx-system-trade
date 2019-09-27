@@ -28,21 +28,21 @@ import           Text.Printf
 
 statistics :: IO ()
 statistics = do
-  let td = Ft.initFxTradeData Ftd.Backtest
+  let td = Ft.initFxTradeDataBacktest
   fsd <- Fm.readFxSettingData
   Prelude.mapM (\(p, c) -> printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
   return ()
 
 debug :: IO ()
 debug = do
-  let td = Ft.initFxTradeData Ftd.Practice
+  td <- Ft.initFxTradeDataTrade Ftd.Practice
   Foa.closeOpen td td
   return ()
 
 backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
-  let td  = Ft.initFxTradeData Ftd.Backtest
+  let td = Ft.initFxTradeDataBacktest
       startN = Gsd.maxTradeTime Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
@@ -57,7 +57,7 @@ backTest = do
 
 trade :: Ftd.FxEnvironment -> IO ()
 trade environment = do
-  let td = Ft.initFxTradeData environment
+  td <- Ft.initFxTradeDataTrade environment
   c <- Fm.getOneChart Fm.getEndChartFromDB
   td <- Fm.updateFxTradeData (Ftd.coName td) td { Ftd.chart = c }
   td' <- Foa.updateFxTradeData Ftd.None 0 td td 
@@ -66,10 +66,9 @@ trade environment = do
 
 tradeSim :: IO ()
 tradeSim = do
-  let td  = Ft.initFxTradeData Ftd.Backtest
+  let td = Ft.initFxTradeDataBacktest
   endN <- (-) <$> (Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB) <*> pure (-1)
-  let -- startN = endN - Gsd.maxTradeTime Gsd.gsd * 4
-      startN = Gsd.maxTradeTime Gsd.gsd * 2
+  let startN = Gsd.maxTradeTime Gsd.gsd * 2
   (pl, fsd) <- tradeSimLearning startN
   (s, f) <- Fm.readBacktestResult "trade-sim"
   td' <- tradeSimLoop startN endN pl td fsd
@@ -137,9 +136,6 @@ backTestLoop lf n endN td fsd = do
   (lok, ok, oknum, tdlt, fsd1) <- if lf || Ftd.side td == Ftd.None
                                   then learning n fsd
                                   else return (True, True, 0, [Ftd.initFxTradeDataCommon], fsd)
-{-
-  (lok, ok, oknum, tdlt, fsd1) <- learning n fsd
--}
   (fsd2, tdt) <- Ft.backTest n td fsd1
   let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok

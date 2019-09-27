@@ -1,4 +1,5 @@
-module FxTrade ( initFxTradeData
+module FxTrade ( initFxTradeDataBacktest
+               , initFxTradeDataTrade
                , backTest
                , gaLearningEvaluate
                , trade
@@ -7,6 +8,7 @@ module FxTrade ( initFxTradeData
                , getChart
                ) where
 
+import           System.Environment
 import           Control.Monad
 import qualified Control.Monad.Random    as R
 import qualified Data.List               as L
@@ -21,7 +23,6 @@ import qualified FxTechnicalAnalysisData as Fad
 import qualified FxTradeData             as Ftd
 import qualified Ga
 import qualified GlobalSettingData       as Gsd
-import qualified SecretData              as Sd
 import qualified Tree                    as Tr
 
 evaluationOk :: [Ftd.FxTradeData] -> Bool
@@ -60,28 +61,34 @@ evaluateProfitDec :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnical
 evaluateProfitDec fts ftad =
   Tr.evaluateTree snd (Fad.algoSetting fts, ftad) (Fad.techAnaTree fts)
 
-initFxTradeData :: Ftd.FxEnvironment -> Ftd.FxTradeData
-initFxTradeData Ftd.Backtest =
+initFxTradeDataBacktest :: Ftd.FxTradeData
+initFxTradeDataBacktest =
   Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
                             , Ftd.coName      = "backtest"
                             , Ftd.environment = Ftd.Backtest
                             , Ftd.bearer      = ""
                             , Ftd.url         = ""
-                        }
-initFxTradeData Ftd.Practice =
-  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.practiceMaxUnit Gsd.gsd
-                            , Ftd.coName      = "trade_practice"
-                            , Ftd.environment = Ftd.Practice
-                            , Ftd.bearer      = Sd.tradePracticeBearer Sd.sd
-                            , Ftd.url         = Sd.tradePracticeUrl Sd.sd
-                        }
-initFxTradeData Ftd.Production =
-  Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
-                            , Ftd.coName      = "trade_production"
-                            , Ftd.environment = Ftd.Production
-                            , Ftd.bearer      = Sd.tradeProductionBearer Sd.sd
-                            , Ftd.url         = Sd.tradeProductionUrl Sd.sd
                             }
+
+initFxTradeDataTrade :: Ftd.FxEnvironment -> IO (Ftd.FxTradeData)
+initFxTradeDataTrade Ftd.Practice = do
+  bearer <- getEnv "TRADE_PRACTICE_BEARER"
+  url <- getEnv "TRADE_PRACTICE_URL"
+  return $ Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.practiceMaxUnit Gsd.gsd
+                                     , Ftd.coName      = "trade_practice"
+                                     , Ftd.environment = Ftd.Practice
+                                     , Ftd.bearer      = bearer
+                                     , Ftd.url         = url
+                                     }
+initFxTradeDataTrade Ftd.Production = do
+  bearer <- getEnv "TRADE_PRODUCTION_BEARER"
+  url <- getEnv "TRADE_PRODUCTION_URL"
+  return $ Ftd.initFxTradeDataCommon { Ftd.maxUnit     = Gsd.productionMaxUnit Gsd.gsd
+                                     , Ftd.coName      = "trade_production"
+                                     , Ftd.environment = Ftd.Production
+                                     , Ftd.bearer      = bearer
+                                     , Ftd.url         = url
+                                     }
 
 evaluateOne :: Fad.FxChartTaData ->
                Fsd.FxSettingData ->
@@ -311,7 +318,7 @@ checkAlgoSetting l fsd td fs = do
 
 evaluate :: Fsd.FxSettingData -> Int -> [Fcd.FxChartData] -> Ftd.FxTradeData
 evaluate fsd ltt fc =
-  let td = initFxTradeData Ftd.Backtest
+  let td = initFxTradeDataBacktest
       ctdl = makeChart fsd ltt fc
       (_, _, td2, _) = L.foldl (\(_, _, td1, _) ctd -> evaluateOne ctd fsd getUnitLearning False td1 Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
       (_, _, td3, _) = evaluateOne (L.last ctdl) fsd getUnitLearning True td2 Fsd.initFxSetting
