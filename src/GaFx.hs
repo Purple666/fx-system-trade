@@ -77,7 +77,7 @@ tradeSim = do
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" td' s (f + 1) fsd
                       return (s, f + 1)
-  Fm.writeBacktestResult "backtest" s' f'
+  Fm.writeBacktestResult "trade-sim" s' f'
   tradeSim
 
 learningEvaluate :: Int ->
@@ -213,8 +213,8 @@ tradeSimEvaluate :: Ftd.FxTradeData ->
 tradeSimEvaluate td fsd e = do
   (open, close, td', _) <- Ft.trade td fsd e
   if open /= Ftd.None || close /= Ftd.None
-    then Fp.printTradeSimProgress open close td'
-    else return ()
+    then Fp.printTradeResult open close td td' $ Ftd.unit td'
+    return ()
   return td'
 
 tradeSimLearning :: Int -> IO (Int, Fsd.FxSettingData)
