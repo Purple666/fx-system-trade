@@ -92,7 +92,7 @@ items:
           - containerPort: 6379
             protocol: TCP
           resources: {}
-          volumeMounts:
+f          volumeMounts:
           - name: nfs-share
             mountPath: /data/db
             subPath: openshift/db/redis
