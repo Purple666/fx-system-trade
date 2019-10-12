@@ -42,6 +42,8 @@ executable fx-exe
                      , deepseq
                      , hashable
                      , vector
+                     , hedis
+                     , lens-aeson
   default-language:    Haskell2010
 
 test-suite fx-test

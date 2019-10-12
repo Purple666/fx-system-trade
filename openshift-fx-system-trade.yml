@@ -1,5 +1,155 @@
 apiVersion: v1
 items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: redis
+    name: redis
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: docker.io/library/redis:latest
+      from:
+        kind: DockerImage
+        name: docker.io/library/redis:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: redis
+    name: redis
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: redis:latest
+    postCommit: {}
+    resources: {}
+    source:
+      contextDir: redis
+      git:
+        uri: https://github.com/andesm/fx-system-trade.git
+        #ref: "opt"
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: python:latest
+      type: Docker
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: redis
+    name: redis
+  spec:
+    replicas: 1
+    selector:
+      app: redis
+      deploymentconfig: redis
+    strategy:
+      resources: {}
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: redis
+          deploymentconfig: redis
+      spec:
+        containers:
+        - image: redis
+          name: redis
+          ports:
+          - containerPort: 6379
+            protocol: TCP
+          resources: {}
+          volumeMounts:
+          - name: nfs-share
+            mountPath: /data/db
+            subPath: openshift/db/redis
+          - name: redis-socket
+            mountPath: /tmp/redis.sock
+        volumes:
+        - name: nfs-share
+          persistentVolumeClaim:
+            claimName: flg-pvc
+        - name: redis-socket
+          hostPath:
+            path: /tmp/redis.sock
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - redis
+        from:
+          kind: ImageStreamTag
+          name: redis:latest
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: redis
+    name: redis
+  spec:
+    ports:
+    - name: 6379-tcp
+      nodePort: 30379
+      port: 6379
+      protocol: TCP
+      targetPort: 6379
+    selector:
+      app: redis
+      deploymentconfig: redis
+    type: NodePort
+  status:
+    loadBalancer: {}
+kind: List
+metadata: {}
+---
+apiVersion: v1
+items:
 - apiVersion: v1
   kind: ImageStream
   metadata:
@@ -68,12 +218,6 @@ items:
           name: haskell:latest
       type: Docker
     triggers:
-    - github:
-        secret: ybTfVr1U-3LE8RCjxYkU
-      type: GitHub
-    - generic:
-        secret: RtFgZcI_7mlAGsRdRUNA
-      type: Generic
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
@@ -109,17 +253,21 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["tail", "-f", "/dev/null"]
           #command: ["./Fx", "backtest"]
           command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
+          - name: redis-socket
+            mountPath: /tmp/redis.sock
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
+        - name: redis-socket
+          hostPath:
+            path: /tmp/redis.sock
     test: false
     triggers:
     - type: ConfigChange
@@ -171,9 +319,6 @@ items:
           #command: ["./Fx", "trade-practice"]
           command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
           resources: {}
-          volumeMounts:
-          - name: localtime
-            mountPath: /etc/localtime
           env:
           - name: TRADE_PRACTICE_BEARER
             valueFrom:
@@ -185,10 +330,18 @@ items:
               secretKeyRef:
                 key: TRADE_PRACTICE_URL
                 name: secret-for-fx-system-trade
+          volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: redis-socket
+            mountPath: /tmp/redis.sock
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
+        - name: redis-socket
+          hostPath:
+            path: /tmp/redis.sock
     test: false
     triggers:
     - type: ConfigChange
@@ -243,10 +396,15 @@ items:
           volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
+          - name: redis-socket
+            mountPath: /tmp/redis.sock
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
+        - name: redis-socket
+          hostPath:
+            path: /tmp/redis.sock
     test: false
     triggers:
     - type: ConfigChange
@@ -284,10 +442,10 @@ items:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: mongo
+        openshift.io/imported-from: docker.io/library/mongo:latest
       from:
         kind: DockerImage
-        name: mongo
+        name: docker.io/library/mongo:latest
       generation: null
       importPolicy: {}
       name: latest
@@ -422,13 +580,13 @@ items:
       local: false
     tags:
     - annotations:
-        openshift.io/imported-from: python:3.7.3
+        openshift.io/imported-from: python
       from:
         kind: DockerImage
-        name: python:3.7.3
+        name: python:latest
       generation: null
       importPolicy: {}
-      name: "3.7.3"
+      name: "latest"
       referencePolicy:
         type: ""
   status:
@@ -474,15 +632,9 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:3.7.3
+          name: python:latest
       type: Docker
     triggers:
-    - github:
-        secret: ZP8b0sDH3nMJDcMXyi1U
-      type: GitHub
-    - generic:
-        secret: SJka0xLWXvSDPSRZXxjY
-      type: Generic
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
@@ -538,98 +690,98 @@ items:
 kind: List
 metadata: {}
 ---
-apiVersion: v1
-items:
-- apiVersion: v1
-  kind: ImageStream
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      app: get-rate-data
-    name: get-rate-data
-  spec:
-    lookupPolicy:
-      local: false
-  status:
-    dockerImageRepository: ""
-- apiVersion: v1
-  kind: BuildConfig
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      app: get-rate-data
-    name: get-rate-data
-  spec:
-    nodeSelector: null
-    output:
-      to:
-        kind: ImageStreamTag
-        name: get-rate-data:latest
-    postCommit: {}
-    resources: {}
-    source:
-      contextDir: get_rate_data
-      git:
-        uri: https://github.com/andesm/fx-system-trade.git
-        #ref: "opt"
-      type: Git
-    strategy:
-      dockerStrategy:
-        from:
-          kind: ImageStreamTag
-          name: python:3.7.3
-          namespace: flg
-      type: Docker
-    triggers:
-    - github:
-        secret: M4_V_EVT61Fn_tq55AEx
-      type: GitHub
-    - generic:
-        secret: scMbnfs6X3m4Rcngw29X
-      type: Generic
-    - type: ConfigChange
-    - imageChange: {}
-      type: ImageChange
-  status:
-    lastVersion: 0
-- apiVersion: batch/v1beta1
-  kind: CronJob
-  metadata:
-    annotations:
-      openshift.io/generated-by: OpenShiftNewApp
-    creationTimestamp: null
-    labels:
-      app: get-rate-data
-    name: get-rate-data
-  spec:
-    schedule: "0 0 * * 0"  
-    jobTemplate:
-      spec:
-        template:        
-          metadata:
-            annotations:
-              openshift.io/generated-by: OpenShiftNewApp
-            creationTimestamp: null
-            labels:
-              parrent: get-rate-data
-          spec:    
-            containers:
-            - image: docker-registry.default.svc:5000/flg/get-rate-data:latest
-              name: get-rate-data
-              namespace: flg
-              resources: {}
-              volumeMounts:
-              - name: nfs-share
-                mountPath: /get_rate_data
-                subPath: home/andesm/dev/fx-system-trade/get_rate_data
-            volumes:
-            - name: nfs-share
-              persistentVolumeClaim:
-                claimName: flg-pvc
-            restartPolicy: OnFailure 
-kind: List
-metadata: {}
+#apiVersion: v1
+#items:
+#- apiVersion: v1
+#  kind: ImageStream
+#  metadata:
+#    annotations:
+#      openshift.io/generated-by: OpenShiftNewApp
+#    creationTimestamp: null
+#    labels:
+#      app: get-rate-data
+#    name: get-rate-data
+#  spec:
+#    lookupPolicy:
+#      local: false
+#  status:
+#    dockerImageRepository: ""
+#- apiVersion: v1
+#  kind: BuildConfig
+#  metadata:
+#    annotations:
+#      openshift.io/generated-by: OpenShiftNewApp
+#    creationTimestamp: null
+#    labels:
+#      app: get-rate-data
+#    name: get-rate-data
+#  spec:
+#    nodeSelector: null
+#    output:
+#      to:
+#        kind: ImageStreamTag
+#        name: get-rate-data:latest
+#    postCommit: {}
+#    resources: {}
+#    source:
+#      contextDir: get_rate_data
+#      git:
+#        uri: https://github.com/andesm/fx-system-trade.git
+#        #ref: "opt"
+#      type: Git
+#    strategy:
+#      dockerStrategy:
+#        from:
+#          kind: ImageStreamTag
+#          name: python:3.7.3
+#          namespace: flg
+#      type: Docker
+#    triggers:
+#    - github:
+#        secret: M4_V_EVT61Fn_tq55AEx
+#      type: GitHub
+#    - generic:
+#        secret: scMbnfs6X3m4Rcngw29X
+#      type: Generic
+#    - type: ConfigChange
+#    - imageChange: {}
+#      type: ImageChange
+#  status:
+#    lastVersion: 0
+#- apiVersion: batch/v1beta1
+#  kind: CronJob
+#  metadata:
+#    annotations:
+#      openshift.io/generated-by: OpenShiftNewApp
+#    creationTimestamp: null
+#    labels:
+#      app: get-rate-data
+#    name: get-rate-data
+#  spec:
+#    schedule: "0 0 * * 0"  
+#    jobTemplate:
+#      spec:
+#        template:        
+#          metadata:
+#            annotations:
+#              openshift.io/generated-by: OpenShiftNewApp
+#            creationTimestamp: null
+#            labels:
+#              parrent: get-rate-data
+#          spec:    
+#            containers:
+#            - image: docker-registry.default.svc:5000/flg/get-rate-data:latest
+#              name: get-rate-data
+#              namespace: flg
+#              resources: {}
+#              volumeMounts:
+#              - name: nfs-share
+#                mountPath: /get_rate_data
+#                subPath: home/andesm/dev/fx-system-trade/get_rate_data
+#            volumes:
+#            - name: nfs-share
+#              persistentVolumeClaim:
+#                claimName: flg-pvc
+#            restartPolicy: OnFailure 
+#kind: List
+#metadata: {}

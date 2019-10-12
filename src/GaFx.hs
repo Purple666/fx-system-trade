@@ -14,6 +14,7 @@ import           Data.Time.Clock.POSIX
 import           Debug.Trace
 import qualified FxChartData           as Fcd
 import qualified FxMongodb             as Fm
+import qualified FxRedis               as Fr
 import qualified FxOandaAPI            as Foa
 import qualified FxPrint               as Fp
 import qualified FxSetting             as Fs
@@ -35,9 +36,8 @@ statistics = do
 
 debug :: IO ()
 debug = do
-  td <- Ft.initFxTradeDataTrade Ftd.Practice
-  Foa.closeOpen td td
-  return ()
+  c <- Fr.getChartList 600000 10
+  debug
 
 backTest :: IO ()
 backTest = do
@@ -45,7 +45,7 @@ backTest = do
   let td = Ft.initFxTradeDataBacktest
       startN = Gsd.maxTradeTime Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
-  endN <- Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB
+  endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (tdt, fsd') <- backTestLoop True startN endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdt
               then do Fp.printBackTestResult "=================================" tdt (s + 1) f fsd'
@@ -58,7 +58,7 @@ backTest = do
 trade :: Ftd.FxEnvironment -> IO ()
 trade environment = do
   td <- Ft.initFxTradeDataTrade environment
-  c <- Fm.getOneChart Fm.getEndChartFromDB
+  c <- Fr.getEndChart
   td <- Fm.updateFxTradeData (Ftd.coName td) td { Ftd.chart = c }
   td' <- Foa.updateFxTradeData Ftd.None 0 td td 
   Fp.printProgressFxTradeData td' c
@@ -67,7 +67,7 @@ trade environment = do
 tradeSim :: IO ()
 tradeSim = do
   let td = Ft.initFxTradeDataBacktest
-  endN <- (-) <$> (Fcd.no <$> Fm.getOneChart Fm.getEndChartFromDB) <*> pure (-1)
+  endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   let startN = Gsd.maxTradeTime Gsd.gsd * 2
   (pl, fsd) <- tradeSimLearning startN
   (s, f) <- Fm.readBacktestResult "trade-sim"
@@ -121,7 +121,7 @@ learning n fsd = do
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
   fsd <- Fm.readFxSettingData
-  e <- Fm.getOneChart Fm.getEndChartFromDB
+  e <- Fr.getEndChart
   (lok, ok, oknum, tdlt, fsd') <- learning (Fcd.no e) fsd
   Fp.printLearningFxTradeData fsd' tdlt oknum lok ok
   return (Fcd.no e, fsd')
@@ -161,11 +161,11 @@ tradeEvaluate td fsd e = do
 
 waitTrade :: IO ()
 waitTrade =
-  waitTradeLoop =<< Fm.getOneChart Fm.getEndChartFromDB
+  waitTradeLoop =<< Fr.getEndChart
 
 waitTradeLoop :: Fcd.FxChartData -> IO ()
 waitTradeLoop p = do
-  e <- Fm.getOneChart Fm.getEndChartFromDB
+  e <- Fr.getEndChart
   if e /= p
     then return ()
     else do threadDelay (10 * 1000 * 1000)
@@ -207,9 +207,9 @@ tradeLoop p pl sleep td fsd = do
 
 
 tradeSimEvaluate :: Ftd.FxTradeData ->
-                 Fsd.FxSettingData ->
-                 Fcd.FxChartData ->
-                 IO Ftd.FxTradeData
+                    Fsd.FxSettingData ->
+                    Fcd.FxChartData ->
+                    IO Ftd.FxTradeData
 tradeSimEvaluate td fsd e = do
   (open, close, td', _) <- Ft.trade td fsd e
   if open /= Ftd.None || close /= Ftd.None
@@ -220,7 +220,7 @@ tradeSimEvaluate td fsd e = do
 tradeSimLearning :: Int -> IO (Int, Fsd.FxSettingData)
 tradeSimLearning n = do
   fsd <- Fm.readFxSettingData
-  e <- Fm.getOneChart $ Fm.getChartListFromDB n (n + 1)
+  e <- Fr.getOneChart n
   (lok, ok, oknum, tdlt, fsd') <- learning (Fcd.no e) fsd
   Fp.printLearningFxTradeData fsd' tdlt oknum lok ok
   return (Fcd.no e, fsd')
@@ -233,7 +233,7 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n endN pl td fsd = do
   let ltt = Ta.getLearningTestTime fsd
-  e <- Fm.getOneChart $ Fm.getChartListFromDB n (n + 1)
+  e <- Fr.getOneChart n 
   (pl', fsd') <- if ltt < Fcd.no e - pl
                  then tradeSimLearning n
                  else return (pl, fsd)

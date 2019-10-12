@@ -18,6 +18,7 @@ import           Data.Maybe
 import           Debug.Trace
 import qualified FxChartData             as Fcd
 import qualified FxMongodb               as Fm
+import qualified FxRedis                 as Fr
 import qualified FxPrint                 as Fp
 import qualified FxTime                  as Ftm
 import qualified FxTradeData             as Ftd
@@ -116,7 +117,7 @@ getNowPrices td = do
              param "instruments" .~ ["USD_JPY"]
   r <- retry 100 $ getWith opts (Ftd.url td ++ "/pricing")
        >>= asJSON
-  e <- Fm.getOneChart Fm.getEndChartFromDB
+  e <- Fr.getEndChart
   let ask = read . pb_price . head . pr_asks . head . pi_prices $ r ^. responseBody
       bid = read . pb_price . head . pr_bids . head . pi_prices $ r ^. responseBody
   return $ e { Fcd.close = if Ftd.side td == Ftd.Buy

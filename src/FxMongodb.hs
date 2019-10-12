@@ -2,12 +2,7 @@
 {-# LANGUAGE OverloadedStrings    #-}
 
 module FxMongodb
-  ( getChartListSlice
-  , getOneChart
-  , getChartListFromDB
-  , getStartChartFromDB
-  , getEndChartFromDB
-  , setFxTradeData
+  ( setFxTradeData
   , updateFxTradeData
   , writeFxSettingData
   , readFxSettingData
@@ -22,49 +17,9 @@ import qualified Data.Map                   as M
 import qualified Data.Text                  as T
 import           Database.MongoDB
 import           Debug.Trace
-import qualified FxChartData                as Fcd
 import qualified FxSettingData              as Fsd
 import qualified FxTradeData                as Ftd
 import qualified GlobalSettingData          as Gsd
-
-getChartListSlice :: Int -> Int -> IO [Fcd.FxChartData]
-getChartListSlice s l =
-  getChartList s (s + l)
-
-getOneChart :: ReaderT MongoContext IO [Document] -> IO Fcd.FxChartData
-getOneChart f = do
-  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" f
-  close pipe
-  r' <- mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
-                                             , Fcd.date  = typed $ valueAt "time"  x
-                                             , Fcd.close = typed $ valueAt "close" x
-                                             }
-             ) r
-  return $ head r'
-
-getChartList :: Int -> Int -> IO [Fcd.FxChartData]
-getChartList s e = do
-  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
-  r <- access pipe master "fx" $ getChartListFromDB s e
-  close pipe
-  mapM (\x -> return $ Fcd.FxChartData { Fcd.no    = typed $ valueAt "no"    x
-                                       , Fcd.date  = typed $ valueAt "time"  x
-                                       , Fcd.close = typed $ valueAt "close" x
-                                       }
-       ) r
-
-getChartListFromDB :: Int -> Int -> ReaderT MongoContext IO [Document]
-getChartListFromDB s e =
-  rest =<< find (select ["no" =: ["$gte" =: s, "$lt" =: e]] "rate")
-
-getStartChartFromDB :: ReaderT MongoContext IO [Document]
-getStartChartFromDB =
-  rest =<< find (select [] "rate") {sort = ["no" =: (1 :: Int)], limit = 1}
-
-getEndChartFromDB :: ReaderT MongoContext IO [Document]
-getEndChartFromDB =
-  rest =<< find (select [] "rate") {sort = ["no" =: (-1 :: Int)], limit = 1}
 
 setFxTradeData :: String-> Ftd.FxTradeData -> IO ()
 setFxTradeData coName td = do

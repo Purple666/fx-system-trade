@@ -15,7 +15,7 @@ import qualified Data.List               as L
 import qualified Data.Map                as M
 import           Debug.Trace
 import qualified FxChartData             as Fcd
-import qualified FxMongodb               as Fm
+import qualified FxRedis                 as Fr
 import qualified FxPrint                 as Fp
 import qualified FxSettingData           as Fsd
 import qualified FxTechnicalAnalysis     as Ta
@@ -37,21 +37,6 @@ getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quant
 
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
 getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
-
-{-
-getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = getUnitBacktest td chart
-
-getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
-getUnitBacktest td chart = let u = truncate $ (25 * (Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd) / chart)
-                           in if Ftd.maxUnit td `div` 2 < u
-                              then Ftd.maxUnit td `div` 2
-                              else u
-getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
-
--}
-
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
@@ -288,7 +273,7 @@ backTest :: Int ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
   let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
-  fc <- Fm.getChartListSlice (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
+  fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
       (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
@@ -331,7 +316,7 @@ getChart n fsd = do
   let ltt = Ta.getLearningTestTime fsd
       lttp = Ta.getPrepareTimeAll fsd + ltt
   n' <- R.getRandomR(n - lttp * Gsd.learningTestCount Gsd.gsd ^ 2, n - lttp)
-  fc <- Fm.getChartListSlice n' lttp
+  fc <- Fr.getChartList n' lttp
   return (ltt, fc)
 
 learningEvaluate :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
@@ -344,7 +329,7 @@ trade :: Ftd.FxTradeData ->
          Fcd.FxChartData ->
          IO (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData, Fsd.FxSetting)
 trade td fsd e = do
-  fc <- (L.++) <$> Fm.getChartListSlice (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
+  fc <- (L.++) <$> Fr.getChartList (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
   return $ evaluateOne (L.last ctdl) fsd getUnitBacktest False td Fsd.initFxSetting
 

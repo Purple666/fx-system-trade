@@ -1,8 +1,8 @@
 #!/bin/bash -x
 #https://www.forexite.com/free_forex_quotes/2016/04/260416.zip
 
-oc login -u andesm -p a
-../scaledown.sh
+#oc login -u andesm -p a
+#../scaledown.sh
 
 function command_error() {
     exit 1
@@ -36,4 +36,4 @@ cd ..
 
 ./store_db.sh
 
-../scaleup.sh
+#../scaleup.sh
