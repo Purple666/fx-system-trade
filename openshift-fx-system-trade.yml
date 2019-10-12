@@ -7,8 +7,8 @@ items:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: redis
-    name: redis
+      app: redis-fx
+    name: redis-fx
   spec:
     lookupPolicy:
       local: false
@@ -25,36 +25,42 @@ items:
         type: ""
   status:
     dockerImageRepository: ""
-- apiVersion: v1
+- apiVersion: build.openshift.io/v1
   kind: BuildConfig
   metadata:
     annotations:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: redis
-    name: redis
+      app: redis-fx
+    name: redis-fx
   spec:
     nodeSelector: null
     output:
       to:
         kind: ImageStreamTag
-        name: redis:latest
+        name: redis-fx:latest
     postCommit: {}
     resources: {}
     source:
       contextDir: redis
       git:
         uri: https://github.com/andesm/fx-system-trade.git
-        #ref: "opt"
       type: Git
     strategy:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: python:latest
+          name: redis-fx:latest
+          namespace: openshift
       type: Docker
     triggers:
+    - github:
+        secret: wZnBH0Z_dHYMNQdN3bgg
+      type: GitHub
+    - generic:
+        secret: CgUWABXh-v4EW-FNnVJO
+      type: Generic
     - type: ConfigChange
     - imageChange: {}
       type: ImageChange
@@ -67,13 +73,13 @@ items:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: redis
-    name: redis
+      app: redis-fx
+    name: redis-fx
   spec:
     replicas: 1
     selector:
-      app: redis
-      deploymentconfig: redis
+      app: redis-fx
+      deploymentconfig: redis-fx
     strategy:
       resources: {}
     template:
@@ -82,12 +88,12 @@ items:
           openshift.io/generated-by: OpenShiftNewApp
         creationTimestamp: null
         labels:
-          app: redis
-          deploymentconfig: redis
+          app: redis-fx
+          deploymentconfig: redis-fx
       spec:
         containers:
-        - image: redis
-          name: redis
+        - image: redis-fx:latest
+          name: redis-fx
           ports:
           - containerPort: 6379
             protocol: TCP
@@ -111,10 +117,10 @@ items:
     - imageChangeParams:
         automatic: true
         containerNames:
-        - redis
+        - redis-fx
         from:
           kind: ImageStreamTag
-          name: redis:latest
+          name: redis-fx:latest
       type: ImageChange
   status:
     availableReplicas: 0
@@ -130,8 +136,8 @@ items:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: redis
-    name: redis
+      app: redis-fx
+    name: redis-fx
   spec:
     ports:
     - name: 6379-tcp
@@ -140,8 +146,8 @@ items:
       protocol: TCP
       targetPort: 6379
     selector:
-      app: redis
-      deploymentconfig: redis
+      app: redis-fx
+      deploymentconfig: redis-fx
     type: NodePort
   status:
     loadBalancer: {}
