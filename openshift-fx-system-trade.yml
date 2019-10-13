@@ -7,8 +7,8 @@ items:
       openshift.io/generated-by: OpenShiftNewApp
     creationTimestamp: null
     labels:
-      app: redis-fx
-    name: redis-fx
+      app: redis5
+    name: redis5
   spec:
     lookupPolicy:
       local: false
@@ -23,6 +23,20 @@ items:
       name: latest
       referencePolicy:
         type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: redis-fx
+    name: redis-fx
+  spec:
+    lookupPolicy:
+      local: false
   status:
     dockerImageRepository: ""
 - apiVersion: build.openshift.io/v1
@@ -51,15 +65,15 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: redis-fx:latest
+          name: redis5:latest
           namespace: openshift
       type: Docker
     triggers:
     - github:
-        secret: wZnBH0Z_dHYMNQdN3bgg
+        secret: GICb9IodagG1diaZLK8G
       type: GitHub
     - generic:
-        secret: CgUWABXh-v4EW-FNnVJO
+        secret: PgaFHrtgyO34wvvadxJP
       type: Generic
     - type: ConfigChange
     - imageChange: {}
@@ -259,7 +273,7 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["./Fx", "backtest"]
+          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
@@ -322,7 +336,7 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["./Fx", "trade-practice"]
+          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
           resources: {}
           env:
@@ -396,7 +410,7 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["./Fx", "trade-sim"]
+          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "trade-sim"]
           resources: {}
           volumeMounts:
