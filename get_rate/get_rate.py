@@ -31,18 +31,16 @@ if __name__ == "__main__":
         now_price['close'] = float(price['bids'][0]['price'])
 
         last_no = redis.llen("fx") - 1
-        t = redis.lindex("fx", last_no).decode()
-        print(t)
-        db_price = json.loads(t)
+        db_price = json.loads(redis.lindex("fx", last_no))
 
         if now_price['time'] == db_price['time'] and same < 4 * 60:
-            new_price['no'] = db_price['no']
-            redis.lset("fx", last_no, json.dump(new_price))
+            now_price['no'] = db_price['no']
+            redis.lset("fx", last_no, json.dump(now_price))
             same += 1
-        elif new_price['time'] != db_price['time']:
-            new_price['no'] = db_price['no'] + 1
-            redis.rpush("fx", json.dump(new_price))
-            print("rate : %s %d %d %6.3f" % (loc.astimezone(), new_price['no'], new_price['time'], new_price['close']))
+        elif now_price['time'] != db_price['time']:
+            now_price['no'] = db_price['no'] + 1
+            redis.rpush("fx", json.dumps(now_price))
+            print("rate : %s %d %d %6.3f" % (loc.astimezone(), now_price['no'], now_price['time'], now_price['close']))
             same = 0
                 
         time.sleep(15)
