@@ -123,14 +123,14 @@ items:
             mountPath: /data/db
             subPath: openshift/db/redis
           - name: redis-socket
-            mountPath: /var/run/redis
+            mountPath: /var/tmp/redis
         volumes:
         - name: nfs-share
           persistentVolumeClaim:
             claimName: flg-pvc
         - name: redis-socket
           hostPath:
-            path: /var/run/redis
+            path: /var/tmp/redis
     test: false
     triggers:
     - type: ConfigChangeq
@@ -286,14 +286,14 @@ items:
           - name: localtime
             mountPath: /etc/localtime
           - name: redis-socket
-            mountPath: /var/run/redis
+            mountPath: /var/tmp/redis
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
         - name: redis-socket
           hostPath: 
-            path: /var/run/redis
+            path: /var/tmp/redis
     test: false
     triggers:
     - type: ConfigChange
@@ -360,14 +360,14 @@ items:
           - name: localtime
             mountPath: /etc/localtime
           - name: redis-socket
-            mountPath: /var/run/redis
+            mountPath: /var/tmp/redis
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
         - name: redis-socket
           hostPath:
-            path: /var/run/redis
+            path: /var/tmp/redis
     test: false
     triggers:
     - type: ConfigChange
@@ -423,14 +423,14 @@ items:
           - name: localtime
             mountPath: /etc/localtime
           - name: redis-socket
-            mountPath: /var/run/redis
+            mountPath: /var/tmp/redis
         volumes:
         - name: localtime
           hostPath:
             path: /etc/localtime
         - name: redis-socket
           hostPath:
-            path: /var/run/redis
+            path: /var/tmp/redis
     test: false
     triggers:
     - type: ConfigChange

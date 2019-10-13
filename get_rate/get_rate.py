@@ -28,16 +28,17 @@ if __name__ == "__main__":
             now_price['time'] = int(loc.replace(tzinfo=JST).timestamp() / 60)
             now_price['close'] = float(price['bids'][0]['price'])
 
-            last_no = redis.llen("fx") - 1
-            db_price = json.loads(redis.lindex("fx", last_no))
+            last_no = redis.zcard("fx") - 1
+            db_price = json.loads(redis.zrange("fx", last_no, last_no))
 
             if now_price['time'] == db_price['time'] and same < 4 * 60:
                 now_price['no'] = db_price['no']
-                redis.lset("fx", last_no, json.dumps(now_price))
+                redis.zrem("fx", json.dumps(db_price))
+                redis.zadd("fx", last_no, json.dumps(now_price))
                 same += 1
             elif now_price['time'] != db_price['time']:
                 now_price['no'] = db_price['no'] + 1
-                redis.rpush("fx", json.dumps(now_price))
+                redis.zadd("fx", now_price['no'], json.dumps(now_price))
                 print("rate : %s %d %d %6.3f" % (loc.astimezone(), now_price['no'], now_price['time'], now_price['close']))
                 same = 0
         except Exception as e:

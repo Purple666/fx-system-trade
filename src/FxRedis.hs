@@ -16,9 +16,9 @@ import           Data.Either
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s l = do
   let e = s + l - 1
-  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/run/redis/redis.sock" 
+  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis/redis.sock" 
                                      }
-  r <- runRedis conn $ lrange "fx" (fromIntegral s) (fromIntegral e)
+  r <- runRedis conn $ zrange "fx" (fromIntegral s) (fromIntegral e)
   disconnect conn
   return . map (\x -> Fcd.FxChartData { Fcd.no    = fromIntegral . fromJust $ x ^? key "no" . _Integer
                                       , Fcd.date  = fromIntegral . fromJust $ x ^? key "time" . _Integer
@@ -31,16 +31,9 @@ getOneChart n = do
   
 getEndChart :: IO Fcd.FxChartData
 getEndChart = do
-  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/run/redis/redis.sock" 
+  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis/redis.sock" 
                                      }
-  e <- runRedis conn $ llen "fx"
-  let n = (fromRight 0 e) - 1
-  r <- runRedis conn $ lindex "fx" n
-  let x = fromJust $ fromRight (Just "") r
+  e <- runRedis conn $ zcard "fx"
   disconnect conn
-  return $ Fcd.FxChartData { Fcd.no    = fromIntegral . fromJust $ x ^? key "no" . _Integer
-                           , Fcd.date  = fromIntegral . fromJust $ x ^? key "time" . _Integer
-                           , Fcd.close = fromJust $ x ^? key "close" . _Double
-                           }
-
-
+  let n = fromIntegral $ (fromRight 0 e) - 1
+  head <$> getChartList n 1

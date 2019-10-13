@@ -14,8 +14,9 @@ chart = []
 no = 0
 for r in df.itertuples():
     t = int(datetime.strptime(r[2] + r[3], "%Y%m%d%H%M%S").timestamp() / 60)
-    pipe.rpush('fx', json.dumps({'no': no, 'time': t, 'close': r[7] }))
+    chart[json.dumps({'no': no, 'time': t, 'close': r[7] })] = no
     no = no + 1
 
+pipe.zadd('fx', chart)
 pipe.execute()
 
