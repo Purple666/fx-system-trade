@@ -29,16 +29,20 @@ if __name__ == "__main__":
             now_price['close'] = float(price['bids'][0]['price'])
 
             last_no = redis.zcard("fx") - 1
-            db_price = json.loads(redis.zrange("fx", last_no, last_no))
+            db_price = json.loads(redis.zrange("fx", last_no, last_no)[0])
 
             if now_price['time'] == db_price['time'] and same < 4 * 60:
                 now_price['no'] = db_price['no']
                 redis.zrem("fx", json.dumps(db_price))
-                redis.zadd("fx", last_no, json.dumps(now_price))
+                chart = {}
+                chart[json.dumps(now_price)] = last_no
+                redis.zadd("fx", chart)
                 same += 1
             elif now_price['time'] != db_price['time']:
                 now_price['no'] = db_price['no'] + 1
-                redis.zadd("fx", now_price['no'], json.dumps(now_price))
+                chart = {}
+                chart[json.dumps(now_price)] = last_no
+                redis.zadd("fx", chart)
                 print("rate : %s %d %d %6.3f" % (loc.astimezone(), now_price['no'], now_price['time'], now_price['close']))
                 same = 0
         except Exception as e:

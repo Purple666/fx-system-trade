@@ -25,6 +25,7 @@ do
             then 
 	        wget https://www.forexite.com/free_forex_quotes/$year/$m/$d$m$y.zip
 	        unzip $d$m$y.zip
+                grep USDJPY $d$m$y.txt > $d$m$y-jpy.txt
             fi
 	done    
     done    
