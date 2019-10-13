@@ -117,22 +117,9 @@ items:
           - containerPort: 6379
             protocol: TCP
           resources: {}
-          volumeMounts:
-          - name: nfs-share
-            mountPath: /data/db
-            subPath: openshift/db/redis
-          - name: redis-socket
-            mountPath: /var/run/redis
-        volumes:
-        - name: nfs-share
-          persistentVolumeClaim:
-            claimName: flg-pvc
-        - name: redis-socket
-          hostPath:
-            path: /var/run/redis
     test: false
     triggers:
-    - type: ConfigChange
+    - type: ConfigChangeq
     - imageChangeParams:
         automatic: true
         containerNames:
