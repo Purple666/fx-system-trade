@@ -20,10 +20,10 @@ if __name__ == "__main__":
                                     params={'instruments': 'USD_JPY'},
                                     headers={'content-type': 'application/json',
                                              'Authorization': 'Bearer 041fff2f1e9950579315d9a8d629ef9f-5b7c44123e8fc34c65951f4d3332b96b'})
-            responce_json = response.json()
         except Exception as e:
             print(e)
 
+        responce_json = response.json()
         price = responce_json['prices'][0]
         loc = dateutil.parser.parse(price['time'])
         
