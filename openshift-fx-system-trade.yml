@@ -292,8 +292,8 @@ items:
           hostPath:
             path: /etc/localtime
         - name: redis-socket
-          hostPath: /var/run/redis
-            path: 
+          hostPath: 
+            path: /var/run/redis
     test: false
     triggers:
     - type: ConfigChange
