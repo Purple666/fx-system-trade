@@ -609,7 +609,7 @@ items:
         openshift.io/imported-from: python
       from:
         kind: DockerImage
-        name: python:latest
+        name: python:3.7.3
       generation: null
       importPolicy: {}
       name: "latest"
