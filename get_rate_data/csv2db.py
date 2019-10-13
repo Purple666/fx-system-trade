@@ -7,7 +7,7 @@ from datetime import datetime
 
 redis = redis.Redis(host='openshift.flg.jp', port=30379, db=0)
 redis.delete('fx')
-qpipe = redis.pipeline()
+pipe = redis.pipeline()
 df = pd.read_csv(sys.stdin, dtype={'date': str, 'time': str})
 
 chart = []
