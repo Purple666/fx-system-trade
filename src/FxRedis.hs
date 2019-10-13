@@ -16,7 +16,7 @@ import           Data.Either
 getChartList :: Int -> Int -> IO [Fcd.FxChartData]
 getChartList s l = do
   let e = s + l - 1
-  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis/redis.sock" 
+  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis.sock" 
                                      }
   r <- runRedis conn $ zrange "fx" (fromIntegral s) (fromIntegral e)
   disconnect conn
@@ -31,7 +31,7 @@ getOneChart n = do
   
 getEndChart :: IO Fcd.FxChartData
 getEndChart = do
-  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis/redis.sock" 
+  conn <- connect defaultConnectInfo { connectPort = UnixSocket "/var/tmp/redis.sock" 
                                      }
   e <- runRedis conn $ zcard "fx"
   disconnect conn
