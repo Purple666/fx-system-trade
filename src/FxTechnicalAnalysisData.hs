@@ -41,7 +41,8 @@ data FxTechnicalAnalysisData = FxTechnicalAnalysisData
   , macd  :: FxMovingAverageData
   , st    :: FxMovingAverageData
   , rsi   :: FxMovingAverageData
-  , bb    :: FxMovingAverageData
+  , bbmf  :: FxMovingAverageData
+  , bbco  :: FxMovingAverageData
   }  deriving (Show, Read, Generic)
 
 data FxMovingAverageData = FxMovingAverageData
@@ -81,6 +82,7 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , stSetting          :: FxAlMaSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
+  , bbSetting          :: FxAlMaSetting
   , simChart           :: Int
   } deriving (Show, Read, Ord, Eq, Generic)
 
@@ -99,29 +101,34 @@ instance Hashable FxAlMaSetting
 fxAlgorithmList :: [(FxTechnicalAnalysisData -> Bool, FxTechnicalAnalysisData -> Bool)]
 fxAlgorithmList =
   concat $ replicate (Gsd.algorithmRepeat Gsd.gsd)
-  [ (isBuy (crossSL    . sma), isSell (crossSL    . sma)) -- 1
-  , (isBuy (crossSM    . sma), isSell (crossSM    . sma)) -- 2
-  , (isBuy (crossML    . sma), isSell (crossML    . sma)) -- 3
-  , (isBuy (crossSL   . macd), isSell (crossSL   . macd)) -- 4
-  , (isBuy (crossSL    . rci), isSell (crossSL    . rci)) -- 5
-  , (isBuy (crossSM    . rci), isSell (crossSM    . rci)) -- 6
-  , (isBuy (crossML    . rci), isSell (crossML    . rci)) -- 7
-  , (isBuy (crossSL    . rsi), isSell (crossSL    . rsi)) -- 8
-  , (isBuy (crossSM    . rsi), isSell (crossSM    . rsi)) -- 9
-  , (isBuy (crossML    . rsi), isSell (crossML    . rsi)) -- 10
-  , (isBuy (crossSL    .  st), isSell (crossSL    .  st)) -- 11
-  , (isBuy (crossSM    .  st), isSell (crossSM    .  st)) -- 12
-  , (isBuy (crossML    .  st), isSell (crossML    .  st)) -- 13
-  , (isBuy (thresholdS . rci), isSell (thresholdS . rci)) -- 14
-  , (isBuy (thresholdM . rci), isSell (thresholdM . rci)) -- 15
-  , (isBuy (thresholdL . rci), isSell (thresholdL . rci)) -- 16
-  , (isBuy (thresholdS . rsi), isSell (thresholdS . rsi)) -- 17
-  , (isBuy (thresholdM . rsi), isSell (thresholdM . rsi)) -- 18
-  , (isBuy (thresholdL . rsi), isSell (thresholdL . rsi)) -- 19
-  , (isBuy (thresholdS .  st), isSell (thresholdS .  st)) -- 20
-  , (isBuy (thresholdM .  st), isSell (thresholdM .  st)) -- 21
-  , (isBuy (thresholdL .  st), isSell (thresholdL .  st)) -- 22
-  , (isBuy (thresholdS .  bb), isSell (thresholdS .  bb)) -- 23
+  [ (isBuy (crossSL    .  sma), isSell (crossSL    .  sma)) -- 1
+  , (isBuy (crossSM    .  sma), isSell (crossSM    .  sma)) -- 2
+  , (isBuy (crossML    .  sma), isSell (crossML    .  sma)) -- 3
+  , (isBuy (crossSL    . macd), isSell (crossSL    . macd)) -- 4
+  , (isBuy (crossSL    .  rci), isSell (crossSL    .  rci)) -- 5
+  , (isBuy (crossSM    .  rci), isSell (crossSM    .  rci)) -- 6
+  , (isBuy (crossML    .  rci), isSell (crossML    .  rci)) -- 7
+  , (isBuy (crossSL    .  rsi), isSell (crossSL    .  rsi)) -- 8
+  , (isBuy (crossSM    .  rsi), isSell (crossSM    .  rsi)) -- 9
+  , (isBuy (crossML    .  rsi), isSell (crossML    .  rsi)) -- 10
+  , (isBuy (crossSL    .   st), isSell (crossSL    .   st)) -- 11
+  , (isBuy (crossSM    .   st), isSell (crossSM    .   st)) -- 12
+  , (isBuy (crossML    .   st), isSell (crossML    .   st)) -- 13
+  , (isBuy (thresholdS .  rci), isSell (thresholdS .  rci)) -- 14
+  , (isBuy (thresholdM .  rci), isSell (thresholdM .  rci)) -- 15
+  , (isBuy (thresholdL .  rci), isSell (thresholdL .  rci)) -- 16
+  , (isBuy (thresholdS .  rsi), isSell (thresholdS .  rsi)) -- 17
+  , (isBuy (thresholdM .  rsi), isSell (thresholdM .  rsi)) -- 18
+  , (isBuy (thresholdL .  rsi), isSell (thresholdL .  rsi)) -- 19
+  , (isBuy (thresholdS .   st), isSell (thresholdS .   st)) -- 20
+  , (isBuy (thresholdM .   st), isSell (thresholdM .   st)) -- 21
+  , (isBuy (thresholdL .   st), isSell (thresholdL .   st)) -- 22
+  , (isBuy (thresholdS . bbmf), isSell (thresholdS . bbmf)) -- 23
+  , (isBuy (thresholdM . bbmf), isSell (thresholdM . bbmf)) -- 24
+  , (isBuy (thresholdL . bbmf), isSell (thresholdL . bbmf)) -- 25
+  , (isBuy (thresholdS . bbco), isSell (thresholdS . bbco)) -- 26
+  , (isBuy (thresholdM . bbco), isSell (thresholdM . bbco)) -- 27
+  , (isBuy (thresholdL . bbco), isSell (thresholdL . bbco)) -- 28
   ]
 
 isBuy :: (FxTechnicalAnalysisData -> FxTradePosition) -> FxTechnicalAnalysisData -> Bool
@@ -170,6 +177,7 @@ initFxAlgorithmSetting alc =
                      , macdSetting        = initFxAlMaSetting
                      , stSetting          = initFxAlMaSetting
                      , rsiSetting         = initFxAlMaSetting
+                     , bbSetting          = initFxAlMaSetting
                      , simChart           = 1
                      }
 
@@ -194,7 +202,8 @@ initFxTechnicalAnalysisData =
                           , macd       = initFxMovingAverageData
                           , st         = initFxMovingAverageData
                           , rsi        = initFxMovingAverageData
-                          , bb         = initFxMovingAverageData
+                          , bbmf       = initFxMovingAverageData
+                          , bbco       = initFxMovingAverageData
                           }
 
 initFxMovingAverageData :: FxMovingAverageData

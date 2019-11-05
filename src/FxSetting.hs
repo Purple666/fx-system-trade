@@ -186,12 +186,12 @@ crossoverFxAlgorithmSetting a b = do
   die <- R.replicateM 4 $ R.getRandomR (True, False)
   (ta, tb)       <- Tr.crossoverTree (Fad.algorithmAndRate a) (Fad.algorithmOrRate a)
                     (Fad.algorithmTree a) (Fad.algorithmListCount a) (Fad.algorithmTree b) (Fad.algorithmListCount b)
-  (rcia, rcib)   <- crossoverOrdFxAlMaSetting (Fad.rciSetting a) (Fad.rciSetting b)
-  (smaa, smab)   <- crossoverOrdFxAlMaSetting (Fad.smaSetting a) (Fad.smaSetting b)
-
-  (emaa, emab)   <- crossoverOrdFxAlMaSetting (Fad.emaSetting a) (Fad.emaSetting b)
+  (rcia, rcib)   <- crossoverOrdFxAlMaSetting (Fad.rciSetting  a) (Fad.rciSetting  b)
+  (smaa, smab)   <- crossoverOrdFxAlMaSetting (Fad.smaSetting  a) (Fad.smaSetting  b)
+  (emaa, emab)   <- crossoverOrdFxAlMaSetting (Fad.emaSetting  a) (Fad.emaSetting  b)
   (macda, macdb) <- crossoverOrdFxAlMaSetting (Fad.macdSetting a) (Fad.macdSetting b)
-  (rsia, rsib)   <- crossoverOrdFxAlMaSetting (Fad.rsiSetting a) (Fad.rsiSetting b)
+  (rsia, rsib)   <- crossoverOrdFxAlMaSetting (Fad.rsiSetting  a) (Fad.rsiSetting  b)
+  (bba, bbb)     <- crossoverFxAlMaSettingBB  (Fad.bbSetting   a) (Fad.bbSetting  b)
   return ( a { Fad.algorithmTree    = ta
              , Fad.algorithmAndRate = choice1 die 0 (Fad.algorithmAndRate a) (Fad.algorithmAndRate b)
              , Fad.algorithmOrRate  = choice1 die 1 (Fad.algorithmOrRate  a) (Fad.algorithmOrRate  b)
@@ -200,6 +200,7 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.emaSetting       = emaa
              , Fad.macdSetting      = macda
              , Fad.rsiSetting       = rsia
+             , Fad.bbSetting        = bba
              , Fad.simChart         = choice1 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
          , b { Fad.algorithmTree    = tb
@@ -210,6 +211,7 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.emaSetting       = emab
              , Fad.macdSetting      = macdb
              , Fad.rsiSetting       = rsib
+             , Fad.bbSetting        = bbb
              , Fad.simChart         = choice2 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
            )
@@ -247,6 +249,21 @@ crossoverOrdFxAlMaSetting a b = do
              , Fad.middleSetting    = b' !! 1
              , Fad.longSetting      = b' !! 2
              , Fad.thresholdSetting = choice2 die 1 (Fad.thresholdSetting a)  (Fad.thresholdSetting b)
+            }
+         )
+
+crossoverFxAlMaSettingBB :: MonadRandom m => Fad.FxAlMaSetting -> Fad.FxAlMaSetting -> m (Fad.FxAlMaSetting, Fad.FxAlMaSetting)
+crossoverFxAlMaSettingBB a b = do
+  die <- R.replicateM 5 $ R.getRandomR (True, False)
+  return ( a { Fad.shortSetting     = choice1 die 1 (Fad.shortSetting     a) (Fad.shortSetting      b)
+             , Fad.middleSetting    = choice1 die 2 (Fad.middleSetting    a) (Fad.middleSetting     b)
+             , Fad.longSetting      = choice1 die 3 (Fad.longSetting      a) (Fad.longSetting       b)
+             , Fad.thresholdSetting = choice1 die 4 (Fad.thresholdSetting a) (Fad.thresholdSetting b)
+             }
+         , b { Fad.shortSetting     = choice2 die 1 (Fad.shortSetting     a) (Fad.shortSetting      b)
+             , Fad.middleSetting    = choice2 die 2 (Fad.middleSetting    a) (Fad.middleSetting     b)
+             , Fad.longSetting      = choice2 die 3 (Fad.longSetting      a) (Fad.longSetting       b)
+             , Fad.thresholdSetting = choice2 die 4 (Fad.thresholdSetting a) (Fad.thresholdSetting b)
             }
          )
 
