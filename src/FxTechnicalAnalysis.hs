@@ -291,9 +291,9 @@ getBB p1 p2 n sigma ma x =
       sd = sqrt $ (fromIntegral n * foldl (\acc b -> b ^ (2 :: Int) + acc) 0 s - sum s ^ (2 :: Int)) / fromIntegral (n * (n - 1))
   in if length s < n || ma == 0
      then Fad.None
-     else if ma + sd * (fromIntegral sigma / 100) < Fcd.close chart
+     else if ma + sd * (fromIntegral sigma / 100 + 1) < Fcd.close chart
           then p1
-          else if Fcd.close chart < ma - sd * (fromIntegral sigma / 100)
+          else if Fcd.close chart < ma - sd * (fromIntegral sigma / 100 + 1)
                then p2
                else Fad.None
 

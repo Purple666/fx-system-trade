@@ -70,14 +70,14 @@ tradeSim = do
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   let startN = Gsd.maxTradeTime Gsd.gsd * 2
   (pl, fsd) <- tradeSimLearning startN
-  (s, f) <- Fm.readBacktestResult "trade-sim"
+  (s, f) <- Fm.readBacktestResult "trade_sim"
   td' <- tradeSimLoop startN endN pl td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td'
               then do Fp.printBackTestResult "=================================" td' (s + 1) f fsd
                       return (s + 1, f)
               else do Fp.printBackTestResult "---------------------------------" td' s (f + 1) fsd
                       return (s, f + 1)
-  Fm.writeBacktestResult "trade-sim" s' f'
+  Fm.writeBacktestResult "trade_sim" s' f'
   tradeSim
 
 learningEvaluate :: Int ->
