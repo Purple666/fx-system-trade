@@ -72,12 +72,12 @@ createRandomFxAlMaSetting ix = do
 
 createRandomFxAlMaSettingBB :: MonadRandom m => Fad.FxAlMaSetting -> m Fad.FxAlMaSetting
 createRandomFxAlMaSettingBB ix = do
-  short  <- getRandomR (max 5 (Fad.shortSetting  ix - Gsd.taRandomMargin Gsd.gsd),
-                        max 5 (Fad.shortSetting  ix + Gsd.taRandomMargin Gsd.gsd))
-  middle <- getRandomR (max 5 (Fad.middleSetting ix - Gsd.taRandomMargin Gsd.gsd),
-                        max 5 (Fad.middleSetting ix + Gsd.taRandomMargin Gsd.gsd))
-  long   <- getRandomR (max 5 (Fad.longSetting   ix - Gsd.taRandomMargin Gsd.gsd),
-                        max 5 (Fad.longSetting   ix + Gsd.taRandomMargin Gsd.gsd))
+  short  <- getRandomR (max 1 (Fad.shortSetting  ix - Gsd.taRandomMargin Gsd.gsd),
+                        max 1 (Fad.shortSetting  ix + Gsd.taRandomMargin Gsd.gsd))
+  middle <- getRandomR (max 1 (Fad.middleSetting ix - Gsd.taRandomMargin Gsd.gsd),
+                        max 1 (Fad.middleSetting ix + Gsd.taRandomMargin Gsd.gsd))
+  long   <- getRandomR (max 1 (Fad.longSetting   ix - Gsd.taRandomMargin Gsd.gsd),
+                        max 1 (Fad.longSetting   ix + Gsd.taRandomMargin Gsd.gsd))
   return ix { Fad.shortSetting      = short
             , Fad.middleSetting     = middle
             , Fad.longSetting       = long
@@ -291,9 +291,9 @@ getBB p1 p2 n sigma ma x =
       sd = sqrt $ (fromIntegral n * foldl (\acc b -> b ^ (2 :: Int) + acc) 0 s - sum s ^ (2 :: Int)) / fromIntegral (n * (n - 1))
   in if length s < n || ma == 0
      then Fad.None
-     else if ma + sd * (fromIntegral sigma / 100 + 1) < Fcd.close chart
+     else if ma + sd * (fromIntegral sigma / 10) < Fcd.close chart
           then p1
-          else if Fcd.close chart < ma - sd * (fromIntegral sigma / 100 + 1)
+          else if Fcd.close chart < ma - sd * (fromIntegral sigma / 10)
                then p2
                else Fad.None
 
