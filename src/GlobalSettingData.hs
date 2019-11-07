@@ -22,10 +22,10 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taRandomMargin        = 10
-                    , taMiddleLongMargin    = 10
+  GlobalSettingData { taRandomMargin        = 3
+                    , taMiddleLongMargin    = 6
                     , makeTreeCount         = 2
-                    , algorithmRepeat       = 3
+                    , algorithmRepeat       = 4
                     , learningTestCount     = 3
                     , countUpList           = 2
                     , quantityRate          = 5
