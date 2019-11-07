@@ -258,12 +258,10 @@ crossoverFxAlMaSettingBB a b = do
   return ( a { Fad.shortSetting     = choice1 die 1 (Fad.shortSetting     a) (Fad.shortSetting      b)
              , Fad.middleSetting    = choice1 die 2 (Fad.middleSetting    a) (Fad.middleSetting     b)
              , Fad.longSetting      = choice1 die 3 (Fad.longSetting      a) (Fad.longSetting       b)
-             , Fad.thresholdSetting = choice1 die 4 (Fad.thresholdSetting a) (Fad.thresholdSetting b)
              }
          , b { Fad.shortSetting     = choice2 die 1 (Fad.shortSetting     a) (Fad.shortSetting      b)
              , Fad.middleSetting    = choice2 die 2 (Fad.middleSetting    a) (Fad.middleSetting     b)
              , Fad.longSetting      = choice2 die 3 (Fad.longSetting      a) (Fad.longSetting       b)
-             , Fad.thresholdSetting = choice2 die 4 (Fad.thresholdSetting a) (Fad.thresholdSetting b)
             }
          )
 
