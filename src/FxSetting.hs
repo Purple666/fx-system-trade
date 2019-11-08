@@ -191,7 +191,8 @@ crossoverFxAlgorithmSetting a b = do
   (emaa, emab)   <- crossoverOrdFxAlMaSetting (Fad.emaSetting  a) (Fad.emaSetting  b)
   (macda, macdb) <- crossoverOrdFxAlMaSetting (Fad.macdSetting a) (Fad.macdSetting b)
   (rsia, rsib)   <- crossoverOrdFxAlMaSetting (Fad.rsiSetting  a) (Fad.rsiSetting  b)
-  (bba, bbb)     <- crossoverFxAlMaSettingBB  (Fad.bbSetting   a) (Fad.bbSetting  b)
+  (bbmfa, bbmfb) <- crossoverFxAlMaSettingBB  (Fad.bbmfSetting a) (Fad.bbmfSetting b)
+  (bbcoa, bbcob) <- crossoverFxAlMaSettingBB  (Fad.bbcoSetting a) (Fad.bbcoSetting b)
   return ( a { Fad.algorithmTree    = ta
              , Fad.algorithmAndRate = choice1 die 0 (Fad.algorithmAndRate a) (Fad.algorithmAndRate b)
              , Fad.algorithmOrRate  = choice1 die 1 (Fad.algorithmOrRate  a) (Fad.algorithmOrRate  b)
@@ -200,7 +201,8 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.emaSetting       = emaa
              , Fad.macdSetting      = macda
              , Fad.rsiSetting       = rsia
-             , Fad.bbSetting        = bba
+             , Fad.bbmfSetting      = bbmfa
+             , Fad.bbcoSetting      = bbcoa
              , Fad.simChart         = choice1 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
          , b { Fad.algorithmTree    = tb
@@ -211,7 +213,8 @@ crossoverFxAlgorithmSetting a b = do
              , Fad.emaSetting       = emab
              , Fad.macdSetting      = macdb
              , Fad.rsiSetting       = rsib
-             , Fad.bbSetting        = bbb
+             , Fad.bbmfSetting      = bbmfb
+             , Fad.bbcoSetting      = bbcob
              , Fad.simChart         = choice2 die 3 (Fad.simChart  a) (Fad.simChart  b)
              }
            )

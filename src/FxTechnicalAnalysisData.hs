@@ -82,7 +82,8 @@ data FxAlgorithmSetting = FxAlgorithmSetting
   , stSetting          :: FxAlMaSetting
   , rciSetting         :: FxAlMaSetting
   , rsiSetting         :: FxAlMaSetting
-  , bbSetting          :: FxAlMaSetting
+  , bbmfSetting        :: FxAlMaSetting
+  , bbcoSetting        :: FxAlMaSetting
   , simChart           :: Int
   } deriving (Show, Read, Ord, Eq, Generic)
 
@@ -177,7 +178,8 @@ initFxAlgorithmSetting alc =
                      , macdSetting        = initFxAlMaSetting
                      , stSetting          = initFxAlMaSetting
                      , rsiSetting         = initFxAlMaSetting
-                     , bbSetting          = initFxAlMaSetting
+                     , bbmfSetting        = initFxAlMaSetting
+                     , bbcoSetting        = initFxAlMaSetting
                      , simChart           = 1
                      }
 

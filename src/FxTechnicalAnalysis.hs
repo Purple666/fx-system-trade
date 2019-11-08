@@ -97,7 +97,8 @@ createRandomFxAlgorithmSetting ix = do
   rci  <- createRandomFxAlMaSetting $ Fad.rciSetting  ix
   st   <- createRandomFxAlMaSetting $ Fad.stSetting   ix
   rsi  <- createRandomFxAlMaSetting $ Fad.rsiSetting  ix
-  bb   <- createRandomFxAlMaSettingBB $ Fad.bbSetting  ix
+  bbmf <- createRandomFxAlMaSettingBB $ Fad.bbmfSetting  ix
+  bbco <- createRandomFxAlMaSettingBB $ Fad.bbcoSetting  ix
   return $ ix { Fad.algorithmTree    = at
               , Fad.algorithmAndRate = taAndR
               , Fad.algorithmOrRate  = taOrR
@@ -107,7 +108,8 @@ createRandomFxAlgorithmSetting ix = do
               , Fad.macdSetting      = macd
               , Fad.stSetting        = st
               , Fad.rsiSetting       = rsi
-              , Fad.bbSetting        = bb
+              , Fad.bbmfSetting        = bbmf
+              , Fad.bbcoSetting        = bbco
               , Fad.simChart         = sc
               }
 
@@ -299,14 +301,15 @@ getBB p1 p2 n sigma ma x =
 
 setBB :: Fad.FxTradePosition ->
          Fad.FxTradePosition ->
-         Fad.FxAlgorithmSetting ->
+         Fad.FxAlMaSetting ->
+         Fad.FxAlMaSetting ->
          Fad.FxMovingAverageData ->
          [Fcd.FxChartData] ->
          Fad.FxMovingAverageData
-setBB p1 p2 ftas mad x =
-  Fad.initFxMovingAverageData { Fad.thresholdS = getBB p1 p2 (Fad.shortSetting  $ Fad.smaSetting ftas) (Fad.shortSetting  $ Fad.bbSetting ftas) (Fad.short  mad) x
-                              , Fad.thresholdM = getBB p1 p2 (Fad.middleSetting $ Fad.smaSetting ftas) (Fad.middleSetting $ Fad.bbSetting ftas) (Fad.middle mad) x
-                              , Fad.thresholdL = getBB p1 p2 (Fad.longSetting   $ Fad.smaSetting ftas) (Fad.longSetting   $ Fad.bbSetting ftas) (Fad.long  mad) x
+setBB p1 p2 ss bbs mad x =
+  Fad.initFxMovingAverageData { Fad.thresholdS = getBB p1 p2 (Fad.shortSetting  ss) (Fad.shortSetting  bbs) (Fad.short  mad) x
+                              , Fad.thresholdM = getBB p1 p2 (Fad.middleSetting ss) (Fad.middleSetting bbs) (Fad.middle mad) x
+                              , Fad.thresholdL = getBB p1 p2 (Fad.longSetting   ss) (Fad.longSetting   bbs) (Fad.long   mad) x
                               }
 
 getST :: Int -> Int -> [Fcd.FxChartData] -> [Fad.FxTechnicalAnalysisData] -> (Double, Double, Double)
@@ -392,8 +395,8 @@ makeFxTechnicalAnalysisData ftas lr chart pdl =
                                       , Fad.rci   = makeFxMovingAverageData getRci (-100) 100 lr (Fad.rciSetting ftas) Fad.rci pdl
                                       , Fad.st    = setFxMovingAverageData k d sd  0 100 (Fad.stSetting ftas) Fad.st pdl
                                       , Fad.rsi   = makeFxMovingAverageData getRsi 0 100 lr (Fad.rsiSetting ftas) Fad.rsi pdl
-                                      , Fad.bbmf  = setBB Fad.Buy  Fad.Sell ftas (Fad.sma x) lr
-                                      , Fad.bbco  = setBB Fad.Sell Fad.Buy  ftas (Fad.sma x) lr
+                                      , Fad.bbmf  = setBB Fad.Buy  Fad.Sell (Fad.smaSetting ftas) (Fad.bbmfSetting ftas) (Fad.sma x) lr
+                                      , Fad.bbco  = setBB Fad.Sell Fad.Buy  (Fad.smaSetting ftas) (Fad.bbcoSetting ftas)  (Fad.sma x) lr
                                       }
   in if null pdl
      then Fad.initFxTechnicalAnalysisData
