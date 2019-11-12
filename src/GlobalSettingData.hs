@@ -24,10 +24,10 @@ gsd :: GlobalSettingData
 gsd =
   GlobalSettingData { taRandomMargin        = 10
                     , taMiddleLongMargin    = 6
-                    , makeTreeCount         = 3
-                    , algorithmRepeat       = 3
-                    , learningTestCount     = 3
-                    , countUpList           = 3
+                    , makeTreeCount         = 10
+                    , algorithmRepeat       = 10
+                    , learningTestCount     = 10
+                    , countUpList           = 10
                     , quantityRate          = 5
                     , treeAndRate           = 1
                     , treeOrRate            = 1
