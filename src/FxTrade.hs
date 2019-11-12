@@ -84,11 +84,9 @@ evaluateOne :: Fad.FxChartTaData ->
                (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData, Fsd.FxSetting)
 evaluateOne ctd fsd f1 forceSell td fs =
   let cd        = Fad.taChart ctd
-      chart     = if Ftd.side td == Ftd.Buy
-                  then Fcd.close cd - Gsd.spread Gsd.gsd / 2
-                  else if Ftd.side td == Ftd.Sell
-                       then Fcd.close cd + Gsd.spread Gsd.gsd / 2
-                       else Fcd.close cd
+      chartBuy  = Fcd.close cd + Gsd.spread Gsd.gsd / 2
+      chartSell = Fcd.close cd - Gsd.spread Gsd.gsd / 2
+      chart     = Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeDate = Fcd.no cd - Fcd.no (Ftd.tradeRate td)
       ftado     = Fad.open        ctd
@@ -100,9 +98,9 @@ evaluateOne ctd fsd f1 forceSell td fs =
       lcd = Gsd.maxTradeTime Gsd.gsd
       (position, open)
         | (Ftd.side td == Ftd.None || ({- Ta.getHoldTime fsd < tradeDate && -} Ftd.side td == Ftd.Sell)) &&
-          evaluateProfitInc fto ftado = (chart, Ftd.Buy)
+          evaluateProfitInc fto ftado = (chartBuy, Ftd.Buy)
         | (Ftd.side td == Ftd.None || ({- Ta.getHoldTime fsd < tradeDate && -} Ftd.side td == Ftd.Buy))  &&
-          evaluateProfitDec fto ftado = (chart, Ftd.Sell)
+          evaluateProfitDec fto ftado = (chartSell, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       (profits, close)
         | open /= Ftd.None && Ftd.side td == Ftd.Buy  = (chart - tradeRate, Ftd.Buy)
@@ -164,11 +162,11 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                   else Ftd.unit td
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position + Gsd.spread Gsd.gsd / 2
+                                                          , Fcd.close = position
                                                           }
                                  else if open == Ftd.Sell
                                       then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                               , Fcd.close = position - Gsd.spread Gsd.gsd / 2 
+                                                               , Fcd.close = position
                                                                }
                                       else Ftd.tradeRate td
                , Ftd.side  = if open == Ftd.Buy
