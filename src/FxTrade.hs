@@ -84,7 +84,11 @@ evaluateOne :: Fad.FxChartTaData ->
                (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData, Fsd.FxSetting)
 evaluateOne ctd fsd f1 forceSell td fs =
   let cd        = Fad.taChart ctd
-      chart     = Fcd.close cd
+      chart     = if Ftd.side td == Ftd.Buy
+                  then Fcd.close cd - Gsd.spread Gsd.gsd / 2
+                  else if Ftd.side td == Ftd.Sell
+                       then Fcd.close cd + Gsd.spread Gsd.gsd / 2
+                       else Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeDate = Fcd.no cd - Fcd.no (Ftd.tradeRate td)
       ftado     = Fad.open        ctd
@@ -154,7 +158,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
               else fs'
       td' = td { Ftd.chart = cd
                , Ftd.unit  = if open /= Ftd.None
-                             then f1 td $ Ftd.tradeRate td'
+                             then f1 td . Fcd.close $ Ftd.tradeRate td'
                              else if close /= Ftd.None
                                   then 0
                                   else Ftd.unit td
