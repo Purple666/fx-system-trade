@@ -154,17 +154,17 @@ evaluateOne ctd fsd f1 forceSell td fs =
               else fs'
       td' = td { Ftd.chart = cd
                , Ftd.unit  = if open /= Ftd.None
-                             then f1 td position
+                             then f1 td $ Ftd.tradeRate td'
                              else if close /= Ftd.None
                                   then 0
                                   else Ftd.unit td
                , Ftd.tradeRate = if open == Ftd.Buy
                                  then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                          , Fcd.close = position + Gsd.spread Gsd.gsd
+                                                          , Fcd.close = position + Gsd.spread Gsd.gsd / 2
                                                           }
                                  else if open == Ftd.Sell
                                       then Fcd.initFxChartData { Fcd.no  = Fcd.no cd
-                                                               , Fcd.close = position - Gsd.spread Gsd.gsd
+                                                               , Fcd.close = position - Gsd.spread Gsd.gsd / 2 
                                                                }
                                       else Ftd.tradeRate td
                , Ftd.side  = if open == Ftd.Buy
