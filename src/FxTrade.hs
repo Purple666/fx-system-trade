@@ -25,11 +25,10 @@ import qualified Ga
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
 
-evaluationOk :: [Ftd.FxTradeData] -> Bool
-evaluationOk tdlt =
+evaluationOk :: [Ftd.FxTradeData] -> Fsd.FxSettingData -> Bool
+evaluationOk tdlt fsd =
   -- L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt
-  0 < (sum $ map Ftd.profit tdlt) &&
-  Gsd.initalProperty Gsd.gsd * (fromIntegral $ Gsd.learningTestCount Gsd.gsd) < (sum $ map Ftd.realizedPL tdlt)
+  Fsd.getLogProfit fsd < (sum $ map Ftd.profit tdlt)
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
