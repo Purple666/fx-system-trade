@@ -49,7 +49,7 @@ gaLearningDataFromLog n fsd = do
                                                                                              }
                                                    }
                                     return $ Ga.learningData fsd') .
-          L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (b / fromIntegral b') (a / fromIntegral a')) $
+          L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
           M.toList fsl
   return (Ga.learningDataList fsl', Ga.learningDataList $ take (Gsd.gaNum Gsd.gsd) fsl')
 
