@@ -28,6 +28,7 @@ import qualified Tree                    as Tr
 evaluationOk :: [Ftd.FxTradeData] -> Fsd.FxSettingData -> Bool
 evaluationOk tdlt fsd =
   -- L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt
+  if 0 < Fsd.getLogProfitAve fsd
   Fsd.getLogProfitAve fsd < (sum $ map Ftd.profit tdlt)
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
