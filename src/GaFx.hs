@@ -43,7 +43,7 @@ backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd * 10
+      startN = Gsd.maxTradeTime Gsd.gsd * 3
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (tdt, fsd') <- backTestLoop True startN endN td fsd
