@@ -151,8 +151,9 @@ getLogProfit fsd =
 
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
- (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
-
+  if logCount . learningSetting $ fxSetting fsd == 0
+  then 0
+  else (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
 
 maxFxSettingFromLog :: M.Map FxSetting (Double, Int) -> FxSetting
 maxFxSettingFromLog fsl =
