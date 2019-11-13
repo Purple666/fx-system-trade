@@ -28,8 +28,7 @@ import qualified Tree                    as Tr
 evaluationOk :: [Ftd.FxTradeData] -> Fsd.FxSettingData -> Bool
 evaluationOk tdlt fsd =
   -- L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt
-  if 0 < Fsd.getLogProfitAve fsd
-  Fsd.getLogProfitAve fsd < (sum $ map Ftd.profit tdlt)
+  Fsd.getLogProfit fsd < (sum $ map Ftd.profit tdlt)
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
