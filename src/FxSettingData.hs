@@ -11,6 +11,7 @@ module FxSettingData
   , initFxSettingChart
   , getLearningTestTimes
   , getLogProfit
+  , getLogProfitAve
   , setFxSettingData
   , getFxSettingLogResult
   , minFxSettingDelete
@@ -149,7 +150,7 @@ getLogProfit fsd =
   logProfit . learningSetting $ fxSetting fsd
 
 getLogProfitAve :: FxSettingData -> Double
-getLogProfit fsd =
+getLogProfitAve fsd =
  (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
 
 
