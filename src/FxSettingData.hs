@@ -151,7 +151,7 @@ getLogProfit fsd =
 
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
-  if logCount . learningSetting $ fxSetting fsd == 0
+  if (logCount . learningSetting $ fxSetting fsd) == 0
   then 0
   else (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
 
