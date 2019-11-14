@@ -108,15 +108,15 @@ evaluateOne ctd fsd f1 forceSell td fs =
         | open /= Ftd.None && Ftd.side td == Ftd.Sell = (tradeRate - chartBuy, Ftd.Sell)
         | Ftd.side td == Ftd.Buy &&
           (forceSell || lcd < tradeDate ||
-           (0 < chartSell - tradeRate -- && Ta.getHoldTime fsd < tradeDate &&
+           (0 < chartSell - tradeRate && -- Ta.getHoldTime fsd < tradeDate &&
             evaluateProfitDec ftcp ftadcp) ||
-           (chartSell - tradeRate < 0 -- && Ta.getHoldTime fsd < tradeDate &&
+           (chartSell - tradeRate < 0 && -- Ta.getHoldTime fsd < tradeDate &&
             evaluateProfitDec ftcl ftadcl)) = (chartSell - tradeRate, Ftd.Buy)
         | Ftd.side td == Ftd.Sell &&
           (forceSell || lcd < tradeDate ||
-            (0 < tradeRate - chartBuy -- && Ta.getHoldTime fsd < tradeDate &&
+            (0 < tradeRate - chartBuy && -- Ta.getHoldTime fsd < tradeDate &&
              evaluateProfitInc ftcp ftadcp) ||
-            (tradeRate - chartBuy < 0 -- && Ta.getHoldTime fsd < tradeDate &&
+            (tradeRate - chartBuy < 0 && -- Ta.getHoldTime fsd < tradeDate &&
              evaluateProfitInc ftcl ftadcl)) = (tradeRate - chartBuy, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
