@@ -35,9 +35,9 @@ instance Ga.Ga Fsd.FxSettingData where
 
 gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData, Ga.LearningData Fsd.FxSettingData)
 gaLearningDataFromLog n fsd = do
-  let fsl = M.insert Fsd.initFxSetting (1, 1) $ if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
-                                                then Fsd.fxSettingLog fsd
-                                                else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
+  let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
+            then Fsd.fxSettingLog fsd
+            else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
   fsl' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n fsd { Fsd.fxSetting = fs }
                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
                                                                                                   , Fsd.logCount  = c
