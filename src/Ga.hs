@@ -4,7 +4,8 @@ module Ga
   ) where
 
 import           Control.Monad.Random
-import qualified Data.Foldable        as F
+import qualified Data.Foldable           as F
+import qualified GlobalSettingData       as Gsd
 import           Data.List
 import           Debug.Trace
 
