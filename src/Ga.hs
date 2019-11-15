@@ -47,7 +47,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
   learning x =
-    setHash <$> (gaLoop (Gsd.gaNum Gsd.gsd) =<< (learningEvaluate <$> createInitialData (Gsd.gaNum Gsd.gsd) x))
+    setHash <$> (gaLoop (Gsd.gaNum Gsd.gsd) =<< ((learningEvaluate . mappend x) <$> createInitialData (Gsd.gaNum Gsd.gsd) x))
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
