@@ -104,7 +104,7 @@ learningLoop c n fsd ld = do
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
   traceShow(c, Fsd.settingHash $ Fsd.fxSetting fsd, Fsd.settingHash $ Fsd.fxSetting fsd') $ return()
   if ok
-    then return (False, True, plok, tdltm, Fsd.plusLearningTestTimes fsd')
+    then return (False, True, plok, tdltm, fsd')
     else if Fsd.getLearningTestTimes fsd' < fromIntegral c || fsd == fsd'
          then return (False, False, plok, tdltm, Fsd.plusLearningTestTimes fsd')
          else learningLoop (c + 1) n fsd' ld'
