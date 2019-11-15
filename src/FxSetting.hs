@@ -33,7 +33,7 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData, Ga.LearningData Fsd.FxSettingData)
+gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData)
 gaLearningDataFromLog n fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
@@ -51,7 +51,7 @@ gaLearningDataFromLog n fsd = do
                                     return $ Ga.learningData fsd') .
           L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
           M.toList fsl
-  return (Ga.learningDataList fsl', Ga.learningDataList $ take (Gsd.gaNum Gsd.gsd) fsl')
+  return $ Ga.learningDataList fsl'
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd =

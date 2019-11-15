@@ -96,28 +96,26 @@ learningEvaluate n ld = do
 
 learningLoop :: Int ->
                 Int ->
-                Fsd.FxSettingData ->
                 Ga.LearningData Fsd.FxSettingData ->
                 IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
-learningLoop c n fsd ld = do
+learningLoop c n ld = do
   ld' <- Ga.learning ld
-  (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
-  traceShow(c, Fsd.settingHash $ Fsd.fxSetting fsd, Fsd.settingHash $ Fsd.fxSetting fsd') $ return()
+  (ok, plok, tdltm, fsd) <- learningEvaluate n ld'
   if ok
-    then return (False, True, plok, tdltm, fsd')
-    else if Fsd.getLearningTestTimes fsd' < fromIntegral c || fsd == fsd'
-         then return (False, False, plok, tdltm, Fsd.plusLearningTestTimes fsd')
-         else learningLoop (c + 1) n fsd' ld'
+    then return (False, True, plok, tdltm, fsd)
+    else if Fsd.getLearningTestTimes fsd < fromIntegral c || Ga.maximumScore ld == Ga.maximumScore ld'
+         then return (False, False, plok, tdltm, Fsd.plusLearningTestTimes fsd)
+         else learningLoop (c + 1) n ld'
 
 learning :: Int ->
             Fsd.FxSettingData ->
             IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learning n fsd = do
-  (ld, ld') <- Fs.gaLearningDataFromLog n fsd
+  ld <- Fs.gaLearningDataFromLog n fsd
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld
   if ok
     then return (True, True, plok, tdltm, fsd')
-    else learningLoop 0 n fsd' ld'
+    else learningLoop 0 n ld
 
 tradeLearning :: IO (Int, Fsd.FxSettingData)
 tradeLearning = do
