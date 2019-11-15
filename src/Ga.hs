@@ -86,7 +86,7 @@ gaLoop e x = do
   traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
     then return x'
-    else gaLoop e $ mappend x' x
+    else gaLoop e x'
 
 
 
