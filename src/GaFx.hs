@@ -101,6 +101,7 @@ learningLoop :: Int ->
                 IO (Bool, Bool, Int, [Ftd.FxTradeData], Fsd.FxSettingData)
 learningLoop c n fsd ld = do
   ld' <- Ga.learning ld
+  traceShow(c) $ return()
   (ok, plok, tdltm, fsd') <- learningEvaluate n ld'
   if ok
     then return (False, True, plok, tdltm, Fsd.plusLearningTestTimes fsd')
