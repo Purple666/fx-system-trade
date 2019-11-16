@@ -1,5 +1,5 @@
 #!/bin/bash -x
 
-stack clean && stack build && stack exec -- fx-exe statistics
+stack clean && stack install --profile && stack exec --profile -- fx-exe statistics +RTS -xc
 
 
