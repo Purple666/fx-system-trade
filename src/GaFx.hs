@@ -138,7 +138,6 @@ backTestLoop lf n endN td fsd = do
   let fsd3 = Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd2
   Fp.printTestProgress fsd3 fsd td tdt tdlt oknum lok ok
   Fm.writeFxSettingData fsd3
-  fsd3 <- Fm.readFxSettingData
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd3)
