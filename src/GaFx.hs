@@ -68,9 +68,9 @@ tradeSim = do
   let td = Ft.initFxTradeDataBacktest
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   let startN = Gsd.maxTradeTime Gsd.gsd * 2
-  (pl, fsd) <- tradeSimLearning startN
+  fsd <- tradeSimLearning startN
   (s, f) <- Fm.readBacktestResult "trade_sim"
-  td' <- tradeSimLoop startN endN pl td fsd
+  td' <- tradeSimLoop startN endN td fsd
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td'
               then do Fp.printBackTestResult "=================================" td' (s + 1) f fsd
                       return (s + 1, f)
@@ -116,13 +116,13 @@ learning n fsd = do
     then return (True, True, plok, tdltm, fsd')
     else learningLoop 0 n ld
 
-tradeLearning :: IO (Int, Fsd.FxSettingData)
+tradeLearning :: IO (Fsd.FxSettingData)
 tradeLearning = do
   fsd <- Fm.readFxSettingData
   e <- Fr.getEndChart
   (lok, ok, oknum, tdlt, fsd') <- learning (Fcd.no e) fsd
   Fp.printLearningFxTradeData fsd' tdlt oknum lok ok
-  return (Fcd.no e, fsd')
+  return fsd'
 
 backTestLoop :: Bool ->
                 Int ->
@@ -173,9 +173,9 @@ tradeWeeklyLoop :: Ftd.FxTradeData ->
                    IO ()
 tradeWeeklyLoop td = do
   waitTrade
-  (pl, fsd') <- tradeLearning
+  fsd' <- tradeLearning
   e <- Foa.getNowPrices td
-  td' <- tradeLoop e pl 0 td fsd'
+  td' <- tradeLoop e 0 td fsd'
   tdw <- Fm.updateFxTradeData (Ftd.coName td L.++ "_weekly") td
   -- Ftw.tweetTWeek tdw td'
   Fm.setFxTradeData (Ftd.coName td L.++ "_weekly") td'
@@ -183,60 +183,57 @@ tradeWeeklyLoop td = do
 
 tradeLoop :: Fcd.FxChartData ->
              Int ->
-             Int ->
              Ftd.FxTradeData ->
              Fsd.FxSettingData ->
              IO Ftd.FxTradeData
-tradeLoop p pl sleep td fsd = do
+tradeLoop p sleep td fsd = do
   t <- getCurrentTime
   threadDelay ((15 - (truncate (utcTimeToPOSIXSeconds t) `mod` 15)) * 1000 * 1000)
   let ltt = Ta.getLearningTestTime fsd
   e <- Foa.getNowPrices td
-  (pl', fsd') <- if ltt < Fcd.no e - pl
-                 then tradeLearning
-                 else return (pl, fsd)
   (sleep', td'') <- if Fcd.close e /= Fcd.close p
-                    then do td' <- tradeEvaluate td fsd' e
+                    then do td' <- tradeEvaluate td fsd e
                             return (0, td')
                     else return (sleep + 1, td)
+  fsd' <- if Ftd.profit td'' < Ftd.profit td
+          then tradeLearning
+          else return fsd
   if 240 < sleep'
     then return td''
-    else tradeLoop e pl' sleep' td'' fsd'
+    else tradeLoop e sleep' td'' fsd'
 
 
-tradeSimEvaluate :: Ftd.FxTradeData ->
+tradeSimEvaluate :: Int ->
+                    Ftd.FxTradeData ->
                     Fsd.FxSettingData ->
-                    Fcd.FxChartData ->
                     IO Ftd.FxTradeData
-tradeSimEvaluate td fsd e = do
+tradeSimEvaluate n td fsd = do
+  e <- Fr.getOneChart n 
   (open, close, td', _) <- Ft.trade td fsd e
   if open /= Ftd.None || close /= Ftd.None
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
   return td'
 
-tradeSimLearning :: Int -> IO (Int, Fsd.FxSettingData)
+tradeSimLearning :: Int -> IO Fsd.FxSettingData
 tradeSimLearning n = do
   fsd <- Fm.readFxSettingData
   e <- Fr.getOneChart n
   (lok, ok, oknum, tdlt, fsd') <- learning (Fcd.no e) fsd
   Fp.printLearningFxTradeData fsd' tdlt oknum lok ok
-  return (Fcd.no e, fsd')
+  return fsd'
 
 tradeSimLoop :: Int ->
-                Int ->
                 Int ->
                 Ftd.FxTradeData ->
                 Fsd.FxSettingData ->
                 IO Ftd.FxTradeData
-tradeSimLoop n endN pl td fsd = do
-  let ltt = Ta.getLearningTestTime fsd
-  e <- Fr.getOneChart n 
-  (pl', fsd') <- if ltt < Fcd.no e - pl
-                 then tradeSimLearning n
-                 else return (pl, fsd)
-  td' <- tradeSimEvaluate td fsd' e
+tradeSimLoop n endN td fsd = do
+  td' <- tradeSimEvaluate n td fsd
+  fsd' <- if Ftd.profit td' < Ftd.profit td
+          then tradeSimLearning n
+          else return fsd
   if endN <= n ||  Ftd.realizedPL td' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return td'
-    else tradeSimLoop (n + 1) endN pl' td' fsd'
+    else tradeSimLoop (n + 1) endN td' fsd'
 
