@@ -55,7 +55,7 @@ gaLearningDataFromLog n fsd = do
 
 updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog profits fsd fsdr =
-  let fsl  = M.unionWith (\(p0, c0) (p1, c1) -> if c0 < c1
+  let fsl  = M.unionWith (\(p0, c0) (p1, c1) -> if fromIntegral c0 * p0 < fromIntegral c1 * p0
                                                 then (p1, c1)
                                                 else (p0, c0)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdr) 
       fs   = Fsd.fxSetting fsd

@@ -148,7 +148,7 @@ setFxSettingData fs fsl =
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
-  logProfit . learningSetting $ fxSetting fsd
+  (logProfit . learningSetting $ fxSetting fsd) * (fromIntegral . logCount . learningSetting $ fxSetting fsd)
 
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
@@ -161,13 +161,13 @@ maxFxSettingFromLog fsl =
   if L.null fsl
   then initFxSetting
   else L.head . L.map (\(x, (_, _)) -> x) .
-       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+       L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a * fromIntegral a') (b * fromIntegral b')) $
        M.toList fsl
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
 minFxSettingDelete fsl =
   M.fromList . L.take (Gsd.fxSettingLogNum Gsd.gsd) .
-  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare b a) $
+  L.sortBy (\(_, (a, a')) (_, (b, b')) -> compare (a * fromIntegral a') (b * fromIntegral b')) $
   M.toList fsl
 
 getFxSettingLogResult :: FxSettingData -> (Double, Int, Double)
