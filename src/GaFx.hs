@@ -197,8 +197,8 @@ tradeLoop p sleep td fsd = do
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
   fsd4 <- if Ftd.profit td'' < Ftd.profit td
-          then do fsd3 <- tradeLearning fsd2
-                  Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+          then do fsd3 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+                  tradeLearning fsd3
           else return fsd2
   if 240 < sleep'
     then return (td'', fsd4)
@@ -231,8 +231,8 @@ tradeSimLoop :: Int ->
 tradeSimLoop n endN td fsd = do
   (td', fsd1) <- tradeSimEvaluate n td fsd
   fsd3 <- if Ftd.profit td' < Ftd.profit td
-          then do fsd2 <- tradeSimLearning n fsd1
-                  Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
+          then do fsd2 <- Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd1 <$> Fm.readFxSettingData
+                  tradeSimLearning n fsd2
           else return fsd1
   if endN <= n ||  Ftd.realizedPL td' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return td'
