@@ -196,10 +196,10 @@ tradeLoop p sleep td fsd = do
                           then do (td', fsd1) <- tradeEvaluate td fsd e
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
-  fsd3 <- if Ftd.profit td'' < Ftd.profit td
-          then tradeLearning fsd2
+  fsd4 <- if Ftd.profit td'' < Ftd.profit td
+          then do fsd3 <- tradeLearning fsd2
+                  Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
           else return fsd2
-  fsd4 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
   if 240 < sleep'
     then return (td'', fsd4)
     else tradeLoop e sleep' td'' fsd4
