@@ -197,7 +197,7 @@ tradeLoop p sleep td fsd = do
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
   fsd4 <- if Ftd.profit td'' < Ftd.profit td
-          then do fsd3 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+          then do fsd3 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
                   tradeLearning fsd3
           else return fsd2
   if 240 < sleep'
