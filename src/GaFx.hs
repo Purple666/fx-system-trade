@@ -196,7 +196,8 @@ tradeLoop p sleep td fsd = do
                           then do (td', fsd1) <- tradeEvaluate td fsd e
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
-  fsd3 <- if Ftd.profit td'' < Ftd.profit td
+  let ltt = Ta.getLearningTestTime fsd2 * Gsd.learningTestCount Gsd.gsd
+  fsd3 <- if Ftd.profit td'' < Ftd.profit td || ltt < Fcd.no e - (Fcd.no $ Ftd.tradeRate td'')
           then tradeLearning fsd2
           else return fsd2
   fsd5 <- if Ftd.profit td'' /= Ftd.profit td
@@ -233,7 +234,8 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n endN td fsd = do
   (td', fsd1) <- tradeSimEvaluate n td fsd
-  fsd2 <- if Ftd.profit td' < Ftd.profit td
+  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+  fsd2 <- if Ftd.profit td' < Ftd.profit td || ltt < n - (Fcd.no $ Ftd.tradeRate td')
           then tradeSimLearning n fsd1
           else return fsd1
   fsd3 <- if Ftd.profit td' /= Ftd.profit td
