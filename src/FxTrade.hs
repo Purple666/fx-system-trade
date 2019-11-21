@@ -300,7 +300,7 @@ getChart :: Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
 getChart n fsd = do
   let ltt = Ta.getLearningTestTime fsd
       lttp = Ta.getPrepareTimeAll fsd + ltt
-  n' <- R.getRandomR(n - lttp * 2 {- * Gsd.learningTestCount Gsd.gsd * 2 -} , n - lttp)
+  n' <- R.getRandomR(n - lttp * 2 * Gsd.learningTestCount Gsd.gsd , n - lttp)
   fc <- Fr.getChartList n' lttp
   return (ltt, fc)
 
