@@ -230,10 +230,10 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n endN td fsd = do
   (td', fsd1) <- tradeSimEvaluate n td fsd
-  fsd2 <- if Ftd.profit td' < Ftd.profit td
-          then tradeSimLearning n fsd1
+  fsd3 <- if Ftd.profit td' < Ftd.profit td
+          then do fsd2 <- tradeSimLearning n fsd1
+                  Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
           else return fsd1
-  fsd3 <- Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
   if endN <= n ||  Ftd.realizedPL td' < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return td'
     else tradeSimLoop (n + 1) endN td' fsd3
