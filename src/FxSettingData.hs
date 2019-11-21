@@ -15,6 +15,7 @@ module FxSettingData
   , setFxSettingData
   , getFxSettingLogResult
   , minFxSettingDelete
+  , setHashFxSettingData
   ) where
 
 import           Data.Hashable
@@ -176,3 +177,9 @@ getFxSettingLogResult fsd =
      then (0, 0, 0)
      else (p, c, p / fromIntegral c)
 
+setHashFxSettingData :: FxSettingData -> FxSettingData
+setHashFxSettingData fsd = 
+  fsd { fxSetting = (fxSetting fsd)
+                    { settingHash = hash (fxSetting fsd)
+                    }
+      }

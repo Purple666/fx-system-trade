@@ -53,9 +53,11 @@ gaLearningDataFromLog n fsd = do
           M.toList fsl
   return $ Ga.learningDataList fsl'
 
-updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog profits fsd =
-  let fsl  = Fsd.fxSettingLog fsd
+updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog profits fsd fsdr =
+  let fsl  = M.unionWith (\(p0, c0) (p1, c1) -> if c0 < c1
+                                                then (p1, c1)
+                                                else (p0, c0)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdr) 
       fs   = Fsd.fxSetting fsd
   in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
                               if M.member fs fsl
@@ -126,10 +128,7 @@ mutationFxSettingData x _ =
 setHashFxSettingData :: Ga.LearningData Fsd.FxSettingData ->
                         Ga.LearningData Fsd.FxSettingData
 setHashFxSettingData x =
-  Ga.LearningData . L.nub . L.map (\(fsd, p) -> (fsd { Fsd.fxSetting = (Fsd.fxSetting fsd)
-                                                                       { Fsd.settingHash = hash (Fsd.fxSetting fsd)
-                                                                       }
-                                                     }, p)) $ Ga.getLearningData x
+  Ga.LearningData . L.nub . L.map (\(fsd, p) -> (Fsd.setHashFxSettingData fsd, p)) $ Ga.getLearningData x
 
 crossoverFxSettingData :: MonadRandom m =>
                           Ga.LearningData Fsd.FxSettingData ->
