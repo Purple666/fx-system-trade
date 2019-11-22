@@ -22,15 +22,15 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taRandomMargin        = 5
+  GlobalSettingData { taRandomMargin        = 10
                     , taMiddleLongMargin    = 6
                     , makeTreeCount         = 3
                     , algorithmRepeat       = 3
-                    , learningTestCount     = 10
+                    , learningTestCount     = 20
                     , countUpList           = 2
                     , quantityRate          = 5
-                    , treeAndRate           = 1
-                    , treeOrRate            = 1
+                    , treeAndRate           = 5
+                    , treeOrRate            = 3
                     , fxSettingLogNum       = 100
                     , gaNum                 = 30
                     , maxTradeTime          = 24 * 60 * 5
