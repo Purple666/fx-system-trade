@@ -33,7 +33,8 @@ newtype NodeData = NodeData { getNodeData :: (Int, Bool -> Bool -> Bool) } deriv
 
 newtype LeafDataMap a = LeafDataMap { getLeafDataMap :: M.Map (LeafData a) (Double, Int) } deriving(Show, Read, Eq, Ord, Generic)
 
-instance Hashable a => Hashable (LeafDataMap a)
+instance Hashable a => Hashable (LeafDataMap a) where
+   hashWithSalt _ _ = 0
 
 instance Hashable a => Hashable (LeafData a) where
    hashWithSalt = hashUsing (fst . getLeafData)
@@ -42,7 +43,8 @@ instance Hashable NodeData where
    hashWithSalt = hashUsing (fst . getNodeData)
 
 instance (Hashable k, Hashable a) => Hashable (M.Map k a) where
-   hashWithSalt = hashUsing (hash . M.toList)
+   hashWithSalt _ _ = 0
+   -- hashWithSalt = hashUsing (hash . M.toList)
 
 instance Read (LeafData a) where
   readsPrec _ s = let (a, s') = break (\x -> x ==')' || x ==',' || x ==']' ) s
