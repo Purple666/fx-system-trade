@@ -85,7 +85,7 @@ gaLoop e x = do
   x' <- learningEvaluate <$> geneticOperators e x (LearningData [(maximum x, maximumScore x)])
   -- traceShow("ga", e, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
   if maximumScore x' == maximumScore x
-    then return $ LearningData [(maximum x, maximumScore x)]
+    then return x' -- $ LearningData [(maximum x', maximumScore x')]
     else gaLoop e x'
 
 
