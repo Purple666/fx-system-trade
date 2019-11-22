@@ -63,12 +63,12 @@ printTradeResult open close td td' units = do
     (Fcd.no (Ftd.chart td') - Fcd.no (Ftd.tradeRate td))
   printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
-    (Ftd.profit $ td' - td)
+    (Ftd.profit td' - Ftd.profit td)
     (Fcd.close $ Ftd.tradeRate td')
     (Fcd.close $ Ftd.chart td')
     units
     (Ftd.realizedPL td')
-    (Ftd.realizedPL $ td' - td)
+    (Ftd.realizedPL td' - Ftd.realizedPL td)
     (Ftd.trSuccess td')
     (Ftd.trFail td')
     (Ftd.getWinRate td')

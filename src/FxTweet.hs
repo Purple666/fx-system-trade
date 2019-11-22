@@ -31,7 +31,7 @@ tweetClose td td' = do
           (Fcd.close $ Ftd.tradeRate td)
           (Fcd.close $ Ftd.chart td')
           (Ftd.realizedPL td')
-          (Ftd.realizedPL $ td' - td)
+          (Ftd.realizedPL td' - Ftd.realizedPL td)
           (Ftd.getWinRate td')
           (Ftd.trSuccess td')
           (Ftd.trFail td') :: String
@@ -67,7 +67,7 @@ tweetWeek td td' = do
           (Fcd.close $ Ftd.chart td)
           (Fcd.close $ Ftd.chart td')
           (Ftd.realizedPL td')
-          (Ftd.realizedPL $ td' - td)
+          (Ftd.realizedPL td' - Ftd.realizedPL td)
           (Ftd.getWinRate td')
           (Ftd.trSuccess td')
           (Ftd.trFail td') :: String

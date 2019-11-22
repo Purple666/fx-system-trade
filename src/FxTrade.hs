@@ -6,6 +6,7 @@ module FxTrade ( initFxTradeDataBacktest
                , learningEvaluate
                , evaluationOk
                , getChart
+               , getEvaluationValue
                ) where
 
 import           System.Environment
@@ -24,6 +25,16 @@ import qualified FxTradeData             as Ftd
 import qualified Ga
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
+
+getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
+getEvaluationValue fsd td =
+  let lp = Fsd.getLogProfit fsd
+      p = (Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
+  in if lp < 0 && p < 0
+     then -(lp * p)
+     else lp * p
+  --realizedPL x
+  -- profit x
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk tdl fsd =
@@ -322,7 +333,7 @@ gaLearningEvaluate :: Ga.LearningData Fsd.FxSettingData -> Ga.LearningData Fsd.F
 gaLearningEvaluate (Ga.LearningData ld) =
   Ga.LearningData $ L.map (\(fsd, _) -> let ltt = Fsd.learningTestTime $ Fsd.fxSettingChart fsd
                                             fc = Fsd.chart $ Fsd.fxSettingChart fsd
-                                            p = toRational . ((Fsd.getLogProfit fsd + 1) *) . Ftd.getEvaluationValue $ evaluate fsd ltt fc
+                                            p = toRational . getEvaluationValue fsd $ evaluate fsd ltt fc
                                         in (fsd, p)) ld
 
 

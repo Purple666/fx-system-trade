@@ -86,8 +86,8 @@ learningEvaluate :: Int ->
                     IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learningEvaluate n ld = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd
-                                let  p' = Ftd.getEvaluationValue tdl * (Fsd.getLogProfit fsd + 1)
-                                return (p', Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
+                                let p = Ft.getEvaluationValue fsd tdl
+                                return (p, Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
       (pOk, _, tdlOk, fsdOk) = L.maximum r'
       (pNg, _, tdlNg, fsdNg) = L.maximum r

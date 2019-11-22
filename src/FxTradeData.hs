@@ -4,7 +4,7 @@ module FxTradeData
   , FxEnvironment (..)
   , initFxTradeDataCommon
   , getWinRate
-  , getEvaluationValue
+  , getWinRatePure
   ) where
 
 import qualified Data.Map                as M
@@ -34,32 +34,14 @@ data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 
 data FxEnvironment = Backtest | Practice | Production deriving (Show, Read, Eq)
 
-instance Num FxTradeData where
-  x - y = x { unit       = unit       x - unit        y
-            , trSuccess  = trSuccess  x - trSuccess   y
-            , trFail     = trFail     x - trFail      y
-            , profit     = profit     x - profit      y
-            , realizedPL = realizedPL x - realizedPL  y
-            }
-  x + y = x { unit       = unit       x + unit        y
-            , trSuccess  = trSuccess  x + trSuccess   y
-            , trFail     = trFail     x + trFail      y
-            , profit     = profit     x + profit      y
-            , realizedPL = realizedPL x + realizedPL  y
-            }
-
-  fromInteger _ = initFxTradeDataCommon { realizedPL       = 0
-                                        }
-
 instance Eq FxTradeData where
-  x == y = getEvaluationValue x == getEvaluationValue y
+  x == y = realizedPL x == realizedPL y
 
 instance Ord FxTradeData where
   compare x y
-    | getEvaluationValue x == getEvaluationValue y    =  EQ
-    | getEvaluationValue x <= getEvaluationValue y    =  LT
-    | otherwise                                       =  GT
-
+    | realizedPL x == realizedPL y =  EQ
+    | realizedPL x <= realizedPL y =  LT
+    | otherwise                    =  GT
 
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
@@ -78,12 +60,6 @@ initFxTradeDataCommon =
               , bearer              = ""
               , url                 = ""
               }
-
-getEvaluationValue :: FxTradeData -> Double
-getEvaluationValue x =
-  (profit x * realizedPL x * getWinRatePure x ^ 4) / fromIntegral (chartLength x)
-  --realizedPL x
-  -- profit x
 
 getWinRatePure :: FxTradeData -> Double
 getWinRatePure x =
