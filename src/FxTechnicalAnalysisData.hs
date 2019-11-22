@@ -59,9 +59,14 @@ data FxMovingAverageData = FxMovingAverageData
 
 data FxTradePosition = None | Buy | Sell deriving (Show, Read, Eq, Generic)
 
-instance Hashable FxTechnicalAnalysisData
-instance Hashable FxMovingAverageData
-instance Hashable FxTradePosition
+instance Hashable FxTechnicalAnalysisData where
+     hashWithSalt _ _ = 0
+
+instance Hashable FxMovingAverageData where
+     hashWithSalt _ _ = 0
+     
+instance Hashable FxTradePosition  where
+     hashWithSalt _ _ = 0
 
 data FxTechnicalAnalysisSetting =
   FxTechnicalAnalysisSetting { techAnaTree    :: Tr.TreeData (M.Map Int FxAlgorithmSetting, M.Map Int FxTechnicalAnalysisData)
