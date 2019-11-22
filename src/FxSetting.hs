@@ -38,7 +38,7 @@ gaLearningDataFromLog n fsd = do
   let fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
             then Fsd.fxSettingLog fsd
             else M.insert (Fsd.fxSetting fsd) (1, 1) $ Fsd.fxSettingLog fsd
-  fsl' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n fsd { Fsd.fxSetting = fs }
+  fsl' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs }
                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p
                                                                                                   , Fsd.logCount  = c
                                                                                                   }

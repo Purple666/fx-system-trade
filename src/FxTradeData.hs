@@ -5,7 +5,6 @@ module FxTradeData
   , initFxTradeDataCommon
   , getWinRate
   , getEvaluationValue
-  , getEvaluationValueList
   ) where
 
 import qualified Data.Map                as M
@@ -84,10 +83,6 @@ getEvaluationValue :: FxTradeData -> Double
 getEvaluationValue x =
   profit x
   -- (profit x * realizedPL x * getWinRatePure x ^ 4) / fromIntegral (chartLength x)
-
-getEvaluationValueList :: [FxTradeData] -> Double
-getEvaluationValueList tdlt =
-  sum $ map getEvaluationValue tdlt
 
 getWinRatePure :: FxTradeData -> Double
 getWinRatePure x =

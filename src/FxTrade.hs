@@ -25,10 +25,9 @@ import qualified Ga
 import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
 
-evaluationOk :: [Ftd.FxTradeData] -> Fsd.FxSettingData -> Bool
-evaluationOk tdlt fsd =
-  -- L.and $ L.map (\x -> Gsd.initalProperty Gsd.gsd  < Ftd.realizedPL x) tdlt
-  0 < (sum $ map Ftd.profit tdlt)
+evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
+evaluationOk tdl fsd =
+  Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdl
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
@@ -257,7 +256,7 @@ backTest :: Int ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
-  let ltt = Ta.getLearningTestTime fsd -- * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
@@ -296,18 +295,17 @@ evaluate fsd ltt fc =
      then td
      else td3 { Ftd.chartLength = ltt }
 
-getChart :: Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
-getChart n fsd = do
-  let ltt = Ta.getLearningTestTime fsd
+getChart :: Int -> Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
+getChart n c fsd = do
+  let ltt = Ta.getLearningTestTime fsd * c
       lttp = Ta.getPrepareTimeAll fsd + ltt
-  n' <- R.getRandomR(n - lttp * 2 * Gsd.learningTestCount Gsd.gsd , n - lttp)
-  fc <- Fr.getChartList n' lttp
+  fc <- Fr.getChartList (n - lttp) lttp
   return (ltt, fc)
 
-learningEvaluate :: Int -> Fsd.FxSettingData -> IO [Ftd.FxTradeData]
-learningEvaluate n fsd =
-  R.mapM (\_ -> do (ltt, fc) <- getChart n fsd
-                   return $ evaluate fsd ltt fc) [1 ..  (Gsd.learningTestCount Gsd.gsd)]
+learningEvaluate :: Int -> Fsd.FxSettingData -> IO Ftd.FxTradeData
+learningEvaluate n fsd = do
+  (ltt, fc) <- getChart n (Gsd.learningTestCount Gsd.gsd) fsd
+  return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->

@@ -19,8 +19,8 @@ import           Text.Printf
 
 
 printTestProgress :: Fsd.FxSettingData -> Fsd.FxSettingData ->
-                     Ftd.FxTradeData -> Ftd.FxTradeData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printTestProgress fsd fsdo td tdt tdlt oknum lok ok = do
+                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printTestProgress fsd fsdo td tdt tdl oknum lok ok = do
   let ltt = Ta.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
@@ -33,15 +33,15 @@ printTestProgress fsd fsdo td tdt tdlt oknum lok ok = do
     (Fcd.close $ Ftd.chart tdt)
     (show (Ftd.side tdt))
   printFxTradeData tdt
-  printFxTradeData $ sum tdlt
+  printFxTradeData tdl
   printf "| %3d %c %c %3d %3d\n" oknum (head $ show lok) (head $ show ok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
-printLearningFxTradeData :: Fsd.FxSettingData -> [Ftd.FxTradeData] -> Int -> Bool -> Bool -> IO ()
-printLearningFxTradeData fsd tdlt oknum lok ok = do
+printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData fsd tdl oknum lok ok = do
   let ltt = Ta.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   printf "%s : " =<< Ftm.getLogTime
-  printFxTradeData $ sum tdlt
+  printFxTradeData tdl
   printf "%6d %3d %c %c %3d %3d\n" ltt oknum (head $ show lok) (head $ show ok) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls)
 
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
