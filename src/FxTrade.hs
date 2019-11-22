@@ -30,9 +30,11 @@ getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
   let lp = Fsd.getLogProfit fsd
       p = (Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
-  in if lp < 0 && p < 0
-     then -(lp * p)
-     else lp * p
+  in if lp == 0
+     then p
+     else if lp < 0 && p < 0
+          then -(lp * p)
+          else lp * p
   --realizedPL x
   -- profit x
 
