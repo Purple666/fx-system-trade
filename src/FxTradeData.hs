@@ -34,15 +34,6 @@ data FxSide = None | Buy | Sell | Close deriving (Show, Read, Eq)
 
 data FxEnvironment = Backtest | Practice | Production deriving (Show, Read, Eq)
 
-instance Eq FxTradeData where
-  x == y = realizedPL x == realizedPL y
-
-instance Ord FxTradeData where
-  compare x y
-    | realizedPL x == realizedPL y =  EQ
-    | realizedPL x <= realizedPL y =  LT
-    | otherwise                    =  GT
-
 initFxTradeDataCommon :: FxTradeData
 initFxTradeDataCommon =
   FxTradeData { chart               = Fcd.initFxChartData

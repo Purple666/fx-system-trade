@@ -89,8 +89,8 @@ learningEvaluate n ld = do
                                 let p = Ft.getEvaluationValue fsd tdl
                                 return (p, Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
-      (pOk, _, tdlOk, fsdOk) = L.maximum r'
-      (pNg, _, tdlNg, fsdNg) = L.maximum r
+      (_, _, tdlOk, fsdOk) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) r'
+      (_, _, tdlNg, fsdNg) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) r
   return $ if L.null r'
            then (False, 0,           tdlNg, fsdNg)
            else (True,  L.length r', tdlOk, fsdOk)
