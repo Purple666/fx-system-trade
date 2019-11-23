@@ -39,8 +39,8 @@ getEvaluationValue fsd td =
   Ftd.profit td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
-evaluationOk tdl fsd =
-  0 < getEvaluationValue fsd tdl && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdl && 0.5 < Ftd.getWinRatePure tdl
+evaluationOk td fsd =
+  0 < getEvaluationValue fsd td && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td && 0.5 < Ftd.getWinRatePure td
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
@@ -269,7 +269,7 @@ backTest :: Int ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
-  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd -- * Gsd.learningTestCount Gsd.gsd
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
