@@ -40,7 +40,7 @@ getEvaluationValue fsd td =
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk tdl fsd =
-  0 < getEvaluationValue fsd tdl && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdl && 0.5 < Ftd.getWinRatePure td
+  0 < getEvaluationValue fsd tdl && Gsd.initalProperty Gsd.gsd < Ftd.realizedPL tdl && 0.5 < Ftd.getWinRatePure tdl
   
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
