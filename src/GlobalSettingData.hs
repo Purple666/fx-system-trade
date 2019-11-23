@@ -24,14 +24,14 @@ gsd :: GlobalSettingData
 gsd =
   GlobalSettingData { taRandomMargin        = 3
                     , taMiddleLongMargin    = 6
-                    , makeTreeCount         = 3
+                    , makeTreeCount         = 2
                     , algorithmRepeat       = 3
-                    , learningTestCount     = 20
+                    , learningTestCount     = 50
                     , countUpList           = 2
                     , quantityRate          = 5
                     , treeAndRate           = 1
                     , treeOrRate            = 1
-                    , fxSettingLogNum       = 20
+                    , fxSettingLogNum       = 10
                     , gaNum                 = 20
                     , maxTradeTime          = 24 * 60 * 5
                     , initalProperty        = 3000000
