@@ -105,7 +105,7 @@ initFxSettingChart =
 plusLearningTestTimes :: FxSettingData -> FxSettingData
 plusLearningTestTimes fsd =
   fsd { fxSetting = plusLearningTestTimes2 $ fxSetting fsd
-      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
+       , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
       }
 
 plusLearningTestTimes2 :: FxSetting -> FxSetting
