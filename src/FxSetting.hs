@@ -60,7 +60,9 @@ updateFxSettingLog profits fsd fsdr =
   in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
                               if M.member fs fsl
                               then M.adjust (\(p, c) -> (p + profits, c + 1)) fs fsl
-                              else M.insert fs (profits, 1) fsl
+                              else if 0 < profits
+                                   then M.insert fs (profits, 1) fsl
+                                   else fsl
          }
 
 choice1 :: [Bool] -> Int -> b -> b -> b

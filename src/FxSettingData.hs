@@ -71,7 +71,7 @@ data FxLearningSetting =
                     , numTraderadeDate  :: Int
                     , logProfit         :: Double
                     , logCount          :: Int
-                    } deriving (Show, Read, Eq, Ord, Generic)
+                    } deriving (Show, Read, Generic)
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
@@ -175,3 +175,4 @@ setHashFxSettingData fsd =
                     { settingHash = hash (fxSetting fsd)
                     }
       }
+

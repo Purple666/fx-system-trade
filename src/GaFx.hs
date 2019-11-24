@@ -29,7 +29,8 @@ import           Text.Printf
 
 statistics :: IO ()
 statistics = do
-  let td = Ft.initFxTradeDataBacktest
+  let fsd = Fs.updateFxSettingLog 1.0 Fsd.initFxSettingData Fsd.initFxSettingData
+  Fm.writeFxSettingData fsd
   fsd <- Fm.readFxSettingData
   Prelude.mapM (\(p, c) -> printf "%f %d\n" p c) $ Fsd.fxSettingLog fsd
   return ()
