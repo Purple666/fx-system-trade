@@ -5,7 +5,6 @@ data GlobalSettingData = GlobalSettingData
   , taMiddleLongMargin :: Int
   , makeTreeCount      :: Int
   , algorithmRepeat    :: Int
-  , learningTestCount  :: Int
   , treeAndRate        :: Int
   , treeOrRate         :: Int
   , countUpList        :: Double
@@ -26,7 +25,6 @@ gsd =
                     , taMiddleLongMargin    = 6
                     , makeTreeCount         = 2
                     , algorithmRepeat       = 2
-                    , learningTestCount     = 50
                     , countUpList           = 2
                     , quantityRate          = 5
                     , treeAndRate           = 1

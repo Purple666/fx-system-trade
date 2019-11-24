@@ -41,7 +41,7 @@ backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * (Fsd.getLearningTestCount fsd) * 2
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (tdt, fsd') <- backTestLoop startN endN td fsd
@@ -67,7 +67,7 @@ tradeSim :: IO ()
 tradeSim = do
   fsd <- Fm.readFxSettingData
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * (Fsd.getLearningTestCount fsd) * 2
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (_, fsd) <- tradeSimLearning startN fsd
   (s, f) <- Fm.readBacktestResult "trade_sim"
@@ -105,7 +105,7 @@ learningLoop c n ld = do
     then return (False, True, plok, tdl, Fsd.plusLearningTestTimes fsd)
     else if Fsd.getLearningTestTimes fsd < fromIntegral c || Ga.maximumScore ld == Ga.maximumScore ld'
          then return (False, False, plok, tdl, Fsd.plusLearningTestTimes fsd)
-         else learningLoop (c + 1) n ld'
+         else learningLoop (c + 1) n $ Fsd.plusLearningTestCount ld'
 
 learning :: Int ->
             Fsd.FxSettingData ->
@@ -115,7 +115,7 @@ learning n fsd = do
   (ok, plok, tdl, fsd') <- learningEvaluate n ld
   if ok
     then return (True, True, plok, tdl, fsd')
-    else learningLoop 0 n ld
+    else learningLoop 0 n $ Fsd.plusLearningTestCount ld
 
 tradeLearning :: Fsd.FxSettingData -> IO (Bool, Fsd.FxSettingData)
 tradeLearning fsd = do
@@ -193,7 +193,7 @@ tradeLoop pc p sleep td fsd = do
                           then do (td', fsd1) <- tradeEvaluate td fsd e
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
-  let ltt = Ta.getLearningTestTime fsd2 * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd2 * Fsd.getLearningTestCount fsd
   (ok', p', fsd3) <- if Ftd.profit td'' < Ftd.profit td || ltt < (Fcd.no e) - p 
                 then do (ok, fsd3) <- tradeLearning fsd2
                         return (ok, Fcd.no e, fsd3)
@@ -233,7 +233,7 @@ tradeSimLoop :: Int ->
                 IO Ftd.FxTradeData
 tradeSimLoop n p endN td fsd = do
   (td', fsd1) <- tradeSimEvaluate n td fsd
-  let ltt = Ta.getLearningTestTime fsd1 * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd1 * Fsd.getLearningTestCount fsd
   (ok', p', fsd3) <- if Ftd.profit td' < Ftd.profit td || ltt < n - p
                      then do (ok, fsd2) <- tradeSimLearning n fsd1
                              return (ok, n, fsd2)

@@ -268,7 +268,7 @@ backTest :: Int ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
-  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd * Fsd.getLearningTestCount fsd
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
@@ -316,7 +316,7 @@ getChart n c fsd = do
 
 learningEvaluate :: Int -> Fsd.FxSettingData -> IO Ftd.FxTradeData
 learningEvaluate n fsd = do
-  (ltt, fc) <- getChart n (Gsd.learningTestCount Gsd.gsd) fsd
+  (ltt, fc) <- getChart n (Fsd.getLearningTestCount fsd) fsd
   return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->
