@@ -37,7 +37,6 @@ getEvaluationValue fsd td =
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
-  (fromIntegral $ Fsd.getLearningTestTimes fsd) < Ftd.profit td &&
   50 < Ftd.getWinRate td &&
   Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td
   
