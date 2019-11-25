@@ -28,14 +28,7 @@ import qualified Tree                    as Tr
 
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
-  Ftd.profit td
-{-  
-  let lp = Fsd.getLogProfit fsd
-      p = Ftd.profit td -- * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) -- / fromIntegral (Ftd.chartLength td)
-  in if lp < 0 && p < 0
-     then -(lp * p)
-     else lp * p
--}
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
