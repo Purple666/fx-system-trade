@@ -35,24 +35,29 @@ instance Ga.Ga Fsd.FxSettingData where
 
 gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData)
 gaLearningDataFromLog n fsd = do
-  let minp = L.minimum . map fst . M.elems $ Fsd.fxSettingLog fsd
-      maxp = L.maximum . map fst . M.elems $ Fsd.fxSettingLog fsd
-      maxc = L.maximum . map snd . M.elems $ Fsd.fxSettingLog fsd
-      fsl = if M.member (Fsd.fxSetting fsd) (Fsd.fxSettingLog fsd)
-            then Fsd.fxSettingLog fsd
-            else M.insert (Fsd.fxSetting fsd) (maxp, maxc) $ Fsd.fxSettingLog fsd
-  fsl' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs }
-                                    let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p + minp
-                                                                                                  , Fsd.logCount  = c
-                                                                                                  }
-                                                 }
-                                        fsd' = fsd { Fsd.fxSetting = fs'
-                                                   , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart            = fc
-                                                                                             , Fsd.learningTestTime = ltt
-                                                                                             }
-                                                   }
-                                    return $ Ga.learningData fsd') $ M.toList fsl
-  return $ Ga.learningDataList fsl'
+  let fsl = Fsd.fxSettingLog fsd
+      maxp = if M.null fsl
+             then 1
+             else L.maximum . map fst $ M.elems fsl
+      maxc = if M.null fsl
+             then 1
+             else L.maximum . map snd $ M.elems fsl
+      fsl' = if M.member (Fsd.fxSetting fsd) fsl
+             then fsl
+             else M.insert (Fsd.fxSetting fsd) (maxp, maxc) fsl
+      minp = L.minimum . map fst $ M.elems fsl
+  fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs }
+                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p + minp
+                                                                                                   , Fsd.logCount  = c
+                                                                                                   }
+                                                  }
+                                         fsd' = fsd { Fsd.fxSetting = fs'
+                                                    , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart            = fc
+                                                                                              , Fsd.learningTestTime = ltt
+                                                                                              }
+                                                    }
+                                     return $ Ga.learningData fsd') $ M.toList fsl'
+  return $ Ga.learningDataList fsl''
 
 updateFxSettingLog :: Bool -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog ok profits fsd fsdr =
