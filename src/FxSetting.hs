@@ -45,7 +45,7 @@ gaLearningDataFromLog n fsd = do
       fsl' = if M.member (Fsd.fxSetting fsd) fsl
              then fsl
              else M.insert (Fsd.fxSetting fsd) (maxp, maxc) fsl
-      minp = L.minimum . map fst $ M.elems fsl'
+      minp = abs . L.minimum . map fst $ M.elems fsl'
   fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs }
                                      let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p + minp
                                                                                                    , Fsd.logCount  = c
