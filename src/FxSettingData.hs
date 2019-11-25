@@ -116,6 +116,7 @@ plusLearningTestTimes2 :: FxSetting -> FxSetting
 plusLearningTestTimes2 fs =
   fs { learningSetting = (learningSetting fs) {
          learningTestTimes = learningTestTimes (learningSetting fs) + 1
+         learningTestCount = learningTestCount (learningSetting fs) + 1
          }
      }
 
@@ -127,7 +128,7 @@ plusLearningTestCount x =
 plusLearningTestCount2 :: FxSettingData -> FxSettingData
 plusLearningTestCount2 fsd =
   fsd { fxSetting = plusLearningTestCount3 $ fxSetting fsd
-      , fxSettingLog = M.mapKeys (\fs -> plusLearningTestCount3 fs)  $ fxSettingLog fsd
+      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestCount3 fs)  $ fxSettingLog fsd
       }
 
 plusLearningTestCount3 :: FxSetting -> FxSetting
