@@ -186,8 +186,10 @@ tradeEvaluate p td fsd e = do
             fsd3 <- Fs.updateFxSettingLog ok (Ftd.profit td'' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
             Fm.writeFxSettingData fsd3
             return (Fcd.no e, td'', fsd3)
-    else do printf "\n"
-            return (p, td'', fsd1)
+    else if open /= Ftd.None
+         then do printf "\n"
+                 return (p, td'', fsd1)
+         else return (p, td'', fsd1)
 
 tradeSimEvaluate :: Int ->
                     Int -> 
@@ -207,8 +209,10 @@ tradeSimEvaluate n p td fsd = do
             fsd3 <- Fs.updateFxSettingLog ok (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
             Fm.writeFxSettingData fsd3
             return (n, td', fsd3)
-    else do printf "\n"
-            return (p, td', fsd1)
+    else if open /= Ftd.None
+         then do printf "\n"
+                 return (p, td', fsd1)
+         else return (p, td', fsd1)
 
 tradeLoop :: Fcd.FxChartData ->
              Int ->
