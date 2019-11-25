@@ -68,7 +68,7 @@ updateFxSettingLog ok profits fsd fsdr =
   in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
                               if M.member fs fsl
                               then M.adjust (\(p, c) -> (p + profits, c + 1)) fs fsl
-                              else if 0 < profits || ok
+                              else if profits /= 0 || ok
                                    then M.insert fs (profits, 1) fsl
                                    else fsl
          }
