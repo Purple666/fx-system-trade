@@ -103,8 +103,7 @@ createInitialGaData :: MonadRandom m =>
                        Ga.LearningData Fsd.FxSettingData ->
                        m (Ga.LearningData Fsd.FxSettingData)
 createInitialGaData n x =
-  Ga.learningDataList .
-  L.concat <$>
+  (Ga.learningDataList . L.take n . L.concat) <$>
   R.mapM (\_ -> R.mapM createRandomGaData $ Ga.getGaDataList x) [0 .. (n `div` length x)]
 
 copyFxSettingData :: MonadRandom m =>
