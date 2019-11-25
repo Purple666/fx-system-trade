@@ -114,10 +114,10 @@ plusLearningTestTimes fsd =
 
 plusLearningTestTimes2 :: FxSetting -> FxSetting
 plusLearningTestTimes2 fs =
-  fs { learningSetting = (learningSetting fs) {
-         learningTestTimes = learningTestTimes (learningSetting fs) + 1
-         learningTestCount = learningTestCount (learningSetting fs) + 1
-         }
+  fs { learningSetting = (learningSetting fs)
+       { learningTestTimes = learningTestTimes (learningSetting fs) + 1
+       , learningTestCount = learningTestCount (learningSetting fs) + 1
+       }
      }
 
 plusLearningTestCount :: Ga.LearningData FxSettingData ->
