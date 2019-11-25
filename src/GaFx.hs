@@ -194,7 +194,7 @@ tradeLoop pc p sleep td fsd = do
                                   return (0, td', fsd1)
                           else return (sleep + 1, td, fsd)
   let ltt = Ta.getLearningTestTime fsd2 * Fsd.getLearningTestCount fsd2
-  (p', fsd5) <- if Ftd.profit td'' < Ftd.profit td || ltt < (Fcd.no e) - p 
+  (p', fsd5) <- if Ftd.profit td'' /=  Ftd.profit td || ltt < (Fcd.no e) - p 
                 then do (ok, fsd3) <- tradeLearning fsd2
                         fsd4 <- Fs.updateFxSettingLog ok (Ftd.profit td'' - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
                         Fm.writeFxSettingData fsd4
@@ -232,7 +232,7 @@ tradeSimLoop :: Int ->
 tradeSimLoop n p endN td fsd = do
   (td', fsd1) <- tradeSimEvaluate n td fsd
   let ltt = Ta.getLearningTestTime fsd1 * Fsd.getLearningTestCount fsd1
-  (p', fsd4) <- if Ftd.profit td' < Ftd.profit td || ltt < n - p
+  (p', fsd4) <- if Ftd.profit td' /= Ftd.profit td || ltt < n - p
                 then do (ok, fsd2) <- tradeSimLearning n fsd1
                         fsd3 <- Fs.updateFxSettingLog ok (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
                         Fm.writeFxSettingData fsd3
