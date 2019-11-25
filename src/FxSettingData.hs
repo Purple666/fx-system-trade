@@ -143,7 +143,7 @@ getLearningTestTimes fsd =
 
 getLearningTestCount :: FxSettingData -> Int
 getLearningTestCount fsd =
-  learningTestCount . learningSetting $ fxSetting fsd
+  (learningTestCount . learningSetting $ fxSetting fsd) * (learningTestTimes . learningSetting $ fxSetting fsd)
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
