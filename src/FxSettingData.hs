@@ -127,7 +127,7 @@ plusLearningTestCount x =
 plusLearningTestCount2 :: FxSettingData -> FxSettingData
 plusLearningTestCount2 fsd =
   fsd { fxSetting = plusLearningTestCount3 $ fxSetting fsd
-      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestCount3 fs)  $ fxSettingLog fsd
+      , fxSettingLog = M.mapKeys (\fs -> plusLearningTestCount3 fs)  $ fxSettingLog fsd
       }
 
 plusLearningTestCount3 :: FxSetting -> FxSetting
