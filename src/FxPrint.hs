@@ -39,6 +39,7 @@ printTestProgress fsd td tdt tdl oknum lok ok fsde = do
 
 printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> Bool -> IO ()
 printLearningFxTradeData fsd tdl oknum lok ok fsde = do
+  printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
   printLearningResult fsd tdl oknum lok ok fsde
 
