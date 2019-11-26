@@ -28,16 +28,18 @@ import qualified Tree                    as Tr
 
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
-  -- (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
-  Ftd.profit td
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
+  -- Ftd.profit td
 
 getGaEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getGaEvaluationValue fsd td = 
-  Ftd.profit td
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
+  -- Ftd.profit td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   (fromIntegral $ Fsd.getLearningTestTimes fsd) < Ftd.profit td &&
+  0 <= (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
   50 < Ftd.getWinRate td &&
   Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td
   
