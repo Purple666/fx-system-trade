@@ -52,10 +52,9 @@ gaLearningDataFromLog n fsd = do
                                                                                                    }
                                                   }
                                          fsd' = fsd { Fsd.fxSetting = fs'
-                                                    , Fsd.fxSettingChart = Fsd.FxSettingChart { Fsd.chart             = fc
-                                                                                              , Fsd.learningTestTime  = ltt
-                                                                                              , Fsd.resultFxTradeData = Ftd.initFxTradeDataCommon
-                                                                                              }
+                                                    , Fsd.fxSettingChart = (Fsd.fxSettingChart fsd) { Fsd.chart             = fc
+                                                                                                    , Fsd.learningTestTime  = ltt
+                                                                                                    }
                                                     }
                                      return $ Ga.learningData fsd') $ M.toList fsl'
   return $ Ga.learningDataList fsl''
