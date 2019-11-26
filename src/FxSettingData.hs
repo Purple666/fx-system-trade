@@ -90,8 +90,8 @@ initFxSetting :: FxSetting
 initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
-            , learningSetting = FxLearningSetting { learningTestTimes  = 10
-                                                  , learningTestCount  = 10
+            , learningSetting = FxLearningSetting { learningTestTimes  = 30
+                                                  , learningTestCount  = 1
                                                   , totalTradeDate     = 0
                                                   , numTraderadeDate   = 0
                                                   , logProfit          = 0
