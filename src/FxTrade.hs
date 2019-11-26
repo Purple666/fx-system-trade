@@ -36,7 +36,7 @@ getGaEvaluationValue fsd td =
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
-  0 < getEvaluationValue td fsd &&
+  0 < getEvaluationValue fsd td &&
   0 <= (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
   50 < Ftd.getWinRate td &&
   Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td
