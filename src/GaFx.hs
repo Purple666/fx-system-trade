@@ -104,7 +104,7 @@ learningLoop c n ld = do
   (ok, plok, tdl, fsd) <- learningEvaluate n ld'
   if ok
     then return (False, True, plok, tdl, fsd)
-    else if Fsd.getLearningTestTimes fsd < fromIntegral c -- || Ga.maximumScore ld' == Ga.maximumScore ld
+    else if Fsd.getLearningTestTimes fsd < fromIntegral c
          then return (False, False, plok, tdl, Fsd.plusLearningTestTimes fsd)
          else learningLoop (c + 1) n $ Fsd.plusLearningTestCount ld'
 
@@ -112,14 +112,7 @@ learning :: Int ->
             Fsd.FxSettingData ->
             IO (Bool, Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd = do
-  ld <- Fs.gaLearningDataFromLog n fsd
-  learningLoop 0 n ld
-  {- 
-  (ok, plok, tdl, fsd') <- learningEvaluate n ld
-  if ok
-    then return (True, True, plok, tdl, fsd')
-    else learningLoop 0 n $ Fsd.plusLearningTestCount ld
-  -}
+  learningLoop 0 n =<< Fs.gaLearningDataFromLog n fsd
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> IO (Bool, Fsd.FxSettingData)
 tradeLearning e fsd = do
