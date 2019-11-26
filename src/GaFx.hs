@@ -103,7 +103,7 @@ learningLoop c n ld = do
   ld' <- Ga.learning ld
   (ok, plok, tdl, fsd) <- learningEvaluate n ld'
   if ok
-    then return (False, True, plok, tdl, Fsd.plusLearningTestTimes fsd)
+    then return (False, True, plok, tdl, fsd)
     else if Fsd.getLearningTestTimes fsd < fromIntegral c || Ga.maximumScore ld' == Ga.maximumScore ld
          then return (False, False, plok, tdl, Fsd.plusLearningTestTimes fsd)
          else learningLoop (c + 1) n $ Fsd.plusLearningTestCount ld'
