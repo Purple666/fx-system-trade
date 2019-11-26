@@ -6,11 +6,9 @@ module FxSettingData
   , FxLearningSetting (..)
   , FxSettingChart(..)
   , initFxSettingData
-  , plusLearningTestTimes
   , plusLearningTestCount
   , initFxSetting
   , initFxSettingChart
-  , getLearningTestTimes
   , getLearningTestCount
   , getLogProfit
   , getLogProfitAve
@@ -70,8 +68,7 @@ instance Hashable FxSetting where
   hashWithSalt s (FxSetting _ _ _ d e f) = s `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
-  FxLearningSetting { learningTestTimes :: Int
-                    , learningTestCount :: Int
+  FxLearningSetting { learningTestCount :: Int
                     , totalTradeDate    :: Int
                     , numTraderadeDate  :: Int
                     , logProfit         :: Double
@@ -90,8 +87,7 @@ initFxSetting :: FxSetting
 initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
-            , learningSetting = FxLearningSetting { learningTestTimes  = 30
-                                                  , learningTestCount  = 1
+            , learningSetting = FxLearningSetting { learningTestCount  = 1
                                                   , totalTradeDate     = 0
                                                   , numTraderadeDate   = 0
                                                   , logProfit          = 0
@@ -108,19 +104,6 @@ initFxSettingChart =
                  , learningTestTime  = 0
                  , resultFxTradeData = Ftd.initFxTradeDataCommon
                  }
-
-plusLearningTestTimes :: FxSettingData -> FxSettingData
-plusLearningTestTimes fsd =
-  fsd { fxSetting = plusLearningTestTimes2 $ fxSetting fsd
-      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestTimes2 fs)  $ fxSettingLog fsd
-      }
-
-plusLearningTestTimes2 :: FxSetting -> FxSetting
-plusLearningTestTimes2 fs =
-  fs { learningSetting = (learningSetting fs)
-       { learningTestTimes = learningTestTimes (learningSetting fs) + 1
-       }
-     }
 
 plusLearningTestCount :: Ga.LearningData FxSettingData ->
                          Ga.LearningData FxSettingData
@@ -139,10 +122,6 @@ plusLearningTestCount3 fs =
          learningTestCount = learningTestCount (learningSetting fs) + 1
          }
      }
-
-getLearningTestTimes :: FxSettingData -> Int
-getLearningTestTimes fsd =
-  learningTestTimes . learningSetting $ fxSetting fsd
 
 getLearningTestCount :: FxSettingData -> Int
 getLearningTestCount fsd =

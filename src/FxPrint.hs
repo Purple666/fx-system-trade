@@ -84,7 +84,7 @@ printFxTradeData td =
 printLearningResult :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
 printLearningResult fsd tdl oknum ok fsde = do
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  printf "| %3d %c %c %3d %3d %3d\n" oknum (head $ show ok) (head $ show fsde) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls) (Fsd.learningTestCount ls)
+  printf "| %3d %c %c %3d %3d\n" oknum (head $ show ok) (head $ show fsde) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestCount ls)
 
 printBackTestResult :: String -> Ftd.FxTradeData -> Int -> Int -> Fsd.FxSettingData ->  IO ()
 printBackTestResult bar tdt s f fsd = do

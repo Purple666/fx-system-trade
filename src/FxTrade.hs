@@ -38,7 +38,7 @@ evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
   Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
-  (fromIntegral $ Fsd.getLearningTestTimes fsd) * (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.profit td
+  (fromIntegral $ Fsd.getLearningTestCount fsd) * (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.profit td
 
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
