@@ -98,27 +98,27 @@ learningEvaluate n ld = do
 learningLoop :: Int ->
                 Int ->
                 Ga.LearningData Fsd.FxSettingData ->
-                IO (Bool, Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
+                IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learningLoop c n ld = do
   ld' <- Ga.learning ld
-  (ok, plok, tdl, fsd) <- learningEvaluate n ld'
+  (ok, oknum, tdl, fsd) <- learningEvaluate n ld'
   if ok
-    then return (False, True, plok, tdl, fsd)
+    then return (True, oknum, tdl, fsd)
     else if Fsd.getLearningTestTimes fsd < fromIntegral c || Ga.maximumScore ld' == Ga.maximumScore ld
-         then return (False, False, plok, tdl, Fsd.plusLearningTestTimes fsd)
+         then return (False, oknum, tdl, fsd)
          else learningLoop (c + 1) n $ Fsd.plusLearningTestCount ld'
 
 learning :: Int ->
             Fsd.FxSettingData ->
-            IO (Bool, Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
+            IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd = do
   learningLoop 0 n =<< Fs.gaLearningDataFromLog n fsd
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> IO (Bool, Fsd.FxSettingData)
 tradeLearning e fsd = do
-  (lok, ok, oknum, tdl, fsd') <- learning (Fcd.no e) fsd
-  Fp.printLearningFxTradeData fsd' tdl oknum lok ok (fsd' == fsd)
-  return (lok || ok, fsd')
+  (ok, oknum, tdl, fsd') <- learning (Fcd.no e) fsd
+  Fp.printLearningFxTradeData fsd' tdl oknum ok (fsd' == fsd)
+  return (ok, fsd')
 
 backTestLoop :: Int ->
                 Int ->
@@ -126,11 +126,11 @@ backTestLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop n endN td fsd = do
-  (lok, ok, oknum, tdl, fsd2) <- learning n fsd
+  (ok, oknum, tdl, fsd2) <- learning n fsd
   (fsd3, tdt) <- Ft.backTest n td fsd2
-  fsd4 <- Fs.updateFxSettingLog (lok || ok) (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+  fsd4 <- Fs.updateFxSettingLog ok (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
   Fm.writeFxSettingData fsd4
-  Fp.printTestProgress fsd4 td tdt tdl oknum lok ok (fsd4 == fsd)
+  Fp.printTestProgress fsd4 td tdt tdl oknum ok (fsd4 == fsd)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd4)

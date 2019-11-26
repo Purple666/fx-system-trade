@@ -19,8 +19,8 @@ import           Text.Printf
 
 
 printTestProgress :: Fsd.FxSettingData -> 
-                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> Bool -> IO ()
-printTestProgress fsd td tdt tdl oknum lok ok fsde = do
+                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printTestProgress fsd td tdt tdl oknum ok fsde = do
   let ltt = Ta.getLearningTestTime fsd
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
@@ -35,13 +35,13 @@ printTestProgress fsd td tdt tdl oknum lok ok fsde = do
   printFxTradeData tdt
   printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
-  printLearningResult fsd tdl oknum lok ok fsde
+  printLearningResult fsd tdl oknum ok fsde
 
-printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> Bool -> IO ()
-printLearningFxTradeData fsd tdl oknum lok ok fsde = do
+printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData fsd tdl oknum ok fsde = do
   printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
-  printLearningResult fsd tdl oknum lok ok fsde
+  printLearningResult fsd tdl oknum ok fsde
 
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
@@ -81,10 +81,10 @@ printFxTradeData td =
   (Ftd.trFail td)
   (Ftd.getWinRate td)
 
-printLearningResult :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> Bool -> IO ()
-printLearningResult fsd tdl oknum lok ok fsde = do
+printLearningResult :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printLearningResult fsd tdl oknum ok fsde = do
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  printf "| %3d %c %c %c %3d %3d %3d\n" oknum (head $ show lok) (head $ show ok) (head $ show fsde) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls) (Fsd.learningTestCount ls)
+  printf "| %3d %c %c %3d %3d %3d\n" oknum (head $ show ok) (head $ show fsde) (length $ Fsd.fxSettingLog fsd) (Fsd.learningTestTimes ls) (Fsd.learningTestCount ls)
 
 printBackTestResult :: String -> Ftd.FxTradeData -> Int -> Int -> Fsd.FxSettingData ->  IO ()
 printBackTestResult bar tdt s f fsd = do
