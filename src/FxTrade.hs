@@ -30,6 +30,10 @@ getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
   (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
 
+getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
+getGaEvaluationValue fsd td
+  Ftd.profit td * Ftd.trSuccess td
+
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   (fromIntegral $ Fsd.getLearningTestTimes fsd) < Ftd.profit td &&
@@ -337,7 +341,7 @@ gaLearningEvaluate (Ga.LearningData ld) =
                                                            Fsd.resultFxTradeData = td
                                                            }
                                                        }
-                                            p = toRational $ getEvaluationValue fsd td
+                                            p = toRational $ getGaEvaluationValue fsd td
                                         in (fsd', p)) ld
 
 
