@@ -329,8 +329,13 @@ gaLearningEvaluate :: Ga.LearningData Fsd.FxSettingData -> Ga.LearningData Fsd.F
 gaLearningEvaluate (Ga.LearningData ld) =
   Ga.LearningData $ L.map (\(fsd, _) -> let ltt = Fsd.learningTestTime $ Fsd.fxSettingChart fsd
                                             fc = Fsd.chart $ Fsd.fxSettingChart fsd
-                                            p = toRational . getEvaluationValue fsd $ evaluate fsd ltt fc
-                                        in (fsd, p)) ld
+                                            td = evaluate fsd ltt fc
+                                            fsd' = fsd { Fsd.fxSettingChart = (Fsd.fxSettingChart fsd) {
+                                                           Fsd.resultFxTradeData = td
+                                                           }
+                                                       }
+                                            p = toRational $ getEvaluationValue fsd td
+                                        in (fsd', p)) ld
 
 
 

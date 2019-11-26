@@ -33,6 +33,7 @@ printTestProgress fsd td tdt tdl oknum lok ok fsde = do
     (Fcd.close $ Ftd.chart tdt)
     (show (Ftd.side tdt))
   printFxTradeData tdt
+  printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
   printLearningResult fsd tdl oknum lok ok fsde
 
