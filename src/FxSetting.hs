@@ -57,7 +57,7 @@ gaLearningDataFromLog n fsd = do
                                                                                                     }
                                                     }
                                      return $ Ga.learningData fsd') $ M.toList fsl'
-  return (Ga.learningEvaluate $ Ga.learningDataList fsl'')
+  return $ Ga.learningDataList fsl''
 
 updateFxSettingLog :: Bool -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
 updateFxSettingLog ok profits fsd fsdr =

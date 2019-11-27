@@ -32,7 +32,8 @@ getEvaluationValue fsd td =
 
 getGaEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getGaEvaluationValue fsd td = 
-  Ftd.profit td
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.realizedPL td * Ftd.getWinRatePure td ^ 4) / fromIntegral (Ftd.chartLength td)
+  -- Ftd.profit td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =

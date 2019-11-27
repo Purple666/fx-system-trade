@@ -104,7 +104,7 @@ learningLoop n ld (oknum, tdl, fsd) = do
   (ok, oknum', tdl', fsd') <- learningEvaluate n ld'
   if ok
     then return (True, oknum', tdl', fsd')
-    else if Ga.maximumScore ld' <= Ga.maximumScore ld
+    else if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
          then return (False, oknum, tdl, fsd)
          else learningLoop n ld' (oknum', tdl', fsd')
 
