@@ -96,18 +96,17 @@ learningEvaluate n ld = do
            else (True,  L.length r', tdlOk, fsdOk)
 
 learningLoop :: Int ->
-                Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 (Int, Ftd.FxTradeData, Fsd.FxSettingData) ->
                 IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
-learningLoop c n ld (oknum, tdl, fsd) = do
+learningLoop n ld (oknum, tdl, fsd) = do
   ld' <- Ga.learning ld
   (ok, oknum', tdl', fsd') <- learningEvaluate n ld'
   if ok
     then return (True, oknum', tdl', fsd')
     else if Ga.maximumScore ld' <= Ga.maximumScore ld
          then return (False, oknum, tdl, fsd)
-         else learningLoop (c + 1) n ld' (oknum', tdl', fsd')
+         else learningLoop n ld' (oknum', tdl', fsd')
 
 learning :: Int ->
             Fsd.FxSettingData ->
@@ -115,7 +114,7 @@ learning :: Int ->
 learning n fsd = do
   ld <- Fs.gaLearningDataFromLog n fsd
   (_, oknum, tdl, fsd) <- learningEvaluate n ld
-  learningLoop 0 n ld (oknum, tdl, fsd)
+  learningLoop n ld (oknum, tdl, fsd)
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> IO (Bool, Fsd.FxSettingData)
 tradeLearning e fsd = do
