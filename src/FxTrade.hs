@@ -38,7 +38,7 @@ evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
   Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
-  (fromIntegral $ Fsd.getLearningTestCount fsd) * (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.profit td
+  (fromIntegral $ Gsd.learningTestCount Gsd.gsd) * (Ftd.profit . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.profit td
 
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
@@ -272,7 +272,7 @@ backTest :: Int ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
-  let ltt = Ta.getLearningTestTime fsd * Fsd.getLearningTestCount fsd
+  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
@@ -320,7 +320,7 @@ getChart n c fsd = do
 
 learningEvaluate :: Int -> Fsd.FxSettingData -> IO Ftd.FxTradeData
 learningEvaluate n fsd = do
-  (ltt, fc) <- getChart n (Fsd.getLearningTestCount fsd) fsd
+  (ltt, fc) <- getChart n (Gsd.learningTestCount Gsd.gsd) fsd
   return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->

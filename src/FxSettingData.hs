@@ -6,10 +6,8 @@ module FxSettingData
   , FxLearningSetting (..)
   , FxSettingChart(..)
   , initFxSettingData
-  , plusLearningTestCount
   , initFxSetting
   , initFxSettingChart
-  , getLearningTestCount
   , getLogProfit
   , getLogProfitAve
   , setFxSettingData
@@ -68,8 +66,7 @@ instance Hashable FxSetting where
   hashWithSalt s (FxSetting _ _ _ d e f) = s `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
-  FxLearningSetting { learningTestCount :: Int
-                    , totalTradeDate    :: Int
+  FxLearningSetting { totalTradeDate    :: Int
                     , numTraderadeDate  :: Int
                     , logProfit         :: Double
                     , logCount          :: Int
@@ -87,8 +84,7 @@ initFxSetting :: FxSetting
 initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
-            , learningSetting = FxLearningSetting { learningTestCount  = 20
-                                                  , totalTradeDate     = 0
+            , learningSetting = FxLearningSetting { totalTradeDate     = 0
                                                   , numTraderadeDate   = 0
                                                   , logProfit          = 0
                                                   , logCount           = 0
@@ -104,28 +100,6 @@ initFxSettingChart =
                  , learningTestTime  = 0
                  , resultFxTradeData = Ftd.initFxTradeDataCommon
                  }
-
-plusLearningTestCount :: Ga.LearningData FxSettingData ->
-                         Ga.LearningData FxSettingData
-plusLearningTestCount x =
-  Ga.LearningData . L.map (\(fsd, p) -> (plusLearningTestCount2 fsd, p)) $ Ga.getLearningData x
-
-plusLearningTestCount2 :: FxSettingData -> FxSettingData
-plusLearningTestCount2 fsd =
-  fsd { fxSetting = plusLearningTestCount3 $ fxSetting fsd
-      -- , fxSettingLog = M.mapKeys (\fs -> plusLearningTestCount3 fs)  $ fxSettingLog fsd
-      }
-
-plusLearningTestCount3 :: FxSetting -> FxSetting
-plusLearningTestCount3 fs =
-  fs { learningSetting = (learningSetting fs) {
-         learningTestCount = learningTestCount (learningSetting fs) + 1
-         }
-     }
-
-getLearningTestCount :: FxSettingData -> Int
-getLearningTestCount fsd =
-  learningTestCount . learningSetting $ fxSetting fsd
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =

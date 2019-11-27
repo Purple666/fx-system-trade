@@ -9,6 +9,7 @@ data GlobalSettingData = GlobalSettingData
   , treeOrRate         :: Int
   , countUpList        :: Double
   , learningTestTimes  :: Int
+  , learningTestCount  :: Int
   , maxTradeTime       :: Int
   , fxSettingLogNum    :: Int
   , gaNum              :: Int
@@ -31,6 +32,7 @@ gsd =
                     , treeAndRate           = 1
                     , treeOrRate            = 1
                     , learningTestTimes     = 20
+                    , learningTestCount     = 20
                     , fxSettingLogNum       = 100
                     , gaNum                 = 100
                     , maxTradeTime          = 24 * 60 * 5 
