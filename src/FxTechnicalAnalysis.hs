@@ -27,7 +27,7 @@ import qualified FxTradeData             as Ftd
 getLearningTestTime :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int
 getLearningTestTime fsd td =
   let fs = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in Gsd.learningTestTimes Gsd.gsd *
+  in traceShow(Ftd.totalTradeDate td, Ftd.numTraderadeDate td) $ Gsd.learningTestTimes Gsd.gsd *
      if Ftd.numTraderadeDate td == 0
      then 60
      else Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
