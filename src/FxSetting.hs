@@ -33,8 +33,8 @@ instance Ga.Ga Fsd.FxSettingData where
   learningEvaluate  = Ft.gaLearningEvaluate
   setHash           = setHashFxSettingData
 
-gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> IO (Ga.LearningData Fsd.FxSettingData)
-gaLearningDataFromLog n fsd = do
+gaLearningDataFromLog :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Ga.LearningData Fsd.FxSettingData)
+gaLearningDataFromLog n fsd td = do
   let fsl = Fsd.fxSettingLog fsd
       maxp = if M.null fsl
              then 1
@@ -46,7 +46,7 @@ gaLearningDataFromLog n fsd = do
              then fsl
              else M.insert (Fsd.fxSetting fsd) (maxp, maxc) fsl
       minp = abs . L.minimum . map fst $ M.elems fsl'
-  fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs }
+  fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs } td
                                      let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p + minp
                                                                                                    , Fsd.logCount  = c
                                                                                                    }

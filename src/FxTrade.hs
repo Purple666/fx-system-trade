@@ -136,11 +136,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
              evaluateProfitInc ftcl ftadcl)) = (tradeRate - chartBuy, Ftd.Sell)
         | otherwise = (0, Ftd.None)
       fs' = if close /= Ftd.None
-            then let ls  = Fsd.learningSetting fs
-                     ls' = ls { Fsd.totalTradeDate     = Fsd.totalTradeDate ls + tradeDate
-                              , Fsd.numTraderadeDate   = Fsd.numTraderadeDate ls + 1
-                              }
-                     alcOpen = Ta.calcFxalgorithmListCount profits $ Fsd.prevOpen fs
+            then let alcOpen = Ta.calcFxalgorithmListCount profits $ Fsd.prevOpen fs
                      alcCloseProfit
                        | open == Ftd.None && close == Ftd.Buy  && 0 < profits = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapDec ftcp ftadcp
                        | open == Ftd.None && close == Ftd.Sell && 0 < profits = Ta.calcFxalgorithmListCount profits $ Ta.makeValidLeafDataMapInc ftcp ftadcp
@@ -155,8 +151,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
                                        ctd alcCloseProfit $ Fsd.fxTaCloseProfit fs
                      fxTaCloseLoss   = Ta.updateAlgorithmListCount Fad.closeLoss
                                        ctd alcCloseLoss   $ Fsd.fxTaCloseLoss fs
-                 in fs { Fsd.learningSetting  = ls'
-                       , Fsd.fxTaOpen         = fxTaOpen
+                 in fs { Fsd.fxTaOpen         = fxTaOpen
                        , Fsd.fxTaCloseProfit  = fxTaCloseProfit
                        , Fsd.fxTaCloseLoss    = fxTaCloseLoss
                        }
@@ -201,6 +196,8 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + fromIntegral (Ftd.unit td) * profits
                                   else Ftd.realizedPL td
+               , Ftd.totalTradeDate   = Ftd.totalTradeDate td + tradeDate
+               , Ftd.numTraderadeDate = Ftd.numTraderadeDate td + 1
                }
   in (open, close, td', fs'')
 
@@ -273,7 +270,7 @@ backTest :: Int ->
             Fsd.FxSettingData ->
             IO (Fsd.FxSettingData, Ftd.FxTradeData)
 backTest n td fsd = do
-  let ltt = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd td * Gsd.learningTestCount Gsd.gsd
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
@@ -312,16 +309,16 @@ evaluate fsd ltt fc =
      then td
      else td3 { Ftd.chartLength = ltt }
 
-getChart :: Int -> Int -> Fsd.FxSettingData -> IO (Int, [Fcd.FxChartData])
-getChart n c fsd = do
-  let ltt = Ta.getLearningTestTime fsd * c
+getChart :: Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
+getChart n c fsd td = do
+  let ltt = Ta.getLearningTestTime fsd td * c
       lttp = Ta.getPrepareTimeAll fsd + ltt
   fc <- Fr.getChartList (n - lttp) lttp
   return (ltt, fc)
 
-learningEvaluate :: Int -> Fsd.FxSettingData -> IO Ftd.FxTradeData
-learningEvaluate n fsd = do
-  (ltt, fc) <- getChart n (Gsd.learningTestCount Gsd.gsd) fsd
+learningEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
+learningEvaluate n fsd td = do
+  (ltt, fc) <- getChart n (Gsd.learningTestCount Gsd.gsd) fsd td
   return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->

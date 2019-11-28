@@ -66,9 +66,7 @@ instance Hashable FxSetting where
   hashWithSalt s (FxSetting _ _ _ d e f) = s `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
-  FxLearningSetting { totalTradeDate    :: Int
-                    , numTraderadeDate  :: Int
-                    , logProfit         :: Double
+  FxLearningSetting { logProfit         :: Double
                     , logCount          :: Int
                     } deriving (Show, Read, Generic)
 
@@ -84,9 +82,7 @@ initFxSetting :: FxSetting
 initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
-            , learningSetting = FxLearningSetting { totalTradeDate     = 0
-                                                  , numTraderadeDate   = 0
-                                                  , logProfit          = 0
+            , learningSetting = FxLearningSetting { logProfit          = 0
                                                   , logCount           = 0
                                                   }
             , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
