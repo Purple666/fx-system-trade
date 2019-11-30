@@ -197,8 +197,12 @@ evaluateOne ctd fsd f1 forceSell td fs =
                , Ftd.realizedPL = if close /= Ftd.None
                                   then Ftd.realizedPL td + fromIntegral (Ftd.unit td) * profits
                                   else Ftd.realizedPL td
-               , Ftd.totalTradeDate   = Ftd.totalTradeDate td + tradeDate
-               , Ftd.numTraderadeDate = Ftd.numTraderadeDate td + 1
+               , Ftd.totalTradeDate   = if close /= Ftd.None
+                                        then Ftd.totalTradeDate td + tradeDate
+                                        else Ftd.totalTradeDate td 
+               , Ftd.numTraderadeDate = if close /= Ftd.None
+                                        then Ftd.numTraderadeDate td + 1
+                                        else Ftd.numTraderadeDate td
                }
   in (open, close, td', fs'')
 

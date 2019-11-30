@@ -30,7 +30,7 @@ getLearningTestTime fsd td =
   in Gsd.learningTestTimes Gsd.gsd *
      if Ftd.numTraderadeDate td == 0
      then 60
-     else traceShow(Ftd.totalTradeDate td, Ftd.numTraderadeDate td) $ Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
+     else Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
 
 getHoldTime :: Fsd.FxSettingData -> Int
 getHoldTime fsd =
