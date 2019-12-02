@@ -101,7 +101,7 @@ learningEvaluate n ld td = do
 learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     Ftd.FxTradeData -> 
-                    IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
+                    IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learningEvaluate n ld td = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
                                 let p = Ft.getEvaluationValue fsd tdl
@@ -118,7 +118,7 @@ learningLoop n ld td (oknum, tdl, fsd) = do
   ld' <- Ga.learning ld
   (oknum', tdl', fsd') <- learningEvaluate n ld' td
   if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
-    then return (False, oknum, tdl, fsd)
+    then return (True, oknum, tdl, fsd)
     else learningLoop n ld' td (oknum', tdl', fsd')
 
 {-
