@@ -106,8 +106,8 @@ learningEvaluate n ld td = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
                                 let p = Ft.getEvaluationValue fsd tdl
                                 return (p, tdl, fsd)) $ Ga.getGaDataList ld
-  let (_, tdl, fsd) = L.maximumBy (\(p0, _, _) (p1, _, _) -> compare p0 p1) 
-  return (L.length r', tdl, fsd)
+  let (_, tdl, fsd) = L.maximumBy (\(p0, _, _) (p1, _, _) -> compare p0 p1) r
+  return (L.length r, tdl, fsd)
 
 learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
