@@ -28,13 +28,13 @@ import qualified Tree                    as Tr
 
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
-  -- (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
-  Ftd.profit td
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
+  -- Ftd.profit td
 
 getGaEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getGaEvaluationValue fsd td = 
-  -- (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
-  Ftd.profit td
+  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
+  --Ftd.profit td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =

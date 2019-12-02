@@ -81,6 +81,7 @@ tradeSim = do
   Fm.writeBacktestResult "trade_sim" s' f'
   tradeSim
 
+{-
 learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     Ftd.FxTradeData -> 
@@ -95,6 +96,18 @@ learningEvaluate n ld td = do
   return $ if L.null r'
            then (False, 0,           tdlNg, fsdNg)
            else (True,  L.length r', tdlOk, fsdOk)
+-}
+
+learningEvaluate :: Int ->
+                    Ga.LearningData Fsd.FxSettingData ->
+                    Ftd.FxTradeData -> 
+                    IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
+learningEvaluate n ld td = do
+  r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
+                                let p = Ft.getEvaluationValue fsd tdl
+                                return (p, tdl, fsd)) $ Ga.getGaDataList ld
+  let (_, tdl, fsd) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) 
+  return (L.length r', tdl, fsd)
 
 learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
@@ -103,12 +116,17 @@ learningLoop :: Int ->
                 IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learningLoop n ld td (oknum, tdl, fsd) = do
   ld' <- Ga.learning ld
-  (ok, oknum', tdl', fsd') <- learningEvaluate n ld' td
+  (oknum', tdl', fsd') <- learningEvaluate n ld' td
+  if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
+    then return (False, oknum, tdl, fsd)
+    else learningLoop n ld' td (oknum', tdl', fsd')
+
+{-
   if ok
     then return (True, oknum', tdl', fsd')
-    else if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
-         then return (False, oknum, tdl, fsd)
-         else learningLoop n ld' td (oknum', tdl', fsd')
+    else
+-}
+
 
 learning :: Int ->
             Fsd.FxSettingData ->
@@ -116,7 +134,7 @@ learning :: Int ->
             IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd td = do
   ld <- Fs.gaLearningDataFromLog n fsd td
-  (_, oknum, tdl, fsd) <- learningEvaluate n ld td
+  (oknum, tdl, fsd) <- learningEvaluate n ld td
   learningLoop n ld td (oknum, tdl, fsd)
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Bool, Fsd.FxSettingData)
