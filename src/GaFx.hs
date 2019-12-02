@@ -117,7 +117,7 @@ learningLoop :: Int ->
 learningLoop n ld td (oknum, tdl, fsd) = do
   ld' <- Ga.learning ld
   (oknum', tdl', fsd') <- learningEvaluate n ld' td
-  traceShow(length ld, length ld', Ft.getEvaluationValue fsd tdl, Ft.getEvaluationValue fsd' tdl') $ return ()
+  -- traceShow(length ld, length ld', Ft.getEvaluationValue fsd tdl, Ft.getEvaluationValue fsd' tdl') $ return ()
   if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
     then return (True, oknum, tdl, fsd)
     else learningLoop n ld' td (oknum', tdl', fsd')
