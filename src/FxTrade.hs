@@ -334,7 +334,7 @@ trade :: Ftd.FxTradeData ->
 trade td fsd e = do
   fc <- (L.++) <$> Fr.getChartList (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
-      (open, close, td', fs) = evaluateOne (L.last ctdl) fsd getUnitBacktest False 0 td (Fsd.fxSetting fsd)
+      (open, close, td', fs) = evaluateOne (L.last ctdl) fsd getUnitBacktest False (Gsd.spread Gsd.gsd) td (Fsd.fxSetting fsd)
   (fsd', td'') <- checkAlgoSetting 1 fsd td' fs
   return (open, close, td'', fsd')
 
