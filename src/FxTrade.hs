@@ -97,14 +97,13 @@ evaluateOne :: Fad.FxChartTaData ->
                Fsd.FxSettingData ->
                (Ftd.FxTradeData -> Double -> Int) ->
                Bool ->
-               Double ->
                Ftd.FxTradeData ->
                Fsd.FxSetting ->
                (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData, Fsd.FxSetting)
-evaluateOne ctd fsd f1 forceSell spread td fs =
+evaluateOne ctd fsd f1 forceSell td fs =
   let cd        = Fad.taChart ctd
-      chartBuy  = Fcd.close cd + spread / 2
-      chartSell = Fcd.close cd - spread / 2
+      chartBuy  = Fcd.close cd + Gsd.spread Gsd.gsd / 2
+      chartSell = Fcd.close cd - Gsd.spread Gsd.gsd / 2
       chart     = Fcd.close cd
       tradeRate = Fcd.close $ Ftd.tradeRate td
       tradeDate = Fcd.no cd - Fcd.no (Ftd.tradeRate td)
@@ -280,7 +279,7 @@ backTest n td fsd = do
   fc <- Fr.getChartList (n - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd + ltt)
   let ctdl = makeChart fsd ltt fc
       fs = Fsd.fxSetting fsd
-      (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False (Gsd.spread Gsd.gsd) td2 fs2
+      (td4, fs4) = L.foldl (\(td2, fs2) ctd -> let (_, _, td3, fs3) = evaluateOne ctd fsd getUnitBacktest False td2 fs2
                                                in (td3, fs3))
                    (td, fs) ctdl
   checkAlgoSetting ltt fsd td4 fs4
@@ -309,8 +308,8 @@ evaluate :: Fsd.FxSettingData -> Int -> [Fcd.FxChartData] -> Ftd.FxTradeData
 evaluate fsd ltt fc =
   let td = initFxTradeDataBacktest
       ctdl = makeChart fsd ltt fc
-      (_, _, td2, _) = L.foldl (\(_, _, td1, _) ctd -> evaluateOne ctd fsd getUnitLearning False 0 td1 Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
-      (_, _, td3, _) = evaluateOne (L.last ctdl) fsd getUnitLearning True 0 td2 Fsd.initFxSetting
+      (_, _, td2, _) = L.foldl (\(_, _, td1, _) ctd -> evaluateOne ctd fsd getUnitLearning False td1 Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
+      (_, _, td3, _) = evaluateOne (L.last ctdl) fsd getUnitLearning True td2 Fsd.initFxSetting
   in if null ctdl
      then td
      else td3 { Ftd.chartLength = ltt }
@@ -334,7 +333,7 @@ trade :: Ftd.FxTradeData ->
 trade td fsd e = do
   fc <- (L.++) <$> Fr.getChartList (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
-      (open, close, td', fs) = evaluateOne (L.last ctdl) fsd getUnitBacktest False (Gsd.spread Gsd.gsd) td (Fsd.fxSetting fsd)
+      (open, close, td', fs) = evaluateOne (L.last ctdl) fsd getUnitBacktest False td (Fsd.fxSetting fsd)
   (fsd', td'') <- checkAlgoSetting 1 fsd td' fs
   return (open, close, td'', fsd')
 
