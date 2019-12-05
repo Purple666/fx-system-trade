@@ -70,7 +70,7 @@ tradeSim = do
       startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd td + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   e <- Fr.getOneChart startN
-  (_, fsd') <- tradeLearning e fsd td
+  fsd' <- tradeLearning e fsd td
   (s, f) <- Fm.readBacktestResult "trade_sim"
   td' <- tradeSimLoop startN startN endN td fsd'
   (s', f') <- if Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td'
@@ -81,7 +81,6 @@ tradeSim = do
   Fm.writeBacktestResult "trade_sim" s' f'
   tradeSim
 
-{-
 learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     Ftd.FxTradeData -> 
@@ -96,8 +95,8 @@ learningEvaluate n ld td = do
   return $ if L.null r'
            then (False, 0,           tdlNg, fsdNg)
            else (True,  L.length r', tdlOk, fsdOk)
--}
 
+{-
 learningEvaluate :: Int ->
                     Ga.LearningData Fsd.FxSettingData ->
                     Ftd.FxTradeData -> 
@@ -108,19 +107,20 @@ learningEvaluate n ld td = do
                                 return (p, tdl, fsd)) $ Ga.getGaDataList ld
   let (_, tdl, fsd) = L.maximumBy (\(p0, _, _) (p1, _, _) -> compare p0 p1) r
   return (L.length r, tdl, fsd)
+-}
 
 learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 Ftd.FxTradeData -> 
-                (Int, Ftd.FxTradeData, Fsd.FxSettingData) ->
-                IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
-learningLoop n ld td (oknum, tdl, fsd) = do
+                (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData) ->
+                IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
+learningLoop n ld td (ok, oknum, tdl, fsd) = do
   ld' <- Ga.learning ld
-  (oknum', tdl', fsd') <- learningEvaluate n ld' td
+  (ok', oknum', tdl', fsd') <- learningEvaluate n ld' td
   -- traceShow(length ld, length ld', Ft.getEvaluationValue fsd tdl, Ft.getEvaluationValue fsd' tdl') $ return ()
-  if Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
-    then return (True, oknum, tdl, fsd)
-    else learningLoop n ld' td (oknum', tdl', fsd')
+  if ok && Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl
+    then return (oknum, tdl, fsd)
+    else learningLoop n ld' td (ok', oknum', tdl', fsd')
 
 {-
   if ok
@@ -132,17 +132,17 @@ learningLoop n ld td (oknum, tdl, fsd) = do
 learning :: Int ->
             Fsd.FxSettingData ->
             Ftd.FxTradeData -> 
-            IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
+            IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd td = do
   ld <- Fs.gaLearningDataFromLog n fsd td
-  (oknum, tdl, fsd) <- learningEvaluate n ld td
-  learningLoop n ld td (oknum, tdl, fsd)
+  (ok, oknum, tdl, fsd) <- learningEvaluate n ld td
+  learningLoop n ld td (ok, oknum, tdl, fsd)
 
-tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Bool, Fsd.FxSettingData)
+tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Fsd.FxSettingData)
 tradeLearning e fsd td = do
-  (ok, oknum, tdl, fsd') <- learning (Fcd.no e) fsd td
-  Fp.printLearningFxTradeData fsd' tdl oknum ok (fsd' == fsd)
-  return (ok, fsd')
+  (oknum, tdl, fsd') <- learning (Fcd.no e) fsd td
+  Fp.printLearningFxTradeData fsd' tdl oknum (fsd' == fsd)
+  return fsd'
 
 backTestLoop :: Int ->
                 Int ->
@@ -150,11 +150,11 @@ backTestLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop n endN td fsd = do
-  (ok, oknum, tdl, fsd2) <- learning n fsd td
+  (oknum, tdl, fsd2) <- learning n fsd td
   (fsd3, tdt) <- Ft.backTest n td fsd2
-  fsd4 <- Fs.updateFxSettingLog ok (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+  fsd4 <- Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
   Fm.writeFxSettingData fsd4
-  Fp.printTestProgress fsd4 td tdt tdl oknum ok (fsd4 == fsd)
+  Fp.printTestProgress fsd4 td tdt tdl oknum (fsd4 == fsd)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd4)
@@ -177,7 +177,7 @@ tradeWeeklyLoop :: Ftd.FxTradeData -> Fsd.FxSettingData ->
 tradeWeeklyLoop td fsd = do
   waitTrade
   e <- Fr.getEndChart
-  (_, fsd') <- tradeLearning e fsd td
+  fsd' <- tradeLearning e fsd td
   e <- Foa.getNowPrices td
   (td', fsd'') <- tradeLoop e (Fcd.no e) (Fcd.no e) td fsd'
   tdw <- Fm.updateFxTradeData (Ftd.coName td L.++ "_weekly") td
@@ -202,8 +202,8 @@ tradeEvaluate p td fsd e = do
   let ltt = Ta.getLearningTestTime fsd1 td'' * Gsd.learningTestCount Gsd.gsd
   if close /= Ftd.None || ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
-            (ok, fsd2) <- tradeLearning e fsd1 td''
-            fsd3 <- Fs.updateFxSettingLog ok (Ftd.profit td'' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
+            fsd2 <- tradeLearning e fsd1 td''
+            fsd3 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
             Fm.writeFxSettingData fsd3
             return (Fcd.no e, td'', fsd3)
     else if open /= Ftd.None
@@ -225,8 +225,8 @@ tradeSimEvaluate n p td fsd = do
   let ltt = Ta.getLearningTestTime fsd1 td' * Gsd.learningTestCount Gsd.gsd
   if close /= Ftd.None || ltt < n - p
     then do e <- Fr.getOneChart n
-            (ok, fsd2) <- tradeLearning e fsd1 td'
-            fsd3 <- Fs.updateFxSettingLog ok (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
+            fsd2 <- tradeLearning e fsd1 td'
+            fsd3 <- Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
             Fm.writeFxSettingData fsd3
             return (n, td', fsd3)
     else if open /= Ftd.None

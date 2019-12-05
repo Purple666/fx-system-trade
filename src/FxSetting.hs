@@ -59,8 +59,8 @@ gaLearningDataFromLog n fsd td = do
                                      return $ Ga.learningData fsd') $ M.toList fsl'
   return $ Ga.learningDataList fsl''
 
-updateFxSettingLog :: Bool -> Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
-updateFxSettingLog ok profits fsd fsdr =
+updateFxSettingLog :: Double -> Fsd.FxSettingData -> Fsd.FxSettingData -> Fsd.FxSettingData
+updateFxSettingLog profits fsd fsdr =
   let fsl  = M.unionWith (\(p0, c0) (p1, c1) -> if c0 < c1
                                                 then (p1, c1)
                                                 else (p0, c0)) (Fsd.fxSettingLog fsd) (Fsd.fxSettingLog fsdr) 
@@ -68,7 +68,7 @@ updateFxSettingLog ok profits fsd fsdr =
   in fsd { Fsd.fxSettingLog = Fsd.minFxSettingDelete $
                               if M.member fs fsl
                               then M.adjust (\(p, c) -> (p + profits, c + 1)) fs fsl
-                              else if 0 < profits && ok
+                              else if 0 < profits
                                    then M.insert fs (profits, 1) fsl
                                    else fsl
          }
