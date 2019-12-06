@@ -29,18 +29,13 @@ import qualified Tree                    as Tr
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
   (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
-  -- Ftd.profit td
-
-getGaEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
-getGaEvaluationValue fsd td = 
-  (Fsd.getLogProfit fsd * Ftd.profit td * Ftd.getWinRatePure td ^ 4)
-  --Ftd.profit td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
   Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td &&
-  Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd)
+  Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
+  (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.realizedPL td
 
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
@@ -346,7 +341,7 @@ gaLearningEvaluate (Ga.LearningData ld) =
                                                            Fsd.resultFxTradeData = td
                                                            }
                                                        }
-                                            p = toRational $ getGaEvaluationValue fsd td
+                                            p = toRational $ getEvaluationValue fsd td
                                         in (fsd', p)) ld
 
 
