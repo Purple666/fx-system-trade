@@ -135,7 +135,8 @@ learning :: Int ->
             IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd td = do
   ld <- Fs.gaLearningDataFromLog n fsd td
-  (ok, oknum, tdl, fsd) <- learningEvaluate n ld td
+  ld' <- Ga.learning ld
+  (ok, oknum, tdl, fsd) <- learningEvaluate n ld td'
   learningLoop n ld td (ok, oknum, tdl, fsd)
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Fsd.FxSettingData)
