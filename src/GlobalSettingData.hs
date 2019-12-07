@@ -23,10 +23,10 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taRandomMargin        = 5
+  GlobalSettingData { taRandomMargin        = 3
                     , taMiddleLongMargin    = 5
-                    , makeTreeCount         = 3
-                    , algorithmRepeat       = 3
+                    , makeTreeCount         = 2
+                    , algorithmRepeat       = 2
                     , countUpList           = 2
                     , quantityRate          = 5
                     , treeAndRate           = 1
@@ -43,7 +43,4 @@ gsd =
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
-
-
-
 
