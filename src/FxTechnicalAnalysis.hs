@@ -29,8 +29,8 @@ getLearningTestTime fsd td =
   let fs = Fsd.learningSetting $ Fsd.fxSetting fsd
   in Gsd.learningTestTimes Gsd.gsd *
      if Ftd.numTraderadeDate td == 0
-     then getHoldTime fsd * 60
-     else getHoldTime fsd * Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
+     then {- getHoldTime fsd * -} 60
+     else {- getHoldTime fsd * -} Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
 
 getHoldTime :: Fsd.FxSettingData -> Int
 getHoldTime fsd =
