@@ -112,16 +112,14 @@ learningEvaluate n ld td = do
 learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 Ftd.FxTradeData -> 
-                (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData) ->
                 IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
-learningLoop n ld td (ok, oknum, tdl, fsd) = do
+learningLoop n ld td = do
   ld' <- Ga.learning ld
-  (ok', oknum', tdl', fsd') <- learningEvaluate n ld' td
-  traceShow(ok, length ld, length ld', Ft.getEvaluationValue fsd tdl, Ft.getEvaluationValue fsd' tdl') $ return ()
-  if (ok && Ft.getEvaluationValue fsd' tdl' <= Ft.getEvaluationValue fsd tdl) ||
-     (Ft.getEvaluationValue fsd' tdl' == 0 && Ft.getEvaluationValue fsd tdl == 0)
+  (ok, oknum, tdl, fsd) <- learningEvaluate n ld' td
+  traceShow(ok, length ld, length ld', Ft.getEvaluationValue fsd tdl) $ return ()
+  if ok
     then return (oknum, tdl, fsd)
-    else learningLoop n ld' td (ok', oknum', tdl', fsd')
+    else learningLoop n ld' td
 
 {-
   if ok
@@ -136,9 +134,7 @@ learning :: Int ->
             IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd td = do
   ld <- Fs.gaLearningDataFromLog n fsd td
-  ld' <- Ga.learning ld
-  (ok, oknum, tdl, fsd) <- learningEvaluate n ld' td
-  learningLoop n ld' td (ok, oknum, tdl, fsd)
+  learningLoop n ld td
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Fsd.FxSettingData)
 tradeLearning e fsd td = do
