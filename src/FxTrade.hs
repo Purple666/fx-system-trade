@@ -34,6 +34,8 @@ evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
   0 < (getEvaluationValue fsd . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
+  50 < Ftd.getWinRatePure td &&
+  50 < (Ftd.getWinRatePure . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
   Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td &&
   Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) &&
   (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd) < Ftd.realizedPL td
