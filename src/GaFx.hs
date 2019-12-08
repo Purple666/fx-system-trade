@@ -118,7 +118,7 @@ learningLoop n ld td fsd = do
   ld' <- Ga.learning ld
   (ok, oknum, tdl, fsd') <- learningEvaluate n ld' td
   if ok || Ft.getEvaluationValue fsd tdl == 0 || fsd == fsd'
-    then return (oknum, tdl, fsd)
+    then return (oknum, tdl, fsd')
     else learningLoop n ld' td fsd'
 
 learning :: Int ->
