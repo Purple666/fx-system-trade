@@ -116,17 +116,10 @@ learningLoop :: Int ->
 learningLoop n ld td = do
   ld' <- Ga.learning ld
   (ok, oknum, tdl, fsd) <- learningEvaluate n ld' td
-  traceShow(ok, length ld, length ld', Ft.getEvaluationValue fsd tdl) $ return ()
+  --traceShow(ok, length ld, length ld', Ft.getEvaluationValue fsd tdl) $ return ()
   if ok || Ft.getEvaluationValue fsd tdl == 0
     then return (oknum, tdl, fsd)
     else learningLoop n ld' td
-
-{-
-  if ok
-    then return (True, oknum', tdl', fsd')
-    else
--}
-
 
 learning :: Int ->
             Fsd.FxSettingData ->
