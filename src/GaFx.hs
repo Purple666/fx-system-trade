@@ -113,29 +113,29 @@ learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
                 Ftd.FxTradeData -> 
                 Fsd.FxSettingData -> 
-                IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
+                IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learningLoop n ld td fsd = do
   ld' <- Ga.learning ld
   (ok, oknum, tdl, fsd') <- learningEvaluate n ld' td
   if ok || fsd == fsd'
-    then return (oknum, tdl, fsd')
+    then return (False, oknum, tdl, fsd')
     else learningLoop n ld' td fsd'
 
 learning :: Int ->
             Fsd.FxSettingData ->
             Ftd.FxTradeData -> 
-            IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
+            IO (Bool, Int, Ftd.FxTradeData, Fsd.FxSettingData)
 learning n fsd td = do
   ld <- Fs.gaLearningDataFromLog n fsd td
   (ok, oknum, tdl, fsd') <- learningEvaluate n ld td
   if ok
-    then return (oknum, tdl, fsd')
+    then return (True, oknum, tdl, fsd')
     else learningLoop n ld td fsd'
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Fsd.FxSettingData)
 tradeLearning e fsd td = do
-  (oknum, tdl, fsd') <- learning (Fcd.no e) fsd td
-  Fp.printLearningFxTradeData fsd' tdl oknum (fsd' == fsd)
+  (lok, oknum, tdl, fsd') <- learning (Fcd.no e) fsd td
+  Fp.printLearningFxTradeData fsd' tdl oknum lok (fsd' == fsd)
   return fsd'
 
 backTestLoop :: Int ->
@@ -144,11 +144,11 @@ backTestLoop :: Int ->
                 Fsd.FxSettingData ->
                 IO (Ftd.FxTradeData, Fsd.FxSettingData)
 backTestLoop n endN td fsd = do
-  (oknum, tdl, fsd2) <- learning n fsd td
+  (lok, oknum, tdl, fsd2) <- learning n fsd td
   (fsd3, tdt) <- Ft.backTest n td fsd2
   fsd4 <- Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
   Fm.writeFxSettingData fsd4
-  Fp.printTestProgress fsd4 td tdt tdl oknum (fsd4 == fsd)
+  Fp.printTestProgress fsd4 td tdt tdl oknum lok (fsd4 == fsd)
   let n' = Fcd.no (Ftd.chart tdt) + 1
   if endN <= n' || Ftd.realizedPL tdt < Gsd.initalProperty Gsd.gsd / Gsd.quantityRate Gsd.gsd
     then return (tdt, fsd4)

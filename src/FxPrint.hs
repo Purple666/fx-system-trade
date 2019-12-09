@@ -19,8 +19,8 @@ import           Text.Printf
 
 
 printTestProgress :: Fsd.FxSettingData -> 
-                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> Bool -> IO ()
-printTestProgress fsd td tdt tdl oknum fsde = do
+                     Ftd.FxTradeData -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printTestProgress fsd td tdt tdl oknum lok fsde = do
   let ltt = Ta.getLearningTestTime fsd td
       ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   nd  <-  Fcd.getDate . Fcd.date $ Ftd.chart td
@@ -35,13 +35,13 @@ printTestProgress fsd td tdt tdl oknum fsde = do
   printFxTradeData tdt
   printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
-  printLearningResult fsd tdl oknum fsde
+  printLearningResult fsd tdl oknum lok fsde
 
-printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> IO ()
-printLearningFxTradeData fsd tdl oknum fsde = do
+printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printLearningFxTradeData fsd tdl oknum lok fsde = do
   printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingChart fsd
   printFxTradeData tdl
-  printLearningResult fsd tdl oknum fsde
+  printLearningResult fsd tdl oknum lok fsde
 
 printProgressFxTradeData :: Ftd.FxTradeData -> Fcd.FxChartData -> IO ()
 printProgressFxTradeData td e = do
@@ -81,10 +81,10 @@ printFxTradeData td =
   (Ftd.trFail td)
   (Ftd.getWinRate td)
 
-printLearningResult :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> IO ()
-printLearningResult fsd tdl oknum fsde = do
+printLearningResult :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
+printLearningResult fsd tdl oknum lok fsde = do
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  printf "| %3d %c %3d\n" oknum (head $ show fsde) (length $ Fsd.fxSettingLog fsd)
+  printf "| %3d %c %c %3d\n" oknum (head $ show fsde) (head $ show lok) (length $ Fsd.fxSettingLog fsd)
 
 printBackTestResult :: String -> Ftd.FxTradeData -> Int -> Int -> Fsd.FxSettingData ->  IO ()
 printBackTestResult bar tdt s f fsd = do
