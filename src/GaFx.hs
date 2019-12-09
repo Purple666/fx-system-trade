@@ -130,7 +130,7 @@ learning n fsd td = do
   (ok, oknum, tdl, fsd') <- learningEvaluate n ld td
   if ok
     then return (oknum, tdl, fsd')
-    else learningLoop n ld td fsd
+    else learningLoop n ld td fsd'
 
 tradeLearning :: Fcd.FxChartData -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Fsd.FxSettingData)
 tradeLearning e fsd td = do
