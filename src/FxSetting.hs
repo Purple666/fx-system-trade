@@ -47,14 +47,12 @@ gaLearningDataFromLog n fsd td = do
              else M.insert (Fsd.fxSetting fsd) (maxp, maxc) fsl
       minp = abs . L.minimum . map fst $ M.elems fsl'
   fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs } td
-                                     let fs' = fs { Fsd.learningSetting = (Fsd.learningSetting fs) { Fsd.logProfit = p + minp
-                                                                                                   , Fsd.logCount  = c
-                                                                                                   }
-                                                  }
-                                         fsd' = fsd { Fsd.fxSetting = fs'
-                                                    , Fsd.fxSettingChart = (Fsd.fxSettingChart fsd) { Fsd.chart             = fc
-                                                                                                    , Fsd.learningTestTime  = ltt
-                                                                                                    }
+                                     let fsd' = fsd { Fsd.fxSetting = fs
+                                                    , Fsd.fxSettingTemp = (Fsd.fxSettingTemp fsd) { Fsd.chart            = fc
+                                                                                                  , Fsd.learningTestTime = ltt
+                                                                                                  , Fsd.logProfit        = p + minp
+                                                                                                  , Fsd.logCount         = c
+                                                                                                  }
                                                     }
                                      return $ Ga.learningData fsd') $ M.toList fsl'
   return $ Ga.learningDataList fsl''

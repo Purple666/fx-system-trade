@@ -41,7 +41,7 @@ backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd td + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (tdt, fsd') <- backTestLoop startN endN td fsd
@@ -67,7 +67,7 @@ tradeSim :: IO ()
 tradeSim = do
   fsd <- Fm.readFxSettingData
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd td + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   e <- Fr.getOneChart startN
   fsd' <- tradeLearning e fsd td
@@ -193,7 +193,7 @@ tradeEvaluate p td fsd e = do
                else if open /= Ftd.None
                     then Foa.open td td' open
                     else return td
-  let ltt = Ta.getLearningTestTime fsd1 td'' * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd1 * Gsd.learningTestCount Gsd.gsd
   if close /= Ftd.None || ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
             fsd2 <- tradeLearning e fsd1 td''
@@ -216,7 +216,7 @@ tradeSimEvaluate n p td fsd = do
   if open /= Ftd.None || close /= Ftd.None
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
-  let ltt = Ta.getLearningTestTime fsd1 td' * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd1 * Gsd.learningTestCount Gsd.gsd
   if close /= Ftd.None || ltt < n - p
     then do e <- Fr.getOneChart n
             fsd2 <- tradeLearning e fsd1 td'

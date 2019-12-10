@@ -24,13 +24,13 @@ import qualified GlobalSettingData       as Gsd
 import qualified Tree                    as Tr
 import qualified FxTradeData             as Ftd
 
-getLearningTestTime :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int
-getLearningTestTime fsd td =
-  let fs = Fsd.learningSetting $ Fsd.fxSetting fsd
+getLearningTestTime :: Fsd.FxSettingData -> Int
+getLearningTestTime fsd =
+  let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
   in Gsd.learningTestTimes Gsd.gsd *
-     if Ftd.numTraderadeDate td == 0
+     if Fsd.numTraderadeDate ls == 0
      then {- getHoldTime fsd * -} 60
-     else {- getHoldTime fsd * -} Ftd.totalTradeDate td `div` Ftd.numTraderadeDate td
+     else {- getHoldTime fsd * -} Fsd.totalTradeDate ls `div` Fsd.numTraderadeDate ls
 
 getHoldTime :: Fsd.FxSettingData -> Int
 getHoldTime fsd =

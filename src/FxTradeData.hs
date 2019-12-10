@@ -23,8 +23,6 @@ data FxTradeData =
               , profit           :: Double
               , realizedPL       :: Double
               , chartLength      :: Int
-              , totalTradeDate   :: Int
-              , numTraderadeDate :: Int
               , maxUnit          :: Int
               , coName           :: String
               , environment      :: FxEnvironment
@@ -47,8 +45,6 @@ initFxTradeDataCommon =
               , trFail              = 0
               , realizedPL          = Gsd.initalProperty Gsd.gsd
               , chartLength         = 0
-              , totalTradeDate      = 0
-              , numTraderadeDate    = 0
               , maxUnit             = 0
               , coName              = ""
               , environment         = Backtest

@@ -4,10 +4,10 @@ module FxSettingData
   ( FxSettingData (..)
   , FxSetting (..)
   , FxLearningSetting (..)
-  , FxSettingChart(..)
+  , FxSettingTemp(..)
   , initFxSettingData
   , initFxSetting
-  , initFxSettingChart
+  , initFxSettingTemp
   , getLogProfit
   , getLogProfitAve
   , setFxSettingData
@@ -29,9 +29,9 @@ import qualified Tree                    as Tr
 import qualified FxTradeData             as Ftd
 
 data FxSettingData =
-  FxSettingData { fxSettingChart :: FxSettingChart
-                , fxSetting      :: FxSetting
-                , fxSettingLog   :: M.Map FxSetting (Double, Int)
+  FxSettingData { fxSettingTemp :: FxSettingTemp
+                , fxSetting     :: FxSetting
+                , fxSettingLog  :: M.Map FxSetting (Double, Int)
                 } deriving (Show)
 
 data FxSetting =
@@ -44,11 +44,13 @@ data FxSetting =
             , fxTaCloseLoss   :: Fad.FxTechnicalAnalysisSetting
             } deriving (Show, Read, Generic)
 
-data FxSettingChart =
-  FxSettingChart { chart             :: [Fcd.FxChartData]
-                 , learningTestTime  :: Int
-                 , resultFxTradeData :: Ftd.FxTradeData
-                 } deriving (Show)
+data FxSettingTemp =
+  FxSettingTemp { chart             :: [Fcd.FxChartData]
+                , learningTestTime  :: Int
+                , resultFxTradeData :: Ftd.FxTradeData
+                , logProfit         :: Double
+                , logCount          :: Int
+                } deriving (Show)
 
 instance Eq FxSettingData where
   a == b = fxSetting a == fxSetting b
@@ -66,15 +68,15 @@ instance Hashable FxSetting where
   hashWithSalt s (FxSetting _ _ _ d e f) = s `hashWithSalt` d `hashWithSalt` e `hashWithSalt` f
 
 data FxLearningSetting =
-  FxLearningSetting { logProfit         :: Double
-                    , logCount          :: Int
+  FxLearningSetting { totalTradeDate   :: Int
+                    , numTraderadeDate :: Int
                     } deriving (Show, Read, Generic)
 
 initFxSettingData :: FxSettingData
 initFxSettingData =
-  FxSettingData { fxSettingChart = initFxSettingChart
-                , fxSetting      = initFxSetting
-                , fxSettingLog   = M.empty
+  FxSettingData { fxSettingTemp = initFxSettingTemp
+                , fxSetting     = initFxSetting
+                , fxSettingLog  = M.empty
                 }
 
 
@@ -82,20 +84,22 @@ initFxSetting :: FxSetting
 initFxSetting =
   FxSetting { settingHash = 0
             , prevOpen            = ([], M.empty)
-            , learningSetting = FxLearningSetting { logProfit          = 0
-                                                  , logCount           = 0
+            , learningSetting = FxLearningSetting { totalTradeDate   = 0
+                                                  , numTraderadeDate = 0
                                                   }
             , fxTaOpen        = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseProfit = Fad.initFxTechnicalAnalysisSetting
             , fxTaCloseLoss   = Fad.initFxTechnicalAnalysisSetting
             }
 
-initFxSettingChart :: FxSettingChart
-initFxSettingChart =
-  FxSettingChart { chart             = []
-                 , learningTestTime  = 0
-                 , resultFxTradeData = Ftd.initFxTradeDataCommon
-                 }
+initFxSettingTemp :: FxSettingTemp
+initFxSettingTemp =
+  FxSettingTemp { chart             = []
+                , learningTestTime  = 0
+                , resultFxTradeData = Ftd.initFxTradeDataCommon
+                , logProfit         = 0
+                , logCount          = 0
+                }
 
 getSimChartMax :: FxSettingData -> Int
 getSimChartMax fsd =
@@ -119,20 +123,20 @@ setTreeFunction fs =
 
 setFxSettingData :: FxSetting -> M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingData fs fsl =
-  setTreeFunction $ FxSettingData { fxSettingChart = initFxSettingChart
-                                  , fxSetting      = fs
-                                  , fxSettingLog   = fsl
+  setTreeFunction $ FxSettingData { fxSettingTemp = initFxSettingTemp
+                                  , fxSetting     = fs
+                                  , fxSettingLog  = fsl
                                   }
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
-  ((logProfit . learningSetting $ fxSetting fsd) + 1) * (fromIntegral . logCount . learningSetting $ fxSetting fsd)
+  ((logProfit $ fxSettingTemp fsd) + 1) * (fromIntegral . logCount $ fxSettingTemp fsd)
 
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
-  if (logCount . learningSetting $ fxSetting fsd) == 0
+  if (logCount $ fxSettingTemp fsd) == 0
   then 0
-  else (logProfit . learningSetting $ fxSetting fsd) / (fromIntegral . logCount . learningSetting $ fxSetting fsd)
+  else (logProfit $ fxSettingTemp fsd) / (fromIntegral . logCount $ fxSettingTemp fsd)
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
 minFxSettingDelete fsl =
