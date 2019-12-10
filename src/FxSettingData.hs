@@ -72,6 +72,8 @@ data FxLearningSetting =
                     , numTraderadeDate :: Int
                     } deriving (Show, Read, Generic)
 
+instance Hashable FxLearningSetting
+
 initFxSettingData :: FxSettingData
 initFxSettingData =
   FxSettingData { fxSettingTemp = initFxSettingTemp
