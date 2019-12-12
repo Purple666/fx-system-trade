@@ -132,7 +132,7 @@ setFxSettingData fs fsl =
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
-  ((logProfit $ fxSettingTemp fsd) + 1) * (fromIntegral . logCount $ fxSettingTemp fsd)
+  ((logProfit $ fxSettingTemp fsd) + 1) * ((fromIntegral . logCount $ fxSettingTemp fsd) + 1)
 
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
