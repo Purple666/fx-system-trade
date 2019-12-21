@@ -146,9 +146,9 @@ backTestLoop :: Int ->
 backTestLoop n endN td fsd = do
   (lok, oknum, tdl, fsd2) <- learning n fsd td
   (fsd3, tdt) <- Ft.backTest n td fsd2
-  fsd4 <- if lok
-          then return fsd3
-          else Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd3 <$> Fm.readFxSettingData
+  let fsd4 = if lok
+             then fsd3
+             else Fs.updateFxSettingLog (Ftd.profit tdt - Ftd.profit td) fsd3
   Fm.writeFxSettingData fsd4
   Fp.printTestProgress fsd4 td tdt tdl oknum lok (fsd4 == fsd)
   let n' = Fcd.no (Ftd.chart tdt) + 1
@@ -199,7 +199,7 @@ tradeEvaluate p td fsd e = do
   if close /= Ftd.None || ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
             fsd2 <- tradeLearning e fsd1 td''
-            fsd3 <- Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
+            let fsd3 = Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd2
             Fm.writeFxSettingData fsd3
             return (Fcd.no e, td'', fsd3)
     else if open /= Ftd.None
@@ -222,7 +222,7 @@ tradeSimEvaluate n p td fsd = do
   if close /= Ftd.None || ltt < n - p
     then do e <- Fr.getOneChart n
             fsd2 <- tradeLearning e fsd1 td'
-            fsd3 <- Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2 <$> Fm.readFxSettingData
+            let fsd3 = Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2
             Fm.writeFxSettingData fsd3
             return (n, td', fsd3)
     else if open /= Ftd.None
