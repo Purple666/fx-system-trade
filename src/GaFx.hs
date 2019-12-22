@@ -197,9 +197,7 @@ tradeEvaluate p td fsd e = do
   if close /= Ftd.None || ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
             fsd2 <- tradeLearning e fsd1 td''
-            let fsd3 = Fs.updateFxSettingLog (Ftd.profit td'' - Ftd.profit td) fsd2
-            Fm.writeFxSettingData fsd3
-            return (Fcd.no e, td'', fsd3)
+            return (Fcd.no e, td'', fsd2)
     else if open /= Ftd.None
          then do printf "\n"
                  return (p, td'', fsd1)
@@ -220,9 +218,7 @@ tradeSimEvaluate n p td fsd = do
   if close /= Ftd.None || ltt < n - p
     then do e <- Fr.getOneChart n
             fsd2 <- tradeLearning e fsd1 td'
-            let fsd3 = Fs.updateFxSettingLog (Ftd.profit td' - Ftd.profit td) fsd2
-            Fm.writeFxSettingData fsd3
-            return (n, td', fsd3)
+            return (n, td', fsd2)
     else if open /= Ftd.None
          then do printf "\n"
                  return (p, td', fsd1)
