@@ -193,11 +193,12 @@ tradeEvaluate p td fsd e = do
                else if open /= Ftd.None
                     then Foa.open td td' open
                     else return td
-  let ltt = Ta.getLearningTestTime fsd1 -- * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd1
   if close /= Ftd.None || ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
-            fsd2 <- tradeLearning e fsd1 td''
-            return (Fcd.no e, td'', fsd2)
+            fsd2 <- Fm.readFxSettingData
+            fsd3 <- tradeLearning e fsd2 td''
+            return (Fcd.no e, td'', fsd3)
     else if open /= Ftd.None
          then do printf "\n"
                  return (p, td'', fsd1)
@@ -214,11 +215,12 @@ tradeSimEvaluate n p td fsd = do
   if open /= Ftd.None || close /= Ftd.None
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
-  let ltt = Ta.getLearningTestTime fsd1 -- * Gsd.learningTestCount Gsd.gsd
+  let ltt = Ta.getLearningTestTime fsd1
   if close /= Ftd.None || ltt < n - p
     then do e <- Fr.getOneChart n
-            fsd2 <- tradeLearning e fsd1 td'
-            return (n, td', fsd2)
+            fsd2 <- Fm.readFxSettingData
+            fsd3 <- tradeLearning e fsd2 td'
+            return (n, td', fsd3)
     else if open /= Ftd.None
          then do printf "\n"
                  return (p, td', fsd1)
