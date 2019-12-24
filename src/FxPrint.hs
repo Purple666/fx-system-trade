@@ -40,6 +40,7 @@ printTestProgress fsd td tdt tdl oknum lok fsde = do
 printLearningFxTradeData :: Fsd.FxSettingData -> Ftd.FxTradeData -> Int -> Bool -> Bool -> IO ()
 printLearningFxTradeData fsd tdl oknum lok fsde = do
   -- printFxTradeData . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd
+  printf "%s : " =<< Ftm.getLogTime
   printFxTradeData tdl
   printLearningResult fsd tdl oknum lok fsde
 
@@ -60,7 +61,7 @@ printTradeResult open close td td' units = do
   printf "%s %8d | "
     nd
     (Fcd.no (Ftd.chart td') - Fcd.no (Ftd.tradeRate td))
-  printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f "
+  printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     (Ftd.profit td' - Ftd.profit td)
     (Fcd.close $ Ftd.tradeRate td')
