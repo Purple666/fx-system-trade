@@ -88,7 +88,7 @@ learningEvaluate :: Int ->
 learningEvaluate n ld td = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
                                 let p = Ft.getEvaluationValue fsd tdl
-                                traceShow(Ft.evaluationOk tdl, p, Ftd.realizedPL tdl) $ return ()
+                                traceShow(Ft.evaluationOk tdl fsd, p, Ftd.realizedPL tdl) $ return ()
                                 return (p, Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
       (_, _, tdlOk, fsdOk) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) r'
