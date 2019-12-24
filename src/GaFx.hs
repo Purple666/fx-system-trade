@@ -88,6 +88,7 @@ learningEvaluate :: Int ->
 learningEvaluate n ld td = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
                                 let p = Ft.getEvaluationValue fsd tdl
+                                traceShow(p, tdl) $ return ()
                                 return (p, Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
       (_, _, tdlOk, fsdOk) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) r'
@@ -95,19 +96,6 @@ learningEvaluate n ld td = do
   return $ if L.null r'
            then (False, 0,           tdlNg, fsdNg)
            else (True,  L.length r', tdlOk, fsdOk)
-
-{-
-learningEvaluate :: Int ->
-                    Ga.LearningData Fsd.FxSettingData ->
-                    Ftd.FxTradeData -> 
-                    IO (Int, Ftd.FxTradeData, Fsd.FxSettingData)
-learningEvaluate n ld td = do
-  r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
-                                let p = Ft.getEvaluationValue fsd tdl
-                                return (p, tdl, fsd)) $ Ga.getGaDataList ld
-  let (_, tdl, fsd) = L.maximumBy (\(p0, _, _) (p1, _, _) -> compare p0 p1) r
-  return (L.length r, tdl, fsd)
--}
 
 learningLoop :: Int ->
                 Ga.LearningData Fsd.FxSettingData ->
