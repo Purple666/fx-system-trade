@@ -88,7 +88,6 @@ learningEvaluate :: Int ->
 learningEvaluate n ld td = do
   r <- Prelude.mapM (\fsd -> do tdl <- Ft.learningEvaluate n fsd td
                                 let p = Ft.getEvaluationValue fsd tdl
-                                -- traceShow(Ft.evaluationOk tdl fsd, p, Ftd.realizedPL tdl) $ return ()
                                 return (p, Ft.evaluationOk tdl fsd, tdl, fsd)) $ Ga.getGaDataList ld
   let r' = L.filter (\(_, y, _, _) -> y) r
       (_, _, tdlOk, fsdOk) = L.maximumBy (\(p0, _, _, _) (p1, _, _, _) -> compare p0 p1) r'
@@ -182,7 +181,7 @@ tradeEvaluate p td fsd e = do
                     then Foa.open td td' open
                     else return td
   let ltt = Ta.getLearningTestTime fsd1
-  if close /= Ftd.None || ltt < (Fcd.no e) - p 
+  if {- close /= Ftd.None || -} ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
             fsd2 <- Fm.readFxSettingData
             fsd3 <- tradeLearning e fsd2 td''
@@ -204,7 +203,7 @@ tradeSimEvaluate n p td fsd = do
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
   let ltt = Ta.getLearningTestTime fsd1
-  if close /= Ftd.None || ltt < n - p
+  if {- close /= Ftd.None || -} ltt < n - p
     then do e <- Fr.getOneChart n
             fsd2 <- Fm.readFxSettingData
             fsd3 <- tradeLearning e fsd2 td'
