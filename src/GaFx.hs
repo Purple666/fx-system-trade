@@ -200,15 +200,13 @@ tradeSimEvaluate n p td fsd = do
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
   let ltt = Ta.getLearningTestTime fsd1
-  if {- close /= Ftd.None || -} ltt < n - p
+  if ltt < n - p
     then do e <- Fr.getOneChart n
             fsd2 <- Fm.readFxSettingData
             fsd3 <- tradeLearning e fsd2 td'
             return (n, td', fsd3)
     else if open /= Ftd.None
-         then do printf "\n"
-                 return (p, td', fsd1)
-         else return (p, td', fsd1)
+         then return (p, td', fsd1)
 
 tradeLoop :: Fcd.FxChartData ->
              Int ->
