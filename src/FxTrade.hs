@@ -37,12 +37,22 @@ getEvaluationValue fsd td =
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
   0 < getEvaluationValue fsd td &&
-  0 < (getEvaluationValue fsd . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
   50 < Ftd.getWinRate td &&
-  50 < (Ftd.getWinRate . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
-  Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td &&
-  Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
-  (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) < Ftd.realizedPL td
+  Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td
+
+{-   
+  if realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd == Gsd.initalProperty Gsd.gsd
+  then 0 < getEvaluationValue fsd td &&
+       50 < Ftd.getWinRate td &&
+       Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td
+  else 0 < getEvaluationValue fsd td &&
+       50 < Ftd.getWinRate td &&
+       Gsd.initalProperty Gsd.gsd < Ftd.realizedPL td &&
+       0 < (getEvaluationValue fsd . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
+       50 < (Ftd.getWinRate . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
+       Gsd.initalProperty Gsd.gsd < (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) &&
+       (Ftd.realizedPL . Fsd.resultFxTradeData $ Fsd.fxSettingTemp fsd) < Ftd.realizedPL td
+-}
 
 getUnitBacktest :: Ftd.FxTradeData -> Double -> Int
 getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quantityRate Gsd.gsd) / chart)
