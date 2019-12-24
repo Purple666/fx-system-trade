@@ -205,8 +205,7 @@ tradeSimEvaluate n p td fsd = do
             fsd2 <- Fm.readFxSettingData
             fsd3 <- tradeLearning e fsd2 td'
             return (n, td', fsd3)
-    else if open /= Ftd.None
-         then return (p, td', fsd1)
+    else return (p, td', fsd1)
 
 tradeLoop :: Fcd.FxChartData ->
              Int ->
