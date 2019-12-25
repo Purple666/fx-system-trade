@@ -7,6 +7,7 @@ module GaFx
   ) where
 
 import           Control.Concurrent
+import           Control.Monad.Random
 import qualified Data.List             as L
 import qualified Data.Map              as M
 import           Data.Time
@@ -40,8 +41,9 @@ debug = do
 backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
+  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd)
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = r + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   (tdt, fsd') <- backTestLoop startN endN td fsd
@@ -66,8 +68,9 @@ trade environment = do
 tradeSim :: IO ()
 tradeSim = do
   fsd <- Fm.readFxSettingData
+  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd)
   let td = Ft.initFxTradeDataBacktest
-      startN = Gsd.maxTradeTime Gsd.gsd + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
+      startN = r + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
   e <- Fr.getOneChart startN
   fsd' <- tradeLearning e fsd td
