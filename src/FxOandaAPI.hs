@@ -157,7 +157,7 @@ close tdo td = do
   td' <- updateFxTradeData s r tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
-  printf "Close - %7d                                | " u
+  printf "Close - %7d                                    | " u
   Fp.printTradeResult Ftd.None s tdo td' 0
   return td'
 
@@ -177,7 +177,7 @@ open tdo td side = do
   td' <- updateFxTradeData Ftd.None 0 tdo td 
   Fm.setFxTradeData (Ftd.coName td') td'
   printf "%s : " =<< Ftm.getLogTime
-  printf "Open - %s %f %7d %3.6f      | " (show side) b u' (Fcd.close p)
+  printf "Open - %s %f %7d %3.6f          | " (show side) b u' (Fcd.close p)
   Fp.printTradeResult side Ftd.None tdo td' u'
   return td'
 
