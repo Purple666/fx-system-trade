@@ -27,10 +27,10 @@ import qualified FxTradeData             as Ftd
 getLearningTestTime :: Fsd.FxSettingData -> Int
 getLearningTestTime fsd =
   let ls = Fsd.learningSetting $ Fsd.fxSetting fsd
-  in Gsd.learningTestTimes Gsd.gsd *
+  in {- Gsd.learningTestTimes Gsd.gsd * -} 
      if Fsd.numTraderadeDate ls == 0
-     then {- getHoldTime fsd + -} 60
-     else {- getHoldTime fsd + -} Fsd.totalTradeDate ls `div` Fsd.numTraderadeDate ls
+     then getHoldTime fsd + 60
+     else getHoldTime fsd + Fsd.totalTradeDate ls `div` Fsd.numTraderadeDate ls
 
 getHoldTime :: Fsd.FxSettingData -> Int
 getHoldTime fsd =
