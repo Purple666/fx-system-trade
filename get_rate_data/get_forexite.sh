@@ -1,8 +1,8 @@
 #!/bin/bash -x
 #https://www.forexite.com/free_forex_quotes/2016/04/260416.zip
 
-#oc login -u andesm -p a
-#../scaledown.sh
+oc login -u andesm -p a
+../scaledown.sh
 
 function command_error() {
     exit 1
@@ -10,7 +10,7 @@ function command_error() {
 
 cd org
 
-for year in $(seq 2019 2019)
+for year in $(seq 2020 2020)
 do
     for month in $(seq 1 12)
     do
@@ -37,4 +37,4 @@ cd ..
 
 ./store_db.sh
 
-#../scaleup.sh
+../scaleup.sh
