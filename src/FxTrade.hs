@@ -125,7 +125,7 @@ evaluateOne ctd fsd f1 forceSell td fs =
       fto       = Fsd.fxTaOpen        $ Fsd.fxSetting fsd
       ftcp      = Fsd.fxTaCloseProfit $ Fsd.fxSetting fsd
       ftcl      = Fsd.fxTaCloseLoss   $ Fsd.fxSetting fsd
-      lcd = Gsd.maxTradeTime Gsd.gsd
+      lcd = Gsd.maxTradeTime Gsd.gsd + Ta.getHoldTime fsd
       (position, open)
         | (Ftd.side td == Ftd.None || (Ta.getHoldTime fsd < tradeDate && Ftd.side td == Ftd.Sell)) &&
           evaluateProfitInc fto ftado = (chartBuy, Ftd.Buy)
