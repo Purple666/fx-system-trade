@@ -33,13 +33,13 @@ gsd =
                     , treeOrRate            = 3
                     , learningTestTimes     = 30
                     , learningTestCount     = 30
-                    , fxSettingLogNum       = 30
+                    , fxSettingLogNum       = 50
                     , gaNum                 = 30
                     , maxTradeTime          = 24 * 60
                     , initalProperty        = 1000000
                     , productionMaxUnit     = 3000000
                     , practiceMaxUnit       = 250000
-                    , spread                = 0.004
+                    , spread                = 0.008
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
