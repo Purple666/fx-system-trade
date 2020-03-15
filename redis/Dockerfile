@@ -1,5 +1,4 @@
 FROM redis
 COPY redis.conf /etc/redis.conf
-USER root
+USER 999
 ENTRYPOINT ["/usr/local/bin/redis-server", "/etc/redis.conf"]
-        
