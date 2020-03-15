@@ -123,14 +123,14 @@ items:
             mountPath: /data/db
             subPath: openshift/db/redis
           - name: redis-socket
-            mountPath: /var/tmp/redis
+            mountPath: /var/tmp/
         volumes:
         - name: nfs-share
           persistentVolumeClaim:
             claimName: flg-pvc
         - name: redis-socket
           hostPath:
-            path: /var/tmp/redis
+            path: /var/tmp/
     test: false
     triggers:
     - type: ConfigChangeq
