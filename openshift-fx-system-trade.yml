@@ -124,6 +124,7 @@ items:
             subPath: openshift/db/redis
           - name: redis-socket
             mountPath: /var/tmp/
+        serviceAccountName: useroot
         volumes:
         - name: nfs-share
           persistentVolumeClaim:
