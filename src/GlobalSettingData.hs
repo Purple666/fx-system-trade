@@ -39,7 +39,7 @@ gsd =
                     , initalProperty        = 1000000
                     , productionMaxUnit     = 3000000
                     , practiceMaxUnit       = 250000
-                    , spread                = 0.008
+                    , spread                = 0.000
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
