@@ -28,7 +28,7 @@ gsd =
                     , makeTreeCount         = 3
                     , algorithmRepeat       = 3
                     , countUpList           = 3
-                    , treeAndRate           = 1
+                    , treeAndRate           = 3
                     , treeOrRate            = 1
                     , learningTestTimes     = 30
                     , learningTestCount     = 30
@@ -39,7 +39,7 @@ gsd =
                     , initalProperty        = 1000000
                     , productionMaxUnit     = 3000000
                     , practiceMaxUnit       = 250000
-                    , spread                = 0.000
+                    , spread                = 0.008
                     --, dbHost                = "openshift.flg.jp:30017"
                     , dbHost                = "mongo:27017"
                     }
