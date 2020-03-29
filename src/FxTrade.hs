@@ -29,8 +29,8 @@ import qualified Tree                    as Tr
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
   if Fsd.getLogProfit fsd < 0 && Ftd.profit td < 0
-  then - (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 4) / (fromIntegral $ Ftd.chartLength td)
-  else   (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 4) / (fromIntegral $ Ftd.chartLength td)
+  then - (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 8) / (fromIntegral $ Ftd.chartLength td)
+  else   (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 8) / (fromIntegral $ Ftd.chartLength td)
   -- Ftd.realizedPL td / (fromIntegral $ Ftd.chartLength td)
   -- (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 4) / (fromIntegral $ Ftd.chartLength td)
 
@@ -347,7 +347,7 @@ trade :: Ftd.FxTradeData ->
 trade td fsd e = do
   fc <- (L.++) <$> Fr.getChartList (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
-      (open, close, td', fs) = evaluateOne 0 (L.last ctdl) fsd getUnitBacktest False td (Fsd.fxSetting fsd)
+      (open, close, td', fs) = evaluateOne (Gsd.spread Gsd.gsd) (L.last ctdl) fsd getUnitBacktest False td (Fsd.fxSetting fsd)
   (fsd', td'') <- checkAlgoSetting 1 fsd td' fs
   return (open, close, td'', fsd')
 

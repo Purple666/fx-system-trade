@@ -1,3 +1,4 @@
+
 {-# LANGUAGE DeriveGeneric #-}
 
 module FxSettingData
@@ -137,7 +138,7 @@ getLogProfit fsd =
 getLogProfitAve :: FxSettingData -> Double
 getLogProfitAve fsd =
   if (logCount $ fxSettingTemp fsd) == 0
-  then 0
+  then 1
   else (logProfit $ fxSettingTemp fsd) / (fromIntegral . logCount $ fxSettingTemp fsd)
 
 minFxSettingDelete :: M.Map FxSetting (Double, Int) -> M.Map FxSetting (Double, Int)
