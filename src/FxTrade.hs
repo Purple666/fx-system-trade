@@ -322,7 +322,7 @@ evaluate :: Fsd.FxSettingData -> Int -> [Fcd.FxChartData] -> Ftd.FxTradeData
 evaluate fsd ltt fc =
   let td = initFxTradeDataBacktest
       ctdl = makeChart fsd ltt fc
-      (_, _, td2, _) = L.foldl (\(_, _, td1, _) ctd -> evaluateOne 0 ctd fsd getUnitLearning False td1 Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
+      (_, _, td2, _) = L.foldl (\(_, _, td1, _) ctd -> evaluateOne (Gsd.spread Gsd.gsd)  ctd fsd getUnitLearning False td1 Fsd.initFxSetting) (Ftd.None, Ftd.None, td, Fsd.initFxSetting) $ L.init ctdl
       (_, _, td3, _) = evaluateOne 0 (L.last ctdl) fsd getUnitLearning True td2 Fsd.initFxSetting
   in if null ctdl
      then td
