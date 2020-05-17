@@ -212,7 +212,7 @@ addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 addLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   let a' = foldl (flip M.delete) a . M.keys $ M.difference a b
   in LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
-                                                    then (1, y + y')
+                                                    then (x + x', y + y') -- (1, y + y')
                                                     else (x + x', y + y')) a' b
 
 calcValidLeafDataList :: Double -> [LeafData a] -> LeafDataMap a
