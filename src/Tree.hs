@@ -205,7 +205,7 @@ evaluateTree f s (Node x l r) = (snd $ getNodeData x) (evaluateTree f s l) (eval
 unionLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
 unionLeafDataMap (LeafDataMap a) (LeafDataMap b) =
   LeafDataMap $ M.unionWith (\(x, y) (x', y') -> if x + x' < 1
-                                                 then (1, y + y')
+                                                 then (x + x', y + y') -- (1, y + y')
                                                  else (x + x', y + y')) a b
 
 addLeafDataMap :: LeafDataMap a -> LeafDataMap a -> LeafDataMap a
