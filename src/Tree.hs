@@ -13,7 +13,6 @@ module Tree
   , setFunctionToTree
   , makeValidLeafDataList
   , calcValidLeafDataList
-  , unionLeafDataMap
   , addLeafDataMap
   , checkLeafDataMap
   , emptyLeafDataMap
