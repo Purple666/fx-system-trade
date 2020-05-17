@@ -110,7 +110,10 @@ makeTree :: R.MonadRandom m => Int -> Int -> LeafDataMap a -> TreeData a -> m (T
 makeTree andRate orRate (LeafDataMap xs) t =
   if null xs
     then return t
-    else do let xs' = M.map (toRational . fst) xs
+    else do let mx = fst $ minimum xs
+            xs' = if mx <= 0
+                  then M.map (toRational (p + abs mx + 1) $ fst) xs
+                  else M.map (toRational . fst) xs
             foldl (\acc _ -> do acc' <- acc
                                 l <- R.fromList $ M.toList xs'
                                 let c = exsistTreeCount (Leaf l) acc'
