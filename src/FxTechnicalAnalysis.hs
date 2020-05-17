@@ -139,7 +139,7 @@ checkAlgoSetting fts = do
                                ave = foldr (\(acc, _) a -> acc + a) 0 tlcl / fromIntegral (length tlcl)
                            x <- createRandomFxAlgorithmSetting $ Fad.initFxAlgorithmSetting pr
                            return (M.insert nk x as'',
-                                   Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (1, 0) tlcl)
+                                   Tr.LeafDataMap $ M.insert (Fad.initTechAnaLeafData nk) (0, 0) tlcl)
                    else return (as'', tlc)
   return $ fts { Fad.techListCount = tlc'
                , Fad.algoSetting   = as'''
