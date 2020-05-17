@@ -112,7 +112,7 @@ makeTree andRate orRate (LeafDataMap xs) t =
     then return t
     else do let mx = fst $ minimum xs
                 xs' = if mx <= 0
-                      then M.map (toRational (p + abs mx + 1) . fst) xs
+                      then M.map (toRational . (abs mx + 1 +) . fst) xs
                       else M.map (toRational . fst) xs
             foldl (\acc _ -> do acc' <- acc
                                 l <- R.fromList $ M.toList xs'
