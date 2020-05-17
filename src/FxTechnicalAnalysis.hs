@@ -121,7 +121,7 @@ checkAlgoSetting fts = do
   (as'', pr) <- foldl (\acc k -> do (as', p) <- acc
                                     let x = as' M.! k
                                         (a, b) = Tr.checkLeafDataMap $ Fad.algorithmListCount x
-                                        x' = x { Fad.algorithmListCount = Tr.unionLeafDataMap p b }
+                                        x' = x { Fad.algorithmListCount = Tr.addLeafDataMap p b }
                                         t = Tr.adjustTree (Fad.algorithmListCount x') (Fad.algorithmTree x')
                                     t' <- if t == Tr.Empty
                                           then do taAndR <- getRandomR(max 1 (Fad.algorithmAndRate x' - Gsd.treeAndRate Gsd.gsd),
