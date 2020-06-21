@@ -202,6 +202,7 @@ tradeSimEvaluate n p td fsd = do
   if open /= Ftd.None || close /= Ftd.None
     then Fp.printTradeResult open close td td' $ Ftd.unit td'
     else return ()
+  Fm.setFxTradeData (Ftd.coName td) td'
   let ltt = Ta.getLearningTestTime fsd
   if ltt < n - p
     then do e <- Fr.getOneChart n
