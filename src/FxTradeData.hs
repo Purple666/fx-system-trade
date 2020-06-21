@@ -18,10 +18,10 @@ data FxTradeData =
               , tradeRate        :: Fcd.FxChartData
               , unit             :: Int
               , side             :: FxSide
-              , trSuccess        :: Int
-              , trFail           :: Int
-              , profit           :: Double
-              , realizedPL       :: Double
+              , trSuccess        :: !Int
+              , trFail           :: !Int
+              , profit           :: !Double
+              , realizedPL       :: !Double
               , chartLength      :: Int
               , maxUnit          :: Int
               , coName           :: String
