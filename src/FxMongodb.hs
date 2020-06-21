@@ -6,6 +6,7 @@ module FxMongodb
   , updateFxTradeData
   , writeFxSettingData
   , readFxSettingData
+  , readFxSettingDataLog
   , checkFxSettingData
   , readBacktestResult
   , writeBacktestResult
@@ -50,6 +51,16 @@ readFxSettingData = do
     else do fs  <- head <$> mapM (\x -> return (read . typed $ valueAt "fs" x)) r
             fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
             return $ Fsd.setFxSettingData fs fsl
+
+readFxSettingDataLog :: Fsd.FxSettingData -> IO Fsd.FxSettingData
+readFxSettingDataLog fsd = do
+  pipe <- retry 100 $ connect (readHostPort $ Gsd.dbHost Gsd.gsd)
+  r <- access pipe master "fx" $ getDataFromDB  "fxsetting_log"
+  close pipe
+  if null r
+    then return Fsd.initFxSettingData
+    else do fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
+            return $ Fsd.setFxSettingDataLog fsd fs
 
 checkFxSettingData :: IO Bool
 checkFxSettingData = do

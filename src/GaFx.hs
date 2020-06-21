@@ -186,7 +186,7 @@ tradeEvaluate p td fsd e = do
   let ltt = Ta.getLearningTestTime fsd1
   if ltt < (Fcd.no e) - p 
     then do e <- Fr.getEndChart
-            fsd2 <- Fm.readFxSettingData
+            fsd2 <- Fm.readFxSettingDataLog fsd1
             fsd3 <- tradeLearning e fsd2 td''
             return (Fcd.no e, td'', fsd3)
     else return (p, td'', fsd1)
@@ -205,7 +205,7 @@ tradeSimEvaluate n p td fsd = do
   let ltt = Ta.getLearningTestTime fsd1
   if ltt < n - p
     then do e <- Fr.getOneChart n
-            fsd2 <- Fm.readFxSettingData
+            fsd2 <- Fm.readFxSettingDataLog fsd1
             fsd3 <- tradeLearning e fsd2 td'
             return (n, td', fsd3)
     else return (p, td', fsd1)

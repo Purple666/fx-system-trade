@@ -7,6 +7,7 @@ module FxSettingData
   , FxLearningSetting (..)
   , FxSettingTemp(..)
   , initFxSettingData
+  , setFxSettingDataLog
   , initFxSetting
   , initFxSettingTemp
   , getLogProfit
@@ -130,6 +131,11 @@ setFxSettingData fs fsl =
                                   , fxSetting     = fs
                                   , fxSettingLog  = fsl
                                   }
+
+setFxSettingDataLog :: FxSettingData -> FxSettingData
+setFxSettingDataLog fsd fsl =
+  setTreeFunction $ fsd { fxSettingLog  = fsl
+                        }
 
 getLogProfit :: FxSettingData -> Double
 getLogProfit fsd =
