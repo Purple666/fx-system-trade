@@ -60,7 +60,7 @@ readFxSettingDataLog fsd = do
   if null r
     then return Fsd.initFxSettingData
     else do fsl <- head <$> mapM (\x -> return (read . typed $ valueAt "fsl" x)) r
-            return $ Fsd.setFxSettingDataLog fsd fs
+            return $ Fsd.setFxSettingDataLog fsd fsl
 
 checkFxSettingData :: IO Bool
 checkFxSettingData = do
