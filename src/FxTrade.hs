@@ -344,13 +344,12 @@ learningEvaluate n fsd td = do
 trade :: Ftd.FxTradeData ->
          Fsd.FxSettingData ->
          Fcd.FxChartData ->
-         IO (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData, Fsd.FxSettingData)
+         IO (Ftd.FxSide, Ftd.FxSide, Ftd.FxTradeData)
 trade td fsd e = do
   fc <- (L.++) <$> Fr.getChartList (Fcd.no e - 1 - Ta.getPrepareTimeAll fsd) (Ta.getPrepareTimeAll fsd) <*> pure [e]
   let ctdl = makeChart fsd 1 fc
       (open, close, td', fs) = evaluateOne (Gsd.spread Gsd.gsd) (L.last ctdl) fsd getUnitBacktest False td (Fsd.fxSetting fsd)
-  -- (fsd', td'') <- checkAlgoSetting 1 fsd td' fs
-  return (open, close, td', fsd)
+  return (open, close, td')
 
 gaLearningEvaluate :: Ga.LearningData Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
 gaLearningEvaluate (Ga.LearningData ld) =
