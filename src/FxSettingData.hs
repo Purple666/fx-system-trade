@@ -132,7 +132,7 @@ setFxSettingData fs fsl =
                                   , fxSettingLog  = fsl
                                   }
 
-setFxSettingDataLog :: FxSettingData -> FxSettingData
+setFxSettingDataLog :: FxSettingData -> M.Map FxSetting (Double, Int) -> FxSettingData
 setFxSettingDataLog fsd fsl =
   setTreeFunction $ fsd { fxSettingLog  = fsl
                         }
