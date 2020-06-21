@@ -14,10 +14,10 @@ import qualified FxTechnicalAnalysisData as Fad
 import qualified GlobalSettingData       as Gsd
 
 data FxTradeData =
-  FxTradeData { chart            :: Fcd.FxChartData
-              , tradeRate        :: Fcd.FxChartData
-              , unit             :: Int
-              , side             :: FxSide
+  FxTradeData { chart            :: !Fcd.FxChartData
+              , tradeRate        :: !Fcd.FxChartData
+              , unit             :: !Int
+              , side             :: !FxSide
               , trSuccess        :: !Int
               , trFail           :: !Int
               , profit           :: !Double
