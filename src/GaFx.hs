@@ -41,7 +41,7 @@ debug = do
 backTest :: IO ()
 backTest = do
   fsd <- Fm.readFxSettingData
-  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd)
+  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd + 24 * 60 * 20)
   let td = Ft.initFxTradeDataBacktest
       startN = r + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   (s, f) <- Fm.readBacktestResult "backtest"
@@ -68,7 +68,7 @@ trade environment = do
 tradeSim :: IO ()
 tradeSim = do
   fsd <- Fm.readFxSettingData
-  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd)
+  r <- getRandomR (1, Gsd.maxTradeTime Gsd.gsd + 24 * 60 * 20)
   let td = Ft.initFxTradeDataBacktest
       startN = r + (Ta.getLearningTestTime fsd + Ta.getPrepareTimeAll fsd) * Gsd.learningTestCount Gsd.gsd * 2
   endN <- (-) <$> (Fcd.no <$> Fr.getEndChart) <*> pure 1
