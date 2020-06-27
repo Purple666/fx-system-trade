@@ -23,8 +23,8 @@ data GlobalSettingData = GlobalSettingData
 
 gsd :: GlobalSettingData
 gsd =
-  GlobalSettingData { taRandomMargin        = 5
-                    , taMiddleLongMargin    = 3
+  GlobalSettingData { taRandomMargin        = 20
+                    , taMiddleLongMargin    = 5
                     , makeTreeCount         = 5
                     , algorithmRepeat       = 3
                     , countUpList           = 2
