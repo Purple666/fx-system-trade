@@ -56,13 +56,13 @@ getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quant
                               then Ftd.maxUnit td `div` 2
                               else u
 
-{-
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
 getUnitLearning td chart = getUnitBacktest td chart
--}
 
+{-
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
 getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+-}
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
 evaluateProfitInc fts ftad =
