@@ -28,7 +28,8 @@ import qualified Tree                    as Tr
 
 getEvaluationValue :: Fsd.FxSettingData -> Ftd.FxTradeData -> Double
 getEvaluationValue fsd td =
-  (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 4) / (fromIntegral $ Ftd.chartLength td)
+  -- (Fsd.getLogProfit fsd * Ftd.realizedPL td * Ftd.profit td * Ftd.getWinRatePure td ^ 4) / (fromIntegral $ Ftd.chartLength td)
+  Ftd.realizedPL td
 
 evaluationOk :: Ftd.FxTradeData -> Fsd.FxSettingData -> Bool
 evaluationOk td fsd =
@@ -57,11 +58,11 @@ getUnitBacktest td chart = let u = truncate (25 * (Ftd.realizedPL td / Gsd.quant
                               else u
 
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = getUnitBacktest td chart
+getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
 
 {-
 getUnitLearning :: Ftd.FxTradeData -> Double -> Int
-getUnitLearning td chart = truncate $ (25 * Ftd.realizedPL td) / chart
+getUnitLearning td chart = getUnitBacktest td chart
 -}
 
 evaluateProfitInc :: Fad.FxTechnicalAnalysisSetting -> M.Map Int Fad.FxTechnicalAnalysisData -> Bool
