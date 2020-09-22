@@ -57,13 +57,13 @@ printProgressFxTradeData td e = do
 printTradeResult :: Ftd.FxSide -> Ftd.FxSide -> Ftd.FxTradeData -> Ftd.FxTradeData -> Int -> IO ()
 printTradeResult open close td td' units = do
   printf "%s : " =<< Ftm.getLogTime
-  printf "%5s %5s | "
-    (show open)
-    (show close)
   nd <- Fcd.getDate . Fcd.date $ Ftd.chart td'
   printf "%s %8d | "
     nd
     (Fcd.no (Ftd.chart td') - Fcd.no (Ftd.tradeRate td))
+  printf "%5s %5s | "
+    (show open)
+    (show close)
   printf "%7.3f (%+7.3f) %7.3f %7.3f %8d %10.0f (%+10.0f) %6d %6d %6.2f\n"
     (Ftd.profit td')
     (Ftd.profit td' - Ftd.profit td)

@@ -43,6 +43,7 @@ if __name__ == "__main__":
                 chart = {}
                 chart[json.dumps(now_price)] = last_no
                 redis.zadd("fx", chart)
+                print(price['time'], loc)
                 print("rate : %s %d %d %6.3f" % (loc.astimezone(), now_price['no'], now_price['time'], now_price['close']))
                 same = 0
         except Exception as e:
