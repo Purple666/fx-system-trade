@@ -14,9 +14,9 @@ import           Data.UnixTime
 import           GHC.Generics          (Generic)
 
 data FxChartData = FxChartData
-  { no    :: Int
-  , date  :: Int
-  , close :: Double
+  { no    :: !Int
+  , date  :: !Int
+  , close :: !Double
   }
   deriving (Show, Read, Eq, Ord, Generic)
 
