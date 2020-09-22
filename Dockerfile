@@ -8,8 +8,8 @@ USER root
 #WORKDIR /fx/stack
 #RUN stack clean && stack build
 RUN cabal new-update
-RUN cabal new-install --lib mongoDB
-RUN cabal new-install --lib unix-time MonadRandom wreq aeson lens-aeson hedis hashable  extra lens async 
+RUN cabal new-install --lib -O=2 mongoDB
+RUN cabal new-install --lib -O=2 unix-time MonadRandom wreq aeson lens-aeson hedis hashable  extra lens async 
 COPY src /fx/src
 WORKDIR /fx/src
 RUN ghc Fx
