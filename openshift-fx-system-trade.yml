@@ -280,7 +280,6 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "backtest"]
           resources: {}
           volumeMounts:
@@ -343,7 +342,6 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
           resources: {}
           env:
