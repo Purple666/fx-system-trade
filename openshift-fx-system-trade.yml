@@ -417,7 +417,6 @@ items:
         containers:
         - image: fx-system-trade
           name: fx-system-trade
-          #command: ["tail", "-f", "/etc/localtime"]
           command: ["stack", "exec", "--", "fx-exe", "trade-sim"]
           resources: {}
           volumeMounts:
@@ -696,6 +695,13 @@ items:
         - image: get-rate:latest
           name: get-rate
           resources: {}
+          volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+        volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
     test: false
     triggers:
     - type: ConfigChange

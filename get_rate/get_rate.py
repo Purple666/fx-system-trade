@@ -25,7 +25,7 @@ if __name__ == "__main__":
             price = responce_json['prices'][0]
             loc = dateutil.parser.parse(price['time'])
         
-            now_price['time'] = int(loc.replace(tzinfo=JST).timestamp() / 60)
+            now_price['time'] = int(loc.timestamp() / 60)
             now_price['close'] = float(price['bids'][0]['price'])
 
             last_no = redis.zcard("fx") - 1
@@ -43,8 +43,7 @@ if __name__ == "__main__":
                 chart = {}
                 chart[json.dumps(now_price)] = last_no
                 redis.zadd("fx", chart)
-                print(price['time'], loc)
-                print("rate : %s %d %d %6.3f" % (loc.astimezone(), now_price['no'], now_price['time'], now_price['close']))
+                print("rate : %s %d %d %6.3f" % (loc.astimezone(JST), now_price['no'], now_price['time'], now_price['close']))
                 same = 0
         except Exception as e:
             print(e)
