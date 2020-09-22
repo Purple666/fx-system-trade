@@ -13,5 +13,3 @@ RUN cabal new-install --lib -O2 unix-time MonadRandom wreq aeson lens-aeson hedi
 COPY src /fx/src
 WORKDIR /fx/src
 RUN ghc -O2 Fx
-        
-        
