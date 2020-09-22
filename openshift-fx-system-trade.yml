@@ -194,10 +194,10 @@ items:
         openshift.io/imported-from: haskell
       from:
         kind: DockerImage
-        name: haskell:latest
+        name: haskell:8.8.4
       generation: null
       importPolicy: {}
-      name: "latest"
+      name: "8.8.4"
       referencePolicy:
         type: ""
   status:
@@ -242,7 +242,7 @@ items:
       dockerStrategy:
         from:
           kind: ImageStreamTag
-          name: haskell:latest
+          name: haskell:8.8.4
       type: Docker
     triggers:
     - type: ConfigChange
