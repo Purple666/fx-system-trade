@@ -1,7 +1,7 @@
 FROM haskell
 USER root
-COPY stack /fx/stack
-WORKDIR /fx/stack
+#COPY stack /fx/stack
+#WORKDIR /fx/stack
 #RUN stack setup
 #RUN stack build wreq mongoDB unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson
 RUN cabal update
