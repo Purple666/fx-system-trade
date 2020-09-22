@@ -4,10 +4,13 @@ USER root
 #WORKDIR /fx/stack
 #RUN stack setup
 #RUN stack build wreq mongoDB unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson
-RUN cabal update
-RUN cabal install wreq mongoDB unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson
+#COPY src /fx/src
+#WORKDIR /fx/stack
+#RUN stack clean && stack build
+RUN cabal new-update
+RUN cabal new-install wreq mongoDB unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson
 COPY src /fx/src
-WORKDIR /fx/stack
-RUN stack clean && stack build
+WORKDIR /fx/src
+RUN ghc Fx
         
         
