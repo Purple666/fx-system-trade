@@ -281,7 +281,7 @@ items:
         - image: fx-system-trade
           name: fx-system-trade
           #command: ["stack", "exec", "--", "fx-exe", "backtest"]
-          command: ["Fx", "backtest"]
+          command: ["./Fx", "backtest"]
           resources: {}
           volumeMounts:
           - name: localtime
@@ -344,7 +344,7 @@ items:
         - image: fx-system-trade
           name: fx-system-trade
           #command: ["stack", "exec", "--", "fx-exe", "trade-practice"]
-          command: ["Fx", "trade-practice"]
+          command: ["./Fx", "trade-practice"]
           resources: {}
           env:
           - name: TRADE_PRACTICE_BEARER
@@ -418,7 +418,7 @@ items:
         - image: fx-system-trade
           name: fx-system-trade
           #command: ["stack", "exec", "--", "fx-exe", "trade-sim"]
-          command: ["Fx", "trade-sim"]
+          command: ["./Fx", "trade-sim"]
           resources: {}
           volumeMounts:
           - name: localtime
