@@ -8,7 +8,7 @@ USER root
 #WORKDIR /fx/stack
 #RUN stack clean && stack build
 RUN cabal v2-update
-RUN cabal v2-install wreq mongoDB unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson
+RUN cabal v2-install mongoDB
 COPY src /fx/src
 WORKDIR /fx/src
 RUN ghc Fx
