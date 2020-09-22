@@ -7,8 +7,9 @@ USER root
 #COPY src /fx/src
 #WORKDIR /fx/stack
 #RUN stack clean && stack build
-RUN cabal v2-update
-RUN cabal v2-install mongoDB
+RUN cabal new-update
+RUN cabal new-install mongoDB
+RUN cabal new-install unix-time MonadRandom extra lens aeson async hashable hedis lens-aeson wreq         
 COPY src /fx/src
 WORKDIR /fx/src
 RUN ghc Fx
