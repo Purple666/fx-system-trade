@@ -5,7 +5,7 @@ module FxTrade ( initFxTradeDataBacktest
                , trade
                , learningEvaluate
                , evaluationOk
-               , getChart
+               , getChartLearning
                , getEvaluationValue
                ) where
 
@@ -326,19 +326,23 @@ evaluate fsd ltt fc =
      then td
      else td3 { Ftd.chartLength = ltt }
 
-getChart :: Bool -> Int -> Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
-getChart le n c fsd td = do
+getChartLearning :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
+getChartLearning n fsd td = do
   let ltt  = Ta.getLearningTestTime fsd
-      lttc = Ta.getLearningTestTime fsd * c
       lttp = Ta.getPrepareTimeAll fsd + lttc
-  fc <- if le
-        then Fr.getChartList (n - lttp - ltt) lttp
-        else Fr.getChartList (n - lttp) lttp
+  fc <- else Fr.getChartList (n - lttp) lttp
+  return (lttc, fc)
+
+getChartEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
+getChartEvaluate n fsd td = do
+  let ltt  = Ta.getLearningTestTime fsd * (Gsd.learningTestCount Gsd.gsd) 
+      lttp = Ta.getPrepareTimeAll fsd + lttc
+  fc <- Fr.getChartList (n - lttp - Ta.getLearningTestTime fsd) lttp
   return (lttc, fc)
 
 learningEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 learningEvaluate n fsd td = do
-  (ltt, fc) <- getChart True n (Gsd.learningTestCount Gsd.gsd) fsd td
+  (ltt, fc) <- getChartEvaluate True n fsd td
   return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->
