@@ -335,7 +335,7 @@ getChartLearning n fsd td = do
 
 getChartEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
 getChartEvaluate n fsd td = do
-  let ltt  = Ta.getLearningTestTime fsd * (Gsd.learningTestCount Gsd.gsd) 
+  let ltt  = Ta.getLearningTestTime fsd * Gsd.learningTestCount Gsd.gsd
       lttp = Ta.getPrepareTimeAll fsd + ltt
   fc <- Fr.getChartList (n - lttp - Ta.getLearningTestTime fsd) lttp
   return (ltt, fc)
