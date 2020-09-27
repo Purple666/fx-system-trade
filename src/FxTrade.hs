@@ -329,14 +329,14 @@ evaluate fsd ltt fc =
 getChartLearning :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
 getChartLearning n fsd td = do
   let ltt  = Ta.getLearningTestTime fsd
-      lttp = Ta.getPrepareTimeAll fsd + lttc
+      lttp = Ta.getPrepareTimeAll fsd + ltt
   fc <- Fr.getChartList (n - lttp) lttp
   return (lttc, fc)
 
 getChartEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO (Int, [Fcd.FxChartData])
 getChartEvaluate n fsd td = do
   let ltt  = Ta.getLearningTestTime fsd * (Gsd.learningTestCount Gsd.gsd) 
-      lttp = Ta.getPrepareTimeAll fsd + lttc
+      lttp = Ta.getPrepareTimeAll fsd + ltt
   fc <- Fr.getChartList (n - lttp - Ta.getLearningTestTime fsd) lttp
   return (lttc, fc)
 
