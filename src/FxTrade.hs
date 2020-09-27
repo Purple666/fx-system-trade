@@ -342,7 +342,7 @@ getChartEvaluate n fsd td = do
 
 learningEvaluate :: Int -> Fsd.FxSettingData -> Ftd.FxTradeData -> IO Ftd.FxTradeData
 learningEvaluate n fsd td = do
-  (ltt, fc) <- getChartEvaluate True n fsd td
+  (ltt, fc) <- getChartEvaluate n fsd td
   return $ evaluate fsd ltt fc
 
 trade :: Ftd.FxTradeData ->
