@@ -46,7 +46,7 @@ gaLearningDataFromLog n fsd td = do
              then fsl
              else M.insert (Fsd.fxSetting fsd) (maxp, maxc) fsl
       minp = abs . L.minimum . map fst $ M.elems fsl'
-  fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart n 1 fsd { Fsd.fxSetting = fs } td
+  fsl'' <- mapM (\(fs, (p, c)) -> do (ltt, fc) <- Ft.getChart True n 1 fsd { Fsd.fxSetting = fs } td
                                      let fsd' = fsd { Fsd.fxSetting = fs
                                                     , Fsd.fxSettingTemp = (Fsd.fxSettingTemp fsd) { Fsd.chart            = fc
                                                                                                   , Fsd.learningTestTime = ltt
