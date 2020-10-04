@@ -47,7 +47,7 @@ class (Show a, Eq a, Ord a) => Ga a where
   learningData x = LearningData [(x, 0)]
   learningDataList s = LearningData . foldl1 (++) $ map (\(LearningData x) -> x) s
   learning x =
-    setHash <$> (gaLoop 0 (Gsd.gaNum Gsd.gsd) =<< createLoop (Gsd.gaNum Gsd.gsd) x)
+    setHash <$> (gaLoop 0 (Gsd.gaNum Gsd.gsd) =<< createLoop 0 (Gsd.gaNum Gsd.gsd) x)
 
 selection :: (Ga a, MonadRandom m) => LearningData a -> m (LearningData a)
 selection x = do
@@ -80,22 +80,24 @@ geneticOperators e x y = do
     then return y'
     else geneticOperators e x y'
 
-createLoop :: (Ga a) => Int -> LearningData a -> IO (LearningData a)
-createLoop e x = do
+createLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
+createLoop c e x = do
   x' <- (learningEvaluate . mappend x) <$> createInitialData (Gsd.gaNum Gsd.gsd) x
   traceShow("create", e, length x, length x') $ return ()
   if e < length x'
     then return x'
     else if null x'
-         then createLoop e x
-         else createLoop e x'
+         then if 10 < c
+              then x
+              else createLoop (c + 1) e x
+         else createLoop c e x'
 
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop c e x = do
   x' <- learningEvaluate <$> geneticOperators e x (LearningData [(maximum x, maximumScore x)])
   traceShow("ga", e, c, length x, length x', fromRational $ maximumScore x, fromRational $ maximumScore x') $ return ()
   if null x'
-    then gaLoop c e =<< createLoop e x
+    then gaLoop c e =<< createLoop 0  e x
     else if 5 < c && maximumScore x' == maximumScore x
          then return x' -- $ LearningData [(maximum x, maximumScore x)]
          else gaLoop (c + 1) e x'
