@@ -88,7 +88,7 @@ createLoop c e x = do
     then return x'
     else if null x'
          then if 10 < c
-              then x
+              then return x
               else createLoop (c + 1) e x
          else createLoop c e x'
 
