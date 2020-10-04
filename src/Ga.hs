@@ -93,10 +93,10 @@ createLoop e x = do
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop c e x = do
   x' <- learningEvaluate <$> geneticOperators e x (LearningData [(maximum x, maximumScore x)])
-  traceShow("ga", e, c, length x, length x', fromRational $ maximumScore x', fromRational $ maximumScore x) $ return ()
+  traceShow("ga", e, c, length x, length x', fromRational $ maximumScore x, fromRational $ maximumScore x') $ return ()
   if null x'
     then gaLoop c e =<< createLoop e x
-    else if 10 < c && maximumScore x' == maximumScore x
+    else if 5 < c && maximumScore x' == maximumScore x
          then return x' -- $ LearningData [(maximum x, maximumScore x)]
          else gaLoop (c + 1) e x'
 
