@@ -88,7 +88,7 @@ createLoop c e x = do
     then return x'
     else if null x'
          then createLoop (c + 1) e x
-         else createLoop (c + 1) c e x'
+         else createLoop (c + 1) e x'
 
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop c e x = do
