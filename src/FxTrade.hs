@@ -357,15 +357,17 @@ trade td fsd e = do
 
 gaLearningEvaluate :: Ga.LearningData Fsd.FxSettingData -> Ga.LearningData Fsd.FxSettingData
 gaLearningEvaluate (Ga.LearningData ld) =
-  Ga.LearningData $ L.map (\(fsd, _) -> let ltt = Fsd.learningTestTime $ Fsd.fxSettingTemp fsd
-                                            fc = Fsd.chart $ Fsd.fxSettingTemp fsd
-                                            td = evaluate fsd ltt fc
-                                            fsd' = fsd { Fsd.fxSettingTemp = (Fsd.fxSettingTemp fsd) {
-                                                           Fsd.resultFxTradeData = td
-                                                           }
-                                                       }
-                                            p = toRational $ getEvaluationValue fsd td
-                                        in (fsd', p)) ld
-
-
+  Ga.LearningData .
+  L.map (\(fsd, p, _) -> (fsd, p)) .
+  L.filter (\(_, _, ok) -> ok) $
+  L.map (\(fsd, _) -> let ltt = Fsd.learningTestTime $ Fsd.fxSettingTemp fsd
+                          fc = Fsd.chart $ Fsd.fxSettingTemp fsd
+                          td = evaluate fsd ltt fc
+                          fsd' = fsd { Fsd.fxSettingTemp = (Fsd.fxSettingTemp fsd) {
+                                         Fsd.resultFxTradeData = td
+                                         }
+                                     }
+                          p = toRational $ getEvaluationValue fsd td
+                          ok = evaluationOk td fsd' 
+                      in (fsd', p, ok)) ld
 
