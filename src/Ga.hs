@@ -83,7 +83,7 @@ geneticOperators e x y = do
 createLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 createLoop c e x = do
   x' <- (learningEvaluate . mappend x) <$> createInitialData (Gsd.gaNum Gsd.gsd) x
-  traceShow("create", e, c, length x, length x') $ return ()
+  -- traceShow("create", e, c, length x, length x') $ return ()
   if e < length x' || 100 < c
     then return x'
     else if null x'
@@ -93,7 +93,7 @@ createLoop c e x = do
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop c e x = do
   x' <- learningEvaluate <$> geneticOperators e x (LearningData [(maximum x, maximumScore x)])
-  traceShow("ga", e, c, length x, length x', fromRational $ maximumScore x, fromRational $ maximumScore x') $ return ()
+  -- traceShow("ga", e, c, length x, length x', fromRational $ maximumScore x, fromRational $ maximumScore x') $ return ()
   if null x'
     then gaLoop c e =<< createLoop 0  e x
     else if 5 < c && maximumScore x' == maximumScore x
