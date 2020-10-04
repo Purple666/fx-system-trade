@@ -83,14 +83,12 @@ geneticOperators e x y = do
 createLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 createLoop c e x = do
   x' <- (learningEvaluate . mappend x) <$> createInitialData (Gsd.gaNum Gsd.gsd) x
-  traceShow("create", e, length x, length x') $ return ()
-  if e < length x'
+  traceShow("create", e, c, length x, length x') $ return ()
+  if e < length x' || 100 < c
     then return x'
     else if null x'
-         then if 10 < c
-              then return x
-              else createLoop (c + 1) e x
-         else createLoop c e x'
+         then createLoop (c + 1) e x
+         else createLoop (c + 1) c e x'
 
 gaLoop :: (Ga a) => Int -> Int -> LearningData a -> IO (LearningData a)
 gaLoop c e x = do
